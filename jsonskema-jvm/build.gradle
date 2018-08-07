@@ -1,22 +1,57 @@
-plugins {
-    id 'kotlin-platform-jvm' version '1.2.60'
+buildscript {
+  ext.kotlin_version = '1.2.60'
+  ext.serialization_version = '0.6.0'
+  repositories {
+    jcenter()
+    maven { url "https://kotlin.bintray.com/kotlinx" }
+  }
+
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    classpath "org.jetbrains.kotlinx:kotlinx-gradle-serialization-plugin:$serialization_version"
+  }
 }
+
+apply plugin: 'kotlin-platform-jvm'
+//apply plugin: 'kotlinx-serialization'
+
 repositories {
-    mavenCentral()
+  mavenCentral()
+  jcenter()
+  maven { url "https://kotlin.bintray.com/kotlinx" }
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    expectedBy project(":jsonskema-common")
-    testCompile "junit:junit:4.12"
-    testCompile "org.jetbrains.kotlin:kotlin-test"
-    testCompile "org.jetbrains.kotlin:kotlin-test-junit"
+  // Default provider for JSR 353:Java API for Processing JSON
+  compile("org.glassfish:javax.json:1.1.2")
+
+  compile("com.github.pvdberg1998:hashkode:1.2.3")
+
+  compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version"
+
+  // Guava is a suite of core and expanded libraries that include
+  //utility classes, google's collections, io classes, and much
+  //much more.
+  compile("com.google.guava:guava:26.0-jre")
+
+  compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+  expectedBy project(":jsonskema-common")
+  expectedBy project(":jsonskema-api")
+  expectedBy project(":jsonskema-core")
+  testCompile "junit:junit:4.12"
+
+  compile("org.assertj:assertj-core:3.10.0")
+
+  testCompile("nl.jqno.equalsverifier:equalsverifier:2.5.1")
+  testCompile "org.jetbrains.kotlin:kotlin-test"
+  testCompile "org.jetbrains.kotlin:kotlin-test-junit"
+  testCompile 'com.willowtreeapps.assertk:assertk-jvm:0.11'
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+  kotlinOptions.jvmTarget = "1.8"
 }
 compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+  kotlinOptions.jvmTarget = "1.8"
 }
 sourceCompatibility = "1.8"
