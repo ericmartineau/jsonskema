@@ -37,7 +37,7 @@ interface Schema {
    */
   fun withId(id: URI): Schema
 
-  fun toJson(version: JsonSchemaVersion = JsonSchemaVersion.latest()):JsonObject
+  fun toJson(version: JsonSchemaVersion = JsonSchemaVersion.latest()): kotlinx.serialization.json.JsonObject
 
   fun asVersion(version: JsonSchemaVersion): Schema {
     return when (version) {

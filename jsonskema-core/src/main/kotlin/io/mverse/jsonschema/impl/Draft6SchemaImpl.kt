@@ -16,7 +16,7 @@ class Draft6SchemaImpl : JsonSchemaImpl<Draft6Schema>, Draft6Schema {
   // #####  KEYWORDS for Draft6    #######################
   // #####################################################
 
-  override val examples: JsonArray get() = super.examples
+  override val examples: kotlinx.serialization.json.JsonArray get() = super.examples
   override val definitions: Map<String, Schema> get() = super.definitions
   override val constValue: JsonElement? get() = super.constValue
   override val notSchema: Draft6Schema? get() = super.notSchema?.asDraft6()

@@ -26,7 +26,7 @@ interface Draft7Schema : DraftSchema<Draft7Schema> {
 
   override val description: String?
 
-  val examples: JsonArray
+  val examples: kotlinx.serialization.json.JsonArray
 
   val definitions: Map<String, Schema>
 
@@ -52,7 +52,7 @@ interface Draft7Schema : DraftSchema<Draft7Schema> {
 
   override val types: Set<JsonSchemaType>
 
-  override val enumValues: JsonArray?
+  override val enumValues: kotlinx.serialization.json.JsonArray?
 
   override val defaultValue: JsonElement?
 

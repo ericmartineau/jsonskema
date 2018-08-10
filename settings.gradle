@@ -1,20 +1,19 @@
 pluginManagement {
-//  resolutionStrategy {
-//    eachPlugin {
-//      if (requested.id.id == "kotlin-platform-common") {
-//        useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${requested.version}")
-//      }
-//
-//      if (requested.id.id == "kotlin-platform-jvm") {
-//        useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${requested.version}")
-//      }
-//
-//      if (requested.id.id == "kotlin-platform-js") {
-//        useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${requested.version}")
-//      }
-//    }
-//  }
+  repositories {
+    gradlePluginPortal()
+    jcenter()
+    google()
+    mavenLocal()
+    maven { url "https://dl.bintray.com/mverse-io/mverse-public" }
+  }
 }
 rootProject.name = 'jsonskema'
 
-include 'jsonskema-common', 'jsonskema-core', 'jsonskema-jvm', 'jsonskema-js', 'jsonskema-api'
+include 'jsonskema-common'
+include 'jsonskema-core'
+include 'jsonskema-loading'
+include 'jsonskema-validation'
+include 'jsonskema-jvm'
+include 'jsonskema-js'
+include 'jsonskema-api'
+include 'jsonskema-tests'

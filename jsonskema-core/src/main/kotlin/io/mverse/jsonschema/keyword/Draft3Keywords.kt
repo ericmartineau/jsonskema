@@ -5,10 +5,10 @@ import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft3
 import io.mverse.jsonschema.keyword.Keywords.Companion.booleanKeyword
 import io.mverse.jsonschema.keyword.Keywords.Companion.keyword
 import io.mverse.jsonschema.keyword.Keywords.Companion.singleSchemaKeyword
-import lang.json.ValueType.ARRAY
-import lang.json.ValueType.NUMBER
-import lang.json.ValueType.OBJECT
-import lang.json.ValueType.STRING
+import kotlinx.serialization.json.ElementType.ARRAY
+import kotlinx.serialization.json.ElementType.NUMBER
+import kotlinx.serialization.json.ElementType.OBJECT
+import kotlinx.serialization.json.ElementType.STRING
 
 interface Draft3Keywords {
   companion object {

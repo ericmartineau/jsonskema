@@ -8,18 +8,23 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.json
+import lang.json.toJsonArray
+import lang.json.get
 import kotlin.test.Test
 
 class JsonPathTest {
 
   @Test
-  fun testGetLastPath_WhenPathIsBlank_ThenReturnsNull() {
+  fun `(lastPath) WHEN path is blank THEN return null`() {
     assert(JsonPath.rootPath().lastPath)
         .isNull()
   }
 
   @Test
-  fun testGetLastPath_WhenPathHasOneItem_ThenReturnsOnlyItem() {
+  fun `(lastPath) WHEN path has exactly 1 item THEN return 1 item`() {
     assert(JsonPath.rootPath().child("cookie").lastPath)
         .isNotNull {
           it.isEqualTo("cookie")
@@ -72,6 +77,82 @@ class JsonPathTest {
       assert(child.toJsonPointer(), "$message: Correct JSON-Pointer encoding")
           .isEqualTo("/this~1or~1that/eric~0is~1not~1so~1bad")
     }
+  }
+
+  @Test
+  fun `(jsonPointer) WHEN valid nested pointer THEN return correct element`() {
+    val testObject = json {
+      "name" to json {
+        "first" to "Eric"
+        "last" to "Martineau"
+      }
+      "parts" to listOf(3, 4, json {
+        "a" to "A"
+        "b" to "B"
+        "A-D" to listOf("A", "B", "C", "D").toJsonArray()
+      }).toJsonArray()
+    }
+
+    val pointerToC = JsonPath.parseJsonPointer("/parts/2/A-D/2")
+    val found = testObject.get(pointerToC)
+    assertk.assert(found.contentOrNull).isEqualTo("C")
+  }
+
+  @Test
+  fun `(jsonPointer) WHEN invalid nested pointer THEN return JsonNull`() {
+    val testObject = json {
+      "name" to json {
+        "first" to "Eric"
+        "last" to "Martineau"
+      }
+      "parts" to listOf(3, 4, json {
+        "a" to "A"
+        "b" to "B"
+        "A-D" to listOf("A", "B", "C", "D").toJsonArray()
+      }).toJsonArray()
+    }
+
+    val pointerToC = JsonPath.parseJsonPointer("/parts/5/A-D/2")
+    val found = testObject.get(pointerToC)
+    assert(found).isEqualTo(JsonNull)
+  }
+
+  @Test
+  fun `(jsonPointer) WHEN invalid root pointer THEN return JsonNull`() {
+    val testObject = json {
+      "name" to json {
+        "first" to "Eric"
+        "last" to "Martineau"
+      }
+      "parts" to listOf(3, 4, json {
+        "a" to "A"
+        "b" to "B"
+        "A-D" to listOf("A", "B", "C", "D").toJsonArray()
+      }).toJsonArray()
+    }
+
+    val pointerToC = JsonPath.parseJsonPointer("/partsy")
+    val found = testObject[pointerToC]
+    assertk.assert(found).isEqualTo(JsonNull)
+  }
+
+  @Test
+  fun `(jsonPointer) WHEN missing nested pointer THEN return JsonNull`() {
+    val testObject = json {
+      "name" to json {
+        "first" to "Eric"
+        "last" to "Martineau"
+      }
+      "parts" to listOf(3, 4, json {
+        "a" to "A"
+        "b" to "B"
+        "A-D" to listOf("A", "B", "C", "D").toJsonArray()
+      }).toJsonArray()
+    }
+
+    val pointerToC = JsonPath.parseJsonPointer("/name/middle")
+    val found = testObject.get(pointerToC)
+    assertk.assert(found).isEqualTo(JsonNull)
   }
 
   private fun assertPath(message: String, jsonPath: JsonPath) {

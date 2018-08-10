@@ -16,11 +16,15 @@ expect class Escapers() {
   }
 }
 
+expect fun ByteArray.toString(charset:String = "UTF-8") :String
+
 expect class Splitter(splitOn:Char) {
   fun splitToList(input:String): List<String>
   fun split(input: String): Iterable<String>
 }
 
-expect class Joiner(separator:Char, skipNulls:Boolean = true) {
+expect class Joiner(separator:String, skipNulls:Boolean = true) {
   fun join(vararg items:Any?):String
 }
+
+expect fun String.codePointCount():Int

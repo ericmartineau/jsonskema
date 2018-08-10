@@ -16,7 +16,7 @@ interface DraftSchema<SELF : DraftSchema<SELF>> : Schema {
 
   val types: Set<JsonSchemaType>
 
-  val enumValues: JsonArray?
+  val enumValues: kotlinx.serialization.json.JsonArray?
 
   val defaultValue: JsonElement?
 

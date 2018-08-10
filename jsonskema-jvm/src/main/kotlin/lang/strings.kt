@@ -1,5 +1,6 @@
 package lang
 
+import com.google.common.base.Utf8
 import com.google.common.net.UrlEscapers
 import java.util.*
 
@@ -36,8 +37,8 @@ actual open class Escaper actual constructor(vararg escapes: Pair<Char, String>)
 
 actual fun String.format(vararg args: Any?): String = this.format(locale = Locale.US, args = *args)
 
-actual class Joiner actual constructor(separator: Char, skipNulls: Boolean) {
-  val joiner:GuavaJoiner = GuavaJoiner.on(separator).apply {
+actual class Joiner actual constructor(separator: String, skipNulls: Boolean) {
+  val joiner: GuavaJoiner = GuavaJoiner.on(separator).apply {
     if (skipNulls) {
       skipNulls()
     }
@@ -45,3 +46,9 @@ actual class Joiner actual constructor(separator: Char, skipNulls: Boolean) {
 
   actual fun join(vararg items: Any?): String = joiner.join(items)
 }
+
+actual fun String.codePointCount(): Int {
+  return this.codePointCount(0, this.length)
+}
+
+actual fun ByteArray.toString(charset:String): String = this.toString(charset(charset))

@@ -37,7 +37,7 @@ interface Draft3Schema : DraftSchema<Draft3Schema> {
 
   val isRequired: Boolean
 
-  override val enumValues: JsonArray?
+  override val enumValues: kotlinx.serialization.json.JsonArray?
 
   override val defaultValue: JsonElement?
 

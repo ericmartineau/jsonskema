@@ -23,7 +23,7 @@ data class LimitKeyword(val keyword: KeywordInfo<LimitKeyword>,
     }
   }
 
-  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion) {
+  override fun toJson(keyword: KeywordInfo<*>, builder: kotlinx.serialization.json.JsonBuilder, version: JsonSchemaVersion) {
     if (version.isBefore(Draft6)) {
       writeDraft3And4(builder)
     } else if (version.isPublic) {
@@ -40,7 +40,7 @@ data class LimitKeyword(val keyword: KeywordInfo<LimitKeyword>,
     }.toString()
   }
 
-  protected fun writeDraft6AndUp(builder: JsonBuilder) {
+  protected fun writeDraft6AndUp(builder: kotlinx.serialization.json.JsonBuilder) {
     builder.run {
       if (limit != null) {
         keyword.key to getWithPrecision(limit)
@@ -53,7 +53,7 @@ data class LimitKeyword(val keyword: KeywordInfo<LimitKeyword>,
 
   }
 
-  private fun writeDraft3And4(builder: JsonBuilder) {
+  private fun writeDraft3And4(builder: kotlinx.serialization.json.JsonBuilder) {
     if (limit != null && exclusive != null) {
       illegalState("Draft schema version does not support number values for ${keyword.key} " +
           "and ${exclusiveKeyword.key}")

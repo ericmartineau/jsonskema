@@ -6,7 +6,9 @@ import kotlinx.serialization.json.JsonElement
 import lang.URI
 import lang.hashKode
 import lang.illegalState
-import lang.json.asJsonArray
+import lang.isIntegral
+import lang.json.toJsonArray
+import lang.json.toJsonLiteral
 
 abstract class JsonSchemaKeywordImpl<T>(val keywordValue: T? = null) : JsonSchemaKeyword<T> {
 
@@ -16,17 +18,19 @@ abstract class JsonSchemaKeywordImpl<T>(val keywordValue: T? = null) : JsonSchem
     val jsonKey = keyword.key
     builder.run {
       when (keywordValue) {
-        is String-> jsonKey to keywordValue
+        is String-> jsonKey to keywordValue.toJsonLiteral()
         is JsonElement-> jsonKey to keywordValue
-        is URI-> jsonKey to keywordValue.toString()
-        is Boolean-> jsonKey to keywordValue
-        is Set<*>-> jsonKey to keywordValue.map { it.toString() }.asJsonArray()
-//        if (DoubleMath.isMathematicalInteger(number.doubleValue())) {
-//          generator.write(jsonKey, number.intValue())
-//        } else {
-//          generator.write(jsonKey, number.doubleValue())
-//        }
-        is Number-> jsonKey to keywordValue
+        is URI-> jsonKey to keywordValue.toString().toJsonLiteral()
+        is Boolean-> jsonKey to keywordValue.toJsonLiteral()
+        is Iterable<*>-> jsonKey to keywordValue.map { it.toString() }.toJsonArray()
+        is Number-> {
+          val number = keywordValue as Number
+          if (number.isIntegral()) {
+            jsonKey to number.toInt().toJsonLiteral()
+          } else {
+            jsonKey to number.toDouble().toJsonLiteral()
+          }
+        }
         else-> illegalState("Dont know how to write keyword value $keywordValue")
       }
     }

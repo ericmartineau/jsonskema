@@ -12,7 +12,7 @@ import io.mverse.jsonschema.keyword.Draft3Keywords.Companion.REQUIRED_DRAFT3
 import io.mverse.jsonschema.keyword.JsonSchemaKeyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
-import io.mverse.jsonschema.utils.Schemas
+import io.mverse.jsonschema.utils.Schemas.nullSchema
 import kotlinx.serialization.json.JsonElement
 import lang.URI
 
@@ -48,10 +48,10 @@ class Draft3SchemaImpl : JsonSchemaImpl<Draft3Schema>, Draft3Schema {
     }
 
   override val isAllowAdditionalItems: Boolean
-    get() = additionalItemsSchema != Schemas.nullSchema()
+    get() = additionalItemsSchema != nullSchema
 
   override val isAllowAdditionalProperties: Boolean
-    get() = additionalPropertiesSchema != Schemas.nullSchema()
+    get() = additionalPropertiesSchema != nullSchema
 
   constructor(from: Schema) : super(from.location, from.keywords, from.extraProperties, Draft3) {}
 

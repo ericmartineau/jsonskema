@@ -1,5 +1,6 @@
 package io.mverse.jsonschema.builder
 
+import io.mverse.jsonschema.DraftSchema
 import io.mverse.jsonschema.MutableKeywordContainer
 import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.Schema
@@ -9,6 +10,7 @@ import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.impl.Draft7SchemaImpl
 import io.mverse.jsonschema.impl.RefSchemaImpl
+import io.mverse.jsonschema.jsonschema
 import io.mverse.jsonschema.keyword.BooleanKeyword
 import io.mverse.jsonschema.keyword.DependenciesKeyword
 import io.mverse.jsonschema.keyword.IdKeyword
@@ -50,14 +52,15 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import lang.Pattern
 import lang.URI
+import lang.UUID
 import lang.hashKode
-import lang.json.toJson
+import lang.json.toJsonLiteral
 
 open class JsonSchemaBuilder(
     keywords: MutableMap<KeywordInfo<*>, JsonSchemaKeyword<*>> = mutableMapOf(),
     private val extraProperties: MutableMap<String, JsonElement> = mutableMapOf(),
-    private val location: SchemaLocation? = null,
-    private var currentDocument: JsonObject? = null,
+    private val location: SchemaLocation = SchemaPaths.fromNonSchemaSource(UUID.randomUUID()),
+    private var currentDocument: kotlinx.serialization.json.JsonObject? = null,
     private var schemaFactory: SchemaLoader? = null,
     private var loadingReport: LoadingReport = LoadingReport())
   : SchemaBuilder<JsonSchemaBuilder>, MutableKeywordContainer(keywords = keywords) {
@@ -80,31 +83,21 @@ open class JsonSchemaBuilder(
     this.setOrRemoveId(id)
   }
 
-  constructor(version: JsonSchemaVersion, id: URI) : this(location = SchemaPaths.fromIdNonAbsolute(id)) {
-    this.withSchema()
-    this.setOrRemoveId(id)
-  }
-
   constructor(location: SchemaLocation, id: URI) : this(location = location) {
     this.setOrRemoveId(id)
   }
 
   constructor(location: SchemaLocation) : this(keywords = mutableMapOf(), location = location)
 
-  fun currentDocument(): JsonObject? {
-    return currentDocument
-  }
-
   override val id: URI? get() = getKeyword(Keywords.DOLLAR_ID)?.keywordValue
   override var ref: URI?
     get() = getKeyword(Keywords.REF)?.keywordValue
-    set(ref: URI?) {
-      addOrRemoveURI(REF, ref)
-    }
+    set(ref) { addOrRemoveURI(REF, ref) }
 
   override fun withSchema(): JsonSchemaBuilder = apply { keywords[SCHEMA] = SchemaKeyword() }
   override fun withoutSchema(): JsonSchemaBuilder = apply { keywords -= SCHEMA }
   override fun ref(ref: URI): JsonSchemaBuilder = apply {this.ref = ref}
+  override fun ref(ref: String): JsonSchemaBuilder = apply {this.ref = URI(ref)}
 
   override fun title(title: String): JsonSchemaBuilder {
     return addOrRemoveString(Keywords.TITLE, title)
@@ -127,6 +120,8 @@ open class JsonSchemaBuilder(
     }
     return this
   }
+
+
 
   override fun orType(requiredType: JsonSchemaType): JsonSchemaBuilder {
     return type(requiredType)
@@ -227,6 +222,11 @@ open class JsonSchemaBuilder(
     return this
   }
 
+  fun propertySchema(propertySchemaKey: String, block: SchemaBuilder<*>.()->Unit): JsonSchemaBuilder {
+    this.putKeywordSchema(Keywords.PROPERTIES, propertySchemaKey, jsonschema(init = block))
+    return this
+  }
+
   override fun updatePropertySchema(propertyName: String,
                                     updater: (SchemaBuilder<*>) -> SchemaBuilder<*>): JsonSchemaBuilder {
     this.updateKeyword(PROPERTIES, { SchemaMapKeyword() }) { schemaMap ->
@@ -239,7 +239,7 @@ open class JsonSchemaBuilder(
     return this
   }
 
-  override fun propertyNameSchema(propertyNameSchema: JsonSchemaBuilder): JsonSchemaBuilder {
+  override fun propertyNameSchema(propertyNameSchema: SchemaBuilder<*>): JsonSchemaBuilder {
     this.addOrRemoveSchema(Keywords.PROPERTY_NAMES, propertyNameSchema)
     return this
   }
@@ -356,20 +356,20 @@ open class JsonSchemaBuilder(
     return this.addOrRemoveSchema(Keywords.NOT, notSchema)
   }
 
-  override fun enumValues(enumValues: JsonArray): JsonSchemaBuilder {
+  override fun enumValues(enumValues: kotlinx.serialization.json.JsonArray): JsonSchemaBuilder {
     return this.addOrRemoveJsonArray(Keywords.ENUM, enumValues)
   }
 
   override fun constValueString(constValue: String): JsonSchemaBuilder {
-    return this.constValue(constValue.toJson())
+    return this.constValue(constValue.toJsonLiteral())
   }
 
   override fun constValueInt(constValue: Int): JsonSchemaBuilder {
-    return this.constValue(constValue.toJson())
+    return this.constValue(constValue.toJsonLiteral())
   }
 
   override fun constValueDouble(constValue: Double): JsonSchemaBuilder {
-    return this.constValue(constValue.toJson())
+    return this.constValue(constValue.toJsonLiteral())
   }
 
   override fun constValue(constValue: JsonElement): JsonSchemaBuilder {
@@ -422,7 +422,7 @@ open class JsonSchemaBuilder(
   // @see ObjectKeywords
   // #######################################################
 
-  fun <X : JsonSchemaKeyword<*>> keyword(keyword: KeywordInfo<X>, value: X): JsonSchemaBuilder {
+  override fun <X : JsonSchemaKeyword<*>> keyword(keyword: KeywordInfo<X>, value: X): JsonSchemaBuilder {
     keywords[keyword] = value
     return this
   }
@@ -433,7 +433,7 @@ open class JsonSchemaBuilder(
   }
 
   override fun extraProperty(propertyName: String, JsonElement: JsonElement): JsonSchemaBuilder {
-    this.extraProperties.put(propertyName, JsonElement)
+    this.extraProperties[propertyName] = JsonElement
     return this
   }
 
@@ -459,14 +459,15 @@ open class JsonSchemaBuilder(
     return when {
       this.ref != null -> RefSchemaImpl(refURI = this.ref!!,
           factory = schemaFactory,
-          currentDocument = currentDocument!!,
+          currentDocument = currentDocument,
           location = finalLocation,
           report = report)
       else -> Draft7SchemaImpl(finalLocation, this.keywords, this.extraProperties)
     }
   }
 
-  override fun build(): Schema {
+  override fun build(block:JsonSchemaBuilder.()->Unit): Schema {
+    this.block()
     val location: SchemaLocation = when {
       this.id == null -> this.location ?: SchemaPaths.fromBuilder(this)
       this.location != null -> this.location.withId(this.id!!)
@@ -490,7 +491,7 @@ open class JsonSchemaBuilder(
     return this
   }
 
-  override fun withCurrentDocument(currentDocument: JsonObject): JsonSchemaBuilder {
+  override fun withCurrentDocument(currentDocument: kotlinx.serialization.json.JsonObject): JsonSchemaBuilder {
     this.currentDocument = currentDocument
     return this
   }
@@ -630,7 +631,7 @@ open class JsonSchemaBuilder(
     return this
   }
 
-  protected fun addOrRemoveJsonArray(keyword: KeywordInfo<JsonArrayKeyword>, value: JsonArray): JsonSchemaBuilder {
+  protected fun addOrRemoveJsonArray(keyword: KeywordInfo<JsonArrayKeyword>, value: kotlinx.serialization.json.JsonArray): JsonSchemaBuilder {
     if (!removeIfNecessary<Any>(keyword, value)) {
       val keywordValue = JsonArrayKeyword(value)
       keywords.put(keyword, keywordValue)

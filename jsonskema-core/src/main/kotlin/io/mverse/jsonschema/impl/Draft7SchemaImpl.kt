@@ -36,7 +36,7 @@ class Draft7SchemaImpl : JsonSchemaImpl<Draft7Schema>, Draft7Schema {
   // #####  KEYWORDS for Draft6    #######################
   // #####################################################
 
-  override val examples: JsonArray get() = super.examples
+  override val examples: kotlinx.serialization.json.JsonArray get() = super.examples
   override val definitions: Map<String, Schema> get() = super.definitions
 
   override val notSchema: Schema? get() = super.notSchema

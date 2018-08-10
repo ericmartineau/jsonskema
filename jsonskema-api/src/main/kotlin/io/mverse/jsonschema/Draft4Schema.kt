@@ -29,7 +29,7 @@ interface Draft4Schema : DraftSchema<Draft4Schema> {
 
   override val types: Set<JsonSchemaType>
 
-  override val enumValues: JsonArray?
+  override val enumValues: kotlinx.serialization.json.JsonArray?
 
   override val defaultValue: JsonElement?
 

@@ -44,6 +44,7 @@ import lang.Logger
 import lang.SetMultimap
 import lang.URI
 import lang.hashKode
+import lang.json.JsonSaver
 
 val log: Logger = Logger("JsonSchemaImpl")
 
@@ -65,7 +66,7 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>
   override val title: String? by keywords(Keywords.TITLE)
   override val description: String? by keywords(Keywords.DESCRIPTION)
   override val types: Set<JsonSchemaType> by keywords(Keywords.TYPE, emptySet())
-  override val enumValues: JsonArray? by keywords(Keywords.ENUM)
+  override val enumValues: kotlinx.serialization.json.JsonArray? by keywords(Keywords.ENUM)
   override val defaultValue: JsonElement? by keywords(Keywords.DEFAULT)
   override val format: String? by keywords(Keywords.FORMAT)
   override val minLength: Int? by numberKeyword(MIN_LENGTH)
@@ -117,7 +118,6 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>
 
   override fun toJson(version: JsonSchemaVersion): JsonObject {
     return json {
-      val builder = this
       keywords.forEach { (keyword, keywordValue) ->
         if (keyword.applicableVersions.contains(version)) {
           keywordValue.toJson(keyword, this, version)
@@ -133,15 +133,12 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>
   // ######################################################
 
   override fun asDraft6(): Draft6Schema {
-    return if (this is Draft6Schema) {
-      this as Draft6Schema
-    } else Draft6SchemaImpl(this)
+    return if (this is Draft6Schema) this
+    else Draft6SchemaImpl(this)
   }
 
   override fun asDraft3(): Draft3Schema {
-    return if (this is Draft3Schema) {
-      this as Draft3Schema
-    } else Draft3SchemaImpl(this)
+    return this as? Draft3Schema ?: Draft3SchemaImpl(this)
   }
 
   override fun asDraft7(): Draft7Schema {
@@ -149,14 +146,10 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>
   }
 
   override fun asDraft4(): Draft4Schema {
-    return if (this is Draft4Schema) {
-      this as Draft4Schema
-    } else Draft4SchemaImpl(this)
+    return this as? Draft4Schema ?:  Draft4SchemaImpl(this)
   }
 
-  override fun toString(): String {
-    return toJson(version).toString()
-  }
+  override fun toString(): String = JsonSaver().serialize(this.toJson(version))
 
   override fun <X : SchemaBuilder<X>> toBuilder(): X {
     @Suppress("unchecked_cast")
@@ -176,7 +169,7 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>
     return keywords
   }
 
-  protected open val examples: JsonArray by keywords(Keywords.EXAMPLES, JsonArray(emptyList()))
+  protected open val examples: kotlinx.serialization.json.JsonArray by keywords(Keywords.EXAMPLES, kotlinx.serialization.json.JsonArray(emptyList()))
   protected open val definitions: Map<String, Schema> by keywords(Keywords.DEFINITIONS, emptyMap())
   protected open val notSchema: Schema? by keywords(Keywords.NOT)
   protected open val constValue: JsonElement? by keywords(Keywords.CONST)
@@ -192,206 +185,12 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>
   protected open val propertyNameSchema: Schema? by keywords(PROPERTY_NAMES)
 
   protected open val isAllowAdditionalItems: Boolean by lazy {
-    keyword(ADDITIONAL_ITEMS)?.additionalItemSchema != nullSchema()
+    keyword(ADDITIONAL_ITEMS)?.additionalItemSchema != nullSchema
   }
 
   protected open val isAllowAdditionalProperties: Boolean by lazy {
-    keyword(ADDITIONAL_PROPERTIES)?.schema != nullSchema()
+    keyword(ADDITIONAL_PROPERTIES)?.schema != nullSchema
   }
-  //  @SuppressWarnings("unchecked")
-  //  @Nullable
-  //  protected fun uri(keywordType: KeywordInfo<out URIKeyword>): URI {
-  //    return keywordValue<Object>(keywordType).orElse(null)
-  //  }
-
-  //  @SuppressWarnings("unchecked")
-  //  @Nullable
-  //  protected fun string(stringKeyword: KeywordInfo<StringKeyword>): String {
-  //    checkNotNull(stringKeyword, "stringKeyword must not be null")
-  //    return keywordValue<Object>(stringKeyword).orElse(null)
-  //  }
-  //
-
-  //
-  //  protected fun schemaList(keyword: KeywordInfo<out SchemaListKeyword>): List<Schema> {
-  //    checkNotNull(keyword, "keyword must not be null")
-  //    return keyword(keyword).map(???({ SchemaListKeyword.getSubschemas() })).orElse(Collections.emptyList())
-  //  }
-  //
-  //  protected fun schemaMap(keyword: KeywordInfo<SchemaMapKeyword>): Map<String, Schema> {
-  //    checkNotNull(keyword, "keyword must not be null")
-  //    return keyword(keyword).map(???({ SchemaMapKeyword.getSchemas() })).orElse(Collections.emptyMap())
-  //  }
-  //
-  //  @SuppressWarnings("unchecked")
-  //  protected fun <X> keywordValue(keyword: KeywordInfo<out JsonSchemaKeywordImpl<X>>): Optional<X> {
-  //    checkNotNull(keyword, "keyword must not be null")
-  //    val keywordValue = keywords[keyword] as JsonSchemaKeywordImpl<X>
-  //    return if (keywordValue == null) Optional.empty() else Optional.ofNullable(keywordValue!!.getKeywordValue())
-  //  }
-
-  //  protected fun examples(): JsonArray {
-  //    return keyword<JsonSchemaKeyword>(Keywords.EXAMPLES)
-  //        .map(???({ JsonArrayKeyword.getKeywordValue() }))
-  //    .orElse(JsonUtils.emptyJsonArray())
-  //  }
-  //
-  //  protected fun definitions(): Map<String, Schema> {
-  //    return schemaMap(Keywords.DEFINITIONS)
-  //  }
-  //
-  //  protected fun types(): Set<JsonSchemaType> {
-  //    return keyword<JsonSchemaKeyword>(Keywords.TYPE)
-  //        .map(???({ TypeKeyword.getTypes() }))
-  //    .orElse(Collections.emptySet())
-  //  }
-  //
-  //  protected fun enumValues(): Optional<JsonArray> {
-  //    return keywordValue<Object>(Keywords.ENUM)
-  //  }
-  //
-  //  protected fun defaultValue(): Optional<JsonValue> {
-  //    return keywordValue<Object>(Keywords.DEFAULT)
-  //  }
-  //
-  //  protected fun notSchema(): Optional<Schema> {
-  //    return keywordValue<Object>(Keywords.NOT)
-  //  }
-  //
-  //  protected fun constValue(): Optional<JsonValue> {
-  //    return keywordValue<Object>(Keywords.CONST)
-  //  }
-  //
-  //  protected fun allOfSchemas(): List<Schema> {
-  //    return schemaList(Keywords.ALL_OF)
-  //  }
-  //
-  //  protected fun anyOfSchemas(): List<Schema> {
-  //    return schemaList(Keywords.ANY_OF)
-  //  }
-  //
-  //  protected fun oneOfSchemas(): List<Schema> {
-  //    return schemaList(Keywords.ONE_OF)
-  //  }
-  //
-  //  protected fun format(): String {
-  //    return string(Keywords.FORMAT)
-  //  }
-  //
-  //  protected fun minLength(): Integer {
-  //    return keywordValue<Object>(Keywords.MIN_LENGTH)
-  //        .map(???({ Number.intValue() }))
-  //    .orElse(null)
-  //  }
-  //
-  //  protected fun maxLength(): Integer {
-  //    return keywordValue<Object>(Keywords.MAX_LENGTH)
-  //        .map(???({ Number.intValue() }))
-  //    .orElse(null)
-  //  }
-  //
-  //  protected fun pattern(): String {
-  //    return string(Keywords.PATTERN)
-  //  }
-  //
-  //  protected fun multipleOf(): Number {
-  //    return keywordValue<Object>(Keywords.MULTIPLE_OF).orElse(null)
-  //  }
-  //
-  //  protected fun maximum(): Number {
-  //    return keyword<JsonSchemaKeyword>(Keywords.MAXIMUM).map(???({ LimitKeyword.getLimit() })).orElse(null)
-  //  }
-  //
-  //  protected fun minimum(): Number {
-  //    return keyword<JsonSchemaKeyword>(Keywords.MINIMUM).map(???({ LimitKeyword.getLimit() })).orElse(null)
-  //  }
-  //
-  //  protected fun exclusiveMinimum(): Number {
-  //    return keyword<JsonSchemaKeyword>(Keywords.MINIMUM).map(???({ LimitKeyword.getExclusiveLimit() })).orElse(null)
-  //  }
-  //
-  //  protected fun exclusiveMaximum(): Number {
-  //    return keyword<JsonSchemaKeyword>(Keywords.MAXIMUM).map(???({ LimitKeyword.getExclusiveLimit() })).orElse(null)
-  //  }
-  //
-  //  protected fun minItems(): Integer {
-  //    return getInteger(Keywords.MIN_ITEMS)
-  //  }
-  //
-  //  protected fun getInteger(keyword: KeywordInfo<NumberKeyword>): Integer {
-  //    checkNotNull(keyword, "keyword must not be null")
-  //    return keywordValue<Object>(keyword).map(???({ Number.intValue() })).orElse(null)
-  //  }
-  //
-  //  protected fun maxItems(): Integer {
-  //    return getInteger(Keywords.MAX_ITEMS)
-  //  }
-  //
-  //  protected fun allItemSchema(): Optional<Schema> {
-  //    return keyword<JsonSchemaKeyword>(Keywords.ITEMS)
-  //        .flatMap(???({ ItemsKeyword.getAllItemSchema() }))
-  //  }
-  //
-  //  protected fun itemSchemas(): List<Schema> {
-  //    return keyword<JsonSchemaKeyword>(Keywords.ITEMS)
-  //        .map(???({ ItemsKeyword.getIndexedSchemas() }))
-  //    .orElse(Collections.emptyList())
-  //  }
-  //
-  //  protected fun additionalItemsSchema(): Optional<Schema> {
-  //    return keyword<JsonSchemaKeyword>(Keywords.ITEMS).flatMap(???({ ItemsKeyword.getAdditionalItemSchema() }))
-  //  }
-  //
-  //  protected fun containsSchema(): Optional<Schema> {
-  //    return keywordValue<Object>(Keywords.CONTAINS)
-  //  }
-  //
-  //  protected fun uniqueItems(): Boolean {
-  //    return keywordValue<Object>(Keywords.UNIQUE_ITEMS).orElse(false)
-  //  }
-  //
-  //  protected fun properties(): Map<String, Schema> {
-  //    return schemaMap(Keywords.PROPERTIES)
-  //  }
-  //
-  //  protected fun patternProperties(): Map<String, Schema> {
-  //    return schemaMap(Keywords.PATTERN_PROPERTIES)
-  //  }
-  //
-  //  protected fun additionalPropertiesSchema(): Optional<Schema> {
-  //    return keywordValue<Object>(Keywords.ADDITIONAL_PROPERTIES)
-  //  }
-  //
-  //  protected fun propertyNameSchema(): Optional<Schema> {
-  //    return keywordValue<Object>(Keywords.PROPERTY_NAMES)
-  //  }
-  //
-  //  protected fun propertyDependencies(): SetMultimap<String, String> {
-  //    return keyword<JsonSchemaKeyword>(Keywords.DEPENDENCIES)
-  //        .map(???({ DependenciesKeyword.getPropertyDependencies() }))
-  //    .orElse(ImmutableSetMultimap.of())
-  //  }
-  //
-  //  protected fun propertySchemaDependencies(): Map<String, Schema> {
-  //    return keyword<JsonSchemaKeyword>(Keywords.DEPENDENCIES)
-  //        .map(???({ DependenciesKeyword.getDependencySchemas() }))
-  //    .map(???({ SchemaMapKeyword.getSchemas() }))
-  //    .orElse(ImmutableMap.of())
-  //  }
-  //
-  //  protected fun maxProperties(): Integer {
-  //    return getInteger(Keywords.MAX_PROPERTIES)
-  //  }
-  //
-  //  protected fun minProperties(): Integer {
-  //    return getInteger(Keywords.MIN_PROPERTIES)
-  //  }
-  //
-  //  protected fun requiredProperties(): Set<String> {
-  //    return keyword<JsonSchemaKeyword>(Keywords.REQUIRED)
-  //        .map(???({ StringSetKeyword.getKeywordValue() }))
-  //    .orElse(Collections.emptySet())
-  //  }
 
   override fun equals(other: Any?): Boolean {
     return when {

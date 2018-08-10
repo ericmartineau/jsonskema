@@ -47,7 +47,7 @@ abstract class RefSchema : Schema {
   constructor(factory: SchemaLoader?,
               location: SchemaLocation,
               refURI: URI,
-              currentDocument: JsonObject,
+              currentDocument: JsonObject?,
               report: LoadingReport) {
     this.location = location
     this.refURI = refURI
@@ -86,7 +86,7 @@ abstract class RefSchema : Schema {
     return toJson(version ?: JsonSchemaVersion.latest()).toString()
   }
 
-  abstract override fun toJson(version: JsonSchemaVersion): JsonObject
+  abstract override fun toJson(version: JsonSchemaVersion): kotlinx.serialization.json.JsonObject
   abstract override fun asDraft6(): Draft6Schema
   abstract override fun asDraft3(): Draft3Schema
   abstract override fun asDraft4(): Draft4Schema

@@ -1,0 +1,37 @@
+buildscript {
+  repositories {
+    jcenter()
+    maven { url "https://kotlin.bintray.com/kotlinx" }
+  }
+
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    classpath "org.jetbrains.kotlinx:kotlinx-gradle-serialization-plugin:$serialization_version"
+  }
+}
+
+apply plugin: 'kotlin-platform-common'
+apply plugin: 'kotlinx-serialization'
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+  jcenter()
+  maven { url "https://kotlin.bintray.com/kotlinx" }
+}
+
+dependencies {
+  compile "org.jetbrains.kotlin:kotlin-stdlib-common"
+  compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:$serialization_runtime_version"
+
+  compile project(":jsonskema-api")
+  compile project(":jsonskema-core")
+  compile("org.jetbrains.kotlin:kotlin-reflect")
+  compile "org.jetbrains.kotlinx:kotlinx-io:$kotlinx_io_version"
+
+  compile("com.github.pvdberg1998:hashkode:1.2.+") {
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib'
+  }
+  testCompile "org.jetbrains.kotlin:kotlin-test-annotations-common"
+  testCompile "org.jetbrains.kotlin:kotlin-test-common"
+}

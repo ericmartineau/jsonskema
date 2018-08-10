@@ -1,5 +1,7 @@
 package lang
 
+import kotlinx.io.InputStream
+
 actual data class URI(private val juri: JURI) {
   actual constructor(uri: String) : this(JURI.create(uri))
   actual constructor(scheme: String?, schemeSpecificPart: String?, fragment: String?) :
@@ -7,8 +9,15 @@ actual data class URI(private val juri: JURI) {
 
   actual val isAbsolute: Boolean = juri.isAbsolute
   actual val isOpaque: Boolean = juri.isOpaque
-  actual fun resolve(against: URI): URI = juri.resolve(against.juri).toCommonURI()
-  actual fun resolve(against: String): URI = juri.resolve(against).toCommonURI()
+  actual fun resolve(against: URI): URI {
+    return if (this.isOpaque && against.isFragmentOnly) {
+      this.withNewFragment(against)
+    } else {
+      juri.resolve(against.juri).toCommonURI()
+    }
+  }
+
+  actual fun resolve(against: String): URI = this.resolve(URI(against))
 
   actual fun withNewFragment(newFragment: URI): URI {
     check(newFragment.isFragmentOnly) { "Must only be a fragment" }
@@ -22,4 +31,6 @@ actual data class URI(private val juri: JURI) {
   actual val path: String? = juri.path
 
   override fun toString(): String = juri.toString()
+  actual fun relativize(uri: URI): URI = juri.relativize(uri.juri).toCommonURI()
+  actual fun toStream(): InputStream = juri.toURL().openStream()
 }

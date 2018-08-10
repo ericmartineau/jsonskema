@@ -1,5 +1,7 @@
 package io.mverse.jsonschema.validation
 
+import assertk.assert
+import assertk.assertions.isEqualTo
 import io.mverse.jsonschema.SchemaLocation.Companion.documentRoot
 import lang.URI
 import kotlin.test.Test
@@ -14,9 +16,9 @@ class SchemaLocationTest {
     val intermediateLocation = schemaLocation.child(URI("entities"), "definitions", "core", "platformEntity")
     val childLocation = intermediateLocation.child(URI("#platformIdentifier"), "properties", "id")
 
-    assertEquals("JSON Pointer Correct", "/definitions/core/platformEntity/properties/id", childLocation.jsonPath.toJsonPointer())
-    assertEquals("Child Canonical URL", "http://mywebsite.com/schemas/core/entities#platformIdentifier", childLocation.uniqueURI.toString())
-    assertEquals("Child Resolution Scope", "http://mywebsite.com/schemas/core/entities#platformIdentifier", childLocation.resolutionScope.toString())
-    assertEquals("Child Relative URL", "#/definitions/core/platformEntity/properties/id", childLocation.jsonPointerFragment.toString())
+    assert("/definitions/core/platformEntity/properties/id", "JSON Pointer Correct").isEqualTo(childLocation.jsonPath.toJsonPointer())
+    assert("http://mywebsite.com/schemas/core/entities#platformIdentifier", "Child Canonical URL").isEqualTo(childLocation.uniqueURI.toString())
+    assert("http://mywebsite.com/schemas/core/entities#platformIdentifier", "Child Resolution Scope").isEqualTo(childLocation.resolutionScope.toString())
+    assert("#/definitions/core/platformEntity/properties/id", "Child Relative URL").isEqualTo(childLocation.jsonPointerFragment.toString())
   }
 }

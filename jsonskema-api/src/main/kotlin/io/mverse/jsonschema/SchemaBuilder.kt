@@ -30,6 +30,8 @@ interface SchemaBuilder<SELF : SchemaBuilder<SELF>> {
 
   fun ref(ref: URI): SELF
 
+  fun ref(ref: String): SELF
+
   fun title(title: String): SELF
 
   fun defaultValue(defaultValue: JsonElement): SELF
@@ -80,7 +82,7 @@ interface SchemaBuilder<SELF : SchemaBuilder<SELF>> {
 
   fun updatePropertySchema(propertyName: String, updater: (SchemaBuilder<*>)->SchemaBuilder<*>): SELF
 
-  fun propertyNameSchema(propertyNameSchema: SELF): SELF
+  fun propertyNameSchema(propertyNameSchema: SchemaBuilder<*>): SELF
 
   fun patternProperty(pattern: String, schema: SchemaBuilder<*>): SELF
 
@@ -136,7 +138,7 @@ interface SchemaBuilder<SELF : SchemaBuilder<SELF>> {
 
   fun notSchema(notSchema: SchemaBuilder<*>): SELF
 
-  fun enumValues(enumValues: JsonArray): SELF
+  fun enumValues(enumValues: kotlinx.serialization.json.JsonArray): SELF
 
   fun constValueString(constValue: String): SELF
 
@@ -181,11 +183,13 @@ interface SchemaBuilder<SELF : SchemaBuilder<SELF>> {
 
   fun build(itemsLocation: SchemaLocation? = null, report: LoadingReport): Schema
 
-  fun build(): Schema
-
   fun withLoadingReport(report: LoadingReport): SELF
 
   fun withSchemaLoader(factory: SchemaLoader): SELF
 
-  fun withCurrentDocument(currentDocument: JsonObject): SELF
+  fun withCurrentDocument(currentDocument: kotlinx.serialization.json.JsonObject): SELF
+
+  fun <K:JsonSchemaKeyword<*>> keyword(keyword: KeywordInfo<K>, keywordValue: K):SELF
+
+  fun build(block: SELF.() -> Unit = {}): Schema
 }

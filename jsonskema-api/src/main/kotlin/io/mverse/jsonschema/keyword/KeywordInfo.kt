@@ -3,7 +3,7 @@ package io.mverse.jsonschema.keyword
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import lang.hashKode
-import lang.json.ValueType
+import kotlinx.serialization.json.ElementType
 import lang.range
 
 /**
@@ -39,15 +39,15 @@ class KeywordInfo<K : JsonSchemaKeyword<*>> {
   /**
    * Which json types (correlates to [.forSchemas]
    */
-  val applicableTypes: Set<ValueType>
+  val applicableTypes: Set<ElementType>
 
   /**
    * The type of json value expected for this keyword.  Each instance of the keyword can only consuem
    * a single type of value, but they can be linked together using variants.
    */
-  val expects: ValueType
+  val expects: ElementType
 
-  val variants: Map<ValueType, KeywordInfo<K>>
+  val variants: Map<ElementType, KeywordInfo<K>>
 
   internal constructor(mainInfo: KeywordVersionInfoBuilder<K>, allVersions: List<KeywordVersionInfoBuilder<K>>) {
 
@@ -69,7 +69,7 @@ class KeywordInfo<K : JsonSchemaKeyword<*>> {
 
   internal constructor(key: String,
                        forSchemas: Collection<JsonSchemaType>,
-                       expects: ValueType,
+                       expects: ElementType,
                        since: JsonSchemaVersion?,
                        until: JsonSchemaVersion?) {
     var since = since
@@ -90,7 +90,7 @@ class KeywordInfo<K : JsonSchemaKeyword<*>> {
     this.variants = emptyMap()
   }
 
-  fun getTypeVariant(valueType: ValueType): KeywordInfo<K>? {
+  fun getTypeVariant(valueType: ElementType): KeywordInfo<K>? {
     return variants[valueType]
   }
 
@@ -99,7 +99,7 @@ class KeywordInfo<K : JsonSchemaKeyword<*>> {
    * @param types List of types we're looking for
    * @return A list
    */
-  fun getTypeVariants(vararg types: ValueType): List<KeywordInfo<K>> {
+  fun getTypeVariants(vararg types: ElementType): List<KeywordInfo<K>> {
     val versionsForType = types
         .map { variants[it] }
         .filterNotNull()
@@ -180,7 +180,7 @@ class KeywordInfo<K : JsonSchemaKeyword<*>> {
       return this
     }
 
-    fun expects(firstType: ValueType): KeywordInfoBuilder<K> {
+    fun expects(firstType: ElementType): KeywordInfoBuilder<K> {
       current.expects(firstType)
       return this
     }
@@ -206,7 +206,7 @@ class KeywordInfo<K : JsonSchemaKeyword<*>> {
     private var since: JsonSchemaVersion? = null
     private var until: JsonSchemaVersion? = null
     private var key: String? = null
-    private var expects: ValueType? = null
+    private var expects: ElementType? = null
     internal val forSchemas: MutableSet<JsonSchemaType> = mutableSetOf()
 
     fun build(): KeywordInfo<K> {
@@ -241,7 +241,7 @@ class KeywordInfo<K : JsonSchemaKeyword<*>> {
       return this
     }
 
-    fun expects(firstType: ValueType): KeywordVersionInfoBuilder<K> {
+    fun expects(firstType: ElementType): KeywordVersionInfoBuilder<K> {
       this.expects = firstType
       return this
     }

@@ -8,7 +8,7 @@ import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft5
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft6
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
 import io.mverse.jsonschema.keyword.KeywordInfo.KeywordInfoBuilder
-import lang.json.ValueType
+import kotlinx.serialization.json.ElementType
 
 interface Keywords {
   companion object {
@@ -16,7 +16,7 @@ interface Keywords {
     val DOLLAR_ID_KEY = "\$id"
     val ID_KEY = "id"
 
-    val SCHEMA = keyword<SchemaKeyword>().key("\$schema").expects(ValueType.STRING).build()
+    val SCHEMA = keyword<SchemaKeyword>().key("\$schema").expects(ElementType.STRING).build()
 
     /**
      * From draft-06
@@ -42,7 +42,7 @@ interface Keywords {
      * validation might get stuck in an infinite recursive loop trying to validate the instance. Schemas
      * SHOULD NOT make use of infinite recursive nesting like this; the behavior is undefined.
      */
-    val REF = uriKeyword("\$ref").expects(ValueType.STRING).build()
+    val REF = uriKeyword("\$ref").expects(ElementType.STRING).build()
 
     /**
      * From draft-06
@@ -71,7 +71,7 @@ interface Keywords {
      * is not defined.
      */
     val DOLLAR_ID = keyword<IdKeyword>().key("\$id")
-        .expects(ValueType.STRING)
+        .expects(ElementType.STRING)
         .since(Draft3)
         .build()
 
@@ -93,7 +93,7 @@ interface Keywords {
      * the size of deployed schemas is a concern. Implementations MUST NOT take any other action based
      * on the presence, absence, or contents of "$comment" properties.
      */
-    val COMMENT = stringKeyword("\$comment").expects(ValueType.STRING)
+    val COMMENT = stringKeyword("\$comment").expects(ElementType.STRING)
         .since(Draft7)
         .build()
 
@@ -111,7 +111,7 @@ interface Keywords {
      * The current URI of the schema is also used to construct relative
      * references such as for $ref.
      */
-    val ID = keyword<IdKeyword>().key("id").expects(ValueType.STRING).since(Draft3)
+    val ID = keyword<IdKeyword>().key("id").expects(ElementType.STRING).since(Draft3)
         .until(Draft4).build()
 
     /**
@@ -125,7 +125,7 @@ interface Keywords {
      * produced by this user interface. A title will preferably be short, whereas a description will
      * provide explanation about the purpose of the instance described by this schema.
      */
-    val TITLE = stringKeyword("title").expects(ValueType.STRING).build()
+    val TITLE = stringKeyword("title").expects(ElementType.STRING).build()
 
     /**
      * The value of these keywords MUST be a boolean. When multiple occurrences of these keywords are
@@ -232,7 +232,7 @@ interface Keywords {
      * constraint is a subschema in "definitions":
      */
     val DEFINITIONS = schemaMapKeyword("definitions")
-        .expects(ValueType.OBJECT).since(Draft6).build()
+        .expects(ElementType.OBJECT).since(Draft6).build()
     /**
      * From draft-06
      *
@@ -244,7 +244,7 @@ interface Keywords {
      * produced by this user interface. A title will preferably be short, whereas a description will
      * provide explanation about the purpose of the instance described by this schema.
      */
-    val DESCRIPTION = stringKeyword("description").expects(ValueType.STRING).build()
+    val DESCRIPTION = stringKeyword("description").expects(ElementType.STRING).build()
     /**
      * From draft-06
      *
@@ -256,12 +256,12 @@ interface Keywords {
      * particular schema. It is RECOMMENDED that a default value be valid against
      * the associated schema.
      */
-    val DEFAULT = jsonValueKeyword("default").expects(ValueType.ARRAY)
-        .additionalDefinition().expects(ValueType.OBJECT)
-        .additionalDefinition().expects(ValueType.NUMBER)
-        .additionalDefinition().expects(ValueType.BOOLEAN)
-        .additionalDefinition().expects(ValueType.STRING)
-        .additionalDefinition().expects(ValueType.NULL)
+    val DEFAULT = jsonValueKeyword("default").expects(ElementType.ARRAY)
+        .additionalDefinition().expects(ElementType.OBJECT)
+        .additionalDefinition().expects(ElementType.NUMBER)
+        .additionalDefinition().expects(ElementType.BOOLEAN)
+        .additionalDefinition().expects(ElementType.STRING)
+        .additionalDefinition().expects(ElementType.NULL)
         .build()
     /**
      * The value of "properties" MUST be an object.
@@ -280,7 +280,7 @@ interface Keywords {
      *
      * Omitting this keyword has the same behavior as an empty object.
      */
-    val PROPERTIES = schemaMapKeyword("properties").expects(ValueType.OBJECT).validates(JsonSchemaType.OBJECT).build()
+    val PROPERTIES = schemaMapKeyword("properties").expects(ElementType.OBJECT).validates(JsonSchemaType.OBJECT).build()
     /**
      * The value of this keyword MUST be a non-negative integer.
      *
@@ -289,7 +289,7 @@ interface Keywords {
      * number of properties is less than, or equal to, the value of this
      * keyword.
      */
-    val MAX_PROPERTIES = numberKeyword("maxProperties").expects(ValueType.NUMBER).validates(JsonSchemaType.OBJECT).since(Draft4).build()
+    val MAX_PROPERTIES = numberKeyword("maxProperties").expects(ElementType.NUMBER).validates(JsonSchemaType.OBJECT).since(Draft4).build()
     /**
      * The value of this keyword MUST be an array.
      * Elements of this array, if any, MUST be strings, and MUST be unique.
@@ -301,7 +301,7 @@ interface Keywords {
      *
      * Omitting this keyword has the same behavior as an empty array.
      */
-    val REQUIRED = stringSetKeyword("required").expects(ValueType.ARRAY).validates(JsonSchemaType.OBJECT).since(Draft4).build()
+    val REQUIRED = stringSetKeyword("required").expects(ElementType.ARRAY).validates(JsonSchemaType.OBJECT).since(Draft4).build()
     /**
      * The value of "additionalProperties" MUST be a valid JSON Schema.
      *
@@ -322,8 +322,8 @@ interface Keywords {
      * Omitting this keyword has the same behavior as an empty schema.
      */
     val ADDITIONAL_PROPERTIES = singleSchemaKeyword("additionalProperties")
-        .expects(ValueType.OBJECT).validates(JsonSchemaType.OBJECT).since(Draft3)
-        .additionalDefinition().expects(ValueType.BOOLEAN).from(Draft3).until(Draft5)
+        .expects(ElementType.OBJECT).validates(JsonSchemaType.OBJECT).since(Draft3)
+        .additionalDefinition().expects(ElementType.BOOLEAN).from(Draft3).until(Draft5)
         .build()
 
     /**
@@ -338,7 +338,7 @@ interface Keywords {
      * Omitting this keyword has the same behavior as a value of 0.
      */
     val MIN_PROPERTIES = numberKeyword("minProperties")
-        .expects(ValueType.NUMBER)
+        .expects(ElementType.NUMBER)
         .validates(JsonSchemaType.OBJECT)
         .since(Draft4).build()
     /**
@@ -364,7 +364,7 @@ interface Keywords {
      */
     val DEPENDENCIES: KeywordInfo<DependenciesKeyword> = keyword<DependenciesKeyword>()
         .key("dependencies")
-        .expects(ValueType.OBJECT)
+        .expects(ElementType.OBJECT)
         .validates(JsonSchemaType.OBJECT).build()
 
     /**
@@ -389,7 +389,7 @@ interface Keywords {
      * Omitting this keyword has the same behavior as an empty object.
      */
     val PATTERN_PROPERTIES = schemaMapKeyword("patternProperties")
-        .expects(ValueType.OBJECT).validates(JsonSchemaType.OBJECT).build()
+        .expects(ElementType.OBJECT).validates(JsonSchemaType.OBJECT).build()
 
     /**
      * The value of "propertyNames" MUST be a valid JSON Schema.
@@ -403,7 +403,7 @@ interface Keywords {
      * Omitting this keyword has the same behavior as an empty schema.
      */
     val PROPERTY_NAMES = singleSchemaKeyword("propertyNames")
-        .expects(ValueType.OBJECT).validates(JsonSchemaType.OBJECT).since(Draft6).build()
+        .expects(ElementType.OBJECT).validates(JsonSchemaType.OBJECT).since(Draft6).build()
 
     /**
      * The value of this keyword MUST be either a string or an array. If it is
@@ -421,8 +421,8 @@ interface Keywords {
     //todo:ericm Handle "any" and "disallow"
     val TYPE = keyword<TypeKeyword>()
         .key("type")
-        .expects(ValueType.STRING)
-        .additionalDefinition().expects(ValueType.ARRAY)
+        .expects(ElementType.STRING)
+        .additionalDefinition().expects(ElementType.ARRAY)
         .build()
 
     /**
@@ -433,7 +433,7 @@ interface Keywords {
      * an integer.
      */
     val MULTIPLE_OF = numberKeyword("multipleOf")
-        .expects(ValueType.NUMBER)
+        .expects(ElementType.NUMBER)
         .validates(JsonSchemaType.NUMBER, INTEGER)
         .since(Draft4).build()
 
@@ -445,7 +445,7 @@ interface Keywords {
      * If the instance is a number, then this keyword validates only if the instance is
      * less than or exactly equal to "maximum".
      */
-    val MAXIMUM = keyword<LimitKeyword>().key("maximum").expects(ValueType.NUMBER).validates(JsonSchemaType.NUMBER, JsonSchemaType.INTEGER).build()
+    val MAXIMUM = keyword<LimitKeyword>().key("maximum").expects(ElementType.NUMBER).validates(JsonSchemaType.NUMBER, JsonSchemaType.INTEGER).build()
 
     /**
      * The value of "exclusiveMaximum" MUST be number, representing an exclusive upper
@@ -456,8 +456,8 @@ interface Keywords {
      * strictly less than (not equal to) "exclusiveMaximum".
      */
     val EXCLUSIVE_MAXIMUM = keyword<LimitKeyword>().key("exclusiveMaximum")
-        .expects(ValueType.NUMBER).validates(JsonSchemaType.NUMBER, INTEGER).since(Draft6)
-        .additionalDefinition().expects(ValueType.BOOLEAN).from(Draft3).until(Draft5)
+        .expects(ElementType.NUMBER).validates(JsonSchemaType.NUMBER, INTEGER).since(Draft6)
+        .additionalDefinition().expects(ElementType.BOOLEAN).from(Draft3).until(Draft5)
         .build()
 
     /**
@@ -468,7 +468,7 @@ interface Keywords {
      * If the instance is a number, then this keyword validates only if the instance is
      * greater than or exactly equal to "minimum".
      */
-    val MINIMUM = keyword<LimitKeyword>().key("minimum").validates(JsonSchemaType.NUMBER, INTEGER).expects(ValueType.NUMBER).build()
+    val MINIMUM = keyword<LimitKeyword>().key("minimum").validates(JsonSchemaType.NUMBER, INTEGER).expects(ElementType.NUMBER).build()
 
     /**
      * The value of "exclusiveMinimum" MUST be number, representing an exclusive lower
@@ -478,8 +478,8 @@ interface Keywords {
      * If the instance is a number, then the instance is valid only if it has a value
      * strictly greater than (not equal to) "exclusiveMinimum".
      */
-    val EXCLUSIVE_MINIMUM = keyword<LimitKeyword>().key("exclusiveMinimum").expects(ValueType.NUMBER).validates(JsonSchemaType.NUMBER, JsonSchemaType.INTEGER).since(Draft6)
-        .additionalDefinition().expects(ValueType.BOOLEAN).from(Draft3).until(Draft5)
+    val EXCLUSIVE_MINIMUM = keyword<LimitKeyword>().key("exclusiveMinimum").expects(ElementType.NUMBER).validates(JsonSchemaType.NUMBER, JsonSchemaType.INTEGER).since(Draft6)
+        .additionalDefinition().expects(ElementType.BOOLEAN).from(Draft3).until(Draft5)
         .build()
 
     /**
@@ -497,7 +497,7 @@ interface Keywords {
      * format attribute and instance SHOULD succeed.
      * a href
      */
-    val FORMAT = stringKeyword("format").expects(ValueType.STRING).validates(JsonSchemaType.STRING).build()
+    val FORMAT = stringKeyword("format").expects(ElementType.STRING).validates(JsonSchemaType.STRING).build()
 
     /**
      * The value of this keyword MUST be a non-negative integer.
@@ -508,7 +508,7 @@ interface Keywords {
      * The length of a string instance is defined as the number of its
      * characters as defined by [RFC 7159](https://tools.ietf.org/html/RFC7159).
      */
-    val MAX_LENGTH = numberKeyword("maxLength").expects(ValueType.NUMBER).validates(JsonSchemaType.STRING).build()
+    val MAX_LENGTH = numberKeyword("maxLength").expects(ElementType.NUMBER).validates(JsonSchemaType.STRING).build()
 
     /**
      * The value of this keyword MUST be a non-negative integer.
@@ -525,7 +525,7 @@ interface Keywords {
      *
      * Omitting this keyword has the same behavior as a value of 0.
      */
-    val MIN_LENGTH = numberKeyword("minLength").expects(ValueType.NUMBER).validates(JsonSchemaType.STRING).build()
+    val MIN_LENGTH = numberKeyword("minLength").expects(ElementType.NUMBER).validates(JsonSchemaType.STRING).build()
 
     /**
      * The value of this keyword MUST be a string. This string SHOULD be a
@@ -537,7 +537,7 @@ interface Keywords {
      * expression matches the instance successfully. Recall: regular
      * expressions are not implicitly anchored.
      */
-    val PATTERN = stringKeyword("pattern").expects(ValueType.STRING).validates(JsonSchemaType.STRING).build()
+    val PATTERN = stringKeyword("pattern").expects(ElementType.STRING).validates(JsonSchemaType.STRING).build()
 
     /**
      * The value of "items" MUST be either a valid JSON Schema or an array of valid
@@ -559,8 +559,8 @@ interface Keywords {
      *
      * Omitting this keyword has the same behavior as an empty schema.
      */
-    val ITEMS = keyword<ItemsKeyword>().key("items").expects(ValueType.ARRAY).validates(JsonSchemaType.ARRAY)
-        .additionalDefinition().expects(ValueType.OBJECT)
+    val ITEMS = keyword<ItemsKeyword>().key("items").expects(ElementType.ARRAY).validates(JsonSchemaType.ARRAY)
+        .additionalDefinition().expects(ElementType.OBJECT)
         .build()
 
     /**
@@ -583,8 +583,8 @@ interface Keywords {
      *
      * Omitting this keyword has the same behavior as an empty schema.
      */
-    val ADDITIONAL_ITEMS = keyword<ItemsKeyword>().key("additionalItems").expects(ValueType.OBJECT).validates(JsonSchemaType.ARRAY).since(Draft3)
-        .additionalDefinition().expects(ValueType.BOOLEAN).validates(JsonSchemaType.ARRAY).from(Draft3).until(Draft5)
+    val ADDITIONAL_ITEMS = keyword<ItemsKeyword>().key("additionalItems").expects(ElementType.OBJECT).validates(JsonSchemaType.ARRAY).since(Draft3)
+        .additionalDefinition().expects(ElementType.BOOLEAN).validates(JsonSchemaType.ARRAY).from(Draft3).until(Draft5)
         .build()
 
     /**
@@ -595,7 +595,7 @@ interface Keywords {
      * less than, or equal to, the value of this keyword.
      */
     val MAX_ITEMS = numberKeyword("maxItems")
-        .expects(ValueType.NUMBER).validates(JsonSchemaType.ARRAY).build()
+        .expects(ElementType.NUMBER).validates(JsonSchemaType.ARRAY).build()
 
     /**
      * The value of this keyword MUST be a non-negative integer.
@@ -607,7 +607,7 @@ interface Keywords {
      *
      * Omitting this keyword has the same behavior as a value of 0.
      */
-    val MIN_ITEMS = numberKeyword("minItems").expects(ValueType.NUMBER)
+    val MIN_ITEMS = numberKeyword("minItems").expects(ElementType.NUMBER)
         .validates(JsonSchemaType.ARRAY).build()
 
     /**
@@ -622,7 +622,7 @@ interface Keywords {
      * Omitting this keyword has the same behavior as a value of false.
      */
     val UNIQUE_ITEMS = booleanKeyword("uniqueItems")
-        .expects(ValueType.BOOLEAN).validates(JsonSchemaType.ARRAY)
+        .expects(ElementType.BOOLEAN).validates(JsonSchemaType.ARRAY)
         .build()
 
     /**
@@ -632,7 +632,7 @@ interface Keywords {
      * An array instance is valid against "contains" if at least one of
      * its elements is valid against the given schema.
      */
-    val CONTAINS = singleSchemaKeyword("contains").expects(ValueType.OBJECT).validates(JsonSchemaType.ARRAY).since(Draft6).build()
+    val CONTAINS = singleSchemaKeyword("contains").expects(ElementType.OBJECT).validates(JsonSchemaType.ARRAY).since(Draft6).build()
 
     /**
      * The value of this keyword MUST be an array. This array SHOULD have at
@@ -645,7 +645,7 @@ interface Keywords {
      *
      * Elements in the array might be of any value, including null.
      */
-    val ENUM = jsonArrayKeyword("enum").expects(ValueType.ARRAY).build()
+    val ENUM = jsonArrayKeyword("enum").expects(ElementType.ARRAY).build()
 
     /**
      * The value of this keyword MUST be an array. There are no restrictions placed on the values within the array.
@@ -658,7 +658,7 @@ interface Keywords {
      * Implementations MAY use the value of "default", if present, as an additional example. If "examples" is
      * absent, "default" MAY still be used in this manner.
      */
-    val EXAMPLES = jsonArrayKeyword("examples").expects(ValueType.ARRAY).since(Draft6).build()
+    val EXAMPLES = jsonArrayKeyword("examples").expects(ElementType.ARRAY).since(Draft6).build()
 
     /**
      * The value of this keyword MAY be of any type, including null.
@@ -667,12 +667,12 @@ interface Keywords {
      * An instance validates successfully against this keyword if its value is
      * equal to the value of the keyword.
      */
-    val CONST = jsonValueKeyword("const").expects(ValueType.OBJECT).since(Draft6)
-        .additionalDefinition().expects(ValueType.ARRAY).since(Draft6)
-        .additionalDefinition().expects(ValueType.STRING).since(Draft6)
-        .additionalDefinition().expects(ValueType.NUMBER).since(Draft6)
-        .additionalDefinition().expects(ValueType.BOOLEAN).since(Draft6)
-        .additionalDefinition().expects(ValueType.NULL).since(Draft6)
+    val CONST = jsonValueKeyword("const").expects(ElementType.OBJECT).since(Draft6)
+        .additionalDefinition().expects(ElementType.ARRAY).since(Draft6)
+        .additionalDefinition().expects(ElementType.STRING).since(Draft6)
+        .additionalDefinition().expects(ElementType.NUMBER).since(Draft6)
+        .additionalDefinition().expects(ElementType.BOOLEAN).since(Draft6)
+        .additionalDefinition().expects(ElementType.NULL).since(Draft6)
         .build()
 
     /**
@@ -682,7 +682,7 @@ interface Keywords {
      * An instance is valid against this keyword if it fails to validate
      * successfully against the schema defined by this keyword.
      */
-    val NOT = singleSchemaKeyword("not").expects(ValueType.OBJECT).since(Draft4).build()
+    val NOT = singleSchemaKeyword("not").expects(ElementType.OBJECT).since(Draft4).build()
 
     /**
      * 6.6.1. if
@@ -698,7 +698,7 @@ interface Keywords {
      * validation outcome of against its subschema.
      */
     val IF = singleSchemaKeyword("if")
-        .expects(ValueType.OBJECT)
+        .expects(ElementType.OBJECT)
         .since(Draft7)
         .build()
 
@@ -752,7 +752,7 @@ interface Keywords {
      * successfully against at least one schema defined by this keyword's value.
      */
     val ANY_OF = schemaListKeyword("anyOf")
-        .expects(ValueType.ARRAY)
+        .expects(ElementType.ARRAY)
         .since(Draft4).build()
     /**
      * This keyword's value MUST be a non-empty array.
@@ -762,14 +762,14 @@ interface Keywords {
      * An instance validates successfully against this keyword if it validates
      * successfully against exactly one schema defined by this keyword's value.
      */
-    val ONE_OF = schemaListKeyword("oneOf").expects(ValueType.ARRAY).since(Draft4).build()
+    val ONE_OF = schemaListKeyword("oneOf").expects(ElementType.ARRAY).since(Draft4).build()
 
     fun schemaMapKeyword(keyword: String): KeywordInfo.KeywordInfoBuilder<SchemaMapKeyword> {
       return KeywordInfoBuilder<SchemaMapKeyword>().key(keyword)
     }
 
     fun stringKeyword(keyword: String): KeywordInfo.KeywordInfoBuilder<StringKeyword> {
-      return KeywordInfoBuilder<StringKeyword>().key(keyword).expects(ValueType.STRING)
+      return KeywordInfoBuilder<StringKeyword>().key(keyword).expects(ElementType.STRING)
     }
 
     fun jsonValueKeyword(keyword: String): KeywordInfo.KeywordInfoBuilder<JsonValueKeyword> {
@@ -777,31 +777,31 @@ interface Keywords {
     }
 
     fun numberKeyword(keyword: String): KeywordInfoBuilder<NumberKeyword> {
-      return KeywordInfoBuilder<NumberKeyword>().key(keyword).expects(ValueType.NUMBER)
+      return KeywordInfoBuilder<NumberKeyword>().key(keyword).expects(ElementType.NUMBER)
     }
 
     fun stringSetKeyword(keyword: String): KeywordInfoBuilder<StringSetKeyword> {
-      return KeywordInfoBuilder<StringSetKeyword>().key(keyword).expects(ValueType.ARRAY)
+      return KeywordInfoBuilder<StringSetKeyword>().key(keyword).expects(ElementType.ARRAY)
     }
 
     fun singleSchemaKeyword(keyword: String): KeywordInfoBuilder<SingleSchemaKeyword> {
-      return KeywordInfoBuilder<SingleSchemaKeyword>().key(keyword).expects(ValueType.OBJECT)
+      return KeywordInfoBuilder<SingleSchemaKeyword>().key(keyword).expects(ElementType.OBJECT)
     }
 
     fun schemaListKeyword(keyword: String): KeywordInfoBuilder<SchemaListKeyword> {
-      return KeywordInfoBuilder<SchemaListKeyword>().key(keyword).expects(ValueType.ARRAY)
+      return KeywordInfoBuilder<SchemaListKeyword>().key(keyword).expects(ElementType.ARRAY)
     }
 
     fun uriKeyword(keyword: String): KeywordInfoBuilder<URIKeyword> {
-      return KeywordInfoBuilder<URIKeyword>().key(keyword).expects(ValueType.STRING)
+      return KeywordInfoBuilder<URIKeyword>().key(keyword).expects(ElementType.STRING)
     }
 
     fun booleanKeyword(keyword: String): KeywordInfoBuilder<BooleanKeyword> {
-      return KeywordInfoBuilder<BooleanKeyword>().key(keyword).expects(ValueType.BOOLEAN)
+      return KeywordInfoBuilder<BooleanKeyword>().key(keyword).expects(ElementType.BOOLEAN)
     }
 
     fun jsonArrayKeyword(keyword: String): KeywordInfoBuilder<JsonArrayKeyword> {
-      return KeywordInfoBuilder<JsonArrayKeyword>().key(keyword).expects(ValueType.ARRAY)
+      return KeywordInfoBuilder<JsonArrayKeyword>().key(keyword).expects(ElementType.ARRAY)
     }
 
     inline fun <reified X : JsonSchemaKeyword<*>> keyword(): KeywordInfoBuilder<X> {

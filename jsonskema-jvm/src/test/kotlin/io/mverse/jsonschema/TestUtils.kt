@@ -1,10 +1,14 @@
 package io.mverse.jsonschema
 
+import assertk.Assert
+import assertk.assert
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.json
-import lang.json.toJson
-import lang.json.asJsonArray
+import lang.illegalState
+import lang.json.toJsonLiteral
+import lang.json.toJsonArray
+import kotlin.test.assert
 
 object TestUtils {
 
@@ -21,18 +25,21 @@ object TestUtils {
   }
 
   fun createJsonNumberWithLocation(number: Number): JsonValueWithPath {
-    val jsonElement = number.toJson()
+    val jsonElement = number.toJsonLiteral()
     return JsonValueWithPath.fromJsonValue(jsonElement)
   }
 
   fun createJsonStringWithLocation(string: String): JsonValueWithPath {
-    val jsonElement = string.toJson()
+    val jsonElement = string.toJsonLiteral()
     return JsonValueWithPath.fromJsonValue(jsonElement)
   }
 
   fun createJsonArrayWithLocation(): JsonValueWithPath {
-    val jsonElement = listOf( "foo", "bar", 3, true, JsonNull).asJsonArray()
+    val jsonElement = listOf( "foo", "bar", 3, true, JsonNull).toJsonArray()
 
     return JsonValueWithPath.fromJsonValue(jsonElement)
   }
 }
+
+inline fun <reified T:Any?> T.assertThat(message:String? = null): Assert<T> = assert(this, message)
+inline fun <reified T, reified V> T?.assertThat(block: T.()->V): Assert<V> = assert(this?.block() ?: illegalState("Accessor method returned null"))

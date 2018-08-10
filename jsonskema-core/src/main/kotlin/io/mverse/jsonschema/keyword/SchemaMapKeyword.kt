@@ -1,5 +1,6 @@
 package io.mverse.jsonschema.keyword
 
+import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import kotlinx.serialization.json.JsonBuilder
@@ -11,11 +12,17 @@ data class SchemaMapKeyword(val schemas: Map<String, Schema> = emptyMap()): Subs
   override val subschemas: List<Schema>
     get() = schemas.values.toList()
 
-  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion) {
+  override fun toJson(keyword: KeywordInfo<*>, builder: kotlinx.serialization.json.JsonBuilder, version: JsonSchemaVersion) {
     builder.run {
-      keyword to json {
+      keyword.key to json {
         for ((key,schema) in schemas) {
-          key to schema.asVersion(version).toJson()
+          val schemaJson = when (schema) {
+            is RefSchema-> schema.toJson()
+            else-> schema.asVersion(version).toJson()
+          }
+
+          // Writes the key to the json builder
+          key to schemaJson
         }
       }
     }

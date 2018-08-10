@@ -2,7 +2,8 @@ package io.mverse.jsonschema
 
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.utils.URIUtils
-import io.mverse.jsonschema.utils.URIUtils.resolve
+import io.mverse.jsonschema.utils.isGeneratedURI
+import io.mverse.jsonschema.utils.isJsonPointer
 import lang.URI
 import lang.hashKode
 
@@ -35,18 +36,20 @@ class SchemaLocation private constructor(
    * @return The absolute json-pointer for this location, resolved against the documentURI
    */
   val absoluteJsonPointerURI: URI by lazy {
-    resolve(this.documentURI, jsonPointerFragment)
+    documentURI.resolve(jsonPointerFragment)
   }
 
   val jsonPointerFragment: URI by lazy {
     jsonPath.toURIFragment()
   }
 
+
+
   /**
    * @return Whether this location has an auto-generated root URI.
    */
   private val isGenerated: Boolean
-    get() = URIUtils.isGeneratedURI(this.documentURI)
+    get() = this.documentURI.isGeneratedURI()
 
   init {
     check(documentURI.isAbsolute) { "documentURI should be absolute" }
@@ -57,21 +60,20 @@ class SchemaLocation private constructor(
    * @see .canonicalURI
    */
   val canonicalURI: URI by lazy {
-    canonicalURI ?: {
-      when (isGenerated) {
+    canonicalURI ?: when (isGenerated) {
         true -> jsonPath.toURIFragment()
-        false -> this.uniqueURI
+        false -> uniqueURI ?: this.absoluteJsonPointerURI
       }
-    }()
   }
 
   /**
    * @see .uniqueURI
    */
   val uniqueURI: URI by lazy {
-    when (uniqueURI) {
-      null -> absoluteJsonPointerURI
-      else -> uniqueURI
+    when {
+      uniqueURI != null -> uniqueURI
+      !isGenerated -> this.canonicalURI
+      else -> this.absoluteJsonPointerURI
     }
   }
 
@@ -155,7 +157,7 @@ class SchemaLocation private constructor(
       // Change resolution scope
       if (id != null) {
         check(resolutionScope != null) { "Should have provided a resolution scope" }
-        val resolvedURI = resolve(resolutionScope!!, id!!)
+        val resolvedURI = resolutionScope!!.resolve(id!!)
         return SchemaLocation(canonicalURI = resolvedURI,
             documentURI = documentURI!!,
             resolutionScope = resolvedURI,
@@ -195,7 +197,7 @@ class SchemaLocation private constructor(
 
     fun documentRoot(id: URI): SchemaLocation {
       val path: JsonPath
-      if (URIUtils.isJsonPointer(id)) {
+      if (id.isJsonPointer()) {
         path = JsonPath.parseFromURIFragment(id)
       } else {
         path = ROOT_PATH
@@ -211,7 +213,7 @@ class SchemaLocation private constructor(
     fun refLocation(documentURI: URI, id: URI?, refPath: JsonPath): SchemaLocation {
       val resolutionScope: URI
       if (id != null) {
-        resolutionScope = resolve(documentURI, id)
+        resolutionScope = documentURI.resolve(id)
       } else {
         resolutionScope = documentURI
       }

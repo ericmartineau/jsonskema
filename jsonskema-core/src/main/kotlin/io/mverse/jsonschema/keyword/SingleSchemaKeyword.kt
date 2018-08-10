@@ -6,7 +6,7 @@ import kotlinx.serialization.json.JsonBuilder
 
 class SingleSchemaKeyword(val schema: Schema) : JsonSchemaKeywordImpl<Schema>(schema) {
 
-  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion) {
+  override fun toJson(keyword: KeywordInfo<*>, builder: kotlinx.serialization.json.JsonBuilder, version: JsonSchemaVersion) {
     builder.apply {
       keyword.key to schema.asVersion(version).toJson()
     }

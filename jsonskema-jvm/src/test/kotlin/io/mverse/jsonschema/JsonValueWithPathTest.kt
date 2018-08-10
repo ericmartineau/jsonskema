@@ -3,6 +3,8 @@ package io.mverse.jsonschema
 import assertk.assert
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
+import assertk.assertions.isNotNull
+import assertk.assertions.isNull
 import io.mverse.jsonschema.JsonValueWithPath.Companion.fromJsonValue
 import io.mverse.jsonschema.TestUtils.createJsonArrayWithLocation
 import io.mverse.jsonschema.TestUtils.createJsonNumberWithLocation
@@ -10,19 +12,16 @@ import io.mverse.jsonschema.TestUtils.createJsonObjectWithLocation
 import io.mverse.jsonschema.TestUtils.createJsonStringWithLocation
 import io.mverse.jsonschema.TestUtils.createValue
 import io.mverse.jsonschema.enums.JsonSchemaType
-import io.mverse.jsonschema.utils.valueType
+import kotlinx.serialization.json.ElementType.NULL
+import kotlinx.serialization.json.ElementType.OBJECT
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.json
-import lang.json.ValueType
-import lang.json.ValueType.*
-import lang.json.toJson
+import lang.json.toJsonLiteral
 import nl.jqno.equalsverifier.EqualsVerifier
 import nl.jqno.equalsverifier.Warning
-import org.assertj.core.api.Assertions.assertThat
 import kotlin.test.Test
 
 class JsonValueWithPathTest {
-
 
   @Test
   fun testEquals() {
@@ -39,46 +38,46 @@ class JsonValueWithPathTest {
       "num" to 3
     }
     val value = fromJsonValue(jsonValue)
-    assertThat(value.valueType).isEqualTo(OBJECT)
+    assert(value.type).isEqualTo(OBJECT)
   }
 
   @Test
   fun testGetValueType_WhenNull_ThenNULL() {
     val value = JsonNull
-    assertThat(value.valueType).isEqualTo(NULL)
+    assert(value.type).isEqualTo(NULL)
   }
 
   @Test
   fun testAsJsonObject_HasValue() {
     val value = createJsonObjectWithLocation()
     val jsonObject = value.jsonObject
-    assertThat(jsonObject["foo"].primitive.contentOrNull).isEqualTo("bar")
+    assert(jsonObject["foo"].primitive.contentOrNull).isEqualTo("bar")
   }
 
   @Test
   fun testAsJsonArray_HasValue() {
     val value = createJsonArrayWithLocation()
     val jsonArray = value.jsonArray
-    val expected = "foo".toJson()
-    assertThat(jsonArray[0]).isEqualTo(expected)
+    val expected = "foo".toJsonLiteral()
+    assert(jsonArray[0]).isEqualTo(expected)
   }
 
   @Test
   fun testGetJsonSchemaType_WhenObject_ReturnObject() {
     val value = createJsonObjectWithLocation()
-    assertThat(value.jsonSchemaType).isEqualTo(JsonSchemaType.OBJECT)
+    assert(value.jsonSchemaType).isEqualTo(JsonSchemaType.OBJECT)
   }
 
   @Test
   fun testGetJsonSchemaType_WhenArray_ReturnArray() {
     val value = createJsonArrayWithLocation()
-    assertThat(value.jsonSchemaType).isEqualTo(JsonSchemaType.ARRAY)
+    assert(value.jsonSchemaType).isEqualTo(JsonSchemaType.ARRAY)
   }
 
   @Test
   fun testArraySize_WhenArray_ReturnsSize() {
     val value = createJsonArrayWithLocation()
-    assertThat(value.jsonArray.size).isEqualTo(5)
+    assert(value.jsonArray.size).isEqualTo(5)
   }
 
   @Test
@@ -92,7 +91,7 @@ class JsonValueWithPathTest {
 
   @Test
   fun testAsJsonNumber_WhenNumber_ReturnsJsonNumber() {
-    assertThat(createJsonNumberWithLocation(34.4).number).isNotNull()
+    assert(createJsonNumberWithLocation(34.4).number).isNotNull()
   }
 
   @Test(expected = IllegalStateException::class)
@@ -102,7 +101,7 @@ class JsonValueWithPathTest {
 
   @Test
   fun testAsJsonObject_WhenObject_ReturnsJsonObject() {
-    assertThat(createJsonObjectWithLocation().jsonObject).isNotNull
+    assert(createJsonObjectWithLocation().jsonObject).isNotNull()
   }
 
   @Test(expected = IllegalStateException::class)
@@ -112,12 +111,12 @@ class JsonValueWithPathTest {
 
   @Test
   fun testAsJsonString_WhenString_ReturnsJsonString() {
-    assertThat(createJsonStringWithLocation("joe").string).isEqualTo("joe")
+    assert(createJsonStringWithLocation("joe").string).isEqualTo("joe")
   }
 
   @Test
   fun testAsJsonString_WhenNull_ReturnsNull() {
-    assertThat(createValue(JsonNull).string).isNull()
+    assert(createValue(JsonNull).string).isNull()
   }
 
   @Test
@@ -135,7 +134,7 @@ class JsonValueWithPathTest {
   //
   // @Nullable
   // public String asString() {
-  //     if (is(JsonValue.ValueType.NULL)) {
+  //     if (is(JsonValue.ElementType.NULL)) {
   //         return null;
   //     } else {
   //         return ((JsonString) wrapped).string();
@@ -168,7 +167,7 @@ class JsonValueWithPathTest {
   //         try {
   //             return Optional.of(jsonObject.getBoolean(property.key()));
   //         } catch (IllegalStateException e) {
-  //             throw new UnexpectedValueException(location.getJsonPath(), jsonObject.get(property.key()), JsonValue.ValueType.TRUE, JsonValue.ValueType.FALSE);
+  //             throw new UnexpectedValueException(location.getJsonPath(), jsonObject.get(property.key()), JsonValue.ElementType.TRUE, JsonValue.ElementType.FALSE);
   //         }
   //     }
   //     return Optional.empty();
@@ -319,7 +318,7 @@ class JsonValueWithPathTest {
   //         }
   //         return asJsonObject().string(property.key());
   //     } catch (IllegalStateException e) {
-  //         throw new UnexpectedValueException(location, asJsonObject().get(property.key()), ValueType.STRING);
+  //         throw new UnexpectedValueException(location, asJsonObject().get(property.key()), ElementType.STRING);
   //     }
   // }
   //
@@ -328,15 +327,15 @@ class JsonValueWithPathTest {
   //     return asJsonObject().keywordValue(jsonPointer);
   // }
   //
-  // public boolean has(JsonSchemaKeyword property, JsonValue.ValueType... ofType) {
+  // public boolean has(JsonSchemaKeyword property, JsonValue.ElementType... ofType) {
   //     final Map<String, JsonValue> jsonObject = asJsonObject();
   //     if (!jsonObject.containsKey(property.key())) {
   //         return false;
   //     }
   //     if (ofType != null && ofType.length > 0) {
   //         final JsonValue jsonValue = jsonObject.get(property.key());
-  //         for (JsonValue.ValueType valueType : ofType) {
-  //             if (jsonValue.valueType == valueType) {
+  //         for (JsonValue.ElementType valueType : ofType) {
+  //             if (jsonValue.type == valueType) {
   //                 return true;
   //             }
   //         }
@@ -365,11 +364,11 @@ class JsonValueWithPathTest {
   //     return location.getJsonPointerFragment() + " -> " + wrapped;
   // }
   //
-  // public boolean is(JsonValue.ValueType... types) {
+  // public boolean is(JsonValue.ElementType... types) {
   //     checkNotNull(types, "keywords must not be null");
   //     checkArgument(types.length > 0, "keywords must be >0");
-  //     for (JsonValue.ValueType type : types) {
-  //         if (wrapped.valueType == type) {
+  //     for (JsonValue.ElementType type : types) {
+  //         if (wrapped.type == type) {
   //             return true;
   //         }
   //     }
@@ -415,7 +414,7 @@ class JsonValueWithPathTest {
   //
   // public Stream<JsonValueWithLocation> streamPathAwareArrayItems(JsonSchemaKeyword keyword) {
   //     AtomicInteger i = new AtomicInteger(0);
-  //     if (!has(keyword, JsonValue.ValueType.ARRAY)) {
+  //     if (!has(keyword, JsonValue.ElementType.ARRAY)) {
   //         return Stream.empty();
   //     } else {
   //         return expectArray(keyword)
@@ -438,7 +437,7 @@ class JsonValueWithPathTest {
   //     if (asJsonObject().containsKey(property)) {
   //         JsonValue jsonValue = asJsonObject().get(property);
   //         if (!expected.isAssignableFrom(jsonValue.getClass())) {
-  //             final JsonValue.ValueType valueType = JsonUtils.jsonTypeForClass(expected);
+  //             final JsonValue.ElementType valueType = JsonUtils.jsonTypeForClass(expected);
   //             throw new UnexpectedValueException(location.child(property), jsonValue, valueType);
   //         }
   //         return Optional.of(expected.cast(jsonValue));
@@ -449,11 +448,11 @@ class JsonValueWithPathTest {
   // public static JsonValueWithLocation fromJsonValue(JsonValue jsonObject, SchemaLocation parentLocation) {
   //     final URI uri;
   //     SchemaLocation location = parentLocation;
-  //     if (jsonObject.valueType == ValueType.OBJECT) {
+  //     if (jsonObject.type == ElementType.OBJECT) {
   //         final JsonObject asJsonObject = jsonObject.asJsonObject();
   //         if (asJsonObject.keySet().contains($ID.key())) {
   //             final JsonValue $id = asJsonObject.get($ID.key());
-  //             if ($id.valueType == ValueType.STRING) {
+  //             if ($id.type == ElementType.STRING) {
   //                 uri = URI(((JsonString) $id).string());
   //                 location = location.withId(uri);
   //             }

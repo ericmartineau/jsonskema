@@ -33,7 +33,7 @@ object JsonUtils {
 //  }
 
 
-  fun extractIdFromObject(json: JsonObject, id: String = "\$id", vararg otherIdKeys: String): URI? {
+  fun extractIdFromObject(json: kotlinx.serialization.json.JsonObject, id: String = "\$id", vararg otherIdKeys: String): URI? {
     if (json.containsKey(id)) {
       return tryParseURI(json[id])
     }
@@ -63,6 +63,16 @@ object JsonUtils {
       }
       else->null
     }
+  }
+
+  fun prettyPrintArgs(args: Iterable<Any>): Array<Any> {
+    var i = 0
+    return args.map {
+      when (it) {
+        is JsonElement->it.toString()
+        else-> it
+      }
+    }.toTypedArray()
   }
 
   fun prettyPrintArgs(vararg args: Any): Array<Any> {
@@ -172,15 +182,15 @@ object JsonUtils {
 //        .readValue()
 //  }
 //
-//  fun jsonTypeForClass(clazz: KClass<out JsonElement>): ValueType {
+//  fun jsonTypeForClass(clazz: KClass<out JsonElement>): ElementType {
 //    return if (clazz.isAssignableFrom(JsonNumber::class)) {
-//      ValueType.NUMBER
+//      ElementType.NUMBER
 //    } else if (clazz.isAssignableFrom(JsonString::class)) {
-//      ValueType.STRING
+//      ElementType.STRING
 //    } else if (clazz.isAssignableFrom(JsonObject::class)) {
-//      ValueType.Any
+//      ElementType.Any
 //    } else if (clazz.isAssignableFrom(JsonArray::class)) {
-//      ValueType.ARRAY
+//      ElementType.ARRAY
 //    } else {
 //      throw IllegalArgumentException("Unable to determine type for class: $clazz")
 //    }
@@ -188,12 +198,12 @@ object JsonUtils {
 
 
 
-//  fun toJsonSchemaType(valueType: ValueType): JsonSchemaType {
+//  fun toJsonSchemaType(valueType: ElementType): JsonSchemaType {
 //    when (valueType) {
-//      ValueType.ARRAY -> return JsonSchemaType.ARRAY
-//      ValueType.Any -> return JsonSchemaType.Any
-//      ValueType.STRING -> return JsonSchemaType.STRING
-//      ValueType.NUMBER -> return JsonSchemaType.NUMBER
+//      ElementType.ARRAY -> return JsonSchemaType.ARRAY
+//      ElementType.Any -> return JsonSchemaType.Any
+//      ElementType.STRING -> return JsonSchemaType.STRING
+//      ElementType.NUMBER -> return JsonSchemaType.NUMBER
 //      FALSE -> return JsonSchemaType.BOOLEAN
 //      TRUE -> return JsonSchemaType.BOOLEAN
 //      JsonElement.NULL -> return JsonSchemaType.NULL

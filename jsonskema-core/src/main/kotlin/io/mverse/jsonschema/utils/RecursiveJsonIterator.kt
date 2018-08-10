@@ -4,40 +4,34 @@ import io.mverse.jsonschema.JsonPath
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
-import lang.json.ValueType
+import kotlinx.serialization.json.ElementType
 
-object RecursiveJsonIterator {
-  fun visitDocument(obj: JsonObject, iterator: Visitor) {
-    val rootPath = JsonPath.rootPath()
-    visitObject(obj, rootPath, iterator)
-  }
+fun kotlinx.serialization.json.JsonObject.recurse(visit: Visitor) {
+  val rootPath = JsonPath.rootPath()
+  visitObject(rootPath, visit)
+}
 
-  internal fun visitArray(array: JsonArray, path: JsonPath, iterator: Visitor) {
-    var idx: Int = 0
-    array.forEach { v ->
-      val currIdx = idx++
-      iterator.visitProperty(currIdx, array, path)
-      // iterator.visitArrayElement(currIdx, v, path);
-      if (v.valueType === ValueType.OBJECT) {
-        visitObject(v.jsonObject, path.child(currIdx), iterator)
-      } else if (v.valueType === ValueType.ARRAY) {
-        visitArray(v.jsonArray, path.child(currIdx), iterator)
-      }
+internal fun kotlinx.serialization.json.JsonArray.visitArray(path: JsonPath, visitIndex: Visitor) {
+  var idx: Int = 0
+  this.forEach { v ->
+    val currIdx = idx++
+    visitIndex(currIdx, this, path)
+    when(v) {
+      is kotlinx.serialization.json.JsonObject -> v.visitObject(path.child(currIdx), visitIndex)
+      is kotlinx.serialization.json.JsonArray -> v.visitArray(path.child(currIdx), visitIndex)
     }
-  }
-
-  internal fun visitObject(obj: JsonObject, path: JsonPath, iterator: Visitor) {
-    obj.content.forEach { (k, v) ->
-      iterator.visitProperty(k, v, path)
-      if (v.valueType === ValueType.OBJECT) {
-        visitObject(v.jsonObject, path.child(k), iterator)
-      } else if (v.valueType === ValueType.ARRAY) {
-        visitArray(v.jsonArray, path.child(k), iterator)
-      }
-    }
-  }
-
-  interface Visitor {
-    fun visitProperty(key: Any, value: JsonElement, path: JsonPath)
   }
 }
+
+internal fun kotlinx.serialization.json.JsonObject.visitObject(path: JsonPath, visitProperty: Visitor) {
+
+  content.forEach { (k, v) ->
+    visitProperty(k, v, path)
+    when(v) {
+      is kotlinx.serialization.json.JsonObject -> v.visitObject(path.child(k), visitProperty)
+      is kotlinx.serialization.json.JsonArray -> v.visitArray(path.child(k), visitProperty)
+    }
+  }
+}
+
+typealias Visitor = (/*Key*/Any, /*Visited*/JsonElement, /*Location*/JsonPath) -> Unit

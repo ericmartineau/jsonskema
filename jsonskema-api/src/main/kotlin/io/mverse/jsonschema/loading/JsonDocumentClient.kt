@@ -28,11 +28,11 @@ import lang.URI
  */
 interface JsonDocumentClient {
 
-  fun findLoadedDocument(documentLocation: URI): JsonObject?
+  fun findLoadedDocument(documentLocation: URI): kotlinx.serialization.json.JsonObject?
 
-  fun registerLoadedDocument(documentLocation: URI, document: JsonObject)
+  fun registerLoadedDocument(documentLocation: URI, document: kotlinx.serialization.json.JsonObject)
 
-  fun resolveSchemaWithinDocument(documentURI: URI, schemaURI: URI, document: JsonObject): JsonPath?
+  fun resolveSchemaWithinDocument(documentURI: URI, schemaURI: URI, document: kotlinx.serialization.json.JsonObject): JsonPath?
 
   /**
    * Returns a stream to be used for reading the remote content (response body) of the URL. In the
@@ -43,9 +43,9 @@ interface JsonDocumentClient {
    * @return the input stream of the response
    * @throws java.io.UncheckedIOException if an IO error occurs.
    */
-  fun fetchDocument(uri: URI): JsonObject
+  fun fetchDocument(uri: URI): kotlinx.serialization.json.JsonObject
 
-  fun fetchDocument(url: String): JsonObject {
+  fun fetchDocument(url: String): kotlinx.serialization.json.JsonObject {
     return fetchDocument(URI(url))
   }
 }

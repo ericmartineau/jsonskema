@@ -23,30 +23,30 @@ open class RefSchemaImpl : RefSchema {
   override val version: JsonSchemaVersion = Draft7
 
   constructor(factory: SchemaLoader?,
-                      location: SchemaLocation,
-                      refURI: URI,
-                      currentDocument: JsonObject,
-                      report: LoadingReport) : super(factory, location, refURI, currentDocument, report)
+              location: SchemaLocation,
+              refURI: URI,
+              currentDocument: JsonObject?,
+              report: LoadingReport) : super(factory, location, refURI, currentDocument, report)
 
   protected constructor(location: SchemaLocation, refURI: URI, refSchema: Schema) : super(location, refURI, refSchema)
 
   override fun asDraft6(): Draft6Schema {
-    val schema = refSchema ?: emptySchema()
+    val schema = refSchema ?: emptySchema
     return Draft6RefSchemaImpl(location, refURI, schema.asDraft6())
   }
 
   override fun asDraft7(): Draft7Schema {
-    val schema = refSchema ?: emptySchema()
+    val schema = refSchema ?: emptySchema
     return Draft7RefSchemaImpl(location, refURI, schema.asDraft7())
   }
 
   override fun asDraft4(): Draft4Schema {
-    val schema = refSchema ?: emptySchema()
+    val schema = refSchema ?: emptySchema
     return Draft4RefSchemaImpl(location, refURI, schema.asDraft4())
   }
 
   override fun asDraft3(): Draft3Schema {
-    val schema = refSchema ?: emptySchema()
+    val schema = refSchema ?: emptySchema
     return Draft3RefSchemaImpl(location, refURI, schema.asDraft3())
   }
 

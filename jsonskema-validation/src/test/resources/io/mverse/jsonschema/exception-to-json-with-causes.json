@@ -1,0 +1,19 @@
+{
+  "pointerToViolation": "#/a",
+  "message": "exception message",
+  "schemaLocation": "#",
+  "causes": [
+    {
+      "pointerToViolation": "#/a/0",
+      "keyword": "type",
+      "code": "code",
+      "message": "cause msg foo",
+      "schemaLocation": "#",
+      "template": "cause msg %s",
+      "arguments": [
+        "foo",
+        "bar"
+      ]
+    }
+  ]
+}

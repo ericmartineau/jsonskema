@@ -1,0 +1,34 @@
+{
+  "$comment": "This is cool",
+  "properties": {
+    "base64": {
+      "contentEncoding": "base64",
+      "contentMediaType": "image/png"
+    },
+    "ifTest": {
+      "if": {
+        "type": "string"
+      },
+      "then": {
+        "if": {
+          "pattern": "^s.*$"
+        },
+        "then": {
+          "maxLength": 5
+        },
+        "else": {
+          "maxLength": 10
+        }
+      },
+      "else": {
+        "type": "object"
+      }
+    },
+    "readMe": {
+      "readOnly": true
+    },
+    "writeMe": {
+      "writeOnly": true
+    }
+  }
+}

@@ -1,7 +1,7 @@
 package io.mverse.jsonschema.enums
 
 import io.mverse.jsonschema.SchemaException
-import lang.json.ValueType
+import kotlinx.serialization.json.ElementType
 
 /**
  * Represents the valid json-schema types.
@@ -19,15 +19,15 @@ enum class JsonSchemaType {
     return name.toLowerCase()
   }
 
-  val appliesTo: ValueType by lazy {
+  val appliesTo: ElementType by lazy {
     when (this) {
-      INTEGER -> ValueType.NUMBER
-      BOOLEAN -> ValueType.BOOLEAN
-      STRING -> ValueType.STRING
-      NUMBER -> ValueType.NUMBER
-      NULL -> ValueType.NULL
-      OBJECT -> ValueType.OBJECT
-      ARRAY -> ValueType.ARRAY
+      INTEGER -> ElementType.NUMBER
+      BOOLEAN -> ElementType.BOOLEAN
+      STRING -> ElementType.STRING
+      NUMBER -> ElementType.NUMBER
+      NULL -> ElementType.NULL
+      OBJECT -> ElementType.OBJECT
+      ARRAY -> ElementType.ARRAY
     }
   }
 

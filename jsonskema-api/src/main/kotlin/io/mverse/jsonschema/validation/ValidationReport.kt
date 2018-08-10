@@ -78,7 +78,7 @@ class ValidationReport {
     if (error.causes!!.isNotEmpty()) {
       error.causes.forEach { e -> toStringErrors(e, printer) }
     }
-    printer.println(error.getPointerToViolation())
+    printer.println(error.pathToViolation)
     val keywordValue = error.keyword?.key ?: "Unknown"
     printer.println("\tKeyword: $keywordValue")
     printer.println("\tMessage: " + error.message)

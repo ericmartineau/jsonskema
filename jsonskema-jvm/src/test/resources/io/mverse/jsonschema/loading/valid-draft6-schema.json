@@ -1,0 +1,16 @@
+{
+  "$id": "https://schema.org/valid-draft6.json",
+  "type": "array",
+  "minItems": 2,
+  "maxItems": 3,
+  "uniqueItems": true,
+  "contains": {
+    "properties": {
+      "foo": {
+        "type": "string",
+        "const": "bar"
+      }
+    }
+  },
+  "const": "foo"
+}

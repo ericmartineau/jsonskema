@@ -2,13 +2,8 @@ package io.mverse.jsonschema.utils
 
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaType
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonLiteral
-import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.ElementType
 import lang.convert
-import lang.illegalState
-import lang.json.ValueType
 import lang.runLengths
 
 object JsonSchemaInspections {
@@ -33,7 +28,7 @@ object JsonSchemaInspections {
 
     val fromEnumValue = schema.enumValues.convert { array ->
       val counts = array
-          .map { it.valueType.toJsonSchemaType() }
+          .map { it.type.toJsonSchemaType() }
           .distinct()
           .toList()
       return@convert when (counts.size) {
@@ -67,30 +62,14 @@ object JsonSchemaInspections {
   }
 }
 
-internal fun ValueType.toJsonSchemaType(): JsonSchemaType {
+internal fun ElementType.toJsonSchemaType(): JsonSchemaType {
   return when (this) {
-    ValueType.NULL -> JsonSchemaType.NULL
-    ValueType.STRING -> JsonSchemaType.STRING
-    ValueType.NUMBER -> JsonSchemaType.NUMBER
-    ValueType.INTEGER -> JsonSchemaType.INTEGER
-    ValueType.OBJECT -> JsonSchemaType.OBJECT
-    ValueType.ARRAY -> JsonSchemaType.ARRAY
-    ValueType.BOOLEAN -> JsonSchemaType.BOOLEAN
+    ElementType.NULL -> JsonSchemaType.NULL
+    ElementType.STRING -> JsonSchemaType.STRING
+    ElementType.NUMBER -> JsonSchemaType.NUMBER
+    ElementType.OBJECT -> JsonSchemaType.OBJECT
+    ElementType.ARRAY -> JsonSchemaType.ARRAY
+    ElementType.BOOLEAN -> JsonSchemaType.BOOLEAN
   }
 }
 
-val JsonElement.valueType: ValueType
-  get() {
-    return when {
-      this.isNull -> ValueType.NULL
-      this is JsonObject -> ValueType.OBJECT
-      this is JsonArray -> ValueType.ARRAY
-      this is JsonLiteral -> when {
-        this.booleanOrNull != null -> ValueType.BOOLEAN
-        this.longOrNull != null -> ValueType.INTEGER
-        this.doubleOrNull != null -> ValueType.NUMBER
-        else -> ValueType.STRING
-      }
-      else -> illegalState("Unknown json type")
-    }
-  }

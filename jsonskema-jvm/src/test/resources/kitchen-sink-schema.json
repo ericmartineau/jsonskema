@@ -1,0 +1,110 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://storage.googleapis.com/mverse-test/mverse/kitchenSink/0.0.1/schema/kitchenSink/jsonschema-draft6.json",
+  "properties": {
+    "selfRef": {
+      "$ref": "https://storage.googleapis.com/mverse-test/mverse/kitchenSink/0.0.1/schema/kitchenSink/jsonschema-draft6.json"
+    }
+  },
+  "$comment": "comment",
+  "title": "Kitchen Sink",
+  "readOnly": true,
+  "writeOnly": true,
+  "contentEncoding": "base64",
+  "contentMediaType": "image/png",
+  "definitions": {
+    "innerSelf": {
+      "$ref": "https://storage.googleapis.com/mverse-test/mverse/kitchenSink/0.0.1/schema/kitchenSink/jsonschema-draft6.json"
+    }
+  },
+  "description": "Schema with all the things",
+  "default": 42,
+  "maxProperties": 1000,
+  "required": [
+    "selfRef"
+  ],
+  "additionalProperties": {
+    "format": "uri"
+  },
+  "minProperties": 1,
+  "dependencies": {
+  },
+  "patternProperties": {
+    "^abc.*$": {
+      "type": "string"
+    }
+  },
+  "propertyNames": {
+    "enum": [
+      "name",
+      "age"
+    ]
+  },
+  "type": [
+    "object",
+    "string",
+    "number"
+  ],
+  "multipleOf": 3,
+  "maximum": 345,
+  "exclusiveMaximum": 346,
+  "minimum": 3,
+  "exclusiveMinimum": 2,
+  "format": "uri",
+  "maxLength": 34,
+  "minLength": 1,
+  "pattern": "^[a-z]*$",
+  "items": {
+    "minLength": 5
+  },
+  "additionalItems": {
+    "minLength": 10
+  },
+  "maxItems": 10,
+  "minItems": 1,
+  "uniqueItems": true,
+  "contains": {
+    "maxLength": 10
+  },
+  "enum": [
+    "Bob",
+    3,
+    "Forsgren"
+  ],
+  "examples": [
+    "Bob"
+  ],
+  "not": {
+    "const": 10
+  },
+  "if": {
+    "const": "big"
+  },
+  "then": {
+    "maxLength": 3
+  },
+  "else": {
+    "maxLength": 1
+  },
+  "allOf": [
+    {
+      "not": {
+        "const": null
+      }
+    }
+  ],
+  "oneOf": [
+    {
+      "not": {
+        "const": null
+      }
+    }
+  ],
+  "anyOf": [
+    {
+      "not": {
+        "const": null
+      }
+    }
+  ]
+}

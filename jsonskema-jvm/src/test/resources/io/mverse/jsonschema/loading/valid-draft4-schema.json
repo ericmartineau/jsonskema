@@ -1,0 +1,8 @@
+{
+  "id": "https://schema.org/valid-draft4.json",
+  "type": "array",
+  "minItems": 2,
+  "maxItems": 3,
+  "uniqueItems": true,
+  "additionalItems": false
+}

@@ -5,34 +5,21 @@ import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.builder.JsonSchemaBuilder
 import io.mverse.jsonschema.enums.JsonSchemaType
 
+
 object Schemas {
-  private val EMPTY_SCHEMA = JsonSchemaBuilder().build()
-  private val NULL_SCHEMA_BUILDER = JsonSchemaBuilder().type(JsonSchemaType.NULL)
-  private val NULL_SCHEMA = NULL_SCHEMA_BUILDER.build()
-  private val FALSE_SCHEMA_BUILDER = JsonSchemaBuilder().notSchema(JsonSchemaBuilder())
-  private val FALSE_SCHEMA = FALSE_SCHEMA_BUILDER.build()
+  val nullSchema:Schema = JsonSchemaBuilder().type(JsonSchemaType.NULL).build()
+  val emptySchema:Schema = JsonSchemaBuilder().build()
+  val falseSchema:Schema = JsonSchemaBuilder().notSchema(JsonSchemaBuilder()).build()
 
-  val Schema.isNullSchema: Boolean get() = this== NULL_SCHEMA
-  val Schema.isFalseSchema: Boolean get() = this== FALSE_SCHEMA
-  val Schema.isEmptySchema: Boolean get() = this== EMPTY_SCHEMA
-
-  fun nullSchema(): Schema {
-    return NULL_SCHEMA
-  }
+  val Schema.isNullSchema: Boolean get() = this == nullSchema
+  val Schema.isFalseSchema: Boolean get() = this == falseSchema
+  val Schema.isEmptySchema: Boolean get() = this == emptySchema
 
   fun nullSchemaBuilder(): SchemaBuilder<*> {
-    return NULL_SCHEMA_BUILDER
-  }
-
-  fun falseSchema(): Schema {
-    return FALSE_SCHEMA
-  }
-
-  fun emptySchema(): Schema {
-    return EMPTY_SCHEMA
+    return nullSchema.toBuilder<JsonSchemaBuilder>()
   }
 
   fun falseSchemaBuilder(): SchemaBuilder<*> {
-    return FALSE_SCHEMA_BUILDER
+    return falseSchema.toBuilder<JsonSchemaBuilder>()
   }
 }

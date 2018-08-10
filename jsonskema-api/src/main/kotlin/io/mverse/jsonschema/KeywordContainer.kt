@@ -25,7 +25,7 @@ abstract class KeywordContainer(open val keywords: Map<KeywordInfo<*>, JsonSchem
     return object: ReadOnlyProperty<KeywordContainer, T> {
       override fun getValue(thisRef: KeywordContainer, property: KProperty<*>): T {
         val keyword = thisRef.keyword(info)
-        return keyword!!.value ?: default
+        return keyword?.value ?: default
       }
     }
   }

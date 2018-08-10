@@ -2,21 +2,17 @@ package io.mverse.jsonschema
 
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.keyword.KeywordInfo
-import io.mverse.jsonschema.utils.JsonUtils
 import io.mverse.jsonschema.utils.JsonUtils.extractIdFromObject
 import io.mverse.jsonschema.utils.SchemaPaths
 import io.mverse.jsonschema.utils.toJsonSchemaType
-import io.mverse.jsonschema.utils.valueType
-import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.ElementType
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.boolean
-import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.int
 import lang.convert
 import lang.hashKode
-import lang.json.ValueType
 
 /**
  * This class is used for convenience in accessing data within a JsonObject.  It wraps the JSR353 [JsonObject]
@@ -36,7 +32,7 @@ data class JsonValueWithPath(
   }
 
   val jsonSchemaType: JsonSchemaType
-    get() = wrapped.valueType.toJsonSchemaType()
+    get() = wrapped.type.toJsonSchemaType()
 
   val isBoolean: Boolean
     get() = wrapped.booleanOrNull ?: false
@@ -59,7 +55,7 @@ data class JsonValueWithPath(
 
   override fun hashCode(): Int = hashKode(wrapped, location)
 
-  val jsonArray: JsonArray by lazy {
+  val jsonArray: kotlinx.serialization.json.JsonArray by lazy {
     wrapped.jsonArray
   }
 
@@ -85,15 +81,15 @@ data class JsonValueWithPath(
   }
 
   override operator fun get(key: String): JsonElement {
-    return jsonObject[key]
+    return if (jsonObject.containsKey(key)) jsonObject[key] else JsonNull
   }
 
   operator fun get(prop: KeywordInfo<*>): JsonElement {
-    return jsonObject[prop.key]
+    return this[prop.key]
   }
 
-  fun findObject(property: String): JsonObject? {
-    return get(property) as? JsonObject
+  fun findObject(property: String): kotlinx.serialization.json.JsonObject? {
+    return get(property) as? kotlinx.serialization.json.JsonObject
   }
 
   fun findPathAwareObject(keyword: KeywordInfo<*>): JsonValueWithPath? {
@@ -109,24 +105,27 @@ data class JsonValueWithPath(
   }
 
   override val size: Int get() = jsonObject.size
-  val valueType: ValueType get() = jsonObject.valueType
+  val type: ElementType get() = wrapped.type
   val number: Number? get() = wrapped.primitive.doubleOrNull
   val string: String? get() = wrapped.primitive.contentOrNull
   val boolean: Boolean? get() = wrapped.primitive.booleanOrNull
   val int: Int? get() = wrapped.primitive.intOrNull
   val double: Double? get() = wrapped.primitive.doubleOrNull
+  val arraySize: Int get() = wrapped.jsonArray.size
 
-  //  fun forEachIndex(action: BiConsumer<in Int, in JsonValueWithPath>) {
-  //    val i = AtomicInt(0)
-  //    wrapped.asJsonArray().forEach { v ->
-  //      val idx = i.getAndIncrement()
-  //      action.accept(idx, JsonValueWithPath(root, v, location.child(idx)))
-  //    }
-  //  }
+  fun forEachIndex(action: (Int, JsonValueWithPath) -> Unit) {
+    var i = 0
+    wrapped.jsonArray.forEach { v ->
+      val idx = i++
+      action(idx, JsonValueWithPath(root, v, location.child(idx)))
+    }
+  }
 
-  //  fun forEachKey(action: BiConsumer<in String, in JsonValueWithPath>) {
-  //    wrapped.jsonObject.forEach({ k, v -> action.accept(k, fromJsonValue(root, v, location.child(k))) })
-  //  }
+  fun forEachKey(action: (String, JsonValueWithPath) -> Unit) {
+    wrapped.jsonObject.forEach { (k, v) ->
+      action(k, fromJsonValue(root, v, location.child(k)))
+    }
+  }
 
   //  override operator fun get(key: Any): JsonElement {
   //    return jsonObject[key]
@@ -137,9 +136,9 @@ data class JsonValueWithPath(
     return JsonValueWithPath(root, json, location.child(idx))
   }
 
-  fun getJsonArray(name: String): JsonArray = jsonObject[name].jsonArray
+  fun getJsonArray(name: String): kotlinx.serialization.json.JsonArray = jsonObject[name].jsonArray
 
-  fun getJsonObject(name: String): JsonObject = jsonObject[name].jsonObject
+  fun getJsonObject(name: String): kotlinx.serialization.json.JsonObject = jsonObject[name].jsonObject
 
   fun getString(name: String): String? = jsonObject[name].contentOrNull
 
@@ -152,11 +151,12 @@ data class JsonValueWithPath(
   }
 
   fun path(childKey: String): JsonValueWithPath {
-    return fromJsonValue(root, jsonObject[childKey], location.child(childKey))
+      return fromJsonValue(root, this[childKey], location.child(childKey))
   }
 
   /**
    * Returns JSON text for this JSON value.
+   *
    *
    * @return JSON text
    */
@@ -184,7 +184,7 @@ data class JsonValueWithPath(
 
     fun fromJsonValue(root: JsonElement, jsonObject: JsonElement, location: SchemaLocation): JsonValueWithPath {
       var location = location
-      if (jsonObject is JsonObject) {
+      if (jsonObject is kotlinx.serialization.json.JsonObject) {
         val asJsonObject = jsonObject.jsonObject
         location = extractIdFromObject(asJsonObject, "\$id", "id")
             .convert { location.withId(it) }
@@ -195,7 +195,7 @@ data class JsonValueWithPath(
 
     fun fromJsonValue(jsonObject: JsonElement): JsonValueWithPath {
 
-      if (jsonObject is JsonObject) {
+      if (jsonObject is kotlinx.serialization.json.JsonObject) {
         val schemaLocation = SchemaPaths.fromDocument(jsonObject, "\$id", "id")
         return JsonValueWithPath(jsonObject.jsonObject, jsonObject, schemaLocation)
       }

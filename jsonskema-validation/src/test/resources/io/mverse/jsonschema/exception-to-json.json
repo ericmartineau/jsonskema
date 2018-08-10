@@ -1,0 +1,6 @@
+{
+  "pointerToViolation": "#/a/b",
+  "keyword": "type",
+  "message": "exception message",
+  "schemaLocation": "#"
+}

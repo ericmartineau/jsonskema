@@ -35,7 +35,7 @@ interface SchemaLoader {
    * @param report A place to log loading validation
    * @return A loaded ref schema
    */
-  fun loadRefSchema(referencedFrom: Schema, refURI: URI, currentDocument: JsonObject, report: LoadingReport): Schema
+  fun loadRefSchema(referencedFrom: Schema, refURI: URI, currentDocument: JsonObject?, report: LoadingReport): Schema
 
   /**
    * Loads a subschema within a document
@@ -44,7 +44,7 @@ interface SchemaLoader {
    * @param loadingReport A place to log validation
    * @return The loaded schema
    */
-  fun loadSubSchema(schemaJson: JsonValueWithPath, inDocument: JsonObject, loadingReport: LoadingReport): Schema
+  fun loadSubSchema(schemaJson: JsonValueWithPath, inDocument: kotlinx.serialization.json.JsonObject, loadingReport: LoadingReport): Schema
 
   /**
    * Loads all the values of a subschema into a builder.  This builder can then be modified before calling build()
@@ -53,7 +53,7 @@ interface SchemaLoader {
    * @param loadingReport A place to log loading validation
    * @return A schema builder instance.
    */
-  fun subSchemaBuilder(schemaJson: JsonValueWithPath, inDocument: JsonObject, loadingReport: LoadingReport): SchemaBuilder<*>
+  fun subSchemaBuilder(schemaJson: JsonValueWithPath, inDocument: kotlinx.serialization.json.JsonObject, loadingReport: LoadingReport): SchemaBuilder<*>
 
   /**
    * Looks for a schema that's already been loaded by this loader.
@@ -76,4 +76,6 @@ interface SchemaLoader {
    * @return A new copy of this loader.
    */
   fun withDocumentClient(documentClient: JsonDocumentClient): SchemaLoader
+
+  operator fun plusAssign(preloadedSchema: kotlinx.serialization.json.JsonObject)
 }

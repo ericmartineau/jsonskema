@@ -9,7 +9,7 @@ import lang.Unescaper
 
 object CharUtils {
 
-  private val SPACER = Joiner(' ')
+  private val SPACER = Joiner(" ")
 
   private val JSON_POINTER_SEGMENT_ESCAPER = Escaper(
       '~' to "~0",

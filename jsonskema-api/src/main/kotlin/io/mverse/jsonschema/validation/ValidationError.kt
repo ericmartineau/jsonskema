@@ -24,8 +24,9 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import lang.URI
-import lang.json.asJsonArray
-import lang.json.toJson
+import lang.format
+import lang.json.toJsonArray
+import lang.json.toJsonLiteral
 import lang.json.toJsonObject
 
 /**
@@ -52,7 +53,7 @@ data class ValidationError(
     val errorMessage: String? = null,
     private val messageTemplate: String? = null,
 
-    val causes: List<ValidationError>? = null,
+    val causes: List<ValidationError> = emptyList(),
     val keyword: KeywordInfo<*>? = null,
     val arguments: List<Any>? = null
 ) {
@@ -63,7 +64,7 @@ data class ValidationError(
    * @return all messages
    */
   val allMessages: List<ValidationError>
-    get() = if (causes!!.isEmpty()) {
+    get() = if (causes.isEmpty()) {
       listOf(this)
     } else {
       causes.allMessages
@@ -75,16 +76,7 @@ data class ValidationError(
    * @return the error description
    */
   val message: String
-    get() = getPointerToViolation() + ": " + errorMessage
-
-  val pathToViolation: JsonPath?
-    get() = pointerToViolation
-
-  val schemaLocation: URI?
-    get() = violatedSchema!!.pointerFragmentURI
-
-  val violationCount: Int
-    get() = causes!!.violationCount
+    get() = "$pathToViolation: $errorMessage"
 
   /**
    * A JSON pointer denoting the part of the document which violates the schema. It always points
@@ -93,36 +85,41 @@ data class ValidationError(
    *
    * @return the JSON pointer
    */
-  fun getPointerToViolation(): String? {
-    return pointerToViolation?.toURIFragment()?.toString()
-  }
+  val pathToViolation: String?
+    get() = pointerToViolation?.toURIFragment()?.toString()
 
-  fun toJson(withCauses: Boolean = true): JsonObject {
+  val schemaLocation: URI?
+    get() = violatedSchema!!.pointerFragmentURI
+
+  val violationCount: Int
+    get() = causes!!.violationCount
+
+  fun toJson(withCauses: Boolean = true): kotlinx.serialization.json.JsonObject {
     val errorJson = mutableMapOf<String, JsonElement>()
 
     if (pointerToViolation == null) {
       errorJson["pointerToViolation"] = JsonNull
     } else {
-      errorJson["pointerToViolation"] = getPointerToViolation().toJson()
+      errorJson["pointerToViolation"] = pathToViolation.toJsonLiteral()
     }
     if (this.keyword != null) {
-      errorJson["keyword"] = keyword.key.toJson()
+      errorJson["keyword"] = keyword.key.toJsonLiteral()
     }
     if (code != null) {
       errorJson["code"] = JsonPrimitive(code)
     }
-    errorJson["message"] = this.errorMessage.toJson()
+    errorJson["message"] = this.errorMessage.toJsonLiteral()
     if (violatedSchema != null) {
-      errorJson["schemaLocation"] = schemaLocation!!.toString().toJson()
+      errorJson["schemaLocation"] = schemaLocation!!.toString().toJsonLiteral()
     }
 
-    if (this.arguments!!.isNotEmpty()) {
-      errorJson["template"] = this.messageTemplate.toJson()
-      errorJson["arguments"] = arguments.map { it.toString() }.asJsonArray()
+    if (this.arguments?.isNotEmpty() == true) {
+      errorJson["template"] = this.messageTemplate.toJsonLiteral()
+      errorJson["arguments"] = arguments.map { it.toString() }.toJsonArray()
     }
 
-    if (withCauses && causes!!.isNotEmpty()) {
-      errorJson["causes"] = causes.map { it.toJson() }.asJsonArray()
+    if (withCauses && causes.isNotEmpty()) {
+      errorJson["causes"] = causes.map { it.toJson() }.toJsonArray()
     }
 
     return errorJson.toJsonObject()
@@ -149,10 +146,10 @@ data class ValidationError(
    *
    * @return a JSON description of the validation error
    */
-  fun toJsonErrors(): JsonArray {
+  fun toJsonErrors(): kotlinx.serialization.json.JsonArray {
     return this.allMessages
         .map { e -> e.toJson(false) }
-        .asJsonArray()
+        .toJsonArray()
   }
 
   override fun toString(): String {
@@ -162,6 +159,12 @@ data class ValidationError(
         ", keyword='" + keyword + '\''.toString() +
         ", message='" + errorMessage + '\''.toString() +
         '}'.toString()
+  }
+
+  fun withError(message:String, vararg args:Any):ValidationError {
+    return this.copy(messageTemplate = message,
+        errorMessage = message.format(*args),
+        arguments = args.toList())
   }
 
   fun withKeyword(keyword: KeywordInfo<*>, message: String): ValidationError {
