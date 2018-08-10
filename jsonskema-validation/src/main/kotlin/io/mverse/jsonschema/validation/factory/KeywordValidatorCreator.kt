@@ -2,9 +2,6 @@ package io.mverse.jsonschema.validation.factory
 
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.keyword.JsonSchemaKeyword
-import io.mverse.jsonschema.keyword.KeywordInfo
-import io.mverse.jsonschema.keyword.SchemaKeyword
-import io.mverse.jsonschema.validation.JsonSchemaValidator
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
 

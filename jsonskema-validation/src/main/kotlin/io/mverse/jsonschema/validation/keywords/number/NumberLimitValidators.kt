@@ -8,28 +8,28 @@ import io.mverse.jsonschema.validation.keywords.KeywordValidator
 object NumberLimitValidators {
 
   fun getMaxValidator(keyword: LimitKeyword, schema: Schema, factory: SchemaValidatorFactory): KeywordValidator<LimitKeyword>? {
-    return if (keyword.isExclusive) {
-      NumberExclusiveMaximumValidator(
+    return when {
+      keyword.isExclusive -> NumberExclusiveMaximumValidator(
           schema = schema,
-          exclusiveMaximum = keyword.exclusive!!.toDouble())
-    } else if(keyword.limit != null) {
-      NumberMaximumValidator(
+          exclusiveMaximum = keyword.exclusiveLimit!!.toDouble())
+      keyword.limit != null -> NumberMaximumValidator(
           schema = schema,
           maximum = keyword.limit!!.toDouble()
       )
-    } else null
+      else -> null
+    }
   }
 
   fun getMinValidator(keyword: LimitKeyword, schema: Schema, factory: SchemaValidatorFactory): KeywordValidator<LimitKeyword>? {
-    return if (keyword.isExclusive) {
-      NumberExclusiveMinimumValidator(
+    return when {
+      keyword.isExclusive -> NumberExclusiveMinimumValidator(
           schema = schema,
-          exclusiveMinimum = keyword.exclusive!!.toDouble())
-    } else if(keyword.limit != null) {
-      NumberMinimumValidator(
+          exclusiveMinimum = keyword.exclusiveLimit!!.toDouble())
+      keyword.limit != null -> NumberMinimumValidator(
           schema = schema,
           minimum = keyword.limit!!.toDouble()
       )
-    } else null
+      else -> null
+    }
   }
 }

@@ -1,9 +1,19 @@
 package io.mverse.jsonschema.keyword
 
-data class NumberKeyword(val number: Number) : JsonSchemaKeywordImpl<Number>(number.toDouble()) {
+data class NumberKeyword(override val value: Number) : JsonSchemaKeywordImpl<Number>() {
   val double: Double
-    get() = number.toDouble()
+    get() = value.toDouble()
 
   val integer: Int
-    get() = number.toInt()
+    get() = value.toInt()
+
+  override fun equals(other: Any?): Boolean = when {
+    this === other -> true
+    other !is NumberKeyword -> false
+    else -> double == other.double
+  }
+
+  override fun hashCode(): Int {
+    return double.hashCode()
+  }
 }

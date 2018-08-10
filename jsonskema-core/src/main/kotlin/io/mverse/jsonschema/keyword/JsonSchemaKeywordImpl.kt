@@ -10,12 +10,11 @@ import lang.isIntegral
 import lang.json.toJsonArray
 import lang.json.toJsonLiteral
 
-abstract class JsonSchemaKeywordImpl<T>(val keywordValue: T? = null) : JsonSchemaKeyword<T> {
-
-  override val value: T? = keywordValue
+abstract class JsonSchemaKeywordImpl<T> : JsonSchemaKeyword<T> {
 
   override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion) {
     val jsonKey = keyword.key
+    val keywordValue = value
     builder.run {
       when (keywordValue) {
         is String-> jsonKey to keywordValue.toJsonLiteral()
@@ -37,12 +36,12 @@ abstract class JsonSchemaKeywordImpl<T>(val keywordValue: T? = null) : JsonSchem
   }
 
   override fun equals(other: Any?): Boolean {
-    return other is JsonSchemaKeywordImpl<*> && other.keywordValue == keywordValue
+    return other is JsonSchemaKeywordImpl<*> && other.value == value
   }
 
   override fun hashCode(): Int {
-    return hashKode(keywordValue)
+    return hashKode(value)
   }
 
-  override fun toString(): String = keywordValue.toString()
+  override fun toString(): String = value.toString()
 }

@@ -77,11 +77,11 @@ actual object FormatChecks {
   }
 
   actual fun isValidIPV4(str: String): Boolean {
-    return asInetAddress(str)?.address?.size != IPV4_LENGTH
+    return asInetAddress(str)?.address?.size == IPV4_LENGTH
   }
 
   actual fun isValidIPV6(str: String): Boolean {
-    return asInetAddress(str)?.address?.size != IPV6_LENGTH
+    return asInetAddress(str)?.address?.size == IPV6_LENGTH
   }
 
   /**

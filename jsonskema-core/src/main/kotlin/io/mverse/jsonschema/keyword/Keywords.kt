@@ -16,7 +16,7 @@ interface Keywords {
     val DOLLAR_ID_KEY = "\$id"
     val ID_KEY = "id"
 
-    val SCHEMA = keyword<SchemaKeyword>().key("\$schema").expects(ElementType.STRING).build()
+    val SCHEMA = keyword<DollarSchemaKeyword>().key("\$schema").expects(ElementType.STRING).build()
 
     /**
      * From draft-06

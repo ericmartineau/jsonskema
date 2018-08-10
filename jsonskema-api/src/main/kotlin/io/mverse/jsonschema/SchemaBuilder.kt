@@ -192,4 +192,6 @@ interface SchemaBuilder<SELF : SchemaBuilder<SELF>> {
   fun <K:JsonSchemaKeyword<*>> keyword(keyword: KeywordInfo<K>, keywordValue: K):SELF
 
   fun build(block: SELF.() -> Unit = {}): Schema
+
+  fun propertySchema(propertySchemaKey: String, block: SchemaBuilder<*>.() -> Unit): SELF
 }

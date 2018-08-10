@@ -36,20 +36,17 @@ import io.mverse.jsonschema.keyword.Keywords.Companion.PROPERTY_NAMES
 import io.mverse.jsonschema.keyword.Keywords.Companion.REQUIRED
 import io.mverse.jsonschema.keyword.Keywords.Companion.UNIQUE_ITEMS
 import io.mverse.jsonschema.utils.Schemas.nullSchema
-import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.json
 import lang.Logger
 import lang.SetMultimap
 import lang.URI
-import lang.hashKode
 import lang.json.JsonSaver
 
 val log: Logger = Logger("JsonSchemaImpl")
 
-abstract class JsonSchemaImpl<D : DraftSchema<D>>
-(
+abstract class JsonSchemaImpl<D : DraftSchema<D>>(
     override val location: SchemaLocation,
     override val keywords: Map<KeywordInfo<*>, JsonSchemaKeyword<*>> = emptyMap(),
     override val extraProperties: Map<String, JsonElement> = emptyMap(),
@@ -91,7 +88,7 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>
   }
 
   override val propertySchemaDependencies: Map<String, Schema> by lazy {
-    keyword(DEPENDENCIES)?.dependencySchemas?.schemas ?: emptyMap()
+    keyword(DEPENDENCIES)?.dependencySchemas?.value ?: emptyMap()
   }
 
   override val allItemSchema: D? by lazy {
@@ -149,7 +146,11 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>
     return this as? Draft4Schema ?:  Draft4SchemaImpl(this)
   }
 
-  override fun toString(): String = JsonSaver().serialize(this.toJson(version))
+  override fun toString(): String = toString(version)
+
+  override fun toString(version: JsonSchemaVersion): String {
+    return JsonSaver().serialize(this.toJson(version))
+  }
 
   override fun <X : SchemaBuilder<X>> toBuilder(): X {
     @Suppress("unchecked_cast")
@@ -179,8 +180,8 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>
   protected open val maxProperties: Int? by numberKeyword(MAX_PROPERTIES)
   protected open val minProperties: Int? by numberKeyword(MIN_PROPERTIES)
   protected open val requiredProperties: Set<String> by keywords(REQUIRED, emptySet())
-  protected open val exclusiveMinimum: Number? by lazy { keyword(MINIMUM)?.exclusive }
-  protected open val exclusiveMaximum: Number? by lazy { keyword(MAXIMUM)?.exclusive }
+  protected open val exclusiveMinimum: Number? by lazy { keyword(MINIMUM)?.exclusiveLimit }
+  protected open val exclusiveMaximum: Number? by lazy { keyword(MAXIMUM)?.exclusiveLimit }
   protected open val containsSchema: Schema? by keywords(CONTAINS)
   protected open val propertyNameSchema: Schema? by keywords(PROPERTY_NAMES)
 
@@ -189,18 +190,18 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>
   }
 
   protected open val isAllowAdditionalProperties: Boolean by lazy {
-    keyword(ADDITIONAL_PROPERTIES)?.schema != nullSchema
+    keyword(ADDITIONAL_PROPERTIES)?.value != nullSchema
   }
 
   override fun equals(other: Any?): Boolean {
     return when {
       this === other -> true
       other !is JsonSchemaImpl<*> -> false
-      else -> other.keywords == this.keywords
+      else -> this.keywords == other.keywords
     }
   }
 
   override fun hashCode(): Int {
-    return hashKode(keywords)
+    return keywords.hashCode()
   }
 }

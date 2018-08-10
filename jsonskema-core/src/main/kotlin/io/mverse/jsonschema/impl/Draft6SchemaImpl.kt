@@ -9,6 +9,7 @@ import io.mverse.jsonschema.keyword.KeywordInfo
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import lang.URI
+import lang.freezeMap
 
 class Draft6SchemaImpl : JsonSchemaImpl<Draft6Schema>, Draft6Schema {
 
@@ -43,7 +44,7 @@ class Draft6SchemaImpl : JsonSchemaImpl<Draft6Schema>, Draft6Schema {
 
   constructor(location: SchemaLocation,
               keywords: Map<KeywordInfo<*>, JsonSchemaKeyword<*>>,
-              extraProperties: Map<String, JsonElement>) : super(location, keywords, extraProperties, JsonSchemaVersion.Draft6)
+              extraProperties: Map<String, JsonElement>) : super(location, keywords.freezeMap(), extraProperties.freezeMap(), JsonSchemaVersion.Draft6)
 
   override fun asDraft6(): Draft6Schema = this
   override fun convertVersion(source: Schema): Draft6Schema = source.asDraft6()

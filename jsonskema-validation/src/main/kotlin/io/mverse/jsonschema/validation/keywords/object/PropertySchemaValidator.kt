@@ -14,7 +14,7 @@ data class PropertySchemaValidator(val keyword: SchemaMapKeyword,
                                    val factory: SchemaValidatorFactory)
   : KeywordValidator<SchemaMapKeyword>(PROPERTIES, schema) {
 
-  private val propertyValidators: Map<String, SchemaValidator> = keyword.schemas
+  private val propertyValidators: Map<String, SchemaValidator> = keyword.value
       .map { (key, schema) -> key to factory.createValidator(schema) }
       .toMap()
   private val validatedProperties: Set<String> = HashSet(propertyValidators.keys)

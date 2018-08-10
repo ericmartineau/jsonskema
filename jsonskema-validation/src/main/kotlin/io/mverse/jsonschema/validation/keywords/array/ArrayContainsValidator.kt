@@ -12,7 +12,7 @@ import io.mverse.jsonschema.validation.keywords.KeywordValidator
 data class ArrayContainsValidator(val keyword: SingleSchemaKeyword,
                                   override val schema: Schema,
                                   val factory: SchemaValidatorFactory,
-                                  private val containsValidator: SchemaValidator = factory.createValidator(keyword.schema))
+                                  private val containsValidator: SchemaValidator = factory.createValidator(keyword.value))
   : KeywordValidator<SingleSchemaKeyword>(Keywords.CONTAINS, schema) {
 
 

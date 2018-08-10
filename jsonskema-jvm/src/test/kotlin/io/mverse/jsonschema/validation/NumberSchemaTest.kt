@@ -16,7 +16,12 @@
 package io.mverse.jsonschema.validation
 
 import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.assertj.asserts.hasKeyword
+import io.mverse.jsonschema.assertj.asserts.isNotValid
+import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.getValidator
+import io.mverse.jsonschema.keyword.Keywords
+import io.mverse.jsonschema.keyword.Keywords.Companion.EXCLUSIVE_MAXIMUM
 import io.mverse.jsonschema.loading.parseJsonObject
 import io.mverse.jsonschema.minus
 import io.mverse.jsonschema.plus
@@ -27,7 +32,6 @@ import io.mverse.jsonschema.validation.ValidationMocks.mockNumberSchema
 import io.mverse.jsonschema.validation.ValidationMocks.mockSchema
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
 import lang.json.toJsonLiteral
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -38,11 +42,10 @@ class NumberSchemaTest {
 
   @Test
   fun exclusiveMaximum() {
-    val subject = mockNumberSchema().exclusiveMaximum(20).build()
-    ValidationTestSupport.failureOf(subject)
-        .expectedKeyword("exclusiveMaximum")
-        .input(20)
-        .expect()
+    val schema = mockNumberSchema().exclusiveMaximum(20).build()
+    schema.validating(20.toJsonLiteral())
+        .isNotValid()
+        .hasKeyword(EXCLUSIVE_MAXIMUM)
   }
 
   @Test
@@ -127,7 +130,8 @@ class NumberSchemaTest {
   @Test
   fun toStringNoExplicitType() {
     val rawSchemaJson = loader.readJsonObject("tostring/numberschema.json") - "type"
-    val actual = JsonSchema.schemaReader().readSchema(rawSchemaJson).toString()
+    val schemaFromJson = JsonSchema.schemaReader().readSchema(rawSchemaJson)
+    val actual = schemaFromJson.toString()
     assertEquals(rawSchemaJson, actual.parseJsonObject())
   }
 

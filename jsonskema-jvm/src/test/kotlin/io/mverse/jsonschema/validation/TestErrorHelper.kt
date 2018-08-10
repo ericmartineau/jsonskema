@@ -5,13 +5,13 @@ import com.google.common.base.Preconditions.checkNotNull
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.keyword.Keywords
+import io.mverse.jsonschema.validation.ValidationErrorHelper.TYPE_MISMATCH_ERROR_MESSAGE
 
 object TestErrorHelper {
   fun failure(schema: Schema, desired: JsonSchemaType, found: JsonSchemaType): ValidationError {
-    checkNotNull(schema, "schema" + " must not be null")
     return ValidationError(
         violatedSchema = schema,
-        messageTemplate = ValidationErrorHelper.TYPE_MISMATCH_ERROR_MESSAGE,
+        messageTemplate = TYPE_MISMATCH_ERROR_MESSAGE,
         arguments = listOf(desired, found),
         keyword = Keywords.TYPE,
         pointerToViolation = schema.location.jsonPath)

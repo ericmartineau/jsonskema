@@ -5,6 +5,9 @@ import assertk.assert
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.key
+import assertk.assertions.support.fail
+import assertk.fail
+import com.google.common.collect.Maps
 import io.mverse.jsonschema.Draft7Schema
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.Schema
@@ -35,6 +38,29 @@ fun SchemaAssert.isVersion(version: JsonSchemaVersion): SchemaAssert {
   return this
 }
 
+fun SchemaAssert.isSchemaEqual(other:Schema) {
+  val difference = Maps.difference(this.actual.keywords, other.keywords)
+  if (!difference.areEqual()) {
+    var msg = ""
+    msg += "Schemas don't match: \n"
+    if(difference.entriesOnlyOnLeft().isNotEmpty()) {
+      msg += "- ONLY ON LEFT: ${difference.entriesOnlyOnLeft().keys} \n"
+    }
+    if(difference.entriesOnlyOnRight().isNotEmpty()) {
+      msg += "- ONLY ON RIGHT: ${difference.entriesOnlyOnRight().keys} \n"
+    }
+
+    if(difference.entriesDiffering().isNotEmpty()) {
+      msg += "- DIFFERING: \n"
+      difference.entriesDiffering().forEach { t, diff ->
+        msg += "  - Key: $t\n"
+        msg += "      - LEFT: ${diff.leftValue().toString().prependIndent("      ")}"
+        msg += "      - RIGHT: ${diff.rightValue().toString().prependIndent("      ")}"
+      }
+    }
+  }
+}
+
 inline fun <reified K : JsonSchemaKeyword<*>, reified I : KeywordInfo<K>> SchemaAssert.hasKeyword(keyword: I): Assert<K> {
   assert(actual.keywords, "schema.keywords")
       .key(keyword) { k ->
@@ -56,7 +82,8 @@ fun SchemaAssert.hasProperty(property: String): Draft7Assert {
 }
 
 fun SchemaAssert.validating(toValidate: JsonElement): SchemaValidationAssert {
-  val result = ValidationMocks.createTestValidator(actual).validate(toValidate)
+  val validator = ValidationMocks.createTestValidator(actual)
+  val result = validator.validate(toValidate)
   return assert(result)
 }
 

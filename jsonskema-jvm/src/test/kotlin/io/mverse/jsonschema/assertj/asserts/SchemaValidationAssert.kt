@@ -4,11 +4,11 @@ import assertk.Assert
 import assertk.all
 import assertk.assertions.containsAll
 import assertk.assertions.isEqualTo
-import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
-import assertk.assertions.isNull
-import assertk.assertions.key
+import assertk.fail
+import io.mverse.jsonschema.JsonPath
+import io.mverse.jsonschema.assertThat
 import io.mverse.jsonschema.assertj.subject.ValidationErrorPredicate
 import io.mverse.jsonschema.assertj.subject.ValidationErrorPredicate.Companion.argumentsContainsAll
 import io.mverse.jsonschema.assertj.subject.ValidationErrorPredicate.Companion.codeEquals
@@ -16,9 +16,9 @@ import io.mverse.jsonschema.assertj.subject.ValidationErrorPredicate.Companion.p
 import io.mverse.jsonschema.assertj.subject.ValidationErrorPredicate.Companion.schemaLocationEquals
 import io.mverse.jsonschema.keyword.JsonSchemaKeyword
 import io.mverse.jsonschema.keyword.KeywordInfo
-import io.mverse.jsonschema.keyword.SchemaKeyword
 import io.mverse.jsonschema.validation.ValidationError
 import lang.URI
+import kotlin.test.fail
 
 typealias SchemaValidationAssert = Assert<ValidationError?>
 typealias ValidationListAssert = Assert<List<ValidationError>>
@@ -27,16 +27,21 @@ typealias ValidationListAssert = Assert<List<ValidationError>>
 //  private val flattened: List<ValidationError>
 
 fun SchemaValidationAssert.isValid(): SchemaValidationAssert {
-  assert(this.actual, "violations").isNull()
+  if(this.actual != null) {
+    assertk.fail("Expecting no validation errors, but found: ${
+    this.actual!!.allMessages.joinToString(separator = "\n - ", prefix = "\n - ") { it.message }
+    }")
+  }
   return this
 }
 
 fun SchemaValidationAssert.isNotValid(): SchemaValidationAssert {
-  assert(this.actual, "should have failures, but didn't").isNotNull {
-    assert(it.actual.allMessages.size, "should have at least one violation").isGreaterThan(0)
+  if(this.actual?.allMessages?.size == 0) {
+    fail("Was unexpectedly valid. We should have encountered errors")
   }
   return this
 }
+
 
 //  constructor(errors: List<ValidationError>) : super(stream(errors)
 //      .flatCollection(???(
@@ -86,18 +91,23 @@ fun SchemaValidationAssert.hasViolationsAt(vararg paths: String): SchemaValidati
 }
 
 fun SchemaValidationAssert.hasErrorCode(errorCode: String): SchemaValidationAssert {
-  return filter(codeEquals(errorCode))
+  return apply {filter(codeEquals(errorCode))}
 }
 
 fun SchemaValidationAssert.hasViolationAt(pointerToViolation: String): SchemaValidationAssert {
-  return filter(pointerToViolationEquals(pointerToViolation))
+  val filtered = filter(pointerToViolationEquals(pointerToViolation))
+  return ValidationError.collectErrors(actual!!.violatedSchema!!,
+      JsonPath.parseFromURIFragment(pointerToViolation),
+      filtered)
+      .assertThat()
+
 }
 
 fun SchemaValidationAssert.hasErrorArguments(vararg args: Any): SchemaValidationAssert {
-  return filter(argumentsContainsAll(*args))
+  return apply {filter(argumentsContainsAll(*args))}
 }
 
-inline fun <reified K : JsonSchemaKeyword<*>, reified I : KeywordInfo<K>> SchemaValidationAssert.hasKeyword(keyword: I): SchemaValidationAssert {
+fun <K : JsonSchemaKeyword<*>, I : KeywordInfo<K>> SchemaValidationAssert.hasKeyword(keyword: I): SchemaValidationAssert {
   assert(actual?.keyword, "Has keyword").isEqualTo(keyword)
   return this
 }
@@ -107,10 +117,10 @@ fun SchemaValidationAssert.hasSchemaLocation(uri: String): SchemaValidationAsser
 }
 
 fun SchemaValidationAssert.hasSchemaLocation(uri: URI): SchemaValidationAssert {
-  return filter(schemaLocationEquals(uri))
+  return apply {filter(schemaLocationEquals(uri)) }
 }
 
-private fun SchemaValidationAssert.filter(vararg filters: ValidationErrorPredicate): SchemaValidationAssert {
+private fun SchemaValidationAssert.filter(vararg filters: ValidationErrorPredicate): List<ValidationError> {
   val filteredErrors = this.actual
       ?.allMessages
       ?.filter { e ->
@@ -118,10 +128,15 @@ private fun SchemaValidationAssert.filter(vararg filters: ValidationErrorPredica
             .all { predicate -> predicate(e) }
       } ?: emptyList()
 
-  val schemaValidationAssert = assert(filteredErrors,
-      "violations ${ValidationErrorPredicate.toString(*filters)}")
+  val missingErrors = filteredErrors.isEmpty()
+  if (missingErrors && this.actual?.allMessages?.isNotEmpty() == true) {
+    val allErrors = this.actual?.allMessages?.joinToString(separator = "\n -", prefix = "\n -") { it.message }
+    fail("Expected violation: [${ValidationErrorPredicate.toString(*filters)}] Found: $allErrors")
 
-  schemaValidationAssert.isNotEmpty()
-  return this
+  } else if(missingErrors) {
+    fail("Expected violation: [${ValidationErrorPredicate.toString(*filters)}] No violations were found")
+  }
+
+  return filteredErrors
 }
 

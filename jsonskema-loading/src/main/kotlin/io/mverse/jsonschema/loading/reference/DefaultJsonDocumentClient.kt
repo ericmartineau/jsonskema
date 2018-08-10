@@ -24,19 +24,19 @@ import lang.URI
 /**
  * A [JsonDocumentClient] implementation which uses [URL] for reading the remote content.
  */
-data class DefaultJsonDocumentClient(val schemaCache: SchemaCache = SchemaCache()) : JsonDocumentClient {
+open class DefaultJsonDocumentClient(val schemaCache: SchemaCache = SchemaCache()) : JsonDocumentClient {
 
-  override fun findLoadedDocument(documentLocation: URI): kotlinx.serialization.json.JsonObject? {
+  override fun findLoadedDocument(documentLocation: URI): JsonObject? {
     return schemaCache.lookupDocument(documentLocation)
   }
 
-  override fun registerLoadedDocument(documentLocation: URI, document: kotlinx.serialization.json.JsonObject) {
+  override fun registerLoadedDocument(documentLocation: URI, document: JsonObject) {
     schemaCache.cacheDocument(documentLocation, document)
   }
 
-  override fun resolveSchemaWithinDocument(documentURI: URI, schemaURI: URI, document: kotlinx.serialization.json.JsonObject): JsonPath?? {
+  override fun resolveSchemaWithinDocument(documentURI: URI, schemaURI: URI, document: JsonObject): JsonPath? {
     return schemaCache.resolveURIToDocumentUsingLocalIdentifiers(documentURI, schemaURI, document)
   }
 
-  override fun fetchDocument(uri: URI): kotlinx.serialization.json.JsonObject = uri.toStream().parseJsonObject()
+  override fun fetchDocument(uri: URI): JsonObject = uri.readFully().parseJsonObject()
 }

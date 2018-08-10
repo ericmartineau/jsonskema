@@ -19,7 +19,6 @@ import assertk.assert
 import assertk.assertions.hasToString
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.RefSchema
-import io.mverse.jsonschema.jsonschema
 import io.mverse.jsonschema.loading.parseJsonObject
 import io.mverse.jsonschema.resourceLoader
 import io.mverse.jsonschema.schemaBuilder

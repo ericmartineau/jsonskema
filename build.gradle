@@ -1,1 +1,68 @@
+buildscript {
+  repositories {
+    jcenter()
+  }
 
+  dependencies {
+    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+  }
+}
+subprojects {
+  repositories {
+    maven { url "https://dl.bintray.com/mverse-io/mverse-public" }
+  }
+
+  if (project.name.contains("native")) return
+
+  if (project.name.contains("benchmark")) return
+
+  apply plugin: 'maven-publish'
+
+  def varintName = ""
+
+  if (project.name == "jsonskema-jvm") {
+    varintName = "${rootProject.name}"
+  } else {
+    varintName = "${rootProject.name}-${project.name}"
+  }
+
+  afterEvaluate {
+    task sourceJar(type: Jar, dependsOn: classes) {
+      classifier 'sources'
+      from sourceSets.main.kotlin
+      if (project.name == "jsonskema-jvm" || project.name == "js") {
+        duplicatesStrategy = "exclude"
+        def platformSrc = sourceSets.main.kotlin
+        from(platformSrc
+            + project(':jsonskema-api').sourceSets.main.kotlin
+            + project(':jsonskema-core').sourceSets.main.kotlin
+            + project(':jsonskema-common').sourceSets.main.kotlin
+
+        )
+      }
+    }
+  }
+
+  tasks.withType(Jar) {
+    archivesBaseName = varintName
+  }
+
+  publishing {
+    publications {
+      mavenProject(MavenPublication) {
+        from components.java
+        groupId project.group
+        artifactId varintName
+        version project.version
+
+        artifact sourceJar {
+          classifier "sources"
+        }
+      }
+    }
+  }
+
+  apply plugin: 'com.jfrog.bintray'
+
+  apply from: "${rootProject.rootDir}/gradle/bintray.gradle"
+}

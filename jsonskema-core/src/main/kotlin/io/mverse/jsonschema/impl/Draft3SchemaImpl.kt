@@ -15,6 +15,7 @@ import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.utils.Schemas.nullSchema
 import kotlinx.serialization.json.JsonElement
 import lang.URI
+import lang.freezeMap
 
 class Draft3SchemaImpl : JsonSchemaImpl<Draft3Schema>, Draft3Schema {
 
@@ -53,7 +54,7 @@ class Draft3SchemaImpl : JsonSchemaImpl<Draft3Schema>, Draft3Schema {
   override val isAllowAdditionalProperties: Boolean
     get() = additionalPropertiesSchema != nullSchema
 
-  constructor(from: Schema) : super(from.location, from.keywords, from.extraProperties, Draft3) {}
+  constructor(from: Schema) : super(from.location, from.keywords.freezeMap(), from.extraProperties.freezeMap(), Draft3) {}
 
   constructor(location: SchemaLocation,
               keywords: Map<KeywordInfo<*>, JsonSchemaKeyword<*>>,

@@ -16,7 +16,7 @@ fun Assert<Draft7Schema>.isReadOnly(): Assert<Draft7Schema> {
   return this
 }
 
-fun Assert<Draft7Schema>.isNotReadOnly(): Assert<Draft7Schema> {
+fun Draft7Assert.isNotReadOnly(): Assert<Draft7Schema> {
   assert(actual.isReadOnly, "readOnly").all {
     isNotNull()
     isFalse()
@@ -24,7 +24,7 @@ fun Assert<Draft7Schema>.isNotReadOnly(): Assert<Draft7Schema> {
   return this
 }
 
-fun Assert<Draft7Schema>.isWriteOnly(): Assert<Draft7Schema> {
+fun Draft7Assert.isWriteOnly(): Assert<Draft7Schema> {
   assert(actual.isWriteOnly, "writeOnly").all {
     isNotNull()
     isTrue()
@@ -32,7 +32,7 @@ fun Assert<Draft7Schema>.isWriteOnly(): Assert<Draft7Schema> {
   return this
 }
 
-fun Assert<Draft7Schema>.isNotWriteOnly(): Assert<Draft7Schema> {
+fun Draft7Assert.isNotWriteOnly(): Assert<Draft7Schema> {
   assert(actual.isWriteOnly, "writeOnly").all {
     isNotNull()
     isTrue()
@@ -43,6 +43,11 @@ fun Assert<Draft7Schema>.isNotWriteOnly(): Assert<Draft7Schema> {
 fun Draft7Assert.hasIfSchema(): Draft7Assert {
   hasKeyword(keyword = Keywords.IF)
   return assert(actual.ifSchema!!.asDraft7())
+}
+
+fun Draft7Assert.hasThenSchema(): Draft7Assert {
+  hasKeyword(keyword = Keywords.THEN)
+  return assert(actual.thenSchema!!.asDraft7())
 }
 
 fun Assert<Draft7Schema>.hasElseSchema(): Assert<Draft7Schema> {

@@ -268,14 +268,15 @@ class ArraySchemaValidatorTest {
 
   @Test
   fun validate_WhenItemsSchemaHasEnum_ThenDontEnforceLexicalMatching() {
+
     val enumSchema = mockNumberSchema()
-        .enumValues(jsonArrayOf(12, 24.3, 65))
+        .enumValues("[12, 24.3, 65]".parseJson().jsonArray)
 
     val arraySchema = JsonSchema.schemaBuilder()
         .allItemSchema(enumSchema)
         .build()
 
-    val arrayValues = jsonArrayOf(24.30, 12)
+    val arrayValues = "[24.3, 12]".parseJson().jsonArray
     arraySchema.validating(arrayValues)
         .isValid()
   }

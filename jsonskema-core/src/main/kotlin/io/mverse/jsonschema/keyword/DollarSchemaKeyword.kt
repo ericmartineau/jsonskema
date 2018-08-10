@@ -1,15 +1,13 @@
 package io.mverse.jsonschema.keyword
 
-import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import kotlinx.serialization.json.JsonBuilder
 import lang.URI
 
-open class SchemaKeyword : JsonSchemaKeyword<URI> {
+open class DollarSchemaKeyword : JsonSchemaKeyword<URI> {
+  override val value: URI = URI("")
 
-  override val value: URI? = null
-
-  override fun toJson(keyword: KeywordInfo<*>, builder: kotlinx.serialization.json.JsonBuilder, version: JsonSchemaVersion) {
+  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion) {
     version.metaschemaURI?.let { schemaUri ->
       builder.run {
         SCHEMA_KEYWORD to schemaUri.toString()
@@ -22,7 +20,7 @@ open class SchemaKeyword : JsonSchemaKeyword<URI> {
   }
 
   override fun equals(other: Any?): Boolean {
-    return other is SchemaKeyword
+    return other is DollarSchemaKeyword
   }
 
   override fun toString(): String {
@@ -30,6 +28,6 @@ open class SchemaKeyword : JsonSchemaKeyword<URI> {
   }
 
   companion object {
-    val SCHEMA_KEYWORD = "\$schema"
+    const val SCHEMA_KEYWORD = "\$schema"
   }
 }

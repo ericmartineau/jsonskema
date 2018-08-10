@@ -1,5 +1,4 @@
 buildscript {
-
   repositories {
     jcenter()
     maven { url "https://kotlin.bintray.com/kotlinx" }
@@ -49,7 +48,6 @@ dependencies {
   expectedBy project(":jsonskema-core")
   expectedBy project(":jsonskema-loading")
   expectedBy project(":jsonskema-validation")
-  expectedBy project(":jsonskema-tests")
   testCompile "junit:junit:4.12"
 
   compile("org.assertj:assertj-core:3.10.0")
@@ -64,8 +62,15 @@ dependencies {
   testCompile "org.jetbrains.kotlin:kotlin-test"
   testCompile "org.jetbrains.kotlin:kotlin-test-junit"
   testCompile 'com.willowtreeapps.assertk:assertk-jvm:0.11'
+
+  testCompile "pl.pragmatists:JUnitParams:1.1.1"
+
+
   // Reflections - a Java runtime metadata analysis
   compile("org.reflections:reflections:0.9.11")
+  // All versions of Mockito library that were automatically synced to JCenter and Maven Central. Starting from April 2017 "mockito" Bintray package only contains notable versions of Mockito. For more information see the details of Mockito Continuous Delivery Pipeline 2.0 (https://github.com/mockito/mockito/issues/911)
+  testCompile("org.mockito:mockito-all:1.+")
+
 
 }
 

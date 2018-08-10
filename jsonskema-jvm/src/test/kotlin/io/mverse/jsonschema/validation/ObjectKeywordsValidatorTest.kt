@@ -80,8 +80,8 @@ class ObjectKeywordsValidatorTest {
         .input(fooBar)
         .expectedConsumer { error ->
           //Other stuff
-          assertEquals(1, error.causes!!.size)
-          val cause = error.causes!![0]
+          assertEquals(1, error.causes.size)
+          val cause = error.causes[0]
           assertEquals("#/additionalProperties", cause.schemaLocation.toString())
           assertEquals(Keywords.TYPE, cause.keyword)
           assertEquals(boolSchema.build(), cause.violatedSchema)

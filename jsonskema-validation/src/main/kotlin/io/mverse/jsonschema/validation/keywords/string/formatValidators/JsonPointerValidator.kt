@@ -33,7 +33,7 @@ class JsonPointerValidator : FormatValidator {
       return null
     } catch (e: NullPointerException) {
       return "invalid json-pointer. Can't be null"
-    } catch (e: IllegalArgumentException) {
+    } catch (e: Exception) {
       return e.message
     }
   }

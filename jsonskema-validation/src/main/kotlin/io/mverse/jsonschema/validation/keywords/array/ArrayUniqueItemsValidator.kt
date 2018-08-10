@@ -14,7 +14,7 @@ data class ArrayUniqueItemsValidator(val keyword: BooleanKeyword,
                                      override val schema: Schema,
                                      val factory: SchemaValidatorFactory) : KeywordValidator<BooleanKeyword>(Keywords.UNIQUE_ITEMS, schema) {
 
-  private val requireUnique: Boolean = keyword.keywordValue ?: false
+  private val requireUnique: Boolean = keyword.value ?: false
 
   override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
     if (!requireUnique) {

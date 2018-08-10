@@ -1,5 +1,6 @@
 package io.mverse.jsonschema.loading
 
+import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.JsonValueWithPath.Companion.fromJsonValue
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
@@ -31,6 +32,8 @@ interface SchemaReader {
 
   fun <K : JsonSchemaKeyword<*>> withCustomKeywordLoader(keyword: KeywordInfo<K>,
                                                          keywordExtractor: CustomKeywordLoader<K>): SchemaReader
+
+  operator fun <K : JsonSchemaKeyword<*>> plus(pair: Pair<KeywordInfo<K>, CustomKeywordLoader<K>>): SchemaReader
 
   fun readSchema(inputStream: InputStream): Schema {
     try {
@@ -74,7 +77,7 @@ interface SchemaReader {
 fun String.parseJsonObject(): kotlinx.serialization.json.JsonObject = JsonTreeParser(this).readFully().jsonObject
 fun String.parseJson():JsonElement = JsonTreeParser(this).readFully()
 
-fun InputStream.parseJsonObject(): kotlinx.serialization.json.JsonObject = readFully().parseJsonObject()
+fun InputStream.parseJsonObject(): JsonObject = readFully().parseJsonObject()
 fun InputStream.parseJson():JsonElement = readFully().parseJson()
 
 fun InputStream.readFully():String {

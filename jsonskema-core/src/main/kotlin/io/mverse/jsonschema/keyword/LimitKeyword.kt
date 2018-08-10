@@ -9,27 +9,18 @@ import lang.isIntegral
 
 data class LimitKeyword(val keyword: KeywordInfo<LimitKeyword>,
                       val exclusiveKeyword: KeywordInfo<LimitKeyword>,
-                      val limit: Number?,
-                      val exclusive: Number?,
-                      val isExclusive: Boolean = exclusive != null) : JsonSchemaKeyword<Number> {
+                      val limit: Number? = null,
+                      val exclusiveLimit: Number? = null) : JsonSchemaKeyword<Number?> {
 
   override val value: Number? = limit
 
-  private val exclusiveLimit: Number?
-  get() {
-    return when {
-      isExclusive && exclusive == null && limit != null-> limit.toDouble()
-      else-> exclusive?.toDouble()
-    }
-  }
+  val isExclusive:Boolean = exclusiveLimit != null
 
   override fun toJson(keyword: KeywordInfo<*>, builder: kotlinx.serialization.json.JsonBuilder, version: JsonSchemaVersion) {
-    if (version.isBefore(Draft6)) {
-      writeDraft3And4(builder)
-    } else if (version.isPublic) {
-      writeDraft6AndUp(builder)
-    } else {
-      throw IllegalArgumentException("Unknown output type: $version")
+    when {
+      version.isBefore(Draft6) -> writeDraft3And4(builder)
+      version.isPublic -> writeDraft6AndUp(builder)
+      else -> error("Unknown output type: $version")
     }
   }
 
@@ -47,24 +38,24 @@ data class LimitKeyword(val keyword: KeywordInfo<LimitKeyword>,
       }
 
       if (exclusiveLimit != null) {
-        exclusiveKeyword.key to getWithPrecision(exclusiveLimit!!)
+        exclusiveKeyword.key to getWithPrecision(exclusiveLimit)
       }
     }
-
   }
 
   private fun writeDraft3And4(builder: kotlinx.serialization.json.JsonBuilder) {
-    if (limit != null && exclusive != null) {
+    if (limit != null && exclusiveLimit != null) {
       illegalState("Draft schema version does not support number values for ${keyword.key} " +
           "and ${exclusiveKeyword.key}")
     }
     builder.apply {
-      when (isExclusive) {
-        true-> {
-          keyword.key to getWithPrecision(exclusiveLimit!!)
-          exclusiveKeyword.key to true
-        }
-        false-> keyword.key to getWithPrecision(limit!!)
+      if (exclusiveLimit != null) {
+        keyword.key to getWithPrecision(exclusiveLimit)
+        exclusiveKeyword.key to true
+      }
+
+      if (limit != null) {
+        keyword.key to getWithPrecision(limit)
       }
     }
   }
@@ -72,16 +63,12 @@ data class LimitKeyword(val keyword: KeywordInfo<LimitKeyword>,
   companion object {
 
     fun minimumKeyword(): LimitKeyword {
-      return LimitKeyword(Keywords.MINIMUM, Keywords.EXCLUSIVE_MINIMUM, null, null, false)
+      return LimitKeyword(Keywords.MINIMUM, Keywords.EXCLUSIVE_MINIMUM, null, null)
     }
 
     fun maximumKeyword(): LimitKeyword {
-      return LimitKeyword(Keywords.MAXIMUM, Keywords.EXCLUSIVE_MAXIMUM, null, null, false)
+      return LimitKeyword(Keywords.MAXIMUM, Keywords.EXCLUSIVE_MAXIMUM, null, null)
     }
-
-//    fun builder(keyword: KeywordInfo<LimitKeyword>, exclusiveKeyword: KeywordInfo<LimitKeyword>): LimitKeywordBuilder {
-//      return LimitKeywordBuilder().keyword(keyword).exclusiveKeyword(exclusiveKeyword)
-//    }
 
     private fun getWithPrecision(input: Number): Number {
       return if (input.isIntegral()) {

@@ -105,4 +105,15 @@ data class SchemaLoaderImpl(
     return this.copy(additionalKeywords = this.additionalKeywords + newKeywordDigester)
   }
 
+  override operator fun <K : JsonSchemaKeyword<*>> plus(pair: Pair<KeywordInfo<K>, CustomKeywordLoader<K>>): SchemaReader {
+    return withCustomKeywordLoader(pair.first, pair.second)
+  }
 }
+
+fun <K : JsonSchemaKeyword<*>> customKeyword(keyword: KeywordInfo<K>, keywordExtractor: (JsonValueWithPath) -> K):
+    Pair<KeywordInfo<K>, CustomKeywordLoader<K>> {
+  return keyword to object : CustomKeywordLoader<K> {
+    override fun loadKeywordFromJsonValue(jsonValue: JsonValueWithPath): K? = keywordExtractor(jsonValue)
+  }
+}
+

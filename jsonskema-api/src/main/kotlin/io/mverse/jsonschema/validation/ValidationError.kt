@@ -18,10 +18,9 @@ package io.mverse.jsonschema.validation
 import io.mverse.jsonschema.JsonPath
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.keyword.KeywordInfo
-import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import lang.URI
 import lang.format
@@ -32,6 +31,7 @@ import lang.json.toJsonObject
 /**
  * Thrown by [Schema] subclasses on validation failure.
  */
+@Serializable
 data class ValidationError(
     /**
      * The schema that generated this error
@@ -44,13 +44,14 @@ data class ValidationError(
     private val pointerToViolation: JsonPath? = null,
 
     val code: String? = null,
+
     /**
      * Returns a programmer-readable error description. Unlike [.getMessage] this doesn't
      * contain the JSON pointer denoting the violating document fragment.
      *
      * @return the error description
      */
-    val errorMessage: String? = null,
+    private val errorMessage: String? = null,
     private val messageTemplate: String? = null,
 
     val causes: List<ValidationError> = emptyList(),
@@ -67,7 +68,7 @@ data class ValidationError(
     get() = if (causes.isEmpty()) {
       listOf(this)
     } else {
-      causes.allMessages
+      causes.flattenErrors()
     }
 
   /**
@@ -75,8 +76,16 @@ data class ValidationError(
    *
    * @return the error description
    */
-  val message: String
-    get() = "$pathToViolation: $errorMessage"
+  val message: String get () = "$pathToViolation: $resolvedMessage"
+
+  val resolvedMessage: String
+    get() {
+      return when {
+        errorMessage != null -> errorMessage
+        arguments != null && messageTemplate != null -> messageTemplate.format(*arguments.toTypedArray())
+        else -> ""
+      }
+    }
 
   /**
    * A JSON pointer denoting the part of the document which violates the schema. It always points
@@ -92,36 +101,42 @@ data class ValidationError(
     get() = violatedSchema!!.pointerFragmentURI
 
   val violationCount: Int
-    get() = causes!!.violationCount
+    get() = causes.violationCount
 
   fun toJson(withCauses: Boolean = true): kotlinx.serialization.json.JsonObject {
     val errorJson = mutableMapOf<String, JsonElement>()
+
+    if (arguments?.isNotEmpty() == true) {
+      errorJson["template"] = this.messageTemplate.toJsonLiteral()
+    }
+
+    if (code != null) {
+      errorJson["code"] = JsonPrimitive(code)
+    }
+
+    if (violatedSchema != null) {
+      errorJson["schemaLocation"] = schemaLocation!!.toString().toJsonLiteral()
+    }
 
     if (pointerToViolation == null) {
       errorJson["pointerToViolation"] = JsonNull
     } else {
       errorJson["pointerToViolation"] = pathToViolation.toJsonLiteral()
     }
-    if (this.keyword != null) {
-      errorJson["keyword"] = keyword.key.toJsonLiteral()
-    }
-    if (code != null) {
-      errorJson["code"] = JsonPrimitive(code)
-    }
-    errorJson["message"] = this.errorMessage.toJsonLiteral()
-    if (violatedSchema != null) {
-      errorJson["schemaLocation"] = schemaLocation!!.toString().toJsonLiteral()
+
+    if (arguments?.isNotEmpty() == true) {
+      errorJson["arguments"] = arguments.map { it.toString() }.toJsonArray()
     }
 
-    if (this.arguments?.isNotEmpty() == true) {
-      errorJson["template"] = this.messageTemplate.toJsonLiteral()
-      errorJson["arguments"] = arguments.map { it.toString() }.toJsonArray()
+    if (this.keyword != null) {
+      errorJson["keyword"] = keyword.key.toJsonLiteral()
     }
 
     if (withCauses && causes.isNotEmpty()) {
       errorJson["causes"] = causes.map { it.toJson() }.toJsonArray()
     }
 
+    errorJson["message"] = this.resolvedMessage.toJsonLiteral()
     return errorJson.toJsonObject()
   }
 
@@ -161,7 +176,7 @@ data class ValidationError(
         '}'.toString()
   }
 
-  fun withError(message:String, vararg args:Any):ValidationError {
+  fun withError(message: String, vararg args: Any): ValidationError {
     return this.copy(messageTemplate = message,
         errorMessage = message.format(*args),
         arguments = args.toList())
@@ -174,38 +189,7 @@ data class ValidationError(
         code = "validation.keyword." + keyword.key)
   }
 
-  //  class ValidationErrorBuilder {
-  //
-  //    private var pointerToViolation: JsonPath? = JsonPath.rootPath()
-  //
-  //    fun message(message: String, vararg args: Object): ValidationErrorBuilder {
-  //      this.message = String.format(message, args)
-  //      this.messageTemplate = message
-  //      for (arg in args) {
-  //        this.argument(arg)
-  //      }
-  //      return this
-  //    }
-  //
-  //    fun message(message: String): ValidationErrorBuilder {
-  //      this.message = message
-  //      this.messageTemplate = message
-  //      return this
-  //    }
-  //
-  //    fun pointerToViolationURI(uriFragment: String?): ValidationErrorBuilder {
-  //      if (uriFragment == null) {
-  //        this.pointerToViolation = null
-  //      } else {
-  //        this.pointerToViolation(JsonPath.parseFromURIFragment(uriFragment))
-  //      }
-  //      return this
-  //    }
-  //  }
-
   companion object {
-
-    val NULL_ERROR = ValidationError()
 
     /**
      * Sort of static factory method. It is used by validators to create `ValidationError`s, handling the case of multiple violations
@@ -224,14 +208,13 @@ data class ValidationError(
     fun collectErrors(rootFailingSchema: Schema,
                       currentLocation: JsonPath,
                       failures: List<ValidationError>): ValidationError? {
-      val failureCount = failures.size
       return when {
         failures.isEmpty() -> null
         failures.size == 1 -> failures.first()
         else -> ValidationError(
             violatedSchema = rootFailingSchema,
             pointerToViolation = currentLocation,
-            errorMessage = "%d schema violations found",
+            messageTemplate = "%d schema violations found",
             arguments = listOf(failures.violationCount),
             code = "validation.multipleFailures",
             causes = failures,
@@ -248,14 +231,8 @@ val List<ValidationError>.violationCount: Int
     return kotlin.math.max(1, causeCount)
   }
 
-val List<ValidationError>.allMessages: List<ValidationError>
-  get() {
-    val messages = this
-        .filter { it.causes?.isNotEmpty() == true }
-        .toMutableList()
-    messages.addAll(this
-        .filter { it.causes?.isNotEmpty() == true }
-        .flatMap { it.allMessages })
-
-    return messages.toList()
-  }
+fun List<ValidationError>.flattenErrors(): List<ValidationError> {
+  return filter { it.causes.isEmpty() } +
+      filter { !it.causes.isEmpty() }
+          .flatMap { it.causes.flattenErrors() }
+}

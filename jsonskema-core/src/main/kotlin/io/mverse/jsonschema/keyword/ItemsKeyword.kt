@@ -3,14 +3,12 @@ package io.mverse.jsonschema.keyword
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.utils.Schemas.falseSchema
-import kotlinx.serialization.json.JsonBuilder
 import lang.json.toJsonArray
 
-data class ItemsKeyword(val allItemSchema: Schema? = null,
-                        val additionalItemSchema: Schema? = null,
-                        val indexedSchemas: List<Schema> = emptyList()) : JsonSchemaKeyword<Schema> {
-
-  override val value: Schema? = allItemSchema
+data class ItemsKeyword(val indexedSchemas: List<Schema> = emptyList(),
+                        val allItemSchema: Schema? = null,
+                        val additionalItemSchema: Schema? = null)
+  : SchemaListKeyword(indexedSchemas) {
 
   val hasIndexedSchemas: Boolean get() = indexedSchemas.isNotEmpty()
 

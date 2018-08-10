@@ -17,7 +17,7 @@ expect class URI(uri: String) {
   val schemSpecificPart: String?
   val query: String?
   val path: String?
-  fun toStream():InputStream
+  fun readFully(charset: String = "UTF-8"):String
 }
 
 val URI.isFragmentOnly: Boolean

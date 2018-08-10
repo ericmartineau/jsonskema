@@ -4,7 +4,6 @@ import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.keyword.JsonSchemaKeyword
 import io.mverse.jsonschema.keyword.KeywordInfo
-import io.mverse.jsonschema.keyword.SchemaKeyword
 import io.mverse.jsonschema.validation.SchemaValidator
 import io.mverse.jsonschema.validation.ValidationError
 import io.mverse.jsonschema.validation.ValidationErrorHelper

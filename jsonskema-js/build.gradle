@@ -21,6 +21,5 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-js"
-//    expectedBy project(":jsonskema-common")
     testCompile "org.jetbrains.kotlin:kotlin-test-js"
 }

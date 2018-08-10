@@ -21,6 +21,7 @@ import io.mverse.jsonschema.SchemaException
 import io.mverse.jsonschema.ValidationMocks.createTestValidator
 import io.mverse.jsonschema.loading.parseJson
 import io.mverse.jsonschema.schemaReader
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.content
 import org.eclipse.jetty.server.Server
@@ -69,6 +70,7 @@ class SchemaValidationTestSuite(private val schemaDescription: String, private v
 
     private var server: Server? = null
 
+    @JvmStatic
     @Parameters(name = "{2}")
     fun params(): List<Array<Any>> {
       Preconditions.checkNotNull("jsonApi must not be null")
@@ -84,13 +86,13 @@ class SchemaValidationTestSuite(private val schemaDescription: String, private v
         arr.map { it.jsonObject }.forEach { schemaTest ->
           val testInputs = schemaTest["tests"].jsonArray
           testInputs.map { it.jsonObject }.forEach { input ->
-            val params = arrayOf<Any>(5)
-            params[0] = "[" + fileName + "]/" + schemaTest["description"].content
-            params[1] = schemaTest["schema"].jsonObject
-            params[2] = "[" + fileName + "]/" + input["description"].content
-            params[3] = input.get("data")
-            params[4] = input["valid"].boolean
-            rval.add(params)
+            val params = mutableListOf<Any>()
+            params += "[" + fileName + "]/" + schemaTest["description"].content
+            params += schemaTest["schema"].jsonObject
+            params += "[" + fileName + "]/" + input["description"].content
+            params += input.get("data")
+            params += input["valid"].boolean
+            rval.add(params.toTypedArray())
           }
         }
       }
@@ -102,6 +104,7 @@ class SchemaValidationTestSuite(private val schemaDescription: String, private v
 
     @BeforeClass
     @Throws(Exception::class)
+    @JvmStatic
     fun startJetty() {
       server = Server(1234)
       val handler = ServletHandler()
@@ -113,12 +116,13 @@ class SchemaValidationTestSuite(private val schemaDescription: String, private v
 
     @AfterClass
     @Throws(Exception::class)
+    @JvmStatic
     fun stopJetty() {
       if (server != null) {
         server!!.stop()
       }
     }
 
-    private fun loadTests(input: InputStream): kotlinx.serialization.json.JsonArray = input.parseJson().jsonArray
+    private fun loadTests(input: InputStream): JsonArray = input.parseJson().jsonArray
   }
 }

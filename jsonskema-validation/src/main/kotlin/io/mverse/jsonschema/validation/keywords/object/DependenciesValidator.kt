@@ -13,7 +13,7 @@ import lang.SetMultimap
 class DependenciesValidator(keyword: DependenciesKeyword, schema: Schema, factory: SchemaValidatorFactory) : KeywordValidator<DependenciesKeyword>(Keywords.DEPENDENCIES, schema) {
 
 
-  private val dependencyValidators: Map<String, SchemaValidator> = keyword.dependencySchemas.schemas
+  private val dependencyValidators: Map<String, SchemaValidator> = keyword.dependencySchemas.value
       .entries.map { it.key to factory.createValidator(it.value) }
       .toMap()
 

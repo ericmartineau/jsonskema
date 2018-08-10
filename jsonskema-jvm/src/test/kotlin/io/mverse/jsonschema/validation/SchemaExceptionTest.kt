@@ -12,11 +12,12 @@ import org.junit.Test
 import org.junit.rules.ExpectedException
 
 /**
- * @author erosb
+ * @author ericmartineau
  */
 class SchemaExceptionTest {
 
   @Rule
+  @JvmField
   val expExc = ExpectedException.none()
 
   @Test
@@ -28,7 +29,7 @@ class SchemaExceptionTest {
 
   @Test
   fun testBuildMessageSingleExcType() {
-    val actual = failure(NULL_SCHEMA, NUMBER, STRING).errorMessage
+    val actual = failure(NULL_SCHEMA, NUMBER, STRING).resolvedMessage
     assertEquals("expected type: number, found: string", actual)
   }
 

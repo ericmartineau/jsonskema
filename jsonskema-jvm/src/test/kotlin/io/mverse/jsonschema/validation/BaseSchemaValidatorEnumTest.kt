@@ -80,7 +80,7 @@ class BaseSchemaValidatorEnumTest {
 
   @Test
   fun validate_WhenNumbersHaveDifferentLexicalValues_EnumDoesntMatch() {
-    val testEnum = jsonArrayOf(1, 1.0, 1.00)
+    val testEnum = "[1, 1.0, 1.00]".parseJson().jsonArray
     val testValNotSame = "1.000".toJsonLiteral()
 
     val schema = JsonSchema.schemaBuilder().enumValues(testEnum).build()
@@ -94,7 +94,7 @@ class BaseSchemaValidatorEnumTest {
   @Test
   fun validate_WhenNumbersHaveSameLexicalValues_EnumMatches() {
     val testEnum = "[1, 1.0, 1.00]".parseJson().jsonArray
-    val testValNotSame = "1.000".toJsonLiteral()
+    val testValNotSame = "1.00".parseJson()
 
     val schema = mockSchema().enumValues(testEnum).build()
     schema.validating(testValNotSame)

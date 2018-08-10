@@ -13,7 +13,7 @@ import lang.json.toJsonLiteral
 
 class PropertyNameValidator(keyword: SingleSchemaKeyword, schema: Schema, factory: SchemaValidatorFactory) : KeywordValidator<SingleSchemaKeyword>(Keywords.PROPERTY_NAMES, schema) {
 
-  private val propertyNameValidator: SchemaValidator = factory.createValidator(keyword.schema)
+  private val propertyNameValidator: SchemaValidator = factory.createValidator(keyword.value)
 
   override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
 

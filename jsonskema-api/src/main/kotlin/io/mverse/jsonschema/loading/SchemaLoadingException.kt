@@ -8,5 +8,5 @@ import lang.URI
  * Exception raised during the loading of a schema, if the provided document is invalid.
  */
 class SchemaLoadingException(
-    location: URI, report: LoadingReport, schema: Schema) :
+    val location: URI, val report: LoadingReport, schema: Schema) :
     SchemaException(location, report.toString())

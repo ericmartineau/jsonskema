@@ -14,14 +14,15 @@ data class EnumValidator(val keyword: JsonArrayKeyword,
                          val factory: SchemaValidatorFactory)
   : KeywordValidator<JsonArrayKeyword>(ENUM, parent) {
 
-  private val enumValues: List<JsonElement> = keyword.jsonArray
+  private val enumValues: List<JsonElement> = keyword.value
 
   override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
     for (enumValue in enumValues) {
-      return when (enumValue) {
+      val eq = when (enumValue) {
         is JsonPrimitive -> enumValue.equalsLexically(subject.wrapped)
         else -> enumValue == subject.wrapped
       }
+      if(eq) return true
     }
     report += buildKeywordFailure(subject)
         .withError("%s does not match the enum values", subject)

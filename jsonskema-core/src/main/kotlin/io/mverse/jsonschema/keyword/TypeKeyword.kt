@@ -7,7 +7,9 @@ import lang.json.toJsonArray
 
 data class TypeKeyword(val types:Set<JsonSchemaType> = emptySet(),
                        val disallowedTypes: Set<JsonSchemaType> = JsonSchemaType.values().toSet().minus(types)) :
-    JsonSchemaKeywordImpl<Set<JsonSchemaType>>(types) {
+    JsonSchemaKeywordImpl<Set<JsonSchemaType>>() {
+
+  override val value: Set<JsonSchemaType> = types
 
   constructor(first: JsonSchemaType, vararg additionalTypes: JsonSchemaType):
       this(types = setOf(first) + setOf(*additionalTypes))

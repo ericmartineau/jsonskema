@@ -3,7 +3,6 @@ package io.mverse.jsonschema.keyword
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.builder.DependenciesKeywordBuilder
 import io.mverse.jsonschema.enums.JsonSchemaVersion
-import kotlinx.serialization.json.JsonBuilder
 import kotlinx.serialization.json.json
 import lang.SetMultimap
 import lang.json.toJsonArray
@@ -12,7 +11,7 @@ data class DependenciesKeyword(val dependencySchemas: SchemaMapKeyword = SchemaM
                                val propertyDependencies: SetMultimap<String, String> = SetMultimap())
   : SubschemaKeyword, JsonSchemaKeyword<Map<String, Schema>> {
 
-  override val value: Map<String, Schema>? = dependencySchemas.schemas
+  override val value: Map<String, Schema> = dependencySchemas.value
   override val subschemas: List<Schema> get() = dependencySchemas.subschemas
 
   fun toBuilder(): DependenciesKeywordBuilder {
@@ -26,7 +25,7 @@ data class DependenciesKeyword(val dependencySchemas: SchemaMapKeyword = SchemaM
           prop to setOfDependentProps.toJsonArray()
         }
 
-        dependencySchemas.schemas.forEach{ (key, schema) ->
+        dependencySchemas.value.forEach{ (key, schema) ->
           key to schema.asVersion(version).toJson()
         }
       }

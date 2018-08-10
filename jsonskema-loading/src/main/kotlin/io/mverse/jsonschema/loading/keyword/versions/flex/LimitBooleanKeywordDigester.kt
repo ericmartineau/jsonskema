@@ -30,7 +30,7 @@ data class LimitBooleanKeywordDigester(
 
     val exclusiveLimit = when {
       limitValue.number != null && exclusiveValue.boolean ?: false-> limitValue.number
-      else->null
+      else->exclusiveValue.number
     }
 
     return KeywordDigest.ofNullable(keyword, LimitKeyword(keyword, exclusiveKeyword, limitValue.number, exclusiveLimit))

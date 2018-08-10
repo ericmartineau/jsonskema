@@ -1,3 +1,3 @@
 package io.mverse.jsonschema.keyword
 
-data class BooleanKeyword(val booleanValue: Boolean) : JsonSchemaKeywordImpl<Boolean>(booleanValue)
+data class BooleanKeyword(override val value: Boolean) : JsonSchemaKeywordImpl<Boolean>()

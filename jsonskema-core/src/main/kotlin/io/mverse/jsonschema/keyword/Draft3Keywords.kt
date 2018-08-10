@@ -41,7 +41,7 @@ interface Draft3Keywords {
      * instance matches any type or schema in the array, then this instance
      * is not valid.
      */
-    val DISALLOW = keyword<TypeKeyword>().expects(STRING).onlyForVersion(Draft3)
+    val DISALLOW = keyword<TypeKeyword>().key("disallow").expects(STRING).onlyForVersion(Draft3)
         .additionalDefinition().expects(ARRAY)
         .build()
 

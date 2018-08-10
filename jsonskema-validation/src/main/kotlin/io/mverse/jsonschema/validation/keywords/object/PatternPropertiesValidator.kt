@@ -12,7 +12,7 @@ import lang.Pattern
 
 class PatternPropertiesValidator(keyword: SchemaMapKeyword, schema: Schema, factory: SchemaValidatorFactory) : KeywordValidator<SchemaMapKeyword>(Keywords.PATTERN_PROPERTIES, schema) {
 
-  private val patternValidators = keyword.schemas
+  private val patternValidators = keyword.value
       .map { (regex, schema) ->
         val pattern = Pattern(regex)
         val validator = factory.createValidator(schema)

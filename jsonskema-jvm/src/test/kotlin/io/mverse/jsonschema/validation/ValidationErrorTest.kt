@@ -16,20 +16,25 @@
 package io.mverse.jsonschema.validation
 
 import assertk.assert
+import assertk.assertAll
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import assertk.fail
 import com.google.common.collect.Lists.newArrayList
 import io.mverse.jsonschema.JsonPath
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.assertThat
 import io.mverse.jsonschema.keyword.Keywords
+import io.mverse.jsonschema.loading.readFully
 import io.mverse.jsonschema.resourceLoader
 import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.ValidationMocks.mockBooleanSchema
 import io.mverse.jsonschema.validation.ValidationMocks.mockNullSchema
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import io.mverse.jsonschema.validation.ValidationTestSupport.verifyFailure
+import kotlinx.serialization.json.JSON
 import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -216,4 +221,23 @@ class ValidationErrorTest {
   }
 
   private fun String.toJsonPointer(): JsonPath = JsonPath.parseFromURIFragment(this)
+}
+
+fun assertk.Assert<JsonObject>.isEqualTo(other: JsonObject, path: String = "") {
+  val prefix = if(!path.isBlank()) "" else "$path: "
+
+  if (actual.keys != other.keys) {
+    fail("${prefix}Key mismatch: Extra:${actual.keys.minus(other.keys)}, Missing:${other.keys.minus(actual.keys)}")
+    return
+  }
+
+  assertAll {
+    actual.forEach { (k, v) ->
+      val otherAtKey = other[k]
+      when {
+        v is JsonObject && otherAtKey is JsonObject -> assert(v).isEqualTo(otherAtKey, "$path/$k")
+        else -> assert(v, "Value for key '$k'").isEqualTo(otherAtKey)
+      }
+    }
+  }
 }

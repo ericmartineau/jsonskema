@@ -10,7 +10,7 @@ import io.mverse.jsonschema.validation.ValidationReport
 data class NotKeywordValidator(val keyword: SingleSchemaKeyword,
                                private val notSchema: Schema,
                                val factory: SchemaValidatorFactory) : KeywordValidator<SingleSchemaKeyword>(NOT, notSchema) {
-  private val notValidator = factory.createValidator(keyword.schema)
+  private val notValidator = factory.createValidator(keyword.value)
 
   override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
     val trap = report.createChildReport()

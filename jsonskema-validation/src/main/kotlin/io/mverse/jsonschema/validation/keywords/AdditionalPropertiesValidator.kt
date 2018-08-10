@@ -19,7 +19,7 @@ class AdditionalPropertiesValidator(keyword: SingleSchemaKeyword, schema: Schema
 
   init {
     val draft6Schema = schema.asDraft6()
-    this.additionalPropertiesValidator = factory.createValidator(keyword.schema)
+    this.additionalPropertiesValidator = factory.createValidator(keyword.value)
     this.patternProperties = draft6Schema.patternProperties.keys
         .map { Pattern(it) }
         .toSet()

@@ -11,7 +11,7 @@ import io.mverse.jsonschema.validation.keywords.KeywordValidator
 
 class StringFormatValidator(keyword: StringKeyword, schema: Schema, factory: SchemaValidatorFactory) : KeywordValidator<StringKeyword>(FORMAT, schema) {
 
-  private val formatValidator: FormatValidator? = factory.getFormatValidator(keyword.keywordValue!!)
+  private val formatValidator: FormatValidator? = factory.getFormatValidator(keyword.value!!)
 
   override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
     if (formatValidator == null) {

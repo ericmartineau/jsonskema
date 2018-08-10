@@ -26,7 +26,7 @@ class IPV6Validator : FormatValidator {
 
   override fun validate(subject: String): String? {
     try {
-      if (FormatChecks.isValidIPV4(subject)) return null
+      if (FormatChecks.isValidIPV6(subject)) return null
     } catch (e: Exception) {
     }
 

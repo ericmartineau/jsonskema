@@ -23,6 +23,7 @@ repositories {
 dependencies {
   compile "org.jetbrains.kotlin:kotlin-stdlib-common"
   compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:$serialization_runtime_version"
+  compile 'org.jetbrains.kotlinx:kotlinx-collections-immutable:0.1'
 
   compile project(":jsonskema-api")
   compile("org.jetbrains.kotlin:kotlin-reflect")

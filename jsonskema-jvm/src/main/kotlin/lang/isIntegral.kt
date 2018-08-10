@@ -2,11 +2,6 @@ package lang
 
 import com.google.common.hash.HashCode
 import com.google.common.math.DoubleMath
-import kotlinx.serialization.json.ElementType
-import kotlinx.serialization.json.ElementType.*
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.content
-import kotlinx.serialization.json.doubleOrNull
 import java.math.BigDecimal
 
 actual fun Number.isIntegral(): Boolean {
@@ -15,3 +10,7 @@ actual fun Number.isIntegral(): Boolean {
 
 actual fun Number.toHex(): String = HashCode.fromInt(toInt()).toString()
 
+actual fun Number.isDivisibleBy(op: Number, precision:Int): Boolean {
+  val mod = this.toDouble().toBigDecimal() % op.toDouble().toBigDecimal()
+  return mod.compareTo(BigDecimal.ZERO) == 0
+}

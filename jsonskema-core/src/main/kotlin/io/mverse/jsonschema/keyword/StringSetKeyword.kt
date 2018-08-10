@@ -1,11 +1,13 @@
 package io.mverse.jsonschema.keyword
 
-data class StringSetKeyword(val stringSet:Set<String> = setOf()) : JsonSchemaKeywordImpl<Set<String>>(stringSet) {
-
+data class StringSetKeyword(override val value: Set<String> = setOf()) : JsonSchemaKeywordImpl<Set<String>>() {
   constructor(value: String) : this(setOf(value))
 
-  fun withAnotherValue(anotherValue: String): StringSetKeyword {
-    return StringSetKeyword(stringSet + anotherValue)
+  operator fun plus(other: String): StringSetKeyword {
+    return StringSetKeyword(value + other)
   }
 
+  fun withAnotherValue(anotherValue: String): StringSetKeyword {
+    return this + anotherValue
+  }
 }

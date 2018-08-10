@@ -18,17 +18,14 @@ package io.mverse.jsonschema.validation
 import assertk.assert
 import assertk.assertions.containsAll
 import assertk.assertions.hasSize
-import assertk.assertions.hasToString
 import assertk.assertions.isEqualTo
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.loading.parseJsonObject
 import io.mverse.jsonschema.schemaBuilder
-import io.mverse.jsonschema.string
 import io.mverse.jsonschema.validation.ValidationMocks.createTestValidator
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
-import kotlinx.serialization.json.JsonObject
 import lang.json.toJsonLiteral
 import org.junit.Assert
 import org.junit.Test

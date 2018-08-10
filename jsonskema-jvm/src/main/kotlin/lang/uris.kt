@@ -1,6 +1,7 @@
 package lang
 
 import kotlinx.io.InputStream
+import java.nio.charset.Charset
 
 actual data class URI(private val juri: JURI) {
   actual constructor(uri: String) : this(JURI.create(uri))
@@ -32,5 +33,5 @@ actual data class URI(private val juri: JURI) {
 
   override fun toString(): String = juri.toString()
   actual fun relativize(uri: URI): URI = juri.relativize(uri.juri).toCommonURI()
-  actual fun toStream(): InputStream = juri.toURL().openStream()
+  actual fun readFully(charset:String): String = juri.toURL().readText(Charset.forName(charset))
 }

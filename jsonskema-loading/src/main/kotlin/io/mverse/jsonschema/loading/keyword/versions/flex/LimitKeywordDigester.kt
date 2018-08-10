@@ -31,7 +31,7 @@ data class LimitKeywordDigester(
     return KeywordDigest.ofNullable(keyword, LimitKeyword(keyword = keyword,
         exclusiveKeyword = exclusiveKeyword,
         limit = limitValue.number,
-        exclusive = exclusiveValue.number))
+        exclusiveLimit = exclusiveValue.number))
   }
 
   class LimitKeywordDigesterBuilder

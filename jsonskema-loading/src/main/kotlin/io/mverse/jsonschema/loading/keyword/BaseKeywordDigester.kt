@@ -4,7 +4,6 @@ import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.keyword.JsonSchemaKeyword
 import io.mverse.jsonschema.keyword.KeywordInfo
-import io.mverse.jsonschema.keyword.SchemaKeyword
 import io.mverse.jsonschema.loading.KeywordDigest
 import io.mverse.jsonschema.loading.KeywordDigester
 import io.mverse.jsonschema.loading.LoadingReport

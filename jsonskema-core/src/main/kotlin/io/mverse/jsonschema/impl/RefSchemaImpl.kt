@@ -70,6 +70,8 @@ open class RefSchemaImpl : RefSchema {
     }
   }
 
+  override fun toString(version: JsonSchemaVersion): String = toString()
+
   class RefSchemaBuilder(var refURI:URI? = null)
 
   companion object {

@@ -11,7 +11,7 @@ import lang.Pattern
 
 class StringPatternValidator(keyword: StringKeyword, schema: Schema, factory: SchemaValidatorFactory) : KeywordValidator<StringKeyword>(Keywords.PATTERN, schema) {
 
-  private val pattern: Pattern = Pattern(keyword.keywordValue!!)
+  private val pattern: Pattern = Pattern(keyword.value!!)
 
   override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
     val stringSubject = subject.string ?: ""

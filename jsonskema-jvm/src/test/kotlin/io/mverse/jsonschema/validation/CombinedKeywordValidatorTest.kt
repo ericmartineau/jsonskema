@@ -39,6 +39,7 @@ class CombinedKeywordValidatorTest {
     parentSchema.validating(subject)
         .isNotValid()
         .hasViolationCount(1)
+        .hasKeyword(ALL_OF)
   }
 
   @Test

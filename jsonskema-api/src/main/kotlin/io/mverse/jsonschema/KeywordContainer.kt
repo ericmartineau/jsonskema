@@ -34,12 +34,14 @@ abstract class KeywordContainer(open val keywords: Map<KeywordInfo<*>, JsonSchem
     return object: ReadOnlyProperty<KeywordContainer, N?> {
       override fun getValue(thisRef: KeywordContainer, property: KProperty<*>): N? {
         val value = thisRef.keyword(info)?.value ?: return null
+
         return when(N::class) {
           Int::class-> value.toInt() as N
           Long::class-> value.toLong() as N
           Double::class-> value.toDouble() as N
           Short::class -> value.toShort() as N
-          else-> illegalState("Can't convert type ${N::class}")
+          Number::class-> value as N
+          else-> throw IllegalStateException("Can't convert $value to type ${N::class}")
         }
       }
     }

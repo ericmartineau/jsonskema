@@ -6,6 +6,7 @@
       "$ref": "https://storage.googleapis.com/mverse-test/mverse/kitchenSink/0.0.1/schema/kitchenSink/jsonschema-draft6.json"
     }
   },
+  "const": 42,
   "$comment": "comment",
   "title": "Kitchen Sink",
   "readOnly": true,

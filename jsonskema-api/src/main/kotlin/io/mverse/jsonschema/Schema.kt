@@ -61,4 +61,6 @@ interface Schema {
   fun asDraft6(): Draft6Schema
 
   fun asDraft7(): Draft7Schema
+
+  fun toString(version:JsonSchemaVersion):String
 }

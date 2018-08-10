@@ -11,7 +11,7 @@ import io.mverse.jsonschema.validation.keywords.KeywordValidator
 class RequiredPropertyValidator(keyword: StringSetKeyword, schema: Schema, factory: SchemaValidatorFactory)
   : KeywordValidator<StringSetKeyword>(REQUIRED, schema) {
 
-  private val requiredProperties: Set<String> = keyword.stringSet
+  private val requiredProperties: Set<String> = keyword.value
 
   override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
     for (requiredProp in requiredProperties) {

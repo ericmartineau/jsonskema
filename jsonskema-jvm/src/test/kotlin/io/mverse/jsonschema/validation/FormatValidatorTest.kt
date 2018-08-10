@@ -32,6 +32,7 @@ class FormatValidatorTest(private val formatName: String) {
   }
 
   companion object {
+    @JvmStatic
     @Parameters(name = "{0}")
     fun params(): List<Array<Any>> {
       return Arrays.asList(
