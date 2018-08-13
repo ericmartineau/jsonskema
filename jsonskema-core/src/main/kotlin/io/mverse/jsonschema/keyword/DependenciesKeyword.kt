@@ -12,6 +12,11 @@ data class DependenciesKeyword(val dependencySchemas: SchemaMapKeyword = SchemaM
   : SubschemaKeyword, JsonSchemaKeyword<Map<String, Schema>> {
 
   override val value: Map<String, Schema> = dependencySchemas.value
+
+  override fun copy(value: Map<String, Schema>): JsonSchemaKeyword<Map<String, Schema>> {
+    return this.copy(dependencySchemas = SchemaMapKeyword(value))
+  }
+
   override val subschemas: List<Schema> get() = dependencySchemas.subschemas
 
   fun toBuilder(): DependenciesKeywordBuilder {

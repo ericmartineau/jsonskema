@@ -18,7 +18,14 @@ interface SchemaBuilder<SELF : SchemaBuilder<SELF>> {
   // ##################################################################
 
   val id: URI?
-  var ref: URI?
+  var ref: Any?
+  var refURI: URI?
+  var title: String?
+  var defaultValue: JsonElement?
+  var description: String?
+  var type: JsonSchemaType?
+  var format: String?
+  var pattern: String?
 
   // ##################################################################
   // ########           METADATA KEYWORDS                ##############
@@ -29,7 +36,6 @@ interface SchemaBuilder<SELF : SchemaBuilder<SELF>> {
   fun withoutSchema(): SELF
 
   fun ref(ref: URI): SELF
-  fun ref(ref: Any): SELF
   fun ref(ref: String): SELF
 
   fun title(title: String): SELF

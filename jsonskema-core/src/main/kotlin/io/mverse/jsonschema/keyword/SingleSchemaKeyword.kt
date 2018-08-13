@@ -10,4 +10,8 @@ class SingleSchemaKeyword(override val value: Schema) : JsonSchemaKeywordImpl<Sc
       keyword.key to value.asVersion(version).toJson()
     }
   }
+
+  override fun copy(value: Schema): JsonSchemaKeyword<Schema> {
+    return SingleSchemaKeyword(value)
+  }
 }

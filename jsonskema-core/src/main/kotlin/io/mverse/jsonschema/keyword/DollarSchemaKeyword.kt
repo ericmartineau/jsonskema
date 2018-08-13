@@ -5,6 +5,11 @@ import kotlinx.serialization.json.JsonBuilder
 import lang.URI
 
 open class DollarSchemaKeyword : JsonSchemaKeyword<URI> {
+
+  override fun copy(value: URI): JsonSchemaKeyword<URI> {
+    return this
+  }
+
   override val value: URI = URI("")
 
   override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion) {

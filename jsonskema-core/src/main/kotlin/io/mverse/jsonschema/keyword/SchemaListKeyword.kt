@@ -15,4 +15,8 @@ open class SchemaListKeyword(final override val value: List<Schema> = listOf())
   operator fun plus(schema:List<Schema>): SchemaListKeyword {
     return SchemaListKeyword(value + schema)
   }
+
+  override fun copy(value: List<Schema>): JsonSchemaKeyword<List<Schema>> {
+    return SchemaListKeyword(value)
+  }
 }

@@ -2,7 +2,6 @@ package io.mverse.jsonschema.keyword
 
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft6
-import kotlinx.serialization.json.JsonBuilder
 import kotlinx.serialization.json.json
 import lang.illegalState
 import lang.isIntegral
@@ -11,6 +10,10 @@ data class LimitKeyword(val keyword: KeywordInfo<LimitKeyword>,
                       val exclusiveKeyword: KeywordInfo<LimitKeyword>,
                       val limit: Number? = null,
                       val exclusiveLimit: Number? = null) : JsonSchemaKeyword<Number?> {
+
+  override fun copy(value: Number?): JsonSchemaKeyword<Number?> {
+    return this.copy(limit = value)
+  }
 
   override val value: Number? = limit
 

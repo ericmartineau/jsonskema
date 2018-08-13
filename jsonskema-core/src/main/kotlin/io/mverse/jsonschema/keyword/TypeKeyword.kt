@@ -2,7 +2,6 @@ package io.mverse.jsonschema.keyword
 
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaVersion
-import kotlinx.serialization.json.JsonBuilder
 import lang.json.toJsonArray
 
 data class TypeKeyword(val types:Set<JsonSchemaType> = emptySet(),
@@ -20,6 +19,10 @@ data class TypeKeyword(val types:Set<JsonSchemaType> = emptySet(),
 
   fun withAdditionalType(another: JsonSchemaType): TypeKeyword {
     return TypeKeyword(types + another)
+  }
+
+  override fun copy(value: Set<JsonSchemaType>): JsonSchemaKeyword<Set<JsonSchemaType>> {
+    return this.copy(types = value)
   }
 
   override fun toJson(keyword: KeywordInfo<*>, builder: kotlinx.serialization.json.JsonBuilder, version: JsonSchemaVersion) {

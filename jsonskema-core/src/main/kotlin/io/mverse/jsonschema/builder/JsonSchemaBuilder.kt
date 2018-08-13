@@ -21,15 +21,19 @@ import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.Companion.ADDITIONAL_ITEMS
 import io.mverse.jsonschema.keyword.Keywords.Companion.COMMENT
+import io.mverse.jsonschema.keyword.Keywords.Companion.DESCRIPTION
 import io.mverse.jsonschema.keyword.Keywords.Companion.DOLLAR_ID
 import io.mverse.jsonschema.keyword.Keywords.Companion.ELSE
+import io.mverse.jsonschema.keyword.Keywords.Companion.FORMAT
 import io.mverse.jsonschema.keyword.Keywords.Companion.IF
 import io.mverse.jsonschema.keyword.Keywords.Companion.ITEMS
+import io.mverse.jsonschema.keyword.Keywords.Companion.PATTERN
 import io.mverse.jsonschema.keyword.Keywords.Companion.PROPERTIES
 import io.mverse.jsonschema.keyword.Keywords.Companion.READ_ONLY
 import io.mverse.jsonschema.keyword.Keywords.Companion.REF
 import io.mverse.jsonschema.keyword.Keywords.Companion.SCHEMA
 import io.mverse.jsonschema.keyword.Keywords.Companion.THEN
+import io.mverse.jsonschema.keyword.Keywords.Companion.TYPE
 import io.mverse.jsonschema.keyword.Keywords.Companion.WRITE_ONLY
 import io.mverse.jsonschema.keyword.LimitKeyword
 import io.mverse.jsonschema.keyword.NumberKeyword
@@ -87,11 +91,31 @@ open class JsonSchemaBuilder(
   constructor(location: SchemaLocation) : this(keywords = mutableMapOf(), location = location)
 
   override val id: URI? get() = getKeyword(Keywords.DOLLAR_ID)?.value
-  override var ref: URI?
+  override var ref: Any?
     get() = getKeyword(Keywords.REF)?.value
     set(ref) {
-      addOrRemoveURI(REF, ref)
+      addOrRemoveURI(REF, ref?.let { URI(it.toString()) })
     }
+
+  override var refURI: URI?
+    get() = getKeyword(Keywords.REF)?.value
+    set(ref) { addOrRemoveURI(REF, ref) }
+
+  override var title: String? by mutableKeyword(Keywords.TITLE)
+  override var defaultValue: JsonElement? by mutableKeyword(Keywords.DEFAULT)
+
+  override var description: String? by mutableKeyword(DESCRIPTION)
+  override var type: JsonSchemaType?
+    get() = getKeyword(TYPE)?.types?.firstOrNull()
+    set(type) {
+      this.removeIfNecessary(TYPE, type)
+      if (type != null) {
+        this.type(type)
+      }
+    }
+
+  override var format: String? by mutableKeyword(FORMAT)
+  override var pattern: String? by mutableKeyword(PATTERN)
 
   override fun withSchema(): JsonSchemaBuilder = apply { keywords[SCHEMA] = DollarSchemaKeyword() }
   override fun withoutSchema(): JsonSchemaBuilder = apply { keywords -= SCHEMA }
@@ -453,7 +477,7 @@ open class JsonSchemaBuilder(
     }
 
     return when {
-      this.ref != null -> RefSchemaImpl(refURI = this.ref!!,
+      this.ref != null -> RefSchemaImpl(refURI = this.refURI!!,
           factory = schemaFactory,
           currentDocument = currentDocument,
           location = finalLocation,
@@ -697,9 +721,6 @@ open class JsonSchemaBuilder(
   }
 
   override fun hashCode(): Int = hashKode(keywords)
-
-  override fun ref(ref: Any): JsonSchemaBuilder = apply { this.ref(URI(ref.toString())) }
-
   override fun propertyNameSchema(block: SchemaBuilder<*>.() -> Unit): JsonSchemaBuilder = propertyNameSchema(jsonschemaBuilder(init = block))
   override fun patternProperty(pattern: String, block: SchemaBuilder<*>.() -> Unit): JsonSchemaBuilder = patternProperty(pattern, jsonschemaBuilder(init = block))
   override fun patternProperty(pattern: Pattern, block: SchemaBuilder<*>.() -> Unit): JsonSchemaBuilder = patternProperty(pattern, jsonschemaBuilder(init = block))

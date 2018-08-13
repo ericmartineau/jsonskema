@@ -36,6 +36,10 @@ data class ItemsKeyword(val indexedSchemas: List<Schema> = emptyList(),
     }
   }
 
+  override fun copy(value: List<Schema>): JsonSchemaKeyword<List<Schema>> {
+    return this.copy(indexedSchemas = value)
+  }
+
   override fun toString(): String {
     val result = StringBuilder()
     if (!indexedSchemas.isEmpty()) {
