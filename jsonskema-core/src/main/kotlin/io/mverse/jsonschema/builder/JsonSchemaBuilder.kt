@@ -11,6 +11,7 @@ import io.mverse.jsonschema.impl.RefSchemaImpl
 import io.mverse.jsonschema.jsonschemaBuilder
 import io.mverse.jsonschema.keyword.BooleanKeyword
 import io.mverse.jsonschema.keyword.DependenciesKeyword
+import io.mverse.jsonschema.keyword.DollarSchemaKeyword
 import io.mverse.jsonschema.keyword.IdKeyword
 import io.mverse.jsonschema.keyword.ItemsKeyword
 import io.mverse.jsonschema.keyword.JsonArrayKeyword
@@ -32,7 +33,6 @@ import io.mverse.jsonschema.keyword.Keywords.Companion.THEN
 import io.mverse.jsonschema.keyword.Keywords.Companion.WRITE_ONLY
 import io.mverse.jsonschema.keyword.LimitKeyword
 import io.mverse.jsonschema.keyword.NumberKeyword
-import io.mverse.jsonschema.keyword.DollarSchemaKeyword
 import io.mverse.jsonschema.keyword.SchemaListKeyword
 import io.mverse.jsonschema.keyword.SchemaMapKeyword
 import io.mverse.jsonschema.keyword.SingleSchemaKeyword
@@ -50,6 +50,7 @@ import lang.Pattern
 import lang.URI
 import lang.UUID
 import lang.hashKode
+import lang.json.toJsonArray
 import lang.json.toJsonLiteral
 
 open class JsonSchemaBuilder(
@@ -88,12 +89,14 @@ open class JsonSchemaBuilder(
   override val id: URI? get() = getKeyword(Keywords.DOLLAR_ID)?.value
   override var ref: URI?
     get() = getKeyword(Keywords.REF)?.value
-    set(ref) { addOrRemoveURI(REF, ref) }
+    set(ref) {
+      addOrRemoveURI(REF, ref)
+    }
 
   override fun withSchema(): JsonSchemaBuilder = apply { keywords[SCHEMA] = DollarSchemaKeyword() }
   override fun withoutSchema(): JsonSchemaBuilder = apply { keywords -= SCHEMA }
-  override fun ref(ref: URI): JsonSchemaBuilder = apply {this.ref = ref}
-  override fun ref(ref: String): JsonSchemaBuilder = apply {this.ref = URI(ref)}
+  override fun ref(ref: URI): JsonSchemaBuilder = apply { this.ref = ref }
+  override fun ref(ref: String): JsonSchemaBuilder = apply { this.ref = URI(ref) }
 
   override fun title(title: String): JsonSchemaBuilder {
     return addOrRemoveString(Keywords.TITLE, title)
@@ -116,8 +119,6 @@ open class JsonSchemaBuilder(
     }
     return this
   }
-
-
 
   override fun orType(requiredType: JsonSchemaType): JsonSchemaBuilder {
     return type(requiredType)
@@ -218,7 +219,7 @@ open class JsonSchemaBuilder(
     return this
   }
 
-  override fun propertySchema(propertySchemaKey: String, block: SchemaBuilder<*>.()->Unit): JsonSchemaBuilder {
+  override fun propertySchema(propertySchemaKey: String, block: SchemaBuilder<*>.() -> Unit): JsonSchemaBuilder {
     this.putKeywordSchema(Keywords.PROPERTIES, propertySchemaKey, jsonschemaBuilder(init = block))
     return this
   }
@@ -461,7 +462,7 @@ open class JsonSchemaBuilder(
     }
   }
 
-  override fun build(block:JsonSchemaBuilder.()->Unit): Schema {
+  override fun build(block: JsonSchemaBuilder.() -> Unit): Schema {
     this.block()
     val location: SchemaLocation = when {
       this.id == null -> this.location ?: SchemaPaths.fromBuilder(this)
@@ -545,7 +546,6 @@ open class JsonSchemaBuilder(
 
     return this
   }
-
 
   private fun <X : JsonSchemaKeyword<*>> getKeyword(keyword: KeywordInfo<X>, defaultValue: () -> X): X {
     return keywords.getOrElse(keyword) { defaultValue() } as X
@@ -658,33 +658,28 @@ open class JsonSchemaBuilder(
   }
 
   private fun buildSubSchema(toBuild: SchemaBuilder<*>, keyword: KeywordInfo<*>): Schema {
-    check(this.location != null) { "Location cannot be null" }
-    val childLocation = this.location!!.child(keyword)
+    val childLocation = this.location.child(keyword)
     return toBuild.build(childLocation, loadingReport)
   }
 
   private fun buildSubSchema(toBuild: SchemaBuilder<*>, keyword: KeywordInfo<*>, path: String, vararg paths: String): Schema {
-    check(this.location != null) { "Location cannot be null" }
-    val childLocation = this.location!!.child(keyword).child(path).child(*paths)
+    val childLocation = this.location.child(keyword).child(path).child(*paths)
     return toBuild.build(childLocation, loadingReport)
   }
 
   private fun buildSubSchema(toBuild: SchemaBuilder<*>, keyword: KeywordInfo<*>, idx: Int): Schema {
-    check(this.location != null) { "Location cannot be null" }
-    val childLocation = this.location!!.child(keyword).child(idx)
+    val childLocation = this.location.child(keyword).child(idx)
     return toBuild.build(childLocation, loadingReport)
   }
 
   private fun buildSubSchema(toBuild: SchemaBuilder<*>, keyword: KeywordInfo<*>, list: SchemaListKeyword): Schema {
-    check(this.location != null) { "Location cannot be null" }
-    val childLocation = this.location!!.child(keyword).child(list.subschemas.size)
+    val childLocation = this.location.child(keyword).child(list.subschemas.size)
     return toBuild.build(childLocation, loadingReport)
   }
 
   private fun buildSubSchemas(toBuild: Collection<SchemaBuilder<*>>?, keyword: KeywordInfo<*>): List<Schema> {
-    check(this.location != null) { "Location cannot be null" }
     var idx = 0
-    val childPath = this.location!!.child(keyword)
+    val childPath = this.location.child(keyword)
     return toBuild!!.map { builder -> builder.build(childPath.child(idx++), loadingReport) }
   }
 
@@ -702,4 +697,24 @@ open class JsonSchemaBuilder(
   }
 
   override fun hashCode(): Int = hashKode(keywords)
+
+  override fun ref(ref: Any): JsonSchemaBuilder = apply { this.ref(URI(ref.toString())) }
+
+  override fun propertyNameSchema(block: SchemaBuilder<*>.() -> Unit): JsonSchemaBuilder = propertyNameSchema(jsonschemaBuilder(init = block))
+  override fun patternProperty(pattern: String, block: SchemaBuilder<*>.() -> Unit): JsonSchemaBuilder = patternProperty(pattern, jsonschemaBuilder(init = block))
+  override fun patternProperty(pattern: Pattern, block: SchemaBuilder<*>.() -> Unit): JsonSchemaBuilder = patternProperty(pattern, jsonschemaBuilder(init = block))
+  override fun containsSchema(block: SchemaBuilder<*>.() -> Unit): JsonSchemaBuilder = containsSchema(jsonschemaBuilder(init = block))
+  override fun schemaOfAdditionalItems(block: SchemaBuilder<*>.() -> Unit): JsonSchemaBuilder = schemaOfAdditionalItems(jsonschemaBuilder(init = block))
+  override fun itemSchema(block: SchemaBuilder<*>.() -> Unit): JsonSchemaBuilder = itemSchema(jsonschemaBuilder(init = block))
+  override fun allItemSchema(block: SchemaBuilder<*>.() -> Unit): JsonSchemaBuilder = allItemSchema(jsonschemaBuilder(init = block))
+  override fun notSchema(block: SchemaBuilder<*>.() -> Unit): JsonSchemaBuilder = this.notSchema(jsonschemaBuilder(init = block))
+  override fun enumValues(vararg enumValues: Any?): JsonSchemaBuilder = apply {
+    this.enumValues(enumValues.toList().toJsonArray())
+  }
+  override fun oneOfSchema(block: SchemaBuilder<*>.() -> Unit): JsonSchemaBuilder = oneOfSchema(jsonschemaBuilder(init = block))
+  override fun anyOfSchema(block: SchemaBuilder<*>.() -> Unit): JsonSchemaBuilder = anyOfSchema(jsonschemaBuilder(init = block))
+  override fun allOfSchema(block: SchemaBuilder<*>.() -> Unit): JsonSchemaBuilder = allOfSchema(jsonschemaBuilder(init = block))
+  override fun ifSchema(block: SchemaBuilder<*>.() -> Unit): JsonSchemaBuilder = ifSchema(jsonschemaBuilder(init = block))
+  override fun thenSchema(block: SchemaBuilder<*>.() -> Unit): JsonSchemaBuilder = thenSchema(jsonschemaBuilder(init = block))
+  override fun elseSchema(block: SchemaBuilder<*>.() -> Unit): JsonSchemaBuilder = elseSchema(jsonschemaBuilder(init = block))
 }

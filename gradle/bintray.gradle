@@ -29,7 +29,9 @@ bintray {
 
         githubRepo = 'ericmartineau/jsonskema'
         version {
-            name = project.version
+            name = "${property('library.version')}"
+            released = new Date()
+
         }
     }
 }

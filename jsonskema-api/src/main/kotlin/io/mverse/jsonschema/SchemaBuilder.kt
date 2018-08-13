@@ -29,7 +29,7 @@ interface SchemaBuilder<SELF : SchemaBuilder<SELF>> {
   fun withoutSchema(): SELF
 
   fun ref(ref: URI): SELF
-
+  fun ref(ref: Any): SELF
   fun ref(ref: String): SELF
 
   fun title(title: String): SELF
@@ -79,14 +79,18 @@ interface SchemaBuilder<SELF : SchemaBuilder<SELF>> {
   fun requiredProperty(requiredProperty: String): SELF
 
   fun propertySchema(propertySchemaKey: String, propertySchemaValue: SchemaBuilder<*>): SELF
+  fun propertySchema(propertySchemaKey: String, block: SchemaBuilder<*>.() -> Unit): SELF
 
   fun updatePropertySchema(propertyName: String, updater: (SchemaBuilder<*>)->SchemaBuilder<*>): SELF
 
   fun propertyNameSchema(propertyNameSchema: SchemaBuilder<*>): SELF
+  fun propertyNameSchema(block: SchemaBuilder<*>.() -> Unit): SELF
 
   fun patternProperty(pattern: String, schema: SchemaBuilder<*>): SELF
+  fun patternProperty(pattern: String, block: SchemaBuilder<*>.() -> Unit): SELF
 
   fun patternProperty(pattern: Pattern, schema: SchemaBuilder<*>): SELF
+  fun patternProperty(pattern: Pattern, block: SchemaBuilder<*>.() -> Unit): SELF
 
   fun minProperties(minProperties: Int): SELF
 
@@ -121,24 +125,30 @@ interface SchemaBuilder<SELF : SchemaBuilder<SELF>> {
   fun minItems(minItems: Int): SELF
 
   fun containsSchema(containsSchema: SchemaBuilder<*>): SELF
+  fun containsSchema(block: SchemaBuilder<*>.() -> Unit): SELF
 
   fun noAdditionalItems(): SELF
 
   fun schemaOfAdditionalItems(schemaOfAdditionalItems: SchemaBuilder<*>): SELF
+  fun schemaOfAdditionalItems(block: SchemaBuilder<*>.() -> Unit): SELF
 
   fun itemSchemas(itemSchemas: List<SchemaBuilder<*>>): SELF
 
   fun itemSchema(itemSchema: SchemaBuilder<*>): SELF
+  fun itemSchema(block: SchemaBuilder<*>.() -> Unit): SELF
 
   fun allItemSchema(allItemSchema: SchemaBuilder<*>): SELF
+  fun allItemSchema(block: SchemaBuilder<*>.() -> Unit): SELF
 
   // ##################################################################
   // ########           COMMON KEYWORDS                  ##############
   // ##################################################################
 
   fun notSchema(notSchema: SchemaBuilder<*>): SELF
+  fun notSchema(block: SchemaBuilder<*>.() -> Unit): SELF
 
-  fun enumValues(enumValues: kotlinx.serialization.json.JsonArray): SELF
+  fun enumValues(enumValues: JsonArray): SELF
+  fun enumValues(vararg enumValues: Any?): SELF
 
   fun constValueString(constValue: String): SELF
 
@@ -151,20 +161,26 @@ interface SchemaBuilder<SELF : SchemaBuilder<SELF>> {
   fun oneOfSchemas(oneOfSchemas: Collection<SchemaBuilder<*>>): SELF
 
   fun oneOfSchema(oneOfSchema: SchemaBuilder<*>): SELF
+  fun oneOfSchema(block: SchemaBuilder<*>.() -> Unit): SELF
 
   fun anyOfSchemas(anyOfSchemas: Collection<SchemaBuilder<*>>): SELF
 
   fun anyOfSchema(anyOfSchema: SchemaBuilder<*>): SELF
+  fun anyOfSchema(block: SchemaBuilder<*>.() -> Unit): SELF
 
   fun allOfSchemas(allOfSchemas: Collection<SchemaBuilder<*>>): SELF
 
   fun allOfSchema(allOfSchema: SchemaBuilder<*>): SELF
+  fun allOfSchema(block: SchemaBuilder<*>.() -> Unit): SELF
 
   fun ifSchema(ifSchema: SchemaBuilder<*>): SELF
+  fun ifSchema(block: SchemaBuilder<*>.() -> Unit): SELF
 
   fun thenSchema(thenSchema: SchemaBuilder<*>): SELF
+  fun thenSchema(block: SchemaBuilder<*>.() -> Unit): SELF
 
   fun elseSchema(elseSchema: SchemaBuilder<*>): SELF
+  fun elseSchema(block: SchemaBuilder<*>.() -> Unit): SELF
 
   // ##################################################################
   // ########           INNER KEYWORDS                   ##############
@@ -187,11 +203,10 @@ interface SchemaBuilder<SELF : SchemaBuilder<SELF>> {
 
   fun withSchemaLoader(factory: SchemaLoader): SELF
 
-  fun withCurrentDocument(currentDocument: kotlinx.serialization.json.JsonObject): SELF
+  fun withCurrentDocument(currentDocument: JsonObject): SELF
 
   fun <K:JsonSchemaKeyword<*>> keyword(keyword: KeywordInfo<K>, keywordValue: K):SELF
 
   fun build(block: SELF.() -> Unit = {}): Schema
 
-  fun propertySchema(propertySchemaKey: String, block: SchemaBuilder<*>.() -> Unit): SELF
 }
