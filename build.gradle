@@ -26,6 +26,10 @@ plugins {
   id 'io.mverse.multi-platform' version "0.5.30"
 }
 
+mverse {
+
+}
+
 allprojects {
   group 'io.mverse.jsonskema'
 //  version property('library.version')

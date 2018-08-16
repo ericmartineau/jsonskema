@@ -92,7 +92,6 @@ data class JsonSchemaValidator(val factories: KeywordValidatorCreators,
       ElementType.NUMBER -> validators = numberValidators
       ElementType.BOOLEAN -> validators = booleanValidators
       ElementType.NULL -> validators = nullValidators
-      else -> validators = null
     }
     return validators
   }

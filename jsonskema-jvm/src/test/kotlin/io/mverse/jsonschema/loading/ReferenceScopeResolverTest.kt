@@ -26,7 +26,7 @@ import org.junit.runners.Parameterized.Parameters
 import java.util.*
 
 @RunWith(Parameterized::class)
-class ReferenceScopeResolverTest(expectedOutput: String, parentScope: String,
+class ReferenceScopeResolverTest(name: String, expectedOutput: String, parentScope: String,
                                  encounteredSegment: String) {
 
   private val expectedOutput: URI
@@ -53,20 +53,17 @@ class ReferenceScopeResolverTest(expectedOutput: String, parentScope: String,
     @Parameters(name = "{0}")
     @JvmStatic
     fun params(): List<Array<out Any>> {
-      return Arrays.asList(
-          parList("fragment id", "http://x.y.z/root.json#foo", "http://x.y.z/root.json", "#foo"),
-          parList("rel path", "http://example.org/foo", "http://example.org/bar", "foo"),
-          parList("file name change", "http://x.y.z/schema/child.json",
+      return listOf(
+          arrayOf("fragment id", "http://x.y.z/root.json#foo", "http://x.y.z/root.json", "#foo"),
+          arrayOf("rel path", "http://example.org/foo", "http://example.org/bar", "foo"),
+          arrayOf("file name change", "http://x.y.z/schema/child.json",
               "http://x.y.z/schema/parent.json",
               "child.json"),
-          parList("file name after folder path", "http://x.y.z/schema/child.json",
+          arrayOf("file name after folder path", "http://x.y.z/schema/child.json",
               "http://x.y.z/schema/", "child.json"),
-          parList("new root", "http://bserver.com", "http://aserver.com/",
+          arrayOf("new root", "http://bserver.com", "http://aserver.com/",
               "http://bserver.com"))
     }
 
-    private fun parList(vararg params: String): Array<out Any> {
-      return params
-    }
   }
 }

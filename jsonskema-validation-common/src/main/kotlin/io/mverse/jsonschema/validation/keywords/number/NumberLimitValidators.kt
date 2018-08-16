@@ -12,6 +12,7 @@ object NumberLimitValidators {
       keyword.isExclusive -> NumberExclusiveMaximumValidator(
           schema = schema,
           exclusiveMaximum = keyword.exclusiveLimit!!.toDouble())
+      @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
       keyword.limit != null -> NumberMaximumValidator(
           schema = schema,
           maximum = keyword.limit!!.toDouble()

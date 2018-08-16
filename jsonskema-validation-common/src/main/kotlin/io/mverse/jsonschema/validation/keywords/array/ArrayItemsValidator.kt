@@ -27,6 +27,7 @@ object ArrayItemsValidator {
       }
 
       keyword.allItemSchema != null -> {
+        @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
         val allItemValidator = factory.createValidator(schema = keyword.allItemSchema!!)
         ArrayItemValidator(parentSchema = schema,
             allItemValidator = allItemValidator)
