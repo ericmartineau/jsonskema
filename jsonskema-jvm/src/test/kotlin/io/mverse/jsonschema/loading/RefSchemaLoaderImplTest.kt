@@ -9,6 +9,7 @@ import io.mverse.jsonschema.resourceLoader
 import io.mverse.jsonschema.schemaReader
 import kotlinx.serialization.json.JsonObject
 import lang.URI
+import lang.resolveUri
 import org.junit.Before
 import org.junit.Test
 
@@ -30,7 +31,7 @@ class RefSchemaLoaderImplTest {
   fun resolve_WhenReferenceIsInsideDocument_AndRefHasAbsolutePathPlusSchemeWithLocalId_ThenReturnSomething() {
     val relativeURI = URI("http://schema.mverse.io/mverse-account-profile.json#platformName")
 
-    val absoluteURI = documentURI.resolve(relativeURI)
+    val absoluteURI = documentURI.resolveUri(relativeURI)
 
     val schema = refSchemaLoader.findRefInDocument(documentURI, absoluteURI, accountProfileJson, LoadingReport())
     assert(schema).isNotNull()
@@ -40,7 +41,7 @@ class RefSchemaLoaderImplTest {
   fun resolve_WhenReferenceIsInsideDocument_AndRefHasAbsolutePathWithLocalId_ThenReturnSomething() {
     val relativeURI = URI("/mverse-account-profile.json#platformName")
 
-    val absoluteURI = documentURI.resolve(relativeURI)
+    val absoluteURI = documentURI.resolveUri(relativeURI)
 
     val schema = refSchemaLoader.findRefInDocument(documentURI, absoluteURI, accountProfileJson, LoadingReport())
     assert(schema).isNotNull()
@@ -50,7 +51,7 @@ class RefSchemaLoaderImplTest {
   fun resolve_WhenReferenceIsInsideDocument_AndRefHasLocalIdFragment_ThenReturnSomething() {
     val relativeURI = URI("#platformName")
 
-    val absoluteURI = documentURI.resolve(relativeURI)
+    val absoluteURI = documentURI.resolveUri(relativeURI)
 
     val schema = refSchemaLoader.findRefInDocument(documentURI, absoluteURI, accountProfileJson, LoadingReport())
     assert(schema).isNotNull()
@@ -60,7 +61,7 @@ class RefSchemaLoaderImplTest {
   fun resolve_WhenReferenceIsInsideDocument_AndRefHasRelativePathWithLocalId_ThenReturnSomething() {
     val relativeURI = URI("mverse-account-profile.json#platformName")
 
-    val absoluteURI = documentURI.resolve(relativeURI)
+    val absoluteURI = documentURI.resolveUri(relativeURI)
 
     val schema = refSchemaLoader.findRefInDocument(documentURI, absoluteURI, accountProfileJson, LoadingReport())
     assert(schema).isNotNull()
@@ -70,7 +71,7 @@ class RefSchemaLoaderImplTest {
   fun resolve_WhenReferenceIsOutsideDocument_ThenReturnEmpty() {
     val relativeURI = URI("/primitives.json#/definitions/color")
 
-    val absoluteURI = documentURI.resolve(relativeURI)
+    val absoluteURI = documentURI.resolveUri(relativeURI)
 
     val schema = refSchemaLoader.findRefInDocument(documentURI, absoluteURI, accountProfileJson, LoadingReport())
     assert(schema).isNull()

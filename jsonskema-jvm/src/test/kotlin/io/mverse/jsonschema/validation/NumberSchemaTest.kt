@@ -21,7 +21,7 @@ import io.mverse.jsonschema.assertj.asserts.isNotValid
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.getValidator
 import io.mverse.jsonschema.keyword.Keywords
-import io.mverse.jsonschema.keyword.Keywords.Companion.EXCLUSIVE_MAXIMUM
+import io.mverse.jsonschema.keyword.Keywords.EXCLUSIVE_MAXIMUM
 import io.mverse.jsonschema.loading.parseJsonObject
 import io.mverse.jsonschema.minus
 import io.mverse.jsonschema.plus

@@ -44,11 +44,11 @@ dependencies {
   //  compile 'commons-validator:commons-validator'
 
   compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-  expectedBy project(":jsonskema-common")
-  expectedBy project(":jsonskema-api")
-  expectedBy project(":jsonskema-core")
-  expectedBy project(":jsonskema-loading")
-  expectedBy project(":jsonskema-validation")
+  expectedBy project(":jsonskema-util-common")
+  expectedBy project(":jsonskema-api-common")
+  expectedBy project(":jsonskema-core-common")
+  expectedBy project(":jsonskema-loading-common")
+  expectedBy project(":jsonskema-validation-common")
   testCompile "junit:junit:4.12"
 
   compile("org.assertj:assertj-core:3.10.0")

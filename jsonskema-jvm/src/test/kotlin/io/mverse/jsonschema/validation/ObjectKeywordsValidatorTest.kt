@@ -45,6 +45,7 @@ import io.mverse.jsonschema.validation.ValidationTestSupport.verifyFailure
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.json
 import lang.json.toJsonLiteral
+import lang.size
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before

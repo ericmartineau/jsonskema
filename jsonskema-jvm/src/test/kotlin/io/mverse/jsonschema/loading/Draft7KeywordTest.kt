@@ -17,10 +17,10 @@ import io.mverse.jsonschema.assertj.asserts.withAssertion
 import io.mverse.jsonschema.enums.JsonSchemaType.STRING
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
 import io.mverse.jsonschema.keyword.Keywords
-import io.mverse.jsonschema.keyword.Keywords.Companion.COMMENT
-import io.mverse.jsonschema.keyword.Keywords.Companion.CONTENT_ENCODING
-import io.mverse.jsonschema.keyword.Keywords.Companion.CONTENT_MEDIA_TYPE
-import io.mverse.jsonschema.keyword.Keywords.Companion.PATTERN
+import io.mverse.jsonschema.keyword.Keywords.COMMENT
+import io.mverse.jsonschema.keyword.Keywords.CONTENT_ENCODING
+import io.mverse.jsonschema.keyword.Keywords.CONTENT_MEDIA_TYPE
+import io.mverse.jsonschema.keyword.Keywords.PATTERN
 import io.mverse.jsonschema.resourceLoader
 import io.mverse.jsonschema.schemaReader
 import org.junit.Before

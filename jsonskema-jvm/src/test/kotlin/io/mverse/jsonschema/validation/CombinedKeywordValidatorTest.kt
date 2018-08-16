@@ -20,9 +20,9 @@ import io.mverse.jsonschema.assertj.asserts.hasKeyword
 import io.mverse.jsonschema.assertj.asserts.hasViolationCount
 import io.mverse.jsonschema.assertj.asserts.isNotValid
 import io.mverse.jsonschema.assertj.asserts.validating
-import io.mverse.jsonschema.keyword.Keywords.Companion.ALL_OF
-import io.mverse.jsonschema.keyword.Keywords.Companion.ANY_OF
-import io.mverse.jsonschema.keyword.Keywords.Companion.ONE_OF
+import io.mverse.jsonschema.keyword.Keywords.ALL_OF
+import io.mverse.jsonschema.keyword.Keywords.ANY_OF
+import io.mverse.jsonschema.keyword.Keywords.ONE_OF
 import io.mverse.jsonschema.loading.parseJson
 import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.ValidationMocks.mockNumberSchema

@@ -6,7 +6,9 @@ import io.mverse.jsonschema.loading.parseJsonObject
 import kotlinx.io.InputStream
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import lang.Global
 import kotlin.reflect.KClass
+
 
 fun JsonSchema.resourceLoader():JsonResourceLoader = JsonResourceLoader(JsonResourceLoader::class)
 fun JsonSchema.resourceLoader(klass:KClass<*>):JsonResourceLoader = JsonResourceLoader(klass)

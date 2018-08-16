@@ -1,81 +1,86 @@
 
-buildscript {
-  repositories {
-    jcenter()
-    mavenLocal()
-    maven { url "https://plugins.gradle.org/m2/" }
-    maven { url "https://kotlin.bintray.com/kotlinx" }
-    maven { url "https://dl.bintray.com/jetbrains/kotlin-native-dependencies" }
-  }
+//buildscript {
+//  repositories {
+//    jcenter()
+//    mavenLocal()
+//    maven { url "https://plugins.gradle.org/m2/" }
+//    maven { url "https://kotlin.bintray.com/kotlinx" }
+//    maven { url "https://dl.bintray.com/jetbrains/kotlin-native-dependencies" }
+//  }
+//
+//  dependencies {
+//    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+//    classpath "org.jetbrains.kotlinx:kotlinx-gradle-serialization-plugin:$serialization_version"
+//
+//    classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.2'
+//    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
+//
+//    classpath "com.github.jengelman.gradle.plugins:shadow:2.0.2"
+//    classpath "me.champeau.gradle:jmh-gradle-plugin:0.4.5"
+//    classpath "net.ltgt.gradle:gradle-apt-plugin:0.10"
+//  }
+//}
 
-  dependencies {
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    classpath "org.jetbrains.kotlinx:kotlinx-gradle-serialization-plugin:$serialization_version"
-
-    classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.2'
-    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
-
-    classpath "com.github.jengelman.gradle.plugins:shadow:2.0.2"
-    classpath "me.champeau.gradle:jmh-gradle-plugin:0.4.5"
-    classpath "net.ltgt.gradle:gradle-apt-plugin:0.10"
-  }
+plugins {
+  id 'io.mverse.project' version "0.5.30"
+  id 'io.mverse.multi-platform' version "0.5.30"
 }
 
 allprojects {
   group 'io.mverse.jsonskema'
-  version property('library.version')
-
-  repositories {
-    jcenter()
-    mavenLocal()
-    maven { url "https://dl.bintray.com/mverse-io/mverse-public" }
-  }
+//  version property('library.version')
+//
+//  repositories {
+//    jcenter()
+//    mavenLocal()
+//    maven { url "https://dl.bintray.com/mverse-io/mverse-public" }
+//  }
 }
 
-apply plugin: 'kotlin'
+//apply plugin: 'kotlin'
 
 subprojects {
 
-  apply plugin: 'maven-publish'
+//  apply plugin: 'maven-publish'
 
   def varintName = ""
 
-  afterEvaluate {
-    task sourceJar(type: Jar, dependsOn: classes) {
-      classifier 'sources'
-      from sourceSets.main.kotlin
-//      if (project.name == "jsonskema-jvm") {
-//        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-//        def platformSrc = sourceSets.main.kotlin
-////        def apiSrc = project(":jsonskema-api").sourceSets.main.kotlin
-////        def coreSrc = project(":jsonskema-core").sourceSets.main.kotlin
-////        def commonSrc = project(":jsonskema-common").sourceSets.main.kotlin
+//  afterEvaluate {
+//    task sourceJar(type: Jar, dependsOn: classes) {
+//      classifier 'sources'
+//      from sourceSets.main.kotlin
+////      if (project.name == "jsonskema-jvm") {
+////        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+////        def platformSrc = sourceSets.main.kotlin
+//////        def apiSrc = project(":jsonskema-api").sourceSets.main.kotlin
+//////        def coreSrc = project(":jsonskema-core").sourceSets.main.kotlin
+//////        def commonSrc = project(":jsonskema-common").sourceSets.main.kotlin
+////
+////        from(platformSrc)
+////
+////      }
+//    }
+//  }
+
+//  tasks.withType(Jar) {
+//    archivesBaseName = project.name
+//  }
+
+//  publishing {
+//    publications {
+//      mavenProject(MavenPublication) {
+//        from components.java
+//        groupId "${project.group}"
+//        artifactId "${project.name}"
+//        version "${property('library.version')}"
 //
-//        from(platformSrc)
-//
+//        artifact sourceJar {
+//          classifier "sources"
+//        }
 //      }
-    }
-  }
+//    }
+//  }
 
-  tasks.withType(Jar) {
-    archivesBaseName = project.name
-  }
-
-  publishing {
-    publications {
-      mavenProject(MavenPublication) {
-        from components.java
-        groupId "${project.group}"
-        artifactId "${project.name}"
-        version "${property('library.version')}"
-
-        artifact sourceJar {
-          classifier "sources"
-        }
-      }
-    }
-  }
-
-  apply plugin: 'com.jfrog.bintray'
-  apply from: "${rootProject.rootDir}/gradle/bintray.gradle"
+//  apply plugin: 'com.jfrog.bintray'
+//  apply from: "${rootProject.rootDir}/gradle/bintray.gradle"
 }

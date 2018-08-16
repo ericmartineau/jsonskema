@@ -31,9 +31,9 @@ import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaType.NULL
 import io.mverse.jsonschema.keyword.Keywords
-import io.mverse.jsonschema.keyword.Keywords.Companion.ENUM
-import io.mverse.jsonschema.keyword.Keywords.Companion.TYPE
-import io.mverse.jsonschema.keyword.Keywords.Companion.UNIQUE_ITEMS
+import io.mverse.jsonschema.keyword.Keywords.ENUM
+import io.mverse.jsonschema.keyword.Keywords.TYPE
+import io.mverse.jsonschema.keyword.Keywords.UNIQUE_ITEMS
 import io.mverse.jsonschema.loading.parseJson
 import io.mverse.jsonschema.loading.parseJsonObject
 import io.mverse.jsonschema.minus

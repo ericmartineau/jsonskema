@@ -24,8 +24,9 @@ class EndToEndTest {
     val primitives = JsonSchema.resourceLoader().getStream("primitives.json")
     val jsonSchema = JsonSchema.resourceLoader().getStream("mverse-account-profile.json")
     val jsonData = JsonSchema.resourceLoader().readJson("account-data.json").jsonObject
+    val preloadedSchema = primitives.parseJsonObject()
     val loadedSchema = JsonSchema.schemaReader()
-        .withPreloadedDocument(primitives.parseJsonObject())
+        .withPreloadedDocument(preloadedSchema)
         .readSchema(jsonSchema)
     assert(loadedSchema)
         .validating(jsonData)

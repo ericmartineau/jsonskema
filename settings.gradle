@@ -1,18 +1,19 @@
 pluginManagement {
   repositories {
-    gradlePluginPortal()
     jcenter()
+    gradlePluginPortal()
     google()
-    mavenLocal()
     maven { url "https://dl.bintray.com/mverse-io/mverse-public" }
+    maven { url "https://kotlin.bintray.com/kotlinx" }
   }
+
 }
 rootProject.name = 'jsonskema'
 
-include 'jsonskema-common'
-include 'jsonskema-core'
-include 'jsonskema-loading'
-include 'jsonskema-validation'
+include 'jsonskema-util-common'
+include 'jsonskema-core-common'
+include 'jsonskema-loading-common'
+include 'jsonskema-validation-common'
 include 'jsonskema-jvm'
 include 'jsonskema-js'
-include 'jsonskema-api'
+include 'jsonskema-api-common'

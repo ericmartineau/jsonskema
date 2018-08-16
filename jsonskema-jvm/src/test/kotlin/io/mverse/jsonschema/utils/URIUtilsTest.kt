@@ -10,6 +10,7 @@ import lang.URI
 import lang.isFragmentOnly
 import lang.json.toJsonArray
 import lang.json.toJsonObject
+import lang.resolveUri
 import kotlin.test.Test
 
 class URIUtilsTest {
@@ -23,7 +24,7 @@ class URIUtilsTest {
   @Test
   fun resolve_AgainstURN_WithFragmentOnly() {
     val uriToTest = URI("urn:jsonschema:com:zzzzz:tests:commons:jsonschema:models:Person")
-    assert(uriToTest.resolve( URI("#/some/pointer")))
+    assert(uriToTest.resolveUri( URI("#/some/pointer")))
         .isEqualTo(URI("urn:jsonschema:com:zzzzz:tests:commons:jsonschema:models:Person#/some/pointer"))
   }
 
@@ -126,7 +127,7 @@ class URIUtilsTest {
     }
 
     val uri = generateUniqueURI(jsonObject)
-    val resolve = uri.resolve("#/foofy")
+    val resolve = uri.resolveUri("#/foofy")
     assert(resolve.toString()).isEqualTo(uri.toString() + "#/foofy")
   }
 

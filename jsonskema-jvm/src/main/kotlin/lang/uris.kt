@@ -1,37 +1,22 @@
 package lang
 
-import kotlinx.io.InputStream
 import java.nio.charset.Charset
 
-actual data class URI(private val juri: JURI) {
-  actual constructor(uri: String) : this(JURI.create(uri))
-  actual constructor(scheme: String?, schemeSpecificPart: String?, fragment: String?) :
-      this(java.net.URI(scheme, schemeSpecificPart, fragment))
+actual typealias URI = java.net.URI
 
-  actual val isAbsolute: Boolean = juri.isAbsolute
-  actual val isOpaque: Boolean = juri.isOpaque
-  actual fun resolve(against: URI): URI {
-    return if (this.isOpaque && against.isFragmentOnly) {
-      this.withNewFragment(against)
-    } else {
-      juri.resolve(against.juri).toCommonURI()
-    }
+actual fun URI.readFully(charset: String): String {
+  return toURL().readText(Charset.forName(charset))
+}
+
+actual fun URI.withNewFragment(newFragment: URI): URI {
+  check(newFragment.isFragmentOnly) { "Must only be a fragment" }
+  return URI(scheme, schemeSpecificPart, newFragment.fragment)
+}
+
+actual fun URI.resolveUri(against: URI): URI {
+  return if (this.isOpaque && against.isFragmentOnly) {
+    withNewFragment(against)
+  } else {
+    resolve(against)
   }
-
-  actual fun resolve(against: String): URI = this.resolve(URI(against))
-
-  actual fun withNewFragment(newFragment: URI): URI {
-    check(newFragment.isFragmentOnly) { "Must only be a fragment" }
-    return URI(scheme, schemSpecificPart, newFragment.fragment)
-  }
-
-  actual val fragment: String? = juri.fragment
-  actual val scheme: String? = juri.scheme
-  actual val schemSpecificPart: String? = juri.schemeSpecificPart
-  actual val query: String? = juri.query
-  actual val path: String? = juri.path
-
-  override fun toString(): String = juri.toString()
-  actual fun relativize(uri: URI): URI = juri.relativize(uri.juri).toCommonURI()
-  actual fun readFully(charset:String): String = juri.toURL().readText(Charset.forName(charset))
 }
