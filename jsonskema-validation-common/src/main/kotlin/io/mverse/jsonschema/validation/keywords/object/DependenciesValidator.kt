@@ -19,22 +19,22 @@ class DependenciesValidator(keyword: DependenciesKeyword, schema: Schema, factor
 
   private val propertyDependencies: SetMultimap<String, String> = keyword.propertyDependencies
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     for ((propName, dependencyValidator) in dependencyValidators) {
       if (subject.containsKey(propName)) {
-        dependencyValidator.validate(subject, report)
+        dependencyValidator.validate(subject, parentReport)
       }
     }
 
     propertyDependencies.asMap().forEach { (ifThisPropertyExists, set)->
       for (thenThisMustAlsoExist in set) {
         if (subject.containsKey(ifThisPropertyExists) && !subject.containsKey(thenThisMustAlsoExist)) {
-          report += buildKeywordFailure(subject)
+          parentReport += buildKeywordFailure(subject)
               .withError("property [%s] is required because [%s] was present", thenThisMustAlsoExist, ifThisPropertyExists)
 
         }
       }
     }
-    return report.isValid
+    return parentReport.isValid
   }
 }

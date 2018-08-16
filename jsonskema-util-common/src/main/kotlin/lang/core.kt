@@ -6,3 +6,7 @@ fun <A, B> A?.convert(converter:(A)->B):B? {
     else-> converter(this)
   }
 }
+
+fun noop() {
+  // Do nothing
+}

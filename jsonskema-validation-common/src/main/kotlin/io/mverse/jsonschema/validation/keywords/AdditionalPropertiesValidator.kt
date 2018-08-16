@@ -42,8 +42,8 @@ class AdditionalPropertiesValidator(keyword: SingleSchemaKeyword, schema: Schema
       }
     }
     if (!report.isValid) {
-      parentReport.addReport(schema, subject, Keywords.ADDITIONAL_PROPERTIES, "Additional properties were invalid", report)
+      report.addReport(schema, subject, Keywords.ADDITIONAL_PROPERTIES, "Additional properties were invalid", report)
     }
-    return parentReport.isValid
+    return report.isValid
   }
 }

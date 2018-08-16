@@ -8,19 +8,19 @@ import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.ValidationReport
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
 
-class MinPropertiesValidator(number: NumberKeyword, schema: Schema, factory: SchemaValidatorFactory) : KeywordValidator<NumberKeyword>(Keywords.MIN_PROPERTIES, schema) {
+class MinPropertiesValidator(number: NumberKeyword, schema: Schema) : KeywordValidator<NumberKeyword>(Keywords.MIN_PROPERTIES, schema) {
   private val minProperties: Int = number.integer
 
   init {
     check(minProperties >= 0) { "minProperties can't be negative" }
   }
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     val actualSize = subject.numberOfProperties()
     if (actualSize < minProperties) {
-      report += buildKeywordFailure(subject)
+      parentReport += buildKeywordFailure(subject)
           .withError("minimum size: [%d], found: [%d]", minProperties, actualSize)
     }
-    return report.isValid
+    return parentReport.isValid
   }
 }

@@ -9,16 +9,16 @@ import io.mverse.jsonschema.validation.ValidationReport
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
 import lang.isDivisibleBy
 
-class NumberMultipleOfValidator(numberKeyword: NumberKeyword, schema: Schema, factory: SchemaValidatorFactory) : KeywordValidator<NumberKeyword>(Keywords.MULTIPLE_OF, schema) {
+class NumberMultipleOfValidator(numberKeyword: NumberKeyword, schema: Schema) : KeywordValidator<NumberKeyword>(Keywords.MULTIPLE_OF, schema) {
 
   private val multipleOf: Double = numberKeyword.double
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     val subjectDecimal = subject.number!!.toDouble()
     if (!subjectDecimal.isDivisibleBy(multipleOf)) {
-      report += buildKeywordFailure(subject)
+      parentReport += buildKeywordFailure(subject)
           .withError("Value is not a multiple of %s", multipleOf)
     }
-    return report.isValid
+    return parentReport.isValid
   }
 }

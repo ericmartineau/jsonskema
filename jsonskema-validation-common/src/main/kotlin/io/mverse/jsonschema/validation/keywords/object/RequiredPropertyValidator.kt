@@ -8,18 +8,18 @@ import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.ValidationReport
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
 
-class RequiredPropertyValidator(keyword: StringSetKeyword, schema: Schema, factory: SchemaValidatorFactory)
+class RequiredPropertyValidator(keyword: StringSetKeyword, schema: Schema)
   : KeywordValidator<StringSetKeyword>(REQUIRED, schema) {
 
   private val requiredProperties: Set<String> = keyword.value
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     for (requiredProp in requiredProperties) {
       if (!subject.containsKey(requiredProp)) {
-        report += buildKeywordFailure(subject)
+        parentReport += buildKeywordFailure(subject)
             .withError("required key [%s] not found", requiredProp)
       }
     }
-    return report.isValid
+    return parentReport.isValid
   }
 }

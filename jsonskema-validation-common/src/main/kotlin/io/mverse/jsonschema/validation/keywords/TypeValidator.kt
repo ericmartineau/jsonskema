@@ -18,7 +18,7 @@ class TypeValidator(val keyword: TypeKeyword,
   private val requiredTypes: Set<JsonSchemaType> = keyword.types
   private val requiresInteger: Boolean = requiredTypes.contains(JsonSchemaType.INTEGER) && !this.requiredTypes.contains(JsonSchemaType.NUMBER)
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     val valueType = subject.type
     val schemaType: JsonSchemaType
     if (requiresInteger && valueType == NUMBER) {
@@ -27,8 +27,8 @@ class TypeValidator(val keyword: TypeKeyword,
       schemaType = subject.jsonSchemaType
     }
     if (!requiredTypes.contains(schemaType)) {
-      report += buildTypeMismatchError(subject, parent, requiredTypes)
+      parentReport += buildTypeMismatchError(subject, parent, requiredTypes)
     }
-    return report.isValid
+    return parentReport.isValid
   }
 }

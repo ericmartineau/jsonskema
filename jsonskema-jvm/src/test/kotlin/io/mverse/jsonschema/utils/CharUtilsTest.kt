@@ -62,13 +62,13 @@ class CharUtilsTest {
 
     val stopwatch = Stopwatch()
     for (attempt in attempts) {
-      val parsed = attempt?.toIntOrNull()
+      attempt?.toIntOrNull()
     }
     val elapsed = stopwatch.elapsed
 
     stopwatch.restart()
     for (attempt in attempts) {
-      val parsed = CharUtils.tryParsePositiveInt(attempt)
+      CharUtils.tryParsePositiveInt(attempt)
     }
     val elapsedMe = stopwatch.elapsed
 

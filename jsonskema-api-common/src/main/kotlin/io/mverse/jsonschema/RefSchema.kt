@@ -60,7 +60,7 @@ abstract class RefSchema : Schema {
       while (schema is RefSchema) {
         schema = factory.loadRefSchema(schema, thisRefURI, currentDocument, report)
         if (schema is RefSchema) {
-          thisRefURI = (schema as RefSchema).refURI
+          thisRefURI = schema.refURI
         }
         if (infiniteLoopPrevention++ > 10) {
           throw IllegalStateException("Too many nested references")

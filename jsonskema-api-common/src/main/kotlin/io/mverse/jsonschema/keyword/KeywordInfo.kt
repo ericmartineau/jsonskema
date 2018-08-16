@@ -72,9 +72,9 @@ class KeywordInfo<K : JsonSchemaKeyword<*>> {
                        expects: ElementType,
                        since: JsonSchemaVersion?,
                        until: JsonSchemaVersion?) {
-    var since = since
+    var sinceVar = since
 
-    since = since ?: JsonSchemaVersion.Draft3
+    sinceVar = sinceVar ?: JsonSchemaVersion.Draft3
     this.mostRecentVersion = until ?: JsonSchemaVersion.latest()
     if (forSchemas.isEmpty()) {
       this.forSchemas = JsonSchemaType.values().toHashSet()
@@ -86,7 +86,7 @@ class KeywordInfo<K : JsonSchemaKeyword<*>> {
         .toHashSet()
     this.key = key
     this.expects = expects
-    this.applicableVersions = JsonSchemaVersion.values().range(since, mostRecentVersion)
+    this.applicableVersions = JsonSchemaVersion.values().range(sinceVar, mostRecentVersion)
     this.variants = emptyMap()
   }
 
@@ -137,7 +137,7 @@ class KeywordInfo<K : JsonSchemaKeyword<*>> {
 
     private lateinit var key: String
     private var main: KeywordVersionInfoBuilder<K>
-    private lateinit var current: KeywordVersionInfoBuilder<K>
+    private var current: KeywordVersionInfoBuilder<K>
     private val versions: MutableList<KeywordVersionInfoBuilder<K>> = mutableListOf()
     /**
      * Which types of values this keyword applies to: string, boolean, object, array

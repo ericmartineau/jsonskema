@@ -26,8 +26,8 @@ object CharUtils {
   private val FORWARD_SLASH_SEPARATOR = Splitter('/')
 
   private object UrlSegmentUnscaper : Unescaper() {
-    override fun unescape(input: CharSequence?): String {
-      return URLDecoder.decode(input.toString(), "UTF-8")
+    override fun unescape(string: CharSequence?): String {
+      return URLDecoder.decode(string.toString(), "UTF-8")
     }
   }
 

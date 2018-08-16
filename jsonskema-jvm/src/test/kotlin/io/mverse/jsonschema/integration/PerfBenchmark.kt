@@ -22,7 +22,7 @@ class PerfBenchmark {
 
     val jsonObject = JsonSchema.resourceLoader().readJsonObject("perftest.json")
     val testSubjects = ArrayList<JsonValueWithPath>()
-    jsonObject["schemas"].jsonObject.forEach { (k, v) ->
+    jsonObject["schemas"].jsonObject.forEach { (_, v) ->
       testSubjects.add(JsonValueWithPath.fromJsonValue(v, v, SchemaPaths.fromNonSchemaSource(v)))
     }
 

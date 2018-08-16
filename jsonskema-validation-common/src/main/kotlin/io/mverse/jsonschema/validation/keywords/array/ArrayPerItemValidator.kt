@@ -13,17 +13,17 @@ data class ArrayPerItemValidator(override val schema: Schema,
                                  private val additionalItemValidator: SchemaValidator?)
   : KeywordValidator<ItemsKeyword>(ITEMS, schema) {
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     var success = true
     val indexedValidatorCount = indexedValidators.size
     subject.forEachIndex { idx, item ->
       val valid: Boolean
       when {
         indexedValidatorCount > idx -> {
-          valid = indexedValidators[idx].validate(item, report)
+          valid = indexedValidators[idx].validate(item, parentReport)
           success = success && valid
         }
-        additionalItemValidator != null -> valid = additionalItemValidator.validate(item, report)
+        additionalItemValidator != null -> valid = additionalItemValidator.validate(item, parentReport)
         else -> valid = true
       }
       success = success && valid

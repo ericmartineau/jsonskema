@@ -186,7 +186,7 @@ class ValidationErrorTest {
 
   @Test
   fun violationCountWithoutCauses() {
-    val subject = subjectWithCauses()
+    subjectWithCauses()
         .assertThat { violationCount }
         .isEqualTo(1)
   }

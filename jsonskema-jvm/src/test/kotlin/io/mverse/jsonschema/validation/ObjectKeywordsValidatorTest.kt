@@ -129,7 +129,7 @@ class ObjectKeywordsValidatorTest {
 
     assertEquals("#: Additional properties were invalid", error.message)
     assertEquals(Keywords.ADDITIONAL_PROPERTIES, error.keyword)
-    assertEquals(2, error.causes!!.size)
+    assertEquals(2, error.causes.size)
   }
 
   @Test
@@ -148,19 +148,19 @@ class ObjectKeywordsValidatorTest {
         .build()
 
     val e = verifyFailure { ValidationMocks.createTestValidator(subject).validate(objectTestCases["schemaDepViolation"]) }
-    var creditCardFailure = e.causes!![0]
-    var ageFailure = e.causes!![1]
+    var creditCardFailure = e.causes[0]
+    var ageFailure = e.causes[1]
     // due to schemaDeps being stored in (unsorted) HashMap, the exceptions may need to be swapped
-    if (creditCardFailure.causes!!.isEmpty()) {
+    if (creditCardFailure.causes.isEmpty()) {
       val tmp = creditCardFailure
       creditCardFailure = ageFailure
       ageFailure = tmp
     }
-    val billingAddressFailure = creditCardFailure.causes!![0]
+    val billingAddressFailure = creditCardFailure.causes[0]
     assertEquals("#/billing_address", billingAddressFailure.pathToViolation)
     assertEquals(billingAddressSchema.build(), billingAddressFailure.violatedSchema)
     val billingNameFailure = creditCardFailure
-        .causes!![1]
+        .causes[1]
     assertEquals("#/billing_name", billingNameFailure.pathToViolation)
     assertEquals(billingNameSchema.build(), billingNameFailure.violatedSchema)
     assertEquals("#", ageFailure.pathToViolation)
@@ -176,9 +176,9 @@ class ObjectKeywordsValidatorTest {
         .requiredProperty("boolProp")
         .build()
 
-    val e = verifyFailure { ValidationMocks.createTestValidator(subject).validate(objectTestCases!!.get("multipleViolations")) }
+    val e = verifyFailure { ValidationMocks.createTestValidator(subject).validate(objectTestCases.get("multipleViolations")) }
 
-    assertEquals(3, e.causes!!.size)
+    assertEquals(3, e.causes.size)
     assertEquals(1, countCauseByJsonPointer(e, "#"))
     assertEquals(1, countCauseByJsonPointer(e, "#/numberProp"))
     assertEquals(1, countCauseByJsonPointer(e, "#/stringPatternMatch"))
@@ -205,31 +205,31 @@ class ObjectKeywordsValidatorTest {
     val nested1 = newBuilder().propertySchema("nested", nested2)
     val subject = newBuilder().propertySchema("nested", nested1).build()
 
-    val subjectException = verifyFailure { ValidationMocks.createTestValidator(subject).validate(objectTestCases!!.get("multipleViolationsNested")) }
+    val subjectException = verifyFailure { ValidationMocks.createTestValidator(subject).validate(objectTestCases.get("multipleViolationsNested")) }
 
     assertEquals("#: 9 schema violations found", subjectException.message)
-    assertEquals(4, subjectException.causes!!.size)
+    assertEquals(4, subjectException.causes.size)
     assertEquals(1, countCauseByJsonPointer(subjectException, "#"))
     assertEquals(1, countCauseByJsonPointer(subjectException, "#/numberProp"))
     assertEquals(1, countCauseByJsonPointer(subjectException, "#/stringPatternMatch"))
     assertEquals(1, countCauseByJsonPointer(subjectException, "#/nested"))
 
-    val nested1Exception = subjectException.causes!!
+    val nested1Exception = subjectException.causes
         .firstOrNull { ex -> ex.pathToViolation.equals("#/nested") }!!
 
     assertEquals("#/nested: 6 schema violations found", nested1Exception.message)
-    assertEquals(4, nested1Exception.causes!!.size)
+    assertEquals(4, nested1Exception.causes.size)
     assertEquals(1, countCauseByJsonPointer(nested1Exception, "#/nested"))
     assertEquals(1, countCauseByJsonPointer(nested1Exception, "#/nested/numberProp"))
     assertEquals(1, countCauseByJsonPointer(nested1Exception, "#/nested/stringPatternMatch"))
     assertEquals(1, countCauseByJsonPointer(nested1Exception, "#/nested/nested"))
 
-    val nested2Exception = nested1Exception.causes!!.stream()
+    val nested2Exception = nested1Exception.causes.stream()
         .filter { ex -> ex.pathToViolation.equals("#/nested/nested") }
         .findFirst()
         .get()
     assertEquals("#/nested/nested: 3 schema violations found", nested2Exception.message)
-    assertEquals(3, nested2Exception.causes!!.size)
+    assertEquals(3, nested2Exception.causes.size)
     assertEquals(1, countCauseByJsonPointer(nested2Exception, "#/nested/nested"))
     assertEquals(1, countCauseByJsonPointer(nested2Exception, "#/nested/nested/numberProp"))
     assertEquals(1, countCauseByJsonPointer(nested2Exception, "#/nested/nested/stringPatternMatch"))
@@ -249,7 +249,7 @@ class ObjectKeywordsValidatorTest {
 
   @Test
   fun noProperties() {
-    expectSuccess { ValidationMocks.createTestValidator(mockObjectSchema().build()).validate(objectTestCases!!.get("noProperties")) }
+    expectSuccess { ValidationMocks.createTestValidator(mockObjectSchema().build()).validate(objectTestCases.get("noProperties")) }
   }
 
   @Test
@@ -295,7 +295,7 @@ class ObjectKeywordsValidatorTest {
             mockBooleanSchema().constValue(false.toJsonLiteral())
         )
         .build()
-    expectSuccess { ValidationMocks.createTestValidator(schema).validate(objectTestCases!!.get("patternPropsOverrideAdditionalProps")) }
+    expectSuccess { ValidationMocks.createTestValidator(schema).validate(objectTestCases.get("patternPropsOverrideAdditionalProps")) }
   }
 
   @Test
@@ -336,7 +336,7 @@ class ObjectKeywordsValidatorTest {
         .propertySchema("boolProp", mockBooleanSchema())
         .build()
     expectFailure(subject, mockBooleanSchema().build(), "#/boolProp",
-        objectTestCases!!.get("propertySchemaViolation"))
+        objectTestCases.get("propertySchemaViolation"))
   }
 
   @Test
@@ -371,7 +371,7 @@ class ObjectKeywordsValidatorTest {
             .requiredProperty("billing_address"))
         .build()
     expectFailure(subject, billingAddressSchema.build(), "#/billing_address",
-        objectTestCases!!.get("schemaDepViolation"))
+        objectTestCases.get("schemaDepViolation"))
   }
 
   @Test

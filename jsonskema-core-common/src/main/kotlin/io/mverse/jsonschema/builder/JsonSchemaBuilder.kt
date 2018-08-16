@@ -52,7 +52,6 @@ import io.mverse.jsonschema.utils.Schemas.falseSchemaBuilder
 import kotlinx.serialization.json.JsonElement
 import lang.Pattern
 import lang.URI
-import lang.UUID
 import lang.hashKode
 import lang.json.toJsonArray
 import lang.json.toJsonLiteral
@@ -444,8 +443,8 @@ open class JsonSchemaBuilder(
   // @see ObjectKeywords
   // #######################################################
 
-  override fun <X : JsonSchemaKeyword<*>> keyword(keyword: KeywordInfo<X>, value: X): JsonSchemaBuilder {
-    keywords[keyword] = value
+  override fun <X : JsonSchemaKeyword<*>> keyword(keyword: KeywordInfo<X>, keywordValue: X): JsonSchemaBuilder {
+    keywords[keyword] = keywordValue
     return this
   }
 
@@ -459,9 +458,9 @@ open class JsonSchemaBuilder(
     return this
   }
 
-  override fun build(location: SchemaLocation?, report: LoadingReport): Schema {
+  override fun build(itemsLocation: SchemaLocation?, report: LoadingReport): Schema {
     // Use the location provided during building as an override
-    var loc: SchemaLocation = location ?: this.location!!
+    var loc: SchemaLocation = itemsLocation ?: this.location
     if (id != null) {
       loc = loc.withId(this.id!!)
     }
@@ -490,7 +489,8 @@ open class JsonSchemaBuilder(
   override fun build(): Schema = this.build(block = {})
   override fun build(block: JsonSchemaBuilder.() -> Unit): Schema {
     this.block()
-    val location: SchemaLocation = when {
+    val location: SchemaLocation = @Suppress("USELESS_ELVIS")
+    when {
       this.id == null -> this.location ?: SchemaPaths.fromBuilder(this)
       this.location != null -> this.location.withId(this.id!!)
       else -> SchemaPaths.fromId(this.id!!)
@@ -498,7 +498,7 @@ open class JsonSchemaBuilder(
 
     val built = build(location, loadingReport)
     if (loadingReport.hasErrors()) {
-      throw SchemaLoadingException(location.jsonPointerFragment, loadingReport, built)
+      throw SchemaLoadingException(location.jsonPointerFragment, loadingReport)
     }
     return built
   }
@@ -508,8 +508,8 @@ open class JsonSchemaBuilder(
     return this
   }
 
-  override fun withSchemaLoader(schemaFactory: SchemaLoader): JsonSchemaBuilder {
-    this.schemaFactory = schemaFactory
+  override fun withSchemaLoader(factory: SchemaLoader): JsonSchemaBuilder {
+    this.schemaFactory = factory
     return this
   }
 
@@ -566,7 +566,7 @@ open class JsonSchemaBuilder(
     if (schema == null) {
       keywords.remove(keyword)
     } else {
-      val built = buildSubSchema(schema!!, keyword)
+      val built = buildSubSchema(schema, keyword)
       keywords.put(keyword, SingleSchemaKeyword(built))
     }
 
@@ -574,6 +574,7 @@ open class JsonSchemaBuilder(
   }
 
   private fun <X : JsonSchemaKeyword<*>> getKeyword(keyword: KeywordInfo<X>, defaultValue: () -> X): X {
+    @Suppress("UNCHECKED_CAST")
     return keywords.getOrElse(keyword) { defaultValue() } as X
   }
 

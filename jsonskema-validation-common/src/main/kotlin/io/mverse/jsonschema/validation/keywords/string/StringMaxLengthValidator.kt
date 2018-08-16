@@ -9,20 +9,20 @@ import io.mverse.jsonschema.validation.ValidationReport
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
 import lang.codePointCount
 
-class StringMaxLengthValidator(keyword: NumberKeyword, schema: Schema, factory: SchemaValidatorFactory) : KeywordValidator<NumberKeyword>(Keywords.MAX_LENGTH, schema) {
+class StringMaxLengthValidator(keyword: NumberKeyword, schema: Schema) : KeywordValidator<NumberKeyword>(Keywords.MAX_LENGTH, schema) {
   private val maxLength: Int = keyword.integer
 
   init {
     check(keyword.double >= 0) { "maxLength cannot be negative" }
   }
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     val string = subject.string ?: ""
     val actualLength = string.codePointCount()
     if (actualLength > maxLength) {
-      report += buildKeywordFailure(subject)
+      parentReport += buildKeywordFailure(subject)
           .withError("expected maxLength: %d, actual: %d", maxLength, actualLength)
     }
-    return report.isValid
+    return parentReport.isValid
   }
 }

@@ -9,20 +9,20 @@ import io.mverse.jsonschema.validation.ValidationReport
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
 import lang.codePointCount
 
-class StringMinLengthValidator(keyword: NumberKeyword, schema: Schema, factory: SchemaValidatorFactory) : KeywordValidator<NumberKeyword>(Keywords.MIN_LENGTH, schema) {
+class StringMinLengthValidator(keyword: NumberKeyword, schema: Schema) : KeywordValidator<NumberKeyword>(Keywords.MIN_LENGTH, schema) {
   private val minLength: Int = keyword.integer
 
   init {
     check(keyword.double >= 0) { "minLength cannot be negative" }
   }
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     val string = subject.string ?: ""
     val actualLength = string.codePointCount()
     if (actualLength < minLength) {
-      report += buildKeywordFailure(subject)
+      parentReport += buildKeywordFailure(subject)
           .withError("expected minLength: %d, actual: %d", minLength, actualLength)
     }
-    return report.isValid
+    return parentReport.isValid
   }
 }

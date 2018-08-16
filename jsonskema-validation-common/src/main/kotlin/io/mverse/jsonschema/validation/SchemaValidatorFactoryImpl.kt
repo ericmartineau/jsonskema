@@ -215,9 +215,9 @@ class SchemaValidatorFactoryBuilder {
     // ########################################################### //
     // #########  STRING VALIDATORS      ######################### //
     // ########################################################### //
-    this.addValidator(Keywords.MAX_LENGTH) { keyword, schema, factory -> StringMaxLengthValidator(keyword, schema, factory) }
-    this.addValidator(Keywords.MIN_LENGTH) { keyword, schema, factory -> StringMinLengthValidator(keyword, schema, factory) }
-    this.addValidator(Keywords.PATTERN) { keyword, schema, factory -> StringPatternValidator(keyword, schema, factory) }
+    this.addValidator(Keywords.MAX_LENGTH) { keyword, schema, _ -> StringMaxLengthValidator(keyword, schema) }
+    this.addValidator(Keywords.MIN_LENGTH) { keyword, schema, _ -> StringMinLengthValidator(keyword, schema) }
+    this.addValidator(Keywords.PATTERN) { keyword, schema, _ -> StringPatternValidator(keyword, schema) }
     this.addValidator(Keywords.FORMAT) { keyword, schema, factory -> StringFormatValidator(keyword, schema, factory) }
 
     // ########################################################### //
@@ -233,21 +233,21 @@ class SchemaValidatorFactoryBuilder {
     // ########################################################### //
     // #########  SCHEMA_NUMBER VALIDATORS      ######################### //
     // ########################################################### //
-    this.addValidator(Keywords.MINIMUM) { keyword, schema, factory -> NumberLimitValidators.getMinValidator(keyword, schema, factory) }
-    this.addValidator(Keywords.MAXIMUM) { keyword, schema, factory -> NumberLimitValidators.getMaxValidator(keyword, schema, factory) }
-    this.addValidator(Keywords.MULTIPLE_OF) { numberKeyword, schema, factory -> NumberMultipleOfValidator(numberKeyword, schema, factory) }
+    this.addValidator(Keywords.MINIMUM) { keyword, schema, _ -> NumberLimitValidators.getMinValidator(keyword, schema) }
+    this.addValidator(Keywords.MAXIMUM) { keyword, schema, _ -> NumberLimitValidators.getMaxValidator(keyword, schema) }
+    this.addValidator(Keywords.MULTIPLE_OF) { numberKeyword, schema, _ -> NumberMultipleOfValidator(numberKeyword, schema) }
 
     // ########################################################### //
     // #########  OBJECT VALIDATORS      ######################### //
     // ########################################################### //
     this.addValidator(Keywords.PROPERTIES) { keyword, schema, factory -> PropertySchemaValidator(keyword, schema, factory) }
     this.addValidator(Keywords.PROPERTY_NAMES) { keyword, schema, factory -> PropertyNameValidator(keyword, schema, factory) }
-    this.addValidator(Keywords.REQUIRED) { keyword, schema, factory -> RequiredPropertyValidator(keyword, schema, factory) }
+    this.addValidator(Keywords.REQUIRED) { keyword, schema, _ -> RequiredPropertyValidator(keyword, schema) }
     this.addValidator(Keywords.PATTERN_PROPERTIES) { keyword, schema, factory -> PatternPropertiesValidator(keyword, schema, factory) }
     this.addValidator(Keywords.ADDITIONAL_PROPERTIES) { keyword, schema, factory -> AdditionalPropertiesValidator(keyword, schema, factory) }
     this.addValidator(Keywords.DEPENDENCIES) { keyword, schema, factory -> DependenciesValidator(keyword, schema, factory) }
-    this.addValidator(Keywords.MIN_PROPERTIES) { number, schema, factory -> MinPropertiesValidator(number, schema, factory) }
-    this.addValidator(Keywords.MAX_PROPERTIES) { keyword, schema, factory -> MaxPropertiesValidator(keyword, schema, factory) }
+    this.addValidator(Keywords.MIN_PROPERTIES) { number, schema, _ -> MinPropertiesValidator(number, schema) }
+    this.addValidator(Keywords.MAX_PROPERTIES) { keyword, schema, _ -> MaxPropertiesValidator(keyword, schema) }
 
     return this
   }

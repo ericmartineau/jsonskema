@@ -421,7 +421,7 @@ class DraftSchemaTest {
   companion object {
 
     private val schemaReader = JsonSchema.createSchemaReader()
-    private lateinit var kitchenSinkSchema: Schema
+    private var kitchenSinkSchema: Schema
 
     init {
       val resourceAsStream = DraftSchemaTest::class.java.getResourceAsStream("/kitchen-sink-schema.json")

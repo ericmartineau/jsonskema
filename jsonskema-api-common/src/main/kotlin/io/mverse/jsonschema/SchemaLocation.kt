@@ -113,7 +113,7 @@ class SchemaLocation private constructor(
   fun child(key1: String, key2: Int): SchemaLocation {
     return SchemaLocation(documentURI = this.documentURI,
         resolutionScope = resolutionScope,
-        jsonPath = this.jsonPath.child(key1, key2?.toString()))
+        jsonPath = this.jsonPath.child(key1, key2.toString()))
   }
 
   override fun toString(): String {

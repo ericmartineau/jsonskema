@@ -52,7 +52,7 @@ class SchemaLoaderImplVersionTest {
     val draft4Reader = JsonSchema.createSchemaReader().withStrictValidation(JsonSchemaVersion.Draft4)
     val draft6 = loader.readJsonObject("valid-draft6-schema.json")
     try {
-      val schema = draft4Reader.readSchema(draft6)
+      draft4Reader.readSchema(draft6)
     } catch (e: SchemaLoadingException) {
       assert(e.report.issues).hasSize(2)
 

@@ -13,16 +13,16 @@ class StringFormatValidator(keyword: StringKeyword, schema: Schema, factory: Sch
 
   private val formatValidator: FormatValidator? = factory.getFormatValidator(keyword.value)
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     if (formatValidator == null) {
       return true
     }
     val stringSubject = subject.string!!
     val error = formatValidator.validate(stringSubject)
     if (error != null) {
-      report += buildKeywordFailure(subject)
+      parentReport += buildKeywordFailure(subject)
           .withError(error)
     }
-    return report.isValid
+    return parentReport.isValid
   }
 }

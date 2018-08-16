@@ -17,13 +17,13 @@ data class ArrayMinItemsValidator(val number: NumberKeyword,
     check(minItems >= 0) { "minItems can't be negative" }
   }
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     val actualLength = subject.arraySize
 
     if (actualLength < minItems) {
-      report += buildKeywordFailure(subject)
+      parentReport += buildKeywordFailure(subject)
           .withError("expected minimum item count: %s, found: %s", minItems, actualLength)
     }
-    return report.isValid
+    return parentReport.isValid
   }
 }

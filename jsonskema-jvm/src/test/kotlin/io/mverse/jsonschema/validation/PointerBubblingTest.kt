@@ -34,7 +34,7 @@ class PointerBubblingTest {
     val input = testInputs.getObject("rectangleMultipleFailures")
     val e = verifyFailure { JsonSchema.getValidator(rectangleSchema).validate(input) }
     Assert.assertEquals("#/rectangle", e.pathToViolation)
-    Assert.assertEquals(2, e.causes!!.size)
+    Assert.assertEquals(2, e.causes.size)
     Assert.assertEquals(1, ValidationTestSupport.countCauseByJsonPointer(e, "#/rectangle/a"))
     Assert.assertEquals(1, ValidationTestSupport.countCauseByJsonPointer(e, "#/rectangle/b"))
   }

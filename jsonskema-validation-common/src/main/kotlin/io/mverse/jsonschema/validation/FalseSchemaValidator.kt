@@ -11,11 +11,11 @@ class FalseSchemaValidator private constructor() : SchemaValidator {
   override val schema: Schema
     get() = falseSchema
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
-    report += buildKeywordFailure(subject, nullSchema, null)
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
+    parentReport += buildKeywordFailure(subject, nullSchema, null)
         .withError("no value allowed, found [%s]", subject.wrapped)
 
-    return report.isValid
+    return parentReport.isValid
   }
 
   companion object {

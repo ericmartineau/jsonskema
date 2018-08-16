@@ -8,19 +8,19 @@ import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.ValidationReport
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
 
-class MaxPropertiesValidator(keyword: NumberKeyword, schema: Schema, factory: SchemaValidatorFactory) : KeywordValidator<NumberKeyword>(Keywords.MAX_PROPERTIES, schema) {
+class MaxPropertiesValidator(keyword: NumberKeyword, schema: Schema) : KeywordValidator<NumberKeyword>(Keywords.MAX_PROPERTIES, schema) {
   private val maxProperties: Int = keyword.integer
 
   init {
     check(maxProperties >= 0) { "maxProperties can't be negative" }
   }
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     val actualSize = subject.numberOfProperties()
     if (actualSize > maxProperties) {
-      report += buildKeywordFailure(subject)
+      parentReport += buildKeywordFailure(subject)
           .withError("maximum size: [%d], found: [%d]", maxProperties, actualSize)
     }
-    return report.isValid
+    return parentReport.isValid
   }
 }

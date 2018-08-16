@@ -9,13 +9,13 @@ import io.mverse.jsonschema.validation.keywords.KeywordValidator
 
 class NumberMinimumValidator(schema: Schema, private val minimum: Double) : KeywordValidator<LimitKeyword>(Keywords.MINIMUM, schema) {
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     val subjectNumber = subject.number!!.toDouble()
 
     if (subjectNumber < minimum) {
-      report += buildKeywordFailure(subject)
+      parentReport += buildKeywordFailure(subject)
           .withError("Value is not higher or equal to %s", minimum)
     }
-    return report.isValid
+    return parentReport.isValid
   }
 }

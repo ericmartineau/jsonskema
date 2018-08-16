@@ -66,7 +66,6 @@ object JsonUtils {
   }
 
   fun prettyPrintArgs(args: Iterable<Any>): Array<Any> {
-    var i = 0
     return args.map {
       when (it) {
         is JsonElement->it.toString()
@@ -76,7 +75,6 @@ object JsonUtils {
   }
 
   fun prettyPrintArgs(vararg args: Any): Array<Any> {
-    var i = 0
     return args.map {
       when (it) {
         is JsonElement->it.toString()

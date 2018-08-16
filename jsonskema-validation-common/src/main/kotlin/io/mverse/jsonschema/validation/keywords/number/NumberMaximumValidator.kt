@@ -9,16 +9,16 @@ import io.mverse.jsonschema.validation.keywords.KeywordValidator
 
 class NumberMaximumValidator(schema: Schema, private val maximum: Double) : KeywordValidator<LimitKeyword>(Keywords.MAXIMUM, schema) {
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     val subjectNumber = subject.number!!.toDouble()
 
     // max = 10
     // sub = 10
     // this is okay
     if (subjectNumber > maximum) {
-      report += buildKeywordFailure(subject)
+      parentReport += buildKeywordFailure(subject)
           .withError("Value not lower or equal to %s", maximum)
     }
-    return report.isValid
+    return parentReport.isValid
   }
 }

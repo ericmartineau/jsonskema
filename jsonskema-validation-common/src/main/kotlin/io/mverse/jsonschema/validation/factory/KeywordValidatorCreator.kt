@@ -15,6 +15,7 @@ class KeywordValidatorCreator<K : JsonSchemaKeyword<*>, V : KeywordValidator<K>>
   }
 
   fun invokeUnsafe(keyword:JsonSchemaKeyword<*>, schema:Schema, factory:SchemaValidatorFactory): KeywordValidator<*>? {
-    return block(keyword as K, schema, factory) as KeywordValidator<*>?
+    @Suppress("UNCHECKED_CAST")
+    return block(keyword as K, schema, factory)
   }
 }

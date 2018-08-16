@@ -27,7 +27,7 @@ object ArrayItemsValidator {
       }
 
       keyword.allItemSchema != null -> {
-        val allItemValidator = factory.createValidator(keyword.allItemSchema!!)
+        val allItemValidator = factory.createValidator(schema = keyword.allItemSchema!!)
         ArrayItemValidator(parentSchema = schema,
             allItemValidator = allItemValidator)
       }

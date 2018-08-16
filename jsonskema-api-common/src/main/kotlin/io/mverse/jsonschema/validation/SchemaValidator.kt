@@ -10,7 +10,7 @@ interface SchemaValidator {
 
   val schema: Schema
 
-  fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean
+  fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean
 
   fun validate(subject: JsonElement): ValidationError? {
     val pathAwareSubject = fromJsonValue(subject, subject, schema.location)

@@ -136,7 +136,7 @@ class ArraySchemaValidatorTest {
   @Test
   fun noItemSchema() {
     val schema = JsonSchema.schemaBuilder().build()
-    expectSuccess(schema, arrayTestCases!!.get("noItemSchema"))
+    expectSuccess(schema, arrayTestCases.get("noItemSchema"))
   }
 
   @Test
@@ -145,7 +145,7 @@ class ArraySchemaValidatorTest {
     failureOf(subject)
         .expectedPointer("#")
         .expectedKeyword("uniqueItems")
-        .input(arrayTestCases!!.get("nonUniqueArrayOfArrays"))
+        .input(arrayTestCases.get("nonUniqueArrayOfArrays"))
         .expect()
   }
 
@@ -210,25 +210,25 @@ class ArraySchemaValidatorTest {
   @Test
   fun uniqueItemsObjectViolation() {
     val subject = JsonSchema.schemaBuilder().needsUniqueItems(true).build()
-    expectFailure(subject, "#", arrayTestCases!!.get("nonUniqueObjects"))
+    expectFailure(subject, "#", arrayTestCases.get("nonUniqueObjects"))
   }
 
   @Test
   fun uniqueItemsViolation() {
     val subject = JsonSchema.schemaBuilder().needsUniqueItems(true).build()
-    expectFailure(subject, "#", arrayTestCases!!.get("nonUniqueItems"))
+    expectFailure(subject, "#", arrayTestCases.get("nonUniqueItems"))
   }
 
   @Test
   fun uniqueItemsWithSameToString() {
     val schema = JsonSchema.schemaBuilder().needsUniqueItems(true).build()
-    expectSuccess(schema, arrayTestCases!!.get("uniqueItemsWithSameToString"))
+    expectSuccess(schema, arrayTestCases.get("uniqueItemsWithSameToString"))
   }
 
   @Test
   fun uniqueObjectValues() {
     val schema = JsonSchema.schemaBuilder().needsUniqueItems(true).build()
-    expectSuccess(schema, arrayTestCases!!.get("uniqueObjectValues"))
+    expectSuccess(schema, arrayTestCases.get("uniqueObjectValues"))
   }
 
   @Test

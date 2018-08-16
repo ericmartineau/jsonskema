@@ -46,6 +46,7 @@ class JsonPath : Iterable<String> {
   }
 
   override fun hashCode(): Int {
+    @Suppress("USELESS_ELVIS")
     return hashKode(*(segments ?: arrayOf()))
   }
 

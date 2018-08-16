@@ -75,7 +75,7 @@ class ValidationReport {
   }
 
   private fun toStringErrors(error: ValidationError, printer: PrintWriter) {
-    if (error.causes!!.isNotEmpty()) {
+    if (error.causes.isNotEmpty()) {
       error.causes.forEach { e -> toStringErrors(e, printer) }
     }
     printer.println(error.pathToViolation)

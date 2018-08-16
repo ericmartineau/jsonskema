@@ -13,13 +13,13 @@ data class ConstValidator(val keyword: JsonValueKeyword,
                           val factory: SchemaValidatorFactory)
   : KeywordValidator<JsonValueKeyword>(CONST, parentSchema) {
 
-  private val constValue: JsonElement? = keyword.value!!
+  private val constValue: JsonElement? = keyword.value
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     if (constValue != subject.wrapped) {
-      report += buildKeywordFailure(subject)
+      parentReport += buildKeywordFailure(subject)
           .withError("%s does not match the const value", subject)
     }
-    return report.isValid
+    return parentReport.isValid
   }
 }

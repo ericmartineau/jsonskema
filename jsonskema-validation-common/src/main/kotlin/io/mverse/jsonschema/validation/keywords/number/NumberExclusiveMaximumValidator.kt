@@ -9,14 +9,14 @@ import io.mverse.jsonschema.validation.keywords.KeywordValidator
 
 class NumberExclusiveMaximumValidator(schema: Schema, private val exclusiveMaximum: Double) : KeywordValidator<LimitKeyword>(EXCLUSIVE_MAXIMUM, schema) {
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     val subjectDouble = subject.number!!.toDouble()
 
     if (subjectDouble >= exclusiveMaximum) {
-      report += buildKeywordFailure(subject)
+      parentReport += buildKeywordFailure(subject)
           .withError("Value is not lower than %s", exclusiveMaximum)
     }
 
-    return report.isValid
+    return parentReport.isValid
   }
 }

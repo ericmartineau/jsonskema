@@ -6,6 +6,7 @@ import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import lang.URI
 
+@Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
 class Draft3RefSchemaImpl(location: SchemaLocation,
                           refURI: URI,
                           private val draft3: Draft3Schema)

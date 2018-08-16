@@ -183,14 +183,14 @@ data class JsonValueWithPath(
   companion object {
 
     fun fromJsonValue(root: JsonElement, jsonObject: JsonElement, location: SchemaLocation): JsonValueWithPath {
-      var location = location
-      if (jsonObject is kotlinx.serialization.json.JsonObject) {
+      var locationVar = location
+      if (jsonObject is JsonObject) {
         val asJsonObject = jsonObject.jsonObject
-        location = extractIdFromObject(asJsonObject, "\$id", "id")
-            .convert { location.withId(it) }
-            ?: location
+        locationVar = extractIdFromObject(asJsonObject, "\$id", "id")
+            .convert { locationVar.withId(it) }
+            ?: locationVar
       }
-      return JsonValueWithPath(root, jsonObject, location)
+      return JsonValueWithPath(root, jsonObject, locationVar)
     }
 
     fun fromJsonValue(jsonObject: JsonElement): JsonValueWithPath {

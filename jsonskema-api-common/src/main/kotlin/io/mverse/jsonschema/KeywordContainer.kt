@@ -51,7 +51,7 @@ abstract class KeywordContainer(open val keywords: Map<KeywordInfo<*>, JsonSchem
 abstract class MutableKeywordContainer(override val keywords: MutableMap<KeywordInfo<*>, JsonSchemaKeyword<*>> = mutableMapOf()):KeywordContainer() {
   inline fun <reified T, reified K:JsonSchemaKeyword<T>> mutableKeyword(info:KeywordInfo<K>,
                                                                         crossinline supplier: () -> K = { K::class.constructors.first().call() },
-                                                                        crossinline updater: K.(T) -> K = { this.copy(it) as K })
+                                                                        crossinline updater: K.(T) -> K = { this.withValue(it) as K })
       : ReadWriteProperty<MutableKeywordContainer, T?> {
     return object: ReadWriteProperty<MutableKeywordContainer, T?> {
       override fun setValue(thisRef: MutableKeywordContainer, property: KProperty<*>, value: T?) {

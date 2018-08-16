@@ -26,8 +26,7 @@ import org.junit.runners.Parameterized.Parameters
 import java.util.*
 
 @RunWith(Parameterized::class)
-class ReferenceScopeResolverTest(testcaseName: String, expectedOutput: String,
-                                 parentScope: String,
+class ReferenceScopeResolverTest(expectedOutput: String, parentScope: String,
                                  encounteredSegment: String) {
 
   private val expectedOutput: URI

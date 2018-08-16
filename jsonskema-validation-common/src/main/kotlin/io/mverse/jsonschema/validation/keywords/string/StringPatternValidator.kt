@@ -9,17 +9,17 @@ import io.mverse.jsonschema.validation.ValidationReport
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
 import lang.Pattern
 
-class StringPatternValidator(keyword: StringKeyword, schema: Schema, factory: SchemaValidatorFactory) : KeywordValidator<StringKeyword>(Keywords.PATTERN, schema) {
+class StringPatternValidator(keyword: StringKeyword, schema: Schema) : KeywordValidator<StringKeyword>(Keywords.PATTERN, schema) {
 
   private val pattern: Pattern = Pattern(keyword.value)
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     val stringSubject = subject.string ?: ""
     if (!patternMatches(pattern, stringSubject)) {
-      report += buildKeywordFailure(subject)
+      parentReport += buildKeywordFailure(subject)
           .withError("string [%s] does not match pattern %s", stringSubject, pattern.regex)
     }
-    return report.isValid
+    return parentReport.isValid
   }
 
   private fun patternMatches(pattern: Pattern, string: String): Boolean {

@@ -60,7 +60,7 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
   // ######################################################
 
   override val id: URI? by keywords(Keywords.DOLLAR_ID)
-  override val schemaURI: URI? get() = version?.metaschemaURI
+  override val schemaURI: URI? get() = version.metaschemaURI
   override val title: String? by keywords(Keywords.TITLE)
   override val description: String? by keywords(Keywords.DESCRIPTION)
   override val types: Set<JsonSchemaType> by keywords(Keywords.TYPE, emptySet())

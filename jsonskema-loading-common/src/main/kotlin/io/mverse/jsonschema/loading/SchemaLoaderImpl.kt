@@ -57,8 +57,8 @@ data class SchemaLoaderImpl(
   // ############  FINDING/STORING LOADED SCHEMAS  ###############
   // #############################################################
 
-  override fun findLoadedSchema(schemaURI: URI): Schema?? {
-    return schemaCache.getSchema(schemaURI)
+  override fun findLoadedSchema(schemaLocation: URI): Schema? {
+    return schemaCache.getSchema(schemaLocation)
   }
 
   override fun withPreloadedSchema(schema: Schema): SchemaLoader {
@@ -74,16 +74,16 @@ data class SchemaLoaderImpl(
   // #####  FACTORY METHODS (FOR CUSTOMIZING THE LOADER)   #######
   // #############################################################
 
-  override fun withPreloadedDocument(preloadedSchema: JsonObject): SchemaReader {
-    JsonUtils.extractIdFromObject(preloadedSchema)?.also { id ->
-      documentClient.registerLoadedDocument(id, preloadedSchema)
+  override fun withPreloadedDocument(schemaObject: JsonObject): SchemaReader {
+    JsonUtils.extractIdFromObject(schemaObject)?.also { id ->
+      documentClient.registerLoadedDocument(id, schemaObject)
     }
     return this
   }
 
-  override operator fun plus(preloadedSchema: JsonObject): SchemaReader {
-    JsonUtils.extractIdFromObject(preloadedSchema)?.also { id ->
-      documentClient.registerLoadedDocument(id, preloadedSchema)
+  override operator fun plus(document: JsonObject): SchemaReader {
+    JsonUtils.extractIdFromObject(document)?.also { id ->
+      documentClient.registerLoadedDocument(id, document)
     }
     return this
   }

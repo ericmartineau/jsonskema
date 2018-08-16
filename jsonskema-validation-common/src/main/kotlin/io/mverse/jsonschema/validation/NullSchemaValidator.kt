@@ -11,11 +11,11 @@ class NullSchemaValidator private constructor() : SchemaValidator {
   override val schema: Schema
     get() = nullSchema
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     if (subject.isNotNull) {
-      report += buildTypeMismatchError(subject, nullSchema, JsonSchemaType.NULL)
+      parentReport += buildTypeMismatchError(subject, nullSchema, JsonSchemaType.NULL)
     }
-    return report.isValid
+    return parentReport.isValid
   }
 
   companion object {

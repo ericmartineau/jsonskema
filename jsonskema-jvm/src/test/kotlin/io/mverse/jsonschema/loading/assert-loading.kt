@@ -41,6 +41,7 @@ fun SchemaLoadingAssert.isFailed(errorCount:Int? = null, block: SafeSchemaLoadin
   if (actual?.hasErrors() != true) {
     fail("Unexpected success! Try harder to fail.")
   } else {
+    assert(actual!!.issues.size, "error count").isEqualTo(errorCount)
     assert(actual!!).block()
   }
 }

@@ -20,7 +20,7 @@ data class PropertySchemaValidator(val keyword: SchemaMapKeyword,
   private val validatedProperties: Set<String> = HashSet(propertyValidators.keys)
   private val propertyLength: Int = validatedProperties.size
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     val subjectProperties = subject.jsonObject.keys
 
     val a: Set<String>
@@ -35,9 +35,9 @@ data class PropertySchemaValidator(val keyword: SchemaMapKeyword,
       }
       val propValidator = propertyValidators[property]
       val pathAwareSubject = subject.path(property)
-      propValidator?.validate(pathAwareSubject, report)
+      propValidator?.validate(pathAwareSubject, parentReport)
     }
 
-    return report.isValid
+    return parentReport.isValid
   }
 }

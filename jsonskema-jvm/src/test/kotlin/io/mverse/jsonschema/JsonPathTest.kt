@@ -60,7 +60,7 @@ class JsonPathTest {
     val jsonPath = JsonPath.parseFromURIFragment(uri)
     assertPath("First Pass", jsonPath)
     assertPath("From parsed URI", JsonPath.parseFromURIFragment(jsonPath.toURIFragment()))
-    assertPath("From parsed JsonPointer", JsonPath.parseJsonPointer(jsonPath.toJsonPointer()!!))
+    assertPath("From parsed JsonPointer", JsonPath.parseJsonPointer(jsonPath.toJsonPointer()))
 
     val child = jsonPath.child("eric~is/not/so/bad")
     val message = "Child"

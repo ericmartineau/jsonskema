@@ -26,7 +26,7 @@ class ItemsKeywordDigester : KeywordDigester<ItemsKeyword> {
       OBJECT -> builder.allItemSchema(
           schemaLoader.subSchemaBuilder(itemsValue, itemsValue.rootObject, report)
       )
-      ARRAY -> itemsValue.forEachIndex { idx, idxValue ->
+      ARRAY -> itemsValue.forEachIndex { _, idxValue ->
         if (idxValue.type !== OBJECT) {
           report.error(typeMismatch(Keywords.ITEMS, idxValue))
         } else {

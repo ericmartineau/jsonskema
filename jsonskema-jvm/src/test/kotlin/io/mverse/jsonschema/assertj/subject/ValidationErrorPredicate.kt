@@ -38,7 +38,7 @@ interface ValidationErrorPredicate : (ValidationError) -> Boolean {
 
     fun messageContains(message: String): ValidationErrorPredicate {
       return of("message", "contains", message) { e ->
-        e.message != null && e.message.contains(message)
+        e.message.contains(message)
       }
     }
 

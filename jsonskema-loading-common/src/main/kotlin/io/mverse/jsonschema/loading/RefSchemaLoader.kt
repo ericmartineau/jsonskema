@@ -45,7 +45,6 @@ data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoa
 
   internal fun loadDocument(referenceURI: URI): kotlinx.serialization.json.JsonObject {
     val remoteDocumentURI = referenceURI.withoutFragment()
-    val targetDocument: kotlinx.serialization.json.JsonObject?
 
     val foundDoc = documentClient.findLoadedDocument(remoteDocumentURI)
     return foundDoc
@@ -71,18 +70,18 @@ data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoa
 
   internal fun findRefInDocument(documentURI: URI, referenceURI: URI, parentDocument: kotlinx.serialization.json.JsonObject?,
                                  report: LoadingReport): SchemaBuilder<*>? {
-    var documentURI = documentURI
-    var parentDocument = parentDocument
-    if (parentDocument == null) {
-      parentDocument = loadDocument(referenceURI)
+    var documentURIVar = documentURI
+    var parentDocumentVar = parentDocument
+    if (parentDocumentVar == null) {
+      parentDocumentVar = loadDocument(referenceURI)
     }
 
     //Remove any fragments from the parentDocument URI
-    documentURI = documentURI.withoutFragment()
+    documentURIVar = documentURIVar.withoutFragment()
 
     // Relativizing strips the path down to only the difference between the documentURI and referenceURI.
     // This will tell us whether the referenceURI is naturally scoped within the parentDocument.
-    val relativeURL = documentURI.relativize(referenceURI)
+    val relativeURL = documentURIVar.relativize(referenceURI)
 
     val pathWithinDocument: JsonPath?
     if (relativeURL.equals(ROOT_URI) || relativeURL.equals(BLANK_URI)) {
@@ -93,22 +92,22 @@ data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoa
       pathWithinDocument = JsonPath.parseFromURIFragment(relativeURL)
     } else {
       //This must be a reference $id somewhere in the parentDocument.
-      pathWithinDocument = documentClient.resolveSchemaWithinDocument(documentURI, referenceURI, parentDocument)
+      pathWithinDocument = documentClient.resolveSchemaWithinDocument(documentURIVar, referenceURI, parentDocumentVar)
     }
     if (pathWithinDocument != null) {
 
-      val jsonElement = parentDocument[pathWithinDocument]
+      val jsonElement = parentDocumentVar[pathWithinDocument]
 
       val schemaObject: kotlinx.serialization.json.JsonObject = when (jsonElement) {
-        JsonNull->throw SchemaException(referenceURI, "Unable to resolve '#$relativeURL' as JSON Pointer within '$documentURI'")
+        JsonNull->throw SchemaException(referenceURI, "Unable to resolve '#$relativeURL' as JSON Pointer within '$documentURIVar'")
         is kotlinx.serialization.json.JsonObject -> jsonElement.jsonObject
         else-> throw SchemaException(referenceURI, "Expecting JsonObject at #$relativeURL, but found ${jsonElement.type}")
       }
 
       val foundId = JsonUtils.extractIdFromObject(schemaObject)
-      val fetchedDocumentLocation = SchemaLocation.refLocation(documentURI, foundId, pathWithinDocument)
-      val schemaJson = JsonValueWithPath.fromJsonValue(parentDocument, schemaObject, fetchedDocumentLocation)
-      return schemaLoader.subSchemaBuilder(schemaJson, parentDocument!!, report)
+      val fetchedDocumentLocation = SchemaLocation.refLocation(documentURIVar, foundId, pathWithinDocument)
+      val schemaJson = JsonValueWithPath.fromJsonValue(parentDocumentVar, schemaObject, fetchedDocumentLocation)
+      return schemaLoader.subSchemaBuilder(schemaJson, parentDocumentVar, report)
     }
     return null
   }

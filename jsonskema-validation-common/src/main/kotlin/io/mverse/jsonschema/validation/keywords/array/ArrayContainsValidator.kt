@@ -17,16 +17,16 @@ data class ArrayContainsValidator(val keyword: SingleSchemaKeyword,
 
 
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     for (i in 0 until subject.jsonArray.size) {
-      val trap = report.createChildReport()
+      val trap = parentReport.createChildReport()
       val item = subject[i]
       if (containsValidator.validate(item, trap)) {
         return true
       }
     }
 
-    report += buildKeywordFailure(subject).copy(errorMessage = "array does not contain at least 1 matching item")
-    return report.isValid
+    parentReport += buildKeywordFailure(subject).copy(errorMessage = "array does not contain at least 1 matching item")
+    return parentReport.isValid
   }
 }

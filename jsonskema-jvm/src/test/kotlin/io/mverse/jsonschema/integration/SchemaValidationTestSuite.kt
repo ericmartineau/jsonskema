@@ -82,7 +82,7 @@ class SchemaValidationTestSuite(private val schemaDescription: String, private v
           continue
         }
         val fileName = path.substring(path.lastIndexOf('/') + 1)
-        val arr = loadTests(SchemaValidationTestSuite::class.java!!.getResourceAsStream("/$path"))
+        val arr = loadTests(SchemaValidationTestSuite::class.java.getResourceAsStream("/$path"))
         arr.map { it.jsonObject }.forEach { schemaTest ->
           val testInputs = schemaTest["tests"].jsonArray
           testInputs.map { it.jsonObject }.forEach { input ->
@@ -109,7 +109,7 @@ class SchemaValidationTestSuite(private val schemaDescription: String, private v
       server = Server(1234)
       val handler = ServletHandler()
       server!!.handler = handler
-      handler.addServletWithMapping(ServletHolder(IssueServlet(File(ServletSupport::class.java!!
+      handler.addServletWithMapping(ServletHolder(IssueServlet(File(ServletSupport::class.java
           .getResource("/io/mverse/jsonschema/draft6/remotes").toURI()))), "/*")
       server!!.start()
     }

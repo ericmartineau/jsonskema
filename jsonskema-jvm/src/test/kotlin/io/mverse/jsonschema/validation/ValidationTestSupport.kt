@@ -48,10 +48,10 @@ object ValidationTestSupport {
 
   fun countCauseByJsonPointer(root: ValidationError, pointer: String): Long {
     return root.causes
-        ?.map { it.pathToViolation }
-        ?.filter { ptr -> ptr.equals(pointer) }
-        ?.count()
-        ?.toLong() ?: 0
+        .map { it.pathToViolation }
+        .filter { ptr -> ptr.equals(pointer) }
+        .count()
+        .toLong()
   }
 
   fun countMatchingMessage(messages: List<ValidationError>, expectedSubstring: String): Long {

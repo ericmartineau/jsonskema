@@ -16,7 +16,7 @@ data class EnumValidator(val keyword: JsonArrayKeyword,
 
   private val enumValues: List<JsonElement> = keyword.value
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     for (enumValue in enumValues) {
       val eq = when (enumValue) {
         is JsonPrimitive -> enumValue.equalsLexically(subject.wrapped)
@@ -24,9 +24,9 @@ data class EnumValidator(val keyword: JsonArrayKeyword,
       }
       if(eq) return true
     }
-    report += buildKeywordFailure(subject)
+    parentReport += buildKeywordFailure(subject)
         .withError("%s does not match the enum values", subject)
 
-    return report.isValid
+    return parentReport.isValid
   }
 }

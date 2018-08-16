@@ -12,12 +12,12 @@ data class NotKeywordValidator(val keyword: SingleSchemaKeyword,
                                val factory: SchemaValidatorFactory) : KeywordValidator<SingleSchemaKeyword>(NOT, notSchema) {
   private val notValidator = factory.createValidator(keyword.value)
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
-    val trap = report.createChildReport()
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
+    val trap = parentReport.createChildReport()
     if (notValidator.validate(subject, trap)) {
-      report += buildKeywordFailure(subject)
+      parentReport += buildKeywordFailure(subject)
           .withError("subject must not be valid against schema", notSchema.pointerFragmentURI ?: "")
     }
-    return report.isValid
+    return parentReport.isValid
   }
 }

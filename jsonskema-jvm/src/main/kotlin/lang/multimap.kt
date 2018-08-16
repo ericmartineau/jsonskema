@@ -22,6 +22,7 @@ actual class MutableSetMultimap<K, V>(
   }
 
   actual fun <K, V> freeze(): SetMultimap<K, V> {
+    @Suppress("UNCHECKED_CAST")
     return ImmutableSetMultimap.copyOf(hash) as SetMultimap<K, V>
   }
 }
@@ -45,6 +46,7 @@ actual class MutableListMultimap<K, V>(
   }
 
   actual fun <K, V> freeze(): ListMultimap<K, V> {
+    @Suppress("UNCHECKED_CAST")
     return ImmutableListMultimap.copyOf(hash) as ListMultimap<K, V>
   }
 }

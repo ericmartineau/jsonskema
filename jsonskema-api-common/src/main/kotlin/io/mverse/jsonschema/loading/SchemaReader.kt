@@ -26,7 +26,7 @@ interface SchemaReader {
 
   val documentClient: JsonDocumentClient
 
-  fun withDocumentClient(jsonDocumentClient: JsonDocumentClient): SchemaReader
+  fun withDocumentClient(documentClient: JsonDocumentClient): SchemaReader
   fun withPreloadedDocument(schemaObject: kotlinx.serialization.json.JsonObject): SchemaReader = this + schemaObject
   fun withStrictValidation(vararg versions: JsonSchemaVersion): SchemaReader
 

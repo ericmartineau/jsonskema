@@ -19,13 +19,13 @@ data class ArrayMaxItemsValidator(val number: NumberKeyword,
     check(maxItems >= 0) { "maxItems can't be negative" }
   }
 
-  override fun validate(subject: JsonValueWithPath, report: ValidationReport): Boolean {
+  override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     val actualLength = subject.jsonArray.size
 
     if (actualLength > maxItems) {
-      report += buildKeywordFailure(subject)
+      parentReport += buildKeywordFailure(subject)
           .withError("expected maximum item count: %s, found: %s", maxItems, actualLength)
     }
-    return report.isValid
+    return parentReport.isValid
   }
 }
