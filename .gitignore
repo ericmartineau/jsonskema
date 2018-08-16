@@ -2,3 +2,5 @@
 .idea/
 waypoints-multi.iml
 build/
+.gradletasknamecache
+out/
