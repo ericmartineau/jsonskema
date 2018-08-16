@@ -28,10 +28,13 @@ import java.util.*
 @RunWith(Parameterized::class)
 @Suppress("UNUSED_PARAMETER")
 class ReferenceScopeResolverTest(name: String,
-                                 private val expectedOutput: String,
-                                 private val parentScope: String,
-                                 private val encounteredSegment: String) {
+                                 expectedOutput: String,
+                                 parentScope: String,
+                                 encounteredSegment: String) {
 
+  private val expectedOutput: URI = URI(expectedOutput)
+  private val parentScope: URI = URI(parentScope)
+  private val encounteredSegment: URI = URI(encounteredSegment)
 
   @Test
   fun test() {
@@ -48,13 +51,9 @@ class ReferenceScopeResolverTest(name: String,
       return listOf(
           arrayOf("fragment id", "http://x.y.z/root.json#foo", "http://x.y.z/root.json", "#foo"),
           arrayOf("rel path", "http://example.org/foo", "http://example.org/bar", "foo"),
-          arrayOf("file name change", "http://x.y.z/schema/child.json",
-              "http://x.y.z/schema/parent.json",
-              "child.json"),
-          arrayOf("file name after folder path", "http://x.y.z/schema/child.json",
-              "http://x.y.z/schema/", "child.json"),
-          arrayOf("new root", "http://bserver.com", "http://aserver.com/",
-              "http://bserver.com"))
+          arrayOf("file name change", "http://x.y.z/schema/child.json", "http://x.y.z/schema/parent.json", "child.json"),
+          arrayOf("file name after folder path", "http://x.y.z/schema/child.json", "http://x.y.z/schema/", "child.json"),
+          arrayOf("new root", "http://bserver.com", "http://aserver.com/", "http://bserver.com"))
     }
 
   }
