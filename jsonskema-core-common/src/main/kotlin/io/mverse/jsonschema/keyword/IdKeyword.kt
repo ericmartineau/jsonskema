@@ -5,6 +5,7 @@ import kotlinx.serialization.json.JsonBuilder
 import lang.URI
 
 data class IdKeyword(override val value: URI) : JsonSchemaKeywordImpl<URI>() {
+  override fun withValue(value: URI): JsonSchemaKeyword<URI> = this.copy(value=value)
 
   override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion) {
     builder.run {

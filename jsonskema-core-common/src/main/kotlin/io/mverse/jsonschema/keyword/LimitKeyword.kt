@@ -11,7 +11,7 @@ data class LimitKeyword(val keyword: KeywordInfo<LimitKeyword>,
                       val limit: Number? = null,
                       val exclusiveLimit: Number? = null) : JsonSchemaKeyword<Number?> {
 
-  override fun copy(value: Number?): JsonSchemaKeyword<Number?> {
+  override fun withValue(value: Number?): JsonSchemaKeyword<Number?> {
     return this.copy(limit = value)
   }
 

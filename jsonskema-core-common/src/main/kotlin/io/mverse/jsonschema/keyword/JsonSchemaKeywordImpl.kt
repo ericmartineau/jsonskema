@@ -11,6 +11,7 @@ import lang.json.toJsonArray
 import lang.json.toJsonLiteral
 
 abstract class JsonSchemaKeywordImpl<T> : JsonSchemaKeyword<T> {
+  abstract override fun withValue(value: T): JsonSchemaKeyword<T>
 
   override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion) {
     val jsonKey = keyword.key

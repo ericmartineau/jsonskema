@@ -6,7 +6,7 @@ import lang.URI
 
 open class DollarSchemaKeyword : JsonSchemaKeyword<URI> {
 
-  override fun copy(value: URI): JsonSchemaKeyword<URI> {
+  override fun withValue(value: URI): JsonSchemaKeyword<URI> {
     return this
   }
 

@@ -7,7 +7,6 @@ import lang.json.toJsonArray
 data class TypeKeyword(val types:Set<JsonSchemaType> = emptySet(),
                        val disallowedTypes: Set<JsonSchemaType> = JsonSchemaType.values().toSet().minus(types)) :
     JsonSchemaKeywordImpl<Set<JsonSchemaType>>() {
-
   override val value: Set<JsonSchemaType> = types
 
   constructor(first: JsonSchemaType, vararg additionalTypes: JsonSchemaType):
@@ -19,10 +18,6 @@ data class TypeKeyword(val types:Set<JsonSchemaType> = emptySet(),
 
   fun withAdditionalType(another: JsonSchemaType): TypeKeyword {
     return TypeKeyword(types + another)
-  }
-
-  override fun copy(value: Set<JsonSchemaType>): JsonSchemaKeyword<Set<JsonSchemaType>> {
-    return this.copy(types = value)
   }
 
   override fun toJson(keyword: KeywordInfo<*>, builder: kotlinx.serialization.json.JsonBuilder, version: JsonSchemaVersion) {
@@ -38,4 +33,6 @@ data class TypeKeyword(val types:Set<JsonSchemaType> = emptySet(),
   override fun toString(): String {
     return types.toString()
   }
+
+  override fun withValue(value: Set<JsonSchemaType>): JsonSchemaKeyword<Set<JsonSchemaType>> = this.copy(types=value)
 }

@@ -35,4 +35,9 @@ data class SchemaMapKeyword(override val value: Map<String, Schema> = emptyMap()
   override fun toString(): String {
     return value.toString()
   }
+
+  override fun withValue(value: Map<String, Schema>): JsonSchemaKeyword<Map<String, Schema>> {
+    return this.copy(value=value)
+  }
+
 }

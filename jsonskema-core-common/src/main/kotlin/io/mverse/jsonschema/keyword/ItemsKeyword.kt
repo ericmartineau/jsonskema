@@ -3,6 +3,7 @@ package io.mverse.jsonschema.keyword
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.utils.Schemas.falseSchema
+import lang.URI
 import lang.json.toJsonArray
 
 data class ItemsKeyword(val indexedSchemas: List<Schema> = emptyList(),
@@ -11,6 +12,8 @@ data class ItemsKeyword(val indexedSchemas: List<Schema> = emptyList(),
   : SchemaListKeyword(indexedSchemas) {
 
   val hasIndexedSchemas: Boolean get() = indexedSchemas.isNotEmpty()
+
+
 
   override fun toJson(keyword: KeywordInfo<*>, builder: kotlinx.serialization.json.JsonBuilder, version: JsonSchemaVersion) {
     if (!indexedSchemas.isEmpty()) {
@@ -36,10 +39,6 @@ data class ItemsKeyword(val indexedSchemas: List<Schema> = emptyList(),
     }
   }
 
-  override fun copy(value: List<Schema>): JsonSchemaKeyword<List<Schema>> {
-    return this.copy(indexedSchemas = value)
-  }
-
   override fun toString(): String {
     val result = StringBuilder()
     if (!indexedSchemas.isEmpty()) {
@@ -59,4 +58,6 @@ data class ItemsKeyword(val indexedSchemas: List<Schema> = emptyList(),
     }
     return result.toString()
   }
+
+  override fun withValue(value: List<Schema>): ItemsKeyword = this.copy(indexedSchemas = value)
 }

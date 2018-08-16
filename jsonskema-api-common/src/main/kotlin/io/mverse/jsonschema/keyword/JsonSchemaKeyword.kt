@@ -9,5 +9,5 @@ import kotlinx.serialization.json.JsonBuilder
 interface JsonSchemaKeyword<P> {
   val value: P
   fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion)
-  fun copy(value:P):JsonSchemaKeyword<P>
+  fun withValue(value:P):JsonSchemaKeyword<P>
 }

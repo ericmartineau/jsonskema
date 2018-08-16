@@ -1,6 +1,8 @@
 package io.mverse.jsonschema.keyword
 
 data class NumberKeyword(override val value: Number) : JsonSchemaKeywordImpl<Number>() {
+  override fun withValue(value: Number): JsonSchemaKeyword<Number> = this.copy(value = value)
+
   val double: Double
     get() = value.toDouble()
 
