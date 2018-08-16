@@ -26,20 +26,12 @@ import org.junit.runners.Parameterized.Parameters
 import java.util.*
 
 @RunWith(Parameterized::class)
-class ReferenceScopeResolverTest(name: String, expectedOutput: String, parentScope: String,
-                                 encounteredSegment: String) {
+@Suppress("UNUSED_PARAMETER")
+class ReferenceScopeResolverTest(name: String,
+                                 private val expectedOutput: String,
+                                 private val parentScope: String,
+                                 private val encounteredSegment: String) {
 
-  private val expectedOutput: URI
-
-  private val parentScope: URI
-
-  private val encounteredSegment: URI
-
-  init {
-    this.expectedOutput = URI(expectedOutput)
-    this.parentScope = URI(parentScope)
-    this.encounteredSegment = URI(encounteredSegment)
-  }
 
   @Test
   fun test() {
