@@ -1,11 +1,8 @@
 package io.mverse.jsonschema
 
 import io.mverse.jsonschema.enums.JsonSchemaVersion
-import io.mverse.jsonschema.keyword.KeywordInfo
-import io.mverse.jsonschema.keyword.JsonSchemaKeyword
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import lang.URI
 import lang.hashKode
@@ -42,16 +39,19 @@ abstract class RefSchema(
    */
   val refSchema: Schema get() = refSchemaOrNull ?: illegalState("Ref schema hasn't been resolved")
 
+  /**
+   * A non-resolved schema that contains just the ref keyword
+   */
+  abstract val refOnlySchema:Schema
+
   override val id: URI? get() = refSchema.id
   override val schemaURI: URI? get() = refSchema.schemaURI
   override val title: String? get() = refSchema.title
   override val description: String? get() = refSchema.description
 
-  override val extraProperties: Map<String, JsonElement>
-    get() = refSchema.extraProperties
+  override val extraProperties get() = refSchema.extraProperties
 
-  override val keywords: Map<KeywordInfo<*>, JsonSchemaKeyword<*>>
-    get() = refSchema.keywords
+  override val keywords get() = refSchema.keywords
 
   constructor(factory: SchemaLoader?,
               location: SchemaLocation,
