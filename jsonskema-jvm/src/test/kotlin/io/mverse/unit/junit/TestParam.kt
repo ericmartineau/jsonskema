@@ -10,7 +10,6 @@ data class TestParam<T> private constructor(private val testSubject: T, private 
   private val nameString: String = name.toString()
   fun get(): T = testSubject
 
-
   override fun toString(): String  = nameString
 
   class TestParamsBuilder<T> {

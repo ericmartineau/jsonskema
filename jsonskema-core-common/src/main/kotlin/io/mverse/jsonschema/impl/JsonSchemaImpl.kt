@@ -33,6 +33,7 @@ import io.mverse.jsonschema.keyword.Keywords.PATTERN
 import io.mverse.jsonschema.keyword.Keywords.PATTERN_PROPERTIES
 import io.mverse.jsonschema.keyword.Keywords.PROPERTIES
 import io.mverse.jsonschema.keyword.Keywords.PROPERTY_NAMES
+import io.mverse.jsonschema.keyword.Keywords.REF
 import io.mverse.jsonschema.keyword.Keywords.REQUIRED
 import io.mverse.jsonschema.keyword.Keywords.UNIQUE_ITEMS
 import io.mverse.jsonschema.utils.Schemas.nullSchema
@@ -116,11 +117,16 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
 
   override fun toJson(version: JsonSchemaVersion): JsonObject {
     return json {
-      keywords.forEach { (keyword, keywordValue) ->
-        if (keyword.applicableVersions.contains(version)) {
-          keywordValue.toJson(keyword, this, version)
-        } else {
-          log.warn("Keyword ${keyword.key} does not apply to version: [$version], only for ${keyword.applicableVersions}")
+      if (keywords.containsKey(REF)) {
+        // Output as ref
+        REF.key to keyword(REF)?.value?.toString()
+      } else {
+        keywords.forEach { (keyword, keywordValue) ->
+          if (keyword.applicableVersions.contains(version)) {
+            keywordValue.toJson(keyword, this, version)
+          } else {
+            log.warn("Keyword ${keyword.key} does not apply to version: [$version], only for ${keyword.applicableVersions}")
+          }
         }
       }
     }

@@ -31,23 +31,19 @@ open class RefSchemaImpl : RefSchema {
   protected constructor(location: SchemaLocation, refURI: URI, refSchema: Schema) : super(location, refURI, refSchema)
 
   override fun asDraft6(): Draft6Schema {
-    val schema = refSchema ?: emptySchema
-    return Draft6RefSchemaImpl(location, refURI, schema.asDraft6())
+    return Draft6RefSchemaImpl(location, refURI, refSchema!!.asDraft6())
   }
 
   override fun asDraft7(): Draft7Schema {
-    val schema = refSchema ?: emptySchema
-    return Draft7RefSchemaImpl(location, refURI, schema.asDraft7())
+    return Draft7RefSchemaImpl(location, refURI, refSchema!!.asDraft7())
   }
 
   override fun asDraft4(): Draft4Schema {
-    val schema = refSchema ?: emptySchema
-    return Draft4RefSchemaImpl(location, refURI, schema.asDraft4())
+    return Draft4RefSchemaImpl(location, refURI, refSchema!!.asDraft4())
   }
 
   override fun asDraft3(): Draft3Schema {
-    val schema = refSchema ?: emptySchema
-    return Draft3RefSchemaImpl(location, refURI, schema.asDraft3())
+    return Draft3RefSchemaImpl(location, refURI, refSchema!!.asDraft3())
   }
 
   override fun withId(id: URI): Schema {
@@ -71,12 +67,4 @@ open class RefSchemaImpl : RefSchema {
   }
 
   override fun toString(version: JsonSchemaVersion): String = toString()
-
-  class RefSchemaBuilder(var refURI:URI? = null)
-
-  companion object {
-    fun refSchemaBuilder(refURI: URI): RefSchemaBuilder {
-      return RefSchemaBuilder(refURI = refURI)
-    }
-  }
 }
