@@ -17,6 +17,7 @@ import io.mverse.jsonschema.utils.Schemas.emptySchema
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.json
 import lang.URI
+import lang.illegalState
 
 open class RefSchemaImpl : RefSchema {
 
@@ -31,7 +32,8 @@ open class RefSchemaImpl : RefSchema {
   protected constructor(location: SchemaLocation, refURI: URI, refSchema: Schema) : super(location, refURI, refSchema)
 
   override fun asDraft6(): Draft6Schema {
-    return Draft6RefSchemaImpl(location, refURI, refSchema!!.asDraft6())
+    val r = refSchema ?: illegalState("Ref schema is not resolved: $refURI")
+    return Draft6RefSchemaImpl(location, refURI, r.asDraft6())
   }
 
   override fun asDraft7(): Draft7Schema {

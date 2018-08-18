@@ -5,82 +5,82 @@ import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.JsonSchemaKeyword
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
-import kotlinx.serialization.json.JsonBuilder
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import lang.URI
 import lang.hashKode
+import lang.illegalState
 
 /**
  * This class is used to resolve JSON pointers. during the construction of the schema. This class has been made mutable
  * to permit the loading of recursive schemas.
  */
-abstract class RefSchema : Schema {
+abstract class RefSchema(
+    /**
+     * The location this schema is referenced from
+     */
+    override val location: SchemaLocation,
+
+    /**
+     * The location of this ref schema
+     */
+    val refURI: URI,
+
+    /**
+     * This class can be used as either a resolved schema, or as a reference.  This callback function
+     * allows for lazy loading the schema, while still leveraging the "this" value
+     */
+    refSchemaLoader: ((RefSchema)-> Schema?)?): Schema {
 
   /**
-   * Contains a reference to the actual loaded schema.
+   * Contains a reference to the actual loaded schema, or null if it hasn't been resolved
    */
-  val refSchema: Schema?
+  val refSchemaOrNull by lazy { refSchemaLoader?.invoke(this) }
 
-  override val location: SchemaLocation
+  /**
+   * Reference to the loaded schema
+   */
+  val refSchema: Schema get() = refSchemaOrNull ?: illegalState("Ref schema hasn't been resolved")
 
-  val refURI: URI
-
-  override val id: URI?
-    get() = refSchema!!.id
-
-  override val schemaURI: URI?
-    get() = refSchema!!.schemaURI
-
-  override val title: String?
-    get() = refSchema!!.title
-
-  override val description: String?
-    get() = refSchema!!.description
+  override val id: URI? get() = refSchema.id
+  override val schemaURI: URI? get() = refSchema.schemaURI
+  override val title: String? get() = refSchema.title
+  override val description: String? get() = refSchema.description
 
   override val extraProperties: Map<String, JsonElement>
-    get() = refSchema!!.extraProperties
+    get() = refSchema.extraProperties
 
   override val keywords: Map<KeywordInfo<*>, JsonSchemaKeyword<*>>
-    get() = requireRefSchema()!!.keywords
+    get() = refSchema.keywords
 
   constructor(factory: SchemaLoader?,
               location: SchemaLocation,
               refURI: URI,
               currentDocument: JsonObject?,
-              report: LoadingReport) {
-    this.location = location
-    this.refURI = refURI
-
+              report: LoadingReport): this(location, refURI, loader@{ thisSchema ->
     var infiniteLoopPrevention = 0
-    if (factory != null) {
-      var schema: Schema = this
-      var thisRefURI = this.refURI
 
-      while (schema is RefSchema) {
-        schema = factory.loadRefSchema(schema, thisRefURI, currentDocument, report)
-        if (schema is RefSchema) {
-          thisRefURI = schema.refURI
+    when (factory) {
+      null -> return@loader null
+      else -> {
+        var schema: Schema = thisSchema
+        var thisRefURI = refURI
+        while (schema is RefSchema) {
+          schema = factory.loadRefSchema(schema, thisRefURI, currentDocument, report)
+          if (schema is RefSchema) {
+            thisRefURI = schema.refURI
+          }
+          if (infiniteLoopPrevention++ > 10) {
+            throw IllegalStateException("Too many nested references")
+          }
         }
-        if (infiniteLoopPrevention++ > 10) {
-          throw IllegalStateException("Too many nested references")
-        }
+        return@loader schema
       }
-      this.refSchema = schema
-    } else {
-      this.refSchema = null
     }
-  }
+  })
 
-  protected constructor(location: SchemaLocation, refURI: URI, refSchema: Schema) {
-    this.location = location
-    this.refURI = refURI
-    this.refSchema = refSchema
-  }
-
-  fun requireRefSchema(): Schema? {
-    return refSchema
-  }
+  protected constructor(location: SchemaLocation, refURI: URI, refSchema: Schema):
+      this(location, refURI, {refSchema})
 
   override fun toString(): String {
     return toJson(version ?: JsonSchemaVersion.latest()).toString()
