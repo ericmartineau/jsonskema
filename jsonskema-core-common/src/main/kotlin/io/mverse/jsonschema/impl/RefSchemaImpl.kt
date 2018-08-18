@@ -13,11 +13,9 @@ import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
-import io.mverse.jsonschema.utils.Schemas.emptySchema
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.json
 import lang.URI
-import lang.illegalState
 
 open class RefSchemaImpl : RefSchema {
 
@@ -32,20 +30,19 @@ open class RefSchemaImpl : RefSchema {
   protected constructor(location: SchemaLocation, refURI: URI, refSchema: Schema) : super(location, refURI, refSchema)
 
   override fun asDraft6(): Draft6Schema {
-    val r = refSchema ?: illegalState("Ref schema is not resolved: $refURI")
-    return Draft6RefSchemaImpl(location, refURI, r.asDraft6())
+    return Draft6RefSchemaImpl(location, refURI, (refSchemaOrNull ?: this).asDraft6())
   }
 
   override fun asDraft7(): Draft7Schema {
-    return Draft7RefSchemaImpl(location, refURI, refSchema!!.asDraft7())
+    return Draft7RefSchemaImpl(location, refURI, (refSchemaOrNull ?: this).asDraft7())
   }
 
   override fun asDraft4(): Draft4Schema {
-    return Draft4RefSchemaImpl(location, refURI, refSchema!!.asDraft4())
+    return Draft4RefSchemaImpl(location, refURI, (refSchemaOrNull ?: this).asDraft4())
   }
 
   override fun asDraft3(): Draft3Schema {
-    return Draft3RefSchemaImpl(location, refURI, refSchema!!.asDraft3())
+    return Draft3RefSchemaImpl(location, refURI, (refSchemaOrNull ?: this).asDraft3())
   }
 
   override fun withId(id: URI): Schema {

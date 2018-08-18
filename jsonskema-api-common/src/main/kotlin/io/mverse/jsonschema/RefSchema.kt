@@ -77,7 +77,10 @@ abstract class RefSchema(
         return@loader schema
       }
     }
-  })
+  }) {
+    // Force resolution of the schema
+    this.refSchemaOrNull != null
+  }
 
   protected constructor(location: SchemaLocation, refURI: URI, refSchema: Schema):
       this(location, refURI, {refSchema})
