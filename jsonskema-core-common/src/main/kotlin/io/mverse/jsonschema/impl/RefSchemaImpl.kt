@@ -28,7 +28,7 @@ open class RefSchemaImpl : RefSchema {
               currentDocument: JsonObject?,
               report: LoadingReport) : super(factory, location, refURI, currentDocument, report)
 
-  protected constructor(location: SchemaLocation, refURI: URI, refSchema: Schema) : super(location, refURI, refSchema)
+  constructor(location: SchemaLocation, refURI: URI, refSchema: Schema) : super(location, refURI, refSchema)
 
   override fun asDraft6(): Draft6Schema {
     return Draft6RefSchemaImpl(location, refURI, (refSchemaOrNull ?: refOnlySchema).asDraft6())

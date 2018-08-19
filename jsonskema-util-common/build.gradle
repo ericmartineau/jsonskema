@@ -1,30 +1,14 @@
-buildscript {
-  repositories {
-    jcenter()
-    maven { url "https://kotlin.bintray.com/kotlinx" }
-  }
-
+mverse  {
   dependencies {
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    classpath "org.jetbrains.kotlinx:kotlinx-gradle-serialization-plugin:$serialization_version"
+    compile(kotlinStdlib())
+    compile("kotlin-reflect")
+    compile(kotlinTest())
   }
-}
-
-apply plugin: 'kotlin-platform-common'
-apply plugin: 'kotlinx-serialization'
-
-repositories {
-  mavenLocal()
-  mavenCentral()
-  jcenter()
-  maven { url "https://kotlin.bintray.com/kotlinx" }
 }
 
 dependencies {
-  compile "org.jetbrains.kotlin:kotlin-stdlib-common"
   compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:$serialization_runtime_version"
-
-  compile("org.jetbrains.kotlin:kotlin-reflect")
-  testCompile "org.jetbrains.kotlin:kotlin-test-annotations-common"
-  testCompile "org.jetbrains.kotlin:kotlin-test-common"
+  compile 'org.jetbrains.kotlinx:kotlinx-collections-immutable:0.1'
 }
+
+

@@ -28,7 +28,6 @@ import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.ValidationMocks
 import io.mverse.jsonschema.assertj.subject.ValidationErrorPredicate
 import io.mverse.jsonschema.keyword.KeywordInfo
-import io.mverse.jsonschema.createValidatorFactory
 import io.mverse.jsonschema.getValidator
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull

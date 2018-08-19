@@ -5,6 +5,7 @@ import io.mverse.jsonschema.loading.parseJson
 import io.mverse.jsonschema.loading.parseJsonObject
 import kotlinx.io.InputStream
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
 import kotlin.reflect.KClass
 
 
@@ -21,7 +22,7 @@ class JsonResourceLoader(private val loadFrom: KClass<*>) {
     return loadFrom.java.getResourceAsStream(relPath).readFully().parseJson()
   }
 
-  fun readJsonObject(relPath: String): kotlinx.serialization.json.JsonObject {
+  fun readJsonObject(relPath: String): JsonObject {
     return loadFrom.java.getResourceAsStream(relPath).readFully().parseJsonObject()
   }
 }

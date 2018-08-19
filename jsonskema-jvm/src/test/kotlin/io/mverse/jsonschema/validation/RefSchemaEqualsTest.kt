@@ -17,6 +17,7 @@ package io.mverse.jsonschema.validation
 
 import assertk.assert
 import assertk.assertions.hasToString
+import assertk.assertions.isEqualTo
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.loading.parseJsonObject
@@ -29,7 +30,7 @@ import nl.jqno.equalsverifier.Warning
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
-class RefSchemaTest {
+class RefSchemaEqualsTest {
 
   @Test
   fun toStringTest() {
