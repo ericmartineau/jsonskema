@@ -68,6 +68,7 @@ fun Any?.toJsonElement(): JsonElement {
       is Iterable<*>-> this.toJsonArray()
       is Map<*, *>-> this.toJsonObject()
       is Enum<*>-> this.toString().toJsonLiteral()
+      is JsrValue -> this.toJsonElKt()
       else -> illegalState("Invalid json value")
     }
   }
