@@ -12,6 +12,8 @@ import io.mverse.jsonschema.builder.JsonSchemaBuilder
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
 import io.mverse.jsonschema.jsonschema
+import io.mverse.jsonschema.keyword.Keywords
+import io.mverse.jsonschema.keyword.URIKeyword
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
 import kotlinx.serialization.json.JsonObject
@@ -30,20 +32,41 @@ open class RefSchemaImpl : RefSchema {
 
   constructor(location: SchemaLocation, refURI: URI, refSchema: Schema) : super(location, refURI, refSchema)
 
+  internal constructor(location: SchemaLocation, refURI: URI, refSchemaLoader: (Schema) -> Schema?) : super(location, refURI, refSchemaLoader)
+
   override fun asDraft6(): Draft6Schema {
-    return Draft6RefSchemaImpl(location, refURI, (refSchemaOrNull ?: refOnlySchema).asDraft6())
+    val draft6 = refSchemaOrNull?.asDraft6()
+        ?: Draft6SchemaImpl(
+            location = location,
+            keywords = mapOf(Keywords.REF to URIKeyword(refURI)))
+    return Draft6RefSchemaImpl(location, refURI, draft6)
   }
 
   override fun asDraft7(): Draft7Schema {
-    return Draft7RefSchemaImpl(location, refURI, (refSchemaOrNull ?: refOnlySchema).asDraft7())
+    val draft7 = refSchemaOrNull?.asDraft7()
+        ?: Draft7SchemaImpl(
+            location = location,
+            keywords = mapOf(Keywords.REF to URIKeyword(refURI)),
+            extraProperties = emptyMap())
+    return Draft7RefSchemaImpl(location, refURI, draft7)
   }
 
   override fun asDraft4(): Draft4Schema {
-    return Draft4RefSchemaImpl(location, refURI, (refSchemaOrNull ?: refOnlySchema).asDraft4())
+    val draft4 = refSchemaOrNull?.asDraft4()
+        ?: Draft4SchemaImpl(
+            location = location,
+            keywords = mapOf(Keywords.REF to URIKeyword(refURI)),
+            extraProperties = emptyMap())
+    return Draft4RefSchemaImpl(location, refURI, draft4)
   }
 
   override fun asDraft3(): Draft3Schema {
-    return Draft3RefSchemaImpl(location, refURI, (refSchemaOrNull ?: refOnlySchema).asDraft3())
+    val draft3 = refSchemaOrNull?.asDraft3()
+        ?: Draft3SchemaImpl(
+            location = location,
+            keywords = mapOf(Keywords.REF to URIKeyword(refURI)),
+            extraProperties = emptyMap())
+    return Draft3RefSchemaImpl(location, refURI, draft3)
   }
 
   override fun withId(id: URI): Schema {
