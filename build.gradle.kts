@@ -8,7 +8,9 @@ plugins {
 
 allprojects  {
   plugins.apply("kotlinx-serialization")
-  group = "io.mverse.jsonskema"
+  afterEvaluate {
+    group = "io.mverse.jsonskema"
+  }
   repositories {
     kotlinx()
   }
