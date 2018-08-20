@@ -7,8 +7,10 @@ import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft4
 import io.mverse.jsonschema.keyword.JsonSchemaKeyword
 import io.mverse.jsonschema.keyword.KeywordInfo
+import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.MAXIMUM
 import io.mverse.jsonschema.keyword.Keywords.MINIMUM
+import io.mverse.jsonschema.keyword.URIKeyword
 import kotlinx.serialization.json.JsonElement
 import lang.URI
 import lang.freezeMap
@@ -44,5 +46,7 @@ class Draft4SchemaImpl : JsonSchemaImpl<Draft4Schema>, Draft4Schema {
   override val version: JsonSchemaVersion = Draft4
   override fun asDraft4(): Draft4Schema = this
   override fun convertVersion(source: Schema): Draft4Schema = source.asDraft4()
-  override fun withId(id: URI): Schema = Draft4SchemaImpl(location.withId(id), keywords, extraProperties)
+  override fun withId(id: URI): Schema = Draft4SchemaImpl(location = location.withId(id),
+      keywords = keywords + (Keywords.DOLLAR_ID to URIKeyword(id)),
+      extraProperties = extraProperties)
 }

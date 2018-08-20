@@ -12,6 +12,7 @@ import io.mverse.jsonschema.keyword.Draft3Keywords.REQUIRED_DRAFT3
 import io.mverse.jsonschema.keyword.JsonSchemaKeyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
+import io.mverse.jsonschema.keyword.URIKeyword
 import io.mverse.jsonschema.utils.Schemas.nullSchema
 import kotlinx.serialization.json.JsonElement
 import lang.URI
@@ -64,6 +65,8 @@ class Draft3SchemaImpl : JsonSchemaImpl<Draft3Schema>, Draft3Schema {
   override fun convertVersion(source: Schema): Draft3Schema = source.asDraft3()
 
   override fun withId(id: URI): Schema {
-    return Draft3SchemaImpl(location.withId(id), keywords, extraProperties)
+    return Draft3SchemaImpl(location = location.withId(id),
+        keywords = keywords + (Keywords.ID to URIKeyword(id)),
+        extraProperties = extraProperties)
   }
 }

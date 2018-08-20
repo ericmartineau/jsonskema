@@ -4,16 +4,17 @@ import io.mverse.jsonschema.Draft7Schema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.enums.JsonSchemaVersion
-import io.mverse.jsonschema.enums.JsonSchemaVersion.*
+import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
 import io.mverse.jsonschema.keyword.JsonSchemaKeyword
 import io.mverse.jsonschema.keyword.KeywordInfo
+import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.COMMENT
 import io.mverse.jsonschema.keyword.Keywords.ELSE
 import io.mverse.jsonschema.keyword.Keywords.IF
 import io.mverse.jsonschema.keyword.Keywords.READ_ONLY
 import io.mverse.jsonschema.keyword.Keywords.THEN
 import io.mverse.jsonschema.keyword.Keywords.WRITE_ONLY
-import kotlinx.serialization.json.JsonArray
+import io.mverse.jsonschema.keyword.URIKeyword
 import kotlinx.serialization.json.JsonElement
 import lang.URI
 import lang.freezeMap
@@ -68,5 +69,7 @@ class Draft7SchemaImpl : JsonSchemaImpl<Draft7Schema>, Draft7Schema {
   override val version: JsonSchemaVersion = Draft7
   override fun asDraft7(): Draft7Schema = this
   override fun convertVersion(source: Schema): Draft7Schema = source.asDraft7()
-  override fun withId(id: URI): Schema = Draft7SchemaImpl(location.withId(id), keywords, extraProperties)
+  override fun withId(id: URI): Schema = Draft7SchemaImpl(location = location.withId(id),
+      keywords = keywords + (Keywords.DOLLAR_ID to URIKeyword(id)),
+      extraProperties = extraProperties)
 }
