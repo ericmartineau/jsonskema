@@ -5,6 +5,7 @@ import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft4
+import io.mverse.jsonschema.keyword.IdKeyword
 import io.mverse.jsonschema.keyword.JsonSchemaKeyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
@@ -47,6 +48,6 @@ class Draft4SchemaImpl : JsonSchemaImpl<Draft4Schema>, Draft4Schema {
   override fun asDraft4(): Draft4Schema = this
   override fun convertVersion(source: Schema): Draft4Schema = source.asDraft4()
   override fun withId(id: URI): Schema = Draft4SchemaImpl(location = location.withId(id),
-      keywords = keywords + (Keywords.DOLLAR_ID to URIKeyword(id)),
+      keywords = keywords + (Keywords.DOLLAR_ID to IdKeyword(id)),
       extraProperties = extraProperties)
 }

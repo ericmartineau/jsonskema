@@ -9,6 +9,7 @@ import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft3
 import io.mverse.jsonschema.keyword.Draft3Keywords
 import io.mverse.jsonschema.keyword.Draft3Keywords.EXTENDS
 import io.mverse.jsonschema.keyword.Draft3Keywords.REQUIRED_DRAFT3
+import io.mverse.jsonschema.keyword.IdKeyword
 import io.mverse.jsonschema.keyword.JsonSchemaKeyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
@@ -66,7 +67,7 @@ class Draft3SchemaImpl : JsonSchemaImpl<Draft3Schema>, Draft3Schema {
 
   override fun withId(id: URI): Schema {
     return Draft3SchemaImpl(location = location.withId(id),
-        keywords = keywords + (Keywords.ID to URIKeyword(id)),
+        keywords = keywords + (Keywords.ID to IdKeyword(id)),
         extraProperties = extraProperties)
   }
 }
