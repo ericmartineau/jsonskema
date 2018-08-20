@@ -25,7 +25,7 @@ fun JsrValue.toJsonElKt(): JsonElement = when (this) {
   is JsrArray -> this.toJsonArrayKt()
   is JsrString -> JsonLiteral(this.stringValue)
   is JsrNumber -> JsonLiteral(this.numberValue)
-  else -> illegalState("Unknown JsonValue type")
+  else -> illegalState("Unknown JsonValue type: $this")
 }
 
 fun JsonObject.toJsonObjectJsr(): JsrObject {

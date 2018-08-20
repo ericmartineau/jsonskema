@@ -7,13 +7,18 @@ import javax.json.spi.JsonProvider
 
 actual typealias JsrValue = javax.json.JsonValue
 actual typealias JsrStructure = javax.json.JsonStructure
+
 actual typealias JsrNumber = JsonNumber
+actual val JsrNumber.numberValue: Number get() = this.numberValue()
+
 actual typealias JsrString = JsonString
+actual val JsrString.stringValue: String get() = this.string
 
 actual typealias JsrObject = javax.json.JsonObject
-
+actual val JsrObject.properties: Set<Map.Entry<String, JsrValue>> get() = this.entries
 
 actual typealias JsrArray = javax.json.JsonArray
+actual val JsrArray.values: List<JsrValue> get() = this
 
 actual val JsrNull: JsonValue = JsonValue.NULL
 actual val JsrTrue: JsonValue = JsonValue.TRUE
@@ -30,13 +35,7 @@ actual fun createJsrArray(values: Iterable<JsrValue>): JsrArray {
 }
 
 actual fun createJsrString(string: String): JsrString = provider.createValue(string)
-
 actual fun createJsrNumber(int: Int): JsrNumber = provider.createValue(int)
 actual fun createJsrNumber(double: Double): JsrNumber = provider.createValue(double)
 actual fun createJsrNumber(long: Long): JsrNumber = provider.createValue(long)
 
-actual val JsrObject.properties: Set<Map.Entry<String, JsrValue>> get() = this.entries
-actual val JsrArray.values: List<JsrValue> get() = this
-
-actual val JsrString.stringValue: String get() = this.string
-actual val JsrNumber.numberValue: Number get() = this.numberValue

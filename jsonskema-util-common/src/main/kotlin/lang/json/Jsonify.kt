@@ -51,8 +51,9 @@ fun Iterable<*>.toJsonArray(): JsonArray {
       is JsonElement -> it
       is Iterable<*>-> it.toJsonArray()
       is Map<*, *>-> it.toJsonObject()
-      is Enum<*>-> this.toString().toJsonLiteral()
-      else -> throw IllegalStateException("Invalid json value")
+      is Enum<*>-> it.toString().toJsonLiteral()
+      is JsrValue-> it.toJsonElKt()
+      else -> illegalState("Invalid json value ${it::class}")
     }
   }
   return JsonArray(list)
@@ -69,7 +70,7 @@ fun Any?.toJsonElement(): JsonElement {
       is Map<*, *>-> this.toJsonObject()
       is Enum<*>-> this.toString().toJsonLiteral()
       is JsrValue -> this.toJsonElKt()
-      else -> illegalState("Invalid json value")
+      else -> illegalState("Invalid json value: ${this::class}")
     }
   }
 
