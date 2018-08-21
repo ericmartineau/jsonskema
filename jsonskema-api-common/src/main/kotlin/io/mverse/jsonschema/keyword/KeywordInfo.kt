@@ -2,8 +2,16 @@ package io.mverse.jsonschema.keyword
 
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaVersion
-import lang.hashKode
+import kotlinx.serialization.KInput
+import kotlinx.serialization.KOutput
+import kotlinx.serialization.KSerialClassDesc
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
+import kotlinx.serialization.internal.SerialClassDescImpl
 import kotlinx.serialization.json.ElementType
+import lang.hashKode
+import lang.illegalState
 import lang.range
 
 /**
@@ -16,6 +24,7 @@ import lang.range
  *
  * @param <K> The type of value this keyword produces (a schema, a string, an array, etc)
 </K> */
+@Serializable
 class KeywordInfo<K : JsonSchemaKeyword<*>> {
 
   val key: String
@@ -197,6 +206,7 @@ class KeywordInfo<K : JsonSchemaKeyword<*>> {
   }
 
   companion object {
+
     inline fun <reified X : JsonSchemaKeyword<*>> builder(): KeywordInfoBuilder<X> {
       return KeywordInfoBuilder()
     }
@@ -256,5 +266,16 @@ class KeywordInfo<K : JsonSchemaKeyword<*>> {
     fun from(fromVersion: JsonSchemaVersion): KeywordVersionInfoBuilder<K> {
       return this.since(fromVersion)
     }
+  }
+}
+
+@Serializer(forClass = KeywordInfo::class)
+class KeywordInfoSerializer : KSerializer<KeywordInfo<*>> {
+  override fun save(output: KOutput, obj: KeywordInfo<*>) {
+    output.writeStringValue(obj.key)
+  }
+
+  override fun load(input: KInput): KeywordInfo<*> {
+    illegalState("Unable to deserialize keyword info")
   }
 }

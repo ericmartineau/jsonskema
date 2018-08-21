@@ -6,6 +6,10 @@ import io.mverse.jsonschema.utils.CharUtils.forwardSlashSeparator
 import io.mverse.jsonschema.utils.CharUtils.jsonPointerSegmentEscaper
 import io.mverse.jsonschema.utils.CharUtils.jsonPointerSegmentUnescaper
 import io.mverse.jsonschema.utils.CharUtils.urlSegmentUnescaper
+import kotlinx.serialization.KInput
+import kotlinx.serialization.KOutput
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
 import lang.Escapers.Companion.urlPathSegmentEscaper
 import lang.Joiner
 import lang.Global
@@ -13,6 +17,7 @@ import lang.URI
 import lang.Unescaper
 import lang.hashKode
 
+@Serializable
 class JsonPath : Iterable<String> {
 
   private val segments: Array<String>
@@ -171,7 +176,16 @@ class JsonPath : Iterable<String> {
     }
   }
 
+  @Serializer(forClass = JsonPath::class)
   companion object {
+
+    override fun save(output: KOutput, obj: JsonPath) {
+      output.writeStringValue(obj.toJsonPointer())
+    }
+
+    override fun load(input: KInput): JsonPath {
+      return JsonPath.parseJsonPointer(input.readStringValue())
+    }
 
     @Global
     fun parseFromURIFragment(uriFragment: URI): JsonPath {

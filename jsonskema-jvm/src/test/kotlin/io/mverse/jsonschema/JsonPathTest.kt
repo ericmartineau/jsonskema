@@ -8,6 +8,7 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
+import kotlinx.serialization.json.JSON
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.json
@@ -30,6 +31,16 @@ class JsonPathTest {
           it.isEqualTo("cookie")
         }
   }
+
+  @Test
+  fun testSerialize() {
+    val path = JsonPath.parseJsonPointer("/bob/jones/richard")
+    val serialized = JSON.stringify(path)
+    assert(serialized).isEqualTo("\"/bob/jones/richard\"")
+    val parsed = JSON.parse<JsonPath>("/bob/jones/richard")
+    assert(parsed).isEqualTo(path)
+  }
+
 
   @Test
   fun testGetLastPath_WhenPathHasMultipleItems_ThenReturnsLastItem() {

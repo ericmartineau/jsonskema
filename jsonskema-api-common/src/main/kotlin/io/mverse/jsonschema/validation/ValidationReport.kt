@@ -7,11 +7,17 @@ import io.mverse.jsonschema.validation.ValidationError.Companion.collectErrors
 import kotlinx.io.PrintWriter
 import kotlinx.io.StringWriter
 import kotlinx.io.Writer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
+@Serializable
 class ValidationReport {
+
   val errors = mutableListOf<ValidationError>()
   private var foundError: Boolean = false
 
+  @Transient
   val flattenedErrors: List<ValidationError> get() = errors.map { it.allMessages }.flatten()
   val isValid: Boolean get() = !foundError
 

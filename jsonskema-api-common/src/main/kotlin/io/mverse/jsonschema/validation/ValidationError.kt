@@ -18,7 +18,10 @@ package io.mverse.jsonschema.validation
 import io.mverse.jsonschema.JsonPath
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.keyword.KeywordInfo
+import io.mverse.jsonschema.keyword.KeywordInfoSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
+import kotlinx.serialization.Transient
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonPrimitive
@@ -36,6 +39,7 @@ data class ValidationError(
     /**
      * The schema that generated this error
      */
+    @Transient
     val violatedSchema: Schema? = null,
 
     /**
@@ -51,11 +55,16 @@ data class ValidationError(
      *
      * @return the error description
      */
+    @Transient
     private val errorMessage: String? = null,
+
     private val messageTemplate: String? = null,
 
     val causes: List<ValidationError> = emptyList(),
+
+    @Serializable(with = KeywordInfoSerializer::class)
     val keyword: KeywordInfo<*>? = null,
+
     val arguments: List<Any>? = null
 ) {
 
@@ -64,6 +73,7 @@ data class ValidationError(
    *
    * @return all messages
    */
+  @Transient
   val allMessages: List<ValidationError>
     get() = if (causes.isEmpty()) {
       listOf(this)
@@ -76,8 +86,10 @@ data class ValidationError(
    *
    * @return the error description
    */
+  @Transient
   val message: String get () = "$pathToViolation: $resolvedMessage"
 
+  @Transient
   val resolvedMessage: String
     get() {
       return when {
