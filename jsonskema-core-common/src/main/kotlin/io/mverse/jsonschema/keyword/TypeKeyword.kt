@@ -2,6 +2,7 @@ package io.mverse.jsonschema.keyword
 
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaVersion
+import kotlinx.serialization.json.JsonBuilder
 import lang.json.toJsonArray
 
 data class TypeKeyword(val types:Set<JsonSchemaType> = emptySet(),
@@ -20,12 +21,12 @@ data class TypeKeyword(val types:Set<JsonSchemaType> = emptySet(),
     return TypeKeyword(types + another)
   }
 
-  override fun toJson(keyword: KeywordInfo<*>, builder: kotlinx.serialization.json.JsonBuilder, version: JsonSchemaVersion) {
+  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion) {
     val type = Keywords.TYPE.key
     builder.apply {
       when {
-        types.size == 1-> type to types.first().toString()
-        else-> type to types.map { it.toString() }.toJsonArray()
+        types.size == 1-> type to types.first().name.toLowerCase()
+        else-> type to types.map { it.name.toLowerCase() }.toJsonArray()
       }
     }
   }
