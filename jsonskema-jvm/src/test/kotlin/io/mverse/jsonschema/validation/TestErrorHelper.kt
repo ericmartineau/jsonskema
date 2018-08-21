@@ -12,7 +12,7 @@ object TestErrorHelper {
     return ValidationError(
         violatedSchema = schema,
         messageTemplate = TYPE_MISMATCH_ERROR_MESSAGE,
-        arguments = listOf(desired, found),
+        arguments = listOf(desired.name.toLowerCase(), found.name.toLowerCase()),
         keyword = Keywords.TYPE,
         pointerToViolation = schema.location.jsonPath)
   }
