@@ -8,6 +8,7 @@ import kotlinx.serialization.KSerialClassDesc
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
+import kotlinx.serialization.Transient
 import kotlinx.serialization.internal.SerialClassDescImpl
 import kotlinx.serialization.json.ElementType
 import lang.hashKode
@@ -43,6 +44,7 @@ class KeywordInfo<K : JsonSchemaKeyword<*>> {
   /**
    * Which types of values this keyword applies to: string, boolean, object, array
    */
+  @Transient
   private val forSchemas: Set<JsonSchemaType>
 
   /**

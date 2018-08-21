@@ -1,6 +1,10 @@
 package io.mverse.jsonschema.enums
 
 import io.mverse.jsonschema.SchemaException
+import kotlinx.serialization.KInput
+import kotlinx.serialization.KOutput
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
 import kotlinx.serialization.json.ElementType
 
 /**
@@ -31,7 +35,17 @@ enum class JsonSchemaType {
     }
   }
 
+  @Serializer(forClass = JsonSchemaType::class)
   companion object {
+
+    override fun save(output: KOutput, obj: JsonSchemaType) {
+      output.writeStringValue(obj.toString())
+    }
+
+    override fun load(input: KInput): JsonSchemaType {
+      return JsonSchemaType.fromString(input.readStringValue())
+    }
+
     fun fromString(type: String?): JsonSchemaType {
       if (type == null) {
         return NULL

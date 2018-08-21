@@ -7,7 +7,6 @@ import io.mverse.jsonschema.validation.ValidationError.Companion.collectErrors
 import kotlinx.io.PrintWriter
 import kotlinx.io.StringWriter
 import kotlinx.io.Writer
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
