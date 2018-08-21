@@ -3,6 +3,7 @@ package io.mverse.jsonschema.loading.keyword
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.enums.JsonSchemaType
+import io.mverse.jsonschema.enums.JsonSchemaTypes
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.TYPE
@@ -26,13 +27,13 @@ class TypeKeywordDigester : KeywordDigester<TypeKeyword> {
       ARRAY -> {
         val typeArray = type.jsonArray
             .map { it.primitive.content }
-            .map { JsonSchemaType.fromString(it) }
+            .map { JsonSchemaTypes.fromString(it) }
             .toSet()
 
         KeywordDigest.ofNullable(TYPE, TypeKeyword(typeArray))
       }
       else -> {
-        val typeString = JsonSchemaType.fromString(type.string)
+        val typeString = JsonSchemaTypes.fromString(type.string)
         return KeywordDigest.ofNullable(Keywords.TYPE, TypeKeyword(typeString))
       }
     }

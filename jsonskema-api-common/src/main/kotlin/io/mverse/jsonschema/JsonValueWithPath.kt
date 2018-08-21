@@ -6,7 +6,6 @@ import io.mverse.jsonschema.utils.JsonUtils.extractIdFromObject
 import io.mverse.jsonschema.utils.SchemaPaths
 import io.mverse.jsonschema.utils.toJsonSchemaType
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.json.ElementType
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
@@ -17,8 +16,9 @@ import lang.convert
 import lang.hashKode
 
 /**
- * This class is used for convenience in accessing data within a JsonObject.  It wraps the JSR353 [JsonObject]
- * and adds some extra methods that allow more fluent usage.
+ * This class is used for convenience in accessing data within a JsonObject.
+ *
+ * It wraps the JSR353 [JsonObject] and adds some extra methods that allow more fluent usage.
  */
 @Serializable
 data class JsonValueWithPath(
@@ -34,7 +34,6 @@ data class JsonValueWithPath(
     root.jsonObject
   }
 
-  @Transient
   val jsonSchemaType: JsonSchemaType
     get() = wrapped.type.toJsonSchemaType()
 
@@ -155,7 +154,7 @@ data class JsonValueWithPath(
   }
 
   fun path(childKey: String): JsonValueWithPath {
-      return fromJsonValue(root, this[childKey], location.child(childKey))
+    return fromJsonValue(root, this[childKey], location.child(childKey))
   }
 
   /**

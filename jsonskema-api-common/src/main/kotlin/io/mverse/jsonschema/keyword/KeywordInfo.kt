@@ -2,6 +2,7 @@ package io.mverse.jsonschema.keyword
 
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaVersion
+import io.mverse.jsonschema.enums.appliesTo
 import kotlinx.serialization.KInput
 import kotlinx.serialization.KOutput
 import kotlinx.serialization.KSerialClassDesc

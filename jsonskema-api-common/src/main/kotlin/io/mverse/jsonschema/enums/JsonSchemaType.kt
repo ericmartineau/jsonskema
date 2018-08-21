@@ -6,10 +6,12 @@ import kotlinx.serialization.KOutput
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.json.ElementType
+import lang.Global
 
 /**
  * Represents the valid json-schema types.
  */
+@Serializable(with = JsonSchemaTypes::class)
 enum class JsonSchemaType {
   STRING,
   BOOLEAN,
@@ -22,39 +24,41 @@ enum class JsonSchemaType {
   override fun toString(): String {
     return name.toLowerCase()
   }
+}
 
-  val appliesTo: ElementType by lazy {
-    when (this) {
-      INTEGER -> ElementType.NUMBER
-      BOOLEAN -> ElementType.BOOLEAN
-      STRING -> ElementType.STRING
-      NUMBER -> ElementType.NUMBER
-      NULL -> ElementType.NULL
-      OBJECT -> ElementType.OBJECT
-      ARRAY -> ElementType.ARRAY
-    }
+@Serializer(forClass = JsonSchemaType::class)
+object JsonSchemaTypes {
+
+  override fun save(output: KOutput, obj: JsonSchemaType) {
+    output.writeStringValue(obj.toString())
   }
 
-  @Serializer(forClass = JsonSchemaType::class)
-  companion object {
+  override fun load(input: KInput): JsonSchemaType {
+    return fromString(input.readStringValue())
+  }
 
-    override fun save(output: KOutput, obj: JsonSchemaType) {
-      output.writeStringValue(obj.toString())
+  @Global
+  fun fromString(type: String?): JsonSchemaType {
+    if (type == null) {
+      return JsonSchemaType.NULL
     }
-
-    override fun load(input: KInput): JsonSchemaType {
-      return JsonSchemaType.fromString(input.readStringValue())
-    }
-
-    fun fromString(type: String?): JsonSchemaType {
-      if (type == null) {
-        return NULL
-      }
-      try {
-        return valueOf(type.toUpperCase())
-      } catch (e: IllegalArgumentException) {
-        throw SchemaException("Invalid schema type:$type")
-      }
+    try {
+      return JsonSchemaType.valueOf(type.toUpperCase())
+    } catch (e: IllegalArgumentException) {
+      throw SchemaException("Invalid schema type:$type")
     }
   }
 }
+
+val JsonSchemaType.appliesTo: ElementType
+  get() {
+    return when (this) {
+      JsonSchemaType.INTEGER -> ElementType.NUMBER
+      JsonSchemaType.BOOLEAN -> ElementType.BOOLEAN
+      JsonSchemaType.STRING -> ElementType.STRING
+      JsonSchemaType.NUMBER -> ElementType.NUMBER
+      JsonSchemaType.NULL -> ElementType.NULL
+      JsonSchemaType.OBJECT -> ElementType.OBJECT
+      JsonSchemaType.ARRAY -> ElementType.ARRAY
+    }
+  }
