@@ -13,6 +13,8 @@ import io.mverse.jsonschema.keyword.IdKeyword
 import io.mverse.jsonschema.keyword.JsonSchemaKeyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
+import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
+import io.mverse.jsonschema.keyword.Keywords.ID
 import io.mverse.jsonschema.keyword.URIKeyword
 import io.mverse.jsonschema.utils.Schemas.nullSchema
 import kotlinx.serialization.json.JsonElement
@@ -67,7 +69,10 @@ class Draft3SchemaImpl : JsonSchemaImpl<Draft3Schema>, Draft3Schema {
 
   override fun withId(id: URI): Schema {
     return Draft3SchemaImpl(location = location.withId(id),
-        keywords = keywords + (Keywords.ID to IdKeyword(id)),
+        keywords = keywords.toMutableMap().also {
+          it.remove(DOLLAR_ID)
+          it[ID] = IdKeyword(id)
+        },
         extraProperties = extraProperties)
   }
 }

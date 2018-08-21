@@ -8,6 +8,7 @@ import io.mverse.jsonschema.keyword.IdKeyword
 import io.mverse.jsonschema.keyword.JsonSchemaKeyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
+import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
 import io.mverse.jsonschema.keyword.URIKeyword
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -52,6 +53,9 @@ class Draft6SchemaImpl : JsonSchemaImpl<Draft6Schema>, Draft6Schema {
   override fun asDraft6(): Draft6Schema = this
   override fun convertVersion(source: Schema): Draft6Schema = source.asDraft6()
   override fun withId(id: URI): Schema = Draft6SchemaImpl(location=location.withId(id),
-      keywords = keywords + (Keywords.DOLLAR_ID to IdKeyword(id)),
+      keywords = keywords.toMutableMap().also {
+        it.remove(Keywords.ID)
+        it[DOLLAR_ID] = IdKeyword(id)
+      },
       extraProperties = extraProperties)
 }

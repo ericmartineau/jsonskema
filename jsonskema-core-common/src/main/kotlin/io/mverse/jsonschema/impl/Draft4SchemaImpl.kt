@@ -9,6 +9,8 @@ import io.mverse.jsonschema.keyword.IdKeyword
 import io.mverse.jsonschema.keyword.JsonSchemaKeyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
+import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
+import io.mverse.jsonschema.keyword.Keywords.ID
 import io.mverse.jsonschema.keyword.Keywords.MAXIMUM
 import io.mverse.jsonschema.keyword.Keywords.MINIMUM
 import io.mverse.jsonschema.keyword.URIKeyword
@@ -48,6 +50,9 @@ class Draft4SchemaImpl : JsonSchemaImpl<Draft4Schema>, Draft4Schema {
   override fun asDraft4(): Draft4Schema = this
   override fun convertVersion(source: Schema): Draft4Schema = source.asDraft4()
   override fun withId(id: URI): Schema = Draft4SchemaImpl(location = location.withId(id),
-      keywords = keywords + (Keywords.DOLLAR_ID to IdKeyword(id)),
+      keywords = keywords.toMutableMap().also {
+        it.remove(ID)
+        it[DOLLAR_ID] = IdKeyword(id)
+      },
       extraProperties = extraProperties)
 }

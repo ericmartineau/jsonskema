@@ -10,6 +10,7 @@ import io.mverse.jsonschema.keyword.JsonSchemaKeyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.COMMENT
+import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
 import io.mverse.jsonschema.keyword.Keywords.ELSE
 import io.mverse.jsonschema.keyword.Keywords.IF
 import io.mverse.jsonschema.keyword.Keywords.READ_ONLY
@@ -70,7 +71,13 @@ class Draft7SchemaImpl : JsonSchemaImpl<Draft7Schema>, Draft7Schema {
   override val version: JsonSchemaVersion = Draft7
   override fun asDraft7(): Draft7Schema = this
   override fun convertVersion(source: Schema): Draft7Schema = source.asDraft7()
-  override fun withId(id: URI): Schema = Draft7SchemaImpl(location = location.withId(id),
-      keywords = keywords + (Keywords.DOLLAR_ID to IdKeyword(id)),
-      extraProperties = extraProperties)
+  override fun withId(id: URI): Schema {
+    return Draft7SchemaImpl(
+        location = location.withId(id),
+        keywords = keywords.toMutableMap().also {
+          it.remove(Keywords.ID)
+          it[DOLLAR_ID] = IdKeyword(id)
+        },
+        extraProperties = extraProperties)
+  }
 }

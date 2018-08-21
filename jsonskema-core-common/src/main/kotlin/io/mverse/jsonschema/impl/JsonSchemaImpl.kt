@@ -12,6 +12,7 @@ import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.builder.JsonSchemaBuilder
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaVersion
+import io.mverse.jsonschema.keyword.IdKeyword
 import io.mverse.jsonschema.keyword.JsonSchemaKeyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
@@ -19,6 +20,8 @@ import io.mverse.jsonschema.keyword.Keywords.ADDITIONAL_ITEMS
 import io.mverse.jsonschema.keyword.Keywords.ADDITIONAL_PROPERTIES
 import io.mverse.jsonschema.keyword.Keywords.CONTAINS
 import io.mverse.jsonschema.keyword.Keywords.DEPENDENCIES
+import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
+import io.mverse.jsonschema.keyword.Keywords.ID
 import io.mverse.jsonschema.keyword.Keywords.ITEMS
 import io.mverse.jsonschema.keyword.Keywords.MAXIMUM
 import io.mverse.jsonschema.keyword.Keywords.MAX_ITEMS
@@ -60,7 +63,10 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
   // ###### Getters for common keywords (draft3-6) ########
   // ######################################################
 
-  override val id: URI? by keywords(Keywords.DOLLAR_ID)
+  override val id: URI? by lazy {
+    val kw = keywords()[DOLLAR_ID] ?: keywords()[ID]
+    (kw as? IdKeyword)?.value
+  }
   override val schemaURI: URI? get() = version.metaschemaURI
   override val title: String? by keywords(Keywords.TITLE)
   override val description: String? by keywords(Keywords.DESCRIPTION)
@@ -78,7 +84,7 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
   override val maxItems: Int? by numberKeyword(MAX_ITEMS)
   override val properties: Map<String, Schema> by keywords(PROPERTIES, emptyMap())
   override val patternProperties: Map<String, Schema> by keywords(PATTERN_PROPERTIES, emptyMap())
-  override val additionalPropertiesSchema: D? by lazy {keyword(ADDITIONAL_PROPERTIES)?.value?.toDraftVersion()}
+  override val additionalPropertiesSchema: D? by lazy { keyword(ADDITIONAL_PROPERTIES)?.value?.toDraftVersion() }
   override val requiresUniqueItems: Boolean by keywords(UNIQUE_ITEMS, false)
 
   override val additionalItemsSchema: D? by lazy {
@@ -150,7 +156,7 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
   }
 
   override fun asDraft4(): Draft4Schema {
-    return this as? Draft4Schema ?:  Draft4SchemaImpl(this)
+    return this as? Draft4Schema ?: Draft4SchemaImpl(this)
   }
 
   override fun toString(): String = toString(version)
@@ -212,3 +218,4 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
     return keywords.hashCode()
   }
 }
+
