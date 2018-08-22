@@ -26,6 +26,7 @@ interface SchemaBuilder<SELF : SchemaBuilder<SELF>> {
   var type: JsonSchemaType?
   var format: String?
   var pattern: String?
+  var additionalProperties: Boolean
 
   // ##################################################################
   // ########           METADATA KEYWORDS                ##############

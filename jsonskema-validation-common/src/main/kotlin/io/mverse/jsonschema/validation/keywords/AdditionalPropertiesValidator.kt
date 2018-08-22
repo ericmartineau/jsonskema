@@ -3,9 +3,11 @@ package io.mverse.jsonschema.validation.keywords
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.keyword.Keywords
+import io.mverse.jsonschema.keyword.Keywords.ADDITIONAL_PROPERTIES
 import io.mverse.jsonschema.keyword.SingleSchemaKeyword
 import io.mverse.jsonschema.validation.SchemaValidator
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
+import io.mverse.jsonschema.validation.ValidationError
 import io.mverse.jsonschema.validation.ValidationReport
 import lang.Pattern
 
@@ -28,7 +30,7 @@ class AdditionalPropertiesValidator(keyword: SingleSchemaKeyword, schema: Schema
   }
 
   override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
-    val report = parentReport.createChildReport()
+    val invalidProps = mutableMapOf<JsonValueWithPath, ValidationReport>()
 
     prop@ for (propName in subject.propertyNames()) {
       for (pattern in patternProperties) {
@@ -38,11 +40,21 @@ class AdditionalPropertiesValidator(keyword: SingleSchemaKeyword, schema: Schema
       }
       if (!propertySchemaKeys.contains(propName)) {
         val propertyValue = subject.path(propName)
-        additionalPropertiesValidator.validate(propertyValue, report)
+        val addtlProps = parentReport.createChildReport()
+        additionalPropertiesValidator.validate(propertyValue, addtlProps)
+        if (!addtlProps.isValid) {
+          invalidProps += propertyValue to addtlProps
+        }
       }
     }
-    if (!report.isValid) {
-      parentReport.addReport(schema, subject, Keywords.ADDITIONAL_PROPERTIES, "Additional properties were invalid", report)
+    invalidProps.forEach { (subject, errors)->
+      parentReport += buildKeywordFailure(subject)
+          .copy(keyword = ADDITIONAL_PROPERTIES,
+              code = "validation.keyword.additionalProperties",
+              messageTemplate = "Invalid additional property '%s'",
+              arguments = listOf(subject.path.toJsonPointer()),
+              pointerToViolation = subject.path
+          )
     }
     return parentReport.isValid
   }

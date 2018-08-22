@@ -20,6 +20,7 @@ import io.mverse.jsonschema.keyword.JsonValueKeyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.ADDITIONAL_ITEMS
+import io.mverse.jsonschema.keyword.Keywords.ADDITIONAL_PROPERTIES
 import io.mverse.jsonschema.keyword.Keywords.COMMENT
 import io.mverse.jsonschema.keyword.Keywords.DESCRIPTION
 import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
@@ -49,6 +50,8 @@ import io.mverse.jsonschema.loading.SchemaLoader
 import io.mverse.jsonschema.loading.SchemaLoadingException
 import io.mverse.jsonschema.utils.SchemaPaths
 import io.mverse.jsonschema.utils.Schemas.falseSchemaBuilder
+import io.mverse.jsonschema.utils.Schemas.nullSchema
+import io.mverse.jsonschema.utils.Schemas.nullSchemaBuilder
 import kotlinx.serialization.json.JsonElement
 import lang.Pattern
 import lang.URI
@@ -111,6 +114,18 @@ open class JsonSchemaBuilder(
       this.removeIfNecessary(TYPE, type)
       if (type != null) {
         this.type(type)
+      }
+    }
+
+  override var additionalProperties: Boolean
+    get() {
+      val keyword = getKeyword(ADDITIONAL_PROPERTIES)
+      return keyword?.value != nullSchema
+    }
+    set(value) {
+      when(value) {
+        true-> keywords.remove(ADDITIONAL_PROPERTIES)
+        false-> addOrRemoveSchema(ADDITIONAL_PROPERTIES, nullSchemaBuilder())
       }
     }
 

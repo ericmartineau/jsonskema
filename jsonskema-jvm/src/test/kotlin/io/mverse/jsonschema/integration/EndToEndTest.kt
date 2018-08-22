@@ -2,7 +2,6 @@ package io.mverse.jsonschema.integration
 
 import assertk.assert
 import io.mverse.jsonschema.JsonSchema
-import io.mverse.jsonschema.assertj.asserts.assertValidation
 import io.mverse.jsonschema.assertj.asserts.hasErrorArguments
 import io.mverse.jsonschema.assertj.asserts.hasErrorCode
 import io.mverse.jsonschema.assertj.asserts.hasKeyword
@@ -30,22 +29,21 @@ class EndToEndTest {
         .readSchema(jsonSchema)
     assert(loadedSchema)
         .validating(jsonData)
-        .isNotValid()
-        .assertValidation { errors ->
-          errors.hasViolationsAt("#/secondary_color", "#", "#/contact", "#/contact/email")
-          errors.hasViolationAt("#/secondary_color")
+        .isNotValid {
+          hasViolationsAt("#/secondary_color", "#", "#/contact", "#/contact/email")
+          hasViolationAt("#/secondary_color")
               .hasKeyword(Keywords.PATTERN)
               .hasSchemaLocation("#/properties/secondary_color")
               .hasErrorCode("validation.keyword.pattern")
               .hasErrorArguments("badbadleroybrown", "^#?(?:(?:[0-9a-fA-F]{2}){3}|(?:[0-9a-fA-F]){3})$")
-          errors.hasViolationAt("#/contact/email")
+          hasViolationAt("#/contact/email")
               .hasKeyword(Keywords.FORMAT)
               .hasErrorCode("validation.keyword.format")
-          errors.hasViolationAt("#/contact")
+          hasViolationAt("#/contact")
               .hasErrorArguments("first_name")
-          errors.hasViolationAt("#/contact")
+          hasViolationAt("#/contact")
               .hasErrorArguments("last_name")
-          errors.hasViolationAt("#/contact")
+          hasViolationAt("#/contact")
               .hasErrorArguments("phone")
         }
   }

@@ -4,7 +4,6 @@ import assertk.Assert
 import assertk.all
 import assertk.assertions.containsAll
 import assertk.assertions.isEqualTo
-import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
 import assertk.fail
 import io.mverse.jsonschema.JsonPath
@@ -18,7 +17,6 @@ import io.mverse.jsonschema.keyword.JsonSchemaKeyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.validation.ValidationError
 import lang.URI
-import kotlin.test.fail
 
 typealias SchemaValidationAssert = Assert<ValidationError?>
 typealias ValidationListAssert = Assert<List<ValidationError>>
@@ -35,9 +33,12 @@ fun SchemaValidationAssert.isValid(): SchemaValidationAssert {
   return this
 }
 
-fun SchemaValidationAssert.isNotValid(): SchemaValidationAssert {
+fun SchemaValidationAssert.isNotValid(assertions: SchemaValidationAssert.()->Unit = {}): SchemaValidationAssert {
   if(this.actual?.allMessages?.size == 0) {
     fail("Was unexpectedly valid. We should have encountered errors")
+  }
+  this.all {
+    this.assertions()
   }
   return this
 }
@@ -73,9 +74,9 @@ fun SchemaValidationAssert.hasViolationCount(expected: Int): SchemaValidationAss
   return this
 }
 
-fun SchemaValidationAssert.assertValidation(asserter: (SchemaValidationAssert) -> Unit) {
+fun SchemaValidationAssert.assertValidation(asserter: SchemaValidationAssert.() -> Unit) {
   this.all {
-    asserter(this)
+    this.asserter()
   }
 }
 
