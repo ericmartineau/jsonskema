@@ -71,27 +71,6 @@ class ObjectKeywordsValidatorTest {
     expectSuccess { ValidationMocks.createTestValidator(testSchema).validate(input) }
   }
 
-  @Test
-  fun additionalPropertySchema() {
-    val boolSchema = JsonSchema.schemaBuilder().type(BOOLEAN)
-    val schema = mockObjectSchema().schemaOfAdditionalProperties(boolSchema).build()
-    val fooBar = json { "foo" to "bar" }
-
-    failureOf(schema)
-        .input(fooBar)
-        .expectedConsumer { error ->
-          //Other stuff
-          assertEquals(1, error.causes.size)
-          val cause = error.causes[0]
-          assertEquals("#/additionalProperties", cause.schemaLocation.toString())
-          assertEquals(Keywords.TYPE, cause.keyword)
-          assertEquals(boolSchema.build(), cause.violatedSchema)
-        }
-        .expectedPointer("#")
-        .expectedKeyword(Keywords.ADDITIONAL_PROPERTIES)
-        .expectedSchemaLocation("#")
-        .expect()
-  }
 
   @Test
   fun maxPropertiesFailure() {
@@ -113,24 +92,6 @@ class ObjectKeywordsValidatorTest {
         .expect()
   }
 
-  @Test
-  fun multipleAdditionalProperties() {
-    val subject = mockObjectSchema()
-        .schemaOfAdditionalProperties(mockStringSchema())
-        .build()
-
-    val testValidator = ValidationMocks.createTestValidator(subject)
-
-    val testSubject = json {
-      "a" to true
-      "b" to true
-    }
-    val error = verifyFailure { testValidator.validate(testSubject) }
-
-    assertEquals("#: Additional properties were invalid", error.message)
-    assertEquals(Keywords.ADDITIONAL_PROPERTIES, error.keyword)
-    assertEquals(2, error.causes.size)
-  }
 
   @Test
   fun multipleSchemaDepViolation() {

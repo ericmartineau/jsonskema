@@ -41,12 +41,12 @@ class AdditionalPropertiesValidatorTest {
         .isNotValid()
         .assertValidation {
 
-          hasViolationAt("/named")
+          hasViolationAt("#/named")
               .hasKeyword(ADDITIONAL_PROPERTIES)
               .hasErrorArguments("/named")
               .hasErrorCode("validation.keyword.additionalProperties")
 
-          hasViolationAt("/bogus")
+          hasViolationAt("#/bogus")
               .hasKeyword(ADDITIONAL_PROPERTIES)
               .hasErrorArguments("/bogus")
               .hasErrorCode("validation.keyword.additionalProperties")
