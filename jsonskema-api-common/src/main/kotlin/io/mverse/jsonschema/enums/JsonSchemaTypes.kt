@@ -27,7 +27,7 @@ object JsonSchemaTypes {
 class JsonSchemaTypeSerializer {
 
   override fun save(output: KOutput, obj: JsonSchemaType) {
-    output.writeStringValue(obj.toString())
+    output.writeStringValue(obj.name.toLowerCase())
   }
 
   override fun load(input: KInput): JsonSchemaType {
