@@ -55,7 +55,7 @@ class ValidationErrorTest {
   @Test
   fun testToJson() {
     val subject = ValidationError(
-        violatedSchema = mockBooleanSchema().build(),
+        violatedSchema = mockBooleanSchema.build(),
         pointerToViolation = JsonPath.parseFromURIFragment("#/a/b"),
         errorMessage = "exception message",
         keyword = Keywords.TYPE)
@@ -82,7 +82,7 @@ class ValidationErrorTest {
 
   @Test
   fun throwForMultipleFailures() {
-    val failedSchema = mockNullSchema().build()
+    val failedSchema = mockNullSchema{}
     val input1 = ValidationError(
         violatedSchema = failedSchema,
         code = "code",
@@ -115,7 +115,7 @@ class ValidationErrorTest {
 
   @Test
   fun collectError_WhenSingleFailure_ThenFailureIsReturned() {
-    val failedSchema = mockNullSchema().build()
+    val failedSchema = mockNullSchema {}
     val input = ValidationError(
         violatedSchema = failedSchema,
         code = "code",
@@ -130,7 +130,7 @@ class ValidationErrorTest {
   @Test
   fun toJsonNullPointerToViolation() {
     val subject = ValidationError(
-        violatedSchema = mockBooleanSchema().build(),
+        violatedSchema = mockBooleanSchema.build(),
         code = "exception message",
         errorMessage = "msg",
         keyword = null,
@@ -143,7 +143,7 @@ class ValidationErrorTest {
   @Test
   fun toJsonWithCauses() {
     val cause = ValidationError(
-        violatedSchema = mockNullSchema().build(),
+        violatedSchema = mockNullSchema {},
         code = "code",
         messageTemplate = "cause msg %s",
         keyword = Keywords.TYPE,
@@ -151,7 +151,7 @@ class ValidationErrorTest {
         arguments = listOf("foo", "bar"))
 
     val subject = ValidationError(
-        violatedSchema = mockNullSchema().build(),
+        violatedSchema = mockNullSchema {},
         errorMessage = "exception message",
         keyword = null,
         causes = listOf(cause),
@@ -193,7 +193,7 @@ class ValidationErrorTest {
 
   private fun createTestValidationError(): ValidationError {
     return ValidationError(
-        violatedSchema = mockBooleanSchema().build(),
+        violatedSchema = mockBooleanSchema.build(),
         code = "code",
         errorMessage = "Failed Validation",
         keyword = Keywords.TYPE,
@@ -202,7 +202,7 @@ class ValidationErrorTest {
 
   private fun createDummyException(pointer: String): ValidationError {
     return ValidationError(
-        violatedSchema = mockBooleanSchema().build(),
+        violatedSchema = mockBooleanSchema.build(),
         code = "code",
         errorMessage = "stuff went wrong",
         keyword = Keywords.TYPE,
@@ -212,7 +212,7 @@ class ValidationErrorTest {
   private fun subjectWithCauses(vararg causes: ValidationError?): ValidationError? {
     return if (causes.isEmpty()) {
       ValidationError(
-          violatedSchema = mockBooleanSchema().build(),
+          violatedSchema = mockBooleanSchema.build(),
           code = "code",
           errorMessage = "Failure",
           keyword = Keywords.TYPE,

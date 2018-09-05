@@ -64,3 +64,11 @@ actual object Multimaps {
     return ImmutableListMultimap.of()
   }
 }
+
+actual operator fun <K, V> SetMultimap<K, V>.plus(set: SetMultimap<K, V>): SetMultimap<K, V> {
+  return this.toMutableSetMultimap().apply { putAll(set) }
+}
+
+actual operator fun <K, V> SetMultimap<K, V>.plus(pair: Pair<K, V>): SetMultimap<K, V> {
+  return this.toMutableSetMultimap().apply { put(pair.first, pair.second) }
+}

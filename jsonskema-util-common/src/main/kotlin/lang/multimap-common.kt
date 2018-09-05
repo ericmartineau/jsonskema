@@ -16,6 +16,8 @@ expect class MutableSetMultimap<K, V>() : SetMultimap<K, V> {
 }
 
 expect fun <K, V> SetMultimap<K, V>.toMutableSetMultimap(): MutableSetMultimap<K, V>
+expect operator fun <K, V> SetMultimap<K, V>.plus(set:SetMultimap<K, V>): SetMultimap<K, V>
+expect operator fun <K, V> SetMultimap<K, V>.plus(pair:Pair<K, V>): SetMultimap<K, V>
 
 expect interface ListMultimap<K, V> {
   fun asMap(): Map<K, Collection<V>>

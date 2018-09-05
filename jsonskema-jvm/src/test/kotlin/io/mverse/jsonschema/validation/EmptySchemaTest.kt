@@ -82,8 +82,8 @@ class EmptySchemaTest {
     } else {
       JsonSchema.schemaBuilder()
     }
-    if (title != null) builder.title(title)
-    if (description != null) builder.description(description)
+    if (title != null) builder.title= title
+    if (description != null) builder.description= description
     return builder.build().toString().parseJsonObject()
   }
 }

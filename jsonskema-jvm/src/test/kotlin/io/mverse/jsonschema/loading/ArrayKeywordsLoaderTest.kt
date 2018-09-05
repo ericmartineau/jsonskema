@@ -4,9 +4,10 @@ import assertk.assert
 import assertk.assertions.containsAll
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.assertj.asserts.asserting
 import io.mverse.jsonschema.enums.JsonSchemaType
-import io.mverse.jsonschema.jsonschema
+import io.mverse.jsonschema.schema
 import org.junit.Test
 
 /**
@@ -59,8 +60,8 @@ class ArrayKeywordsLoaderTest : BaseLoaderTest("arraytestschemas.json") {
   }
 
   companion object {
-    private val NULL_SCHEMA = jsonschema {
-      type(JsonSchemaType.NULL)
+    private val NULL_SCHEMA = JsonSchema.schema {
+      type = JsonSchemaType.NULL
     }
   }
 }

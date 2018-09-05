@@ -14,8 +14,6 @@ data class ItemsKeyword(val indexedSchemas: List<Schema> = emptyList(),
 
   val hasIndexedSchemas: Boolean get() = indexedSchemas.isNotEmpty()
 
-
-
   override fun toJson(keyword: KeywordInfo<*>, builder: kotlinx.serialization.json.JsonBuilder, version: JsonSchemaVersion) {
     if (!indexedSchemas.isEmpty()) {
       builder.run {

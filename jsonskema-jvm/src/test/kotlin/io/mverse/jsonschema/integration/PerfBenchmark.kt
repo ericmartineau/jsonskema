@@ -2,8 +2,9 @@ package io.mverse.jsonschema.integration
 
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.JsonValueWithPath
+import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.schemaReader
+import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.utils.SchemaPaths
 import io.mverse.jsonschema.validation.SchemaValidator
 import io.mverse.jsonschema.validation.SchemaValidatorFactoryImpl
@@ -16,7 +17,7 @@ class PerfBenchmark {
   @Test
   fun testPerformance() {
     val draft6 = JsonSchema.resourceLoader().readJsonObject("json-schema-draft-06.json")
-    val draft6Schema = JsonSchema.schemaReader()
+    val draft6Schema = JsonSchema.createSchemaReader()
         .readSchema(draft6)
     val validator = SchemaValidatorFactoryImpl.createValidatorForSchema(draft6Schema)
 

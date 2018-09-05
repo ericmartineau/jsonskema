@@ -25,7 +25,7 @@ import assertk.assertions.isTrue
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaBuilder
-import io.mverse.jsonschema.ValidationMocks
+import io.mverse.jsonschema.validation.ValidationMocks
 import io.mverse.jsonschema.assertj.subject.ValidationErrorPredicate
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.getValidator
@@ -43,6 +43,10 @@ object ValidationTestSupport {
 
   fun buildWithLocation(builder: SchemaBuilder): Schema {
     return builder.build()
+  }
+
+  fun buildWithLocation(builder: Schema): Schema {
+    return builder.toBuilder().build()
   }
 
   fun countCauseByJsonPointer(root: ValidationError, pointer: String): Long {

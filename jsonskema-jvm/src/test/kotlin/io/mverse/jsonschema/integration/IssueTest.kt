@@ -83,7 +83,7 @@
 //  private fun loadSchema(): Schema {
 //    val schemaFile = fileByName("schema.json")
 //    if (schemaFile.isPresent()) {
-//      FileInputStream(schemaFile.get()).use({ schemaStream -> return JsonSchema.schemaReader().readSchema(schemaStream) })
+//      FileInputStream(schemaFile.get()).use({ schemaStream -> return JsonSchema.createSchemaReader().readSchema(schemaStream) })
 //    }
 //    throw RuntimeException(issueDir.getCanonicalPath() + "/schema.json is not found")
 //  }

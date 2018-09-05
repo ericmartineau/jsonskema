@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.builder
 
 import io.mverse.jsonschema.MutableKeywordContainer
+import io.mverse.jsonschema.MutableSchemaMap
 import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaBuilder
@@ -11,7 +12,10 @@ import io.mverse.jsonschema.impl.RefSchemaImpl
 import io.mverse.jsonschema.keyword.BooleanKeyword
 import io.mverse.jsonschema.keyword.DependenciesKeyword
 import io.mverse.jsonschema.keyword.DollarSchemaKeyword
+import io.mverse.jsonschema.keyword.IdKeyword
 import io.mverse.jsonschema.keyword.ItemsKeyword
+import io.mverse.jsonschema.keyword.JsonArrayKeyword
+import io.mverse.jsonschema.keyword.JsonValueKeyword
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
@@ -23,6 +27,7 @@ import io.mverse.jsonschema.keyword.Keywords.CONST
 import io.mverse.jsonschema.keyword.Keywords.CONTAINS
 import io.mverse.jsonschema.keyword.Keywords.CONTENT_ENCODING
 import io.mverse.jsonschema.keyword.Keywords.CONTENT_MEDIA_TYPE
+import io.mverse.jsonschema.keyword.Keywords.DEFAULT
 import io.mverse.jsonschema.keyword.Keywords.DEPENDENCIES
 import io.mverse.jsonschema.keyword.Keywords.DESCRIPTION
 import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
@@ -43,12 +48,15 @@ import io.mverse.jsonschema.keyword.Keywords.MULTIPLE_OF
 import io.mverse.jsonschema.keyword.Keywords.NOT
 import io.mverse.jsonschema.keyword.Keywords.ONE_OF
 import io.mverse.jsonschema.keyword.Keywords.PATTERN
+import io.mverse.jsonschema.keyword.Keywords.PATTERN_PROPERTIES
+import io.mverse.jsonschema.keyword.Keywords.PROPERTIES
 import io.mverse.jsonschema.keyword.Keywords.PROPERTY_NAMES
 import io.mverse.jsonschema.keyword.Keywords.READ_ONLY
 import io.mverse.jsonschema.keyword.Keywords.REF
 import io.mverse.jsonschema.keyword.Keywords.REQUIRED
 import io.mverse.jsonschema.keyword.Keywords.SCHEMA
 import io.mverse.jsonschema.keyword.Keywords.THEN
+import io.mverse.jsonschema.keyword.Keywords.TITLE
 import io.mverse.jsonschema.keyword.Keywords.TYPE
 import io.mverse.jsonschema.keyword.Keywords.UNIQUE_ITEMS
 import io.mverse.jsonschema.keyword.Keywords.WRITE_ONLY
@@ -62,6 +70,7 @@ import io.mverse.jsonschema.keyword.SingleSchemaKeyword
 import io.mverse.jsonschema.keyword.StringKeyword
 import io.mverse.jsonschema.keyword.StringSetKeyword
 import io.mverse.jsonschema.keyword.TypeKeyword
+import io.mverse.jsonschema.keyword.URIKeyword
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
 import io.mverse.jsonschema.loading.SchemaLoadingException
@@ -85,11 +94,10 @@ class JsonSchemaBuilder(
     override var currentDocument: kotlinx.serialization.json.JsonObject? = null,
     override var schemaLoader: SchemaLoader? = null,
     override var loadingReport: LoadingReport = LoadingReport())
-  : SchemaBuilder
-    , MutableKeywordContainer(keywords = keywords) {
+  : SchemaBuilder, MutableKeywordContainer(keywords = keywords) {
 
   constructor(fromSchema: Schema, id: URI) : this(fromSchema, SchemaLocation.builderFromId(id).build()) {
-    this[DOLLAR_ID] = id
+    keywords[DOLLAR_ID] = IdKeyword(id)
   }
 
   constructor(fromSchema: Schema, location: SchemaLocation) : this(location = location,
@@ -103,33 +111,33 @@ class JsonSchemaBuilder(
   }
 
   constructor(id: URI) : this(location = SchemaPaths.fromIdNonAbsolute(id)) {
-    set(DOLLAR_ID, id)
+    keywords[DOLLAR_ID] = IdKeyword(id)
   }
 
   constructor(location: SchemaLocation, id: URI) : this(location = location) {
-    set(DOLLAR_ID, id)
+    keywords[DOLLAR_ID] = IdKeyword(id)
   }
 
   constructor(location: SchemaLocation) : this(keywords = mutableMapOf(), location = location)
 
-  operator fun <X, K:Keyword<X>> set(keyword: KeywordInfo<K>, value:X?, block: (X)->K) {
+  operator fun <X, K : Keyword<X>> set(keyword: KeywordInfo<K>, value: X?, block: (X) -> K) {
     when (value) {
-      null-> keywords.remove(keyword)
-      else->keywords[keyword] = block(value)
+      null -> keywords.remove(keyword)
+      else -> keywords[keyword] = block(value)
     }
   }
 
-  operator fun set(keyword: KeywordInfo<SingleSchemaKeyword>, value:SchemaBuilder?) {
+  operator fun set(keyword: KeywordInfo<SingleSchemaKeyword>, value: SchemaBuilder?) {
     when (value) {
-      null-> keywords.remove(keyword)
-      else-> keywords[keyword] = SingleSchemaKeyword(buildSubSchema(value, keyword))
+      null -> keywords.remove(keyword)
+      else -> keywords[keyword] = SingleSchemaKeyword(buildSubSchema(value, keyword))
     }
   }
 
-  operator fun set(keyword: KeywordInfo<SingleSchemaKeyword>, property:String, value:SchemaBuilder?) {
+  operator fun set(keyword: KeywordInfo<SingleSchemaKeyword>, property: String, value: SchemaBuilder?) {
     when (value) {
-      null-> keywords.remove(keyword)
-      else-> keywords[keyword] = SingleSchemaKeyword(buildSubSchema(value, keyword, property))
+      null -> keywords.remove(keyword)
+      else -> keywords[keyword] = SingleSchemaKeyword(buildSubSchema(value, keyword, property))
     }
   }
 
@@ -137,41 +145,57 @@ class JsonSchemaBuilder(
     keywords[keyword] = value
   }
 
-  operator fun <X, K:Keyword<X>> set(keyword: KeywordInfo<K>, value:X?) {
+  operator fun <X, K : Keyword<X>> set(keyword: KeywordInfo<K>, value: X?) {
     when (value) {
-      null-> keywords.remove(keyword)
-      else-> keywords[keyword] = when(value) {
-        is String->StringKeyword(value)
-        is Number->NumberKeyword(value)
-        is Boolean->BooleanKeyword(value)
-        is Schema->SingleSchemaKeyword(value)
-        is List<*>->SchemaListKeyword(value as List<Schema>)
-        is Map<*,*>->SchemaMapKeyword(value as Map<String, Schema>)
-        is Set<*>->StringSetKeyword(value as Set<String>)
-        else-> illegalState("Dont know how to handle this type of keyword")
+      null -> keywords.remove(keyword)
+      else -> keywords[keyword] = when (value) {
+        is String -> StringKeyword(value)
+        is Number -> NumberKeyword(value)
+        is Boolean -> BooleanKeyword(value)
+        is JsonArray -> JsonArrayKeyword(value)
+        is JsonElement -> JsonValueKeyword(value)
+        is Schema -> SingleSchemaKeyword(value)
+        is List<*> -> SchemaListKeyword(value as List<Schema>)
+        is Map<*, *> -> SchemaMapKeyword(value as Map<String, Schema>)
+        is Set<*> -> StringSetKeyword(value as Set<String>)
+        is URI -> URIKeyword(value)
+        else -> illegalState("Dont know how to handle keyword $keyword, value: $value")
       }
     }
   }
 
-  override fun invoke(block: SchemaBuilder.() -> Unit): SchemaBuilder {
-    return apply(block)
+  override fun invoke(block: SchemaBuilder.() -> Unit): Schema {
+    return apply(block).build()
   }
 
-
   // #######  KEYWORDS  ########  //
+
   override val id: URI? get() = values[Keywords.DOLLAR_ID]
   override var ref: Any?
     get() = values[REF]
-    set(ref) = set(REF, ref?.toString()?.let {URI(it)})
+    set(ref) {
+      val uri = when (ref) {
+        null -> null
+        else -> URI(ref.toString())
+      }
+      set(REF, uri)
+    }
 
   override var refURI: URI?
     get() = values[Keywords.REF]
     set(ref) = set(REF, ref)
 
-  override var title: String? by mutableKeyword(Keywords.TITLE)
-  override var defaultValue: JsonElement? by mutableKeyword(Keywords.DEFAULT)
+  override var title: String?
+    get() = values[TITLE]
+    set(value) = set(TITLE, value)
 
-  override var description: String? by mutableKeyword(DESCRIPTION)
+  override var defaultValue: JsonElement?
+    get() = values[DEFAULT]
+    set(value) = set(DEFAULT, value)
+
+  override var description: String?
+    get() = values[DESCRIPTION]
+    set(value) = set(DESCRIPTION, value)
 
   override var type: JsonSchemaType?
     get() = values[TYPE]?.firstOrNull()
@@ -191,14 +215,19 @@ class JsonSchemaBuilder(
   override var additionalProperties: Boolean
     get() = values[ADDITIONAL_PROPERTIES] != nullSchema
     set(value) {
-      when(value) {
-        true-> this-=ADDITIONAL_PROPERTIES
-        false-> this[ADDITIONAL_PROPERTIES] = nullSchemaBuilder()
+      when (value) {
+        true -> this -= ADDITIONAL_PROPERTIES
+        false -> this[ADDITIONAL_PROPERTIES] = nullSchemaBuilder()
       }
     }
 
-  override var format: String? by mutableKeyword(FORMAT)
-  override var pattern: String? by mutableKeyword(PATTERN)
+  override var format: String?
+    get() = values[FORMAT]
+    set(value) = set(FORMAT, value)
+
+  override var pattern: String?
+    get() = values[PATTERN]
+    set(value) = set(PATTERN, value)
 
   override var types: Set<JsonSchemaType>
     get() = keyword(TYPE)?.types ?: emptySet()
@@ -217,7 +246,7 @@ class JsonSchemaBuilder(
 
   override var minLength: Int?
     get() = values[MIN_LENGTH]?.toInt()
-    set(value) = set(MIN_LENGTH,value)
+    set(value) = set(MIN_LENGTH, value)
 
   override var maxLength: Int?
     get() = values[MAX_LENGTH]?.toInt()
@@ -251,8 +280,8 @@ class JsonSchemaBuilder(
     get() = keywords.containsKey(SCHEMA)
     set(value) {
       when (value) {
-        true->keywords[SCHEMA] = DollarSchemaKeyword()
-        false->keywords.remove(SCHEMA)
+        true -> keywords[SCHEMA] = DollarSchemaKeyword()
+        false -> keywords.remove(SCHEMA)
       }
     }
 
@@ -261,15 +290,19 @@ class JsonSchemaBuilder(
     set(value) = set(ADDITIONAL_PROPERTIES, value)
 
   override var schemaDependencies: Map<String, SchemaBuilder>
-    get() {
-      return this[DEPENDENCIES]
-          ?.dependencySchemas
-          ?.value
-          ?.mapValues { it.value.toBuilder() } ?: emptyMap()
-    }
+    get() = values[DEPENDENCIES].toBuilders()
     set(value) {
-      TODO("Not implemented")
+      val existing = this[DEPENDENCIES] ?: DependenciesKeyword()
+      this[DEPENDENCIES] = existing.copy(dependencySchemas = existing.dependencySchemas.copy(value.buildSchemaMap()))
     }
+
+  fun Map<String, SchemaBuilder>.buildSchemaMap(): Map<String, Schema> = this.mapValues { e ->
+    buildSubSchema(e.value, DEPENDENCIES, e.key)
+  }
+
+  fun Map<String, Schema>?.toBuilders(): Map<String, SchemaBuilder> = this?.mapValues { e ->
+    e.value.toBuilder()
+  } ?: emptyMap()
 
   override var propertyDependencies: SetMultimap<String, String>
     get() = this[DEPENDENCIES]
@@ -280,17 +313,12 @@ class JsonSchemaBuilder(
       keywords[DEPENDENCIES] = dependencies.copy(propertyDependencies = value)
     }
 
-  override var propertySchemas: Map<String, SchemaBuilder>
-    get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-    set(value) {}
+  override var properties: MutableSchemaMap = MutableSchemaMap(PROPERTIES, this)
+  override var patternProperties = MutableSchemaMap(PATTERN_PROPERTIES, this)
 
   override var propertyNameSchema: SchemaBuilder?
     get() = values[PROPERTY_NAMES]?.toBuilder()
     set(value) = set(PROPERTY_NAMES, value)
-
-  override var patternProperties: Map<String, SchemaBuilder>
-    get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-    set(value) {}
 
   override var minProperties: Int?
     get() = values[MIN_PROPERTIES]?.toInt()
@@ -304,7 +332,7 @@ class JsonSchemaBuilder(
     get() = values[MULTIPLE_OF]
     set(value) = set(MULTIPLE_OF, value)
 
-  operator fun minusAssign(keyword:KeywordInfo<*>) {
+  operator fun minusAssign(keyword: KeywordInfo<*>) {
     keywords.remove(keyword)
   }
 
@@ -312,8 +340,8 @@ class JsonSchemaBuilder(
     get() = this[MINIMUM]?.exclusiveLimit
     set(value) {
       when (value) {
-        null-> this -= MINIMUM
-        else-> {
+        null -> this -= MINIMUM
+        else -> {
           val limit: LimitKeyword = this[MINIMUM] ?: minimumKeyword()
           keywords[MINIMUM] = limit.copy(exclusiveLimit = value)
         }
@@ -324,8 +352,8 @@ class JsonSchemaBuilder(
     get() = this[MINIMUM]?.limit
     set(value) {
       when (value) {
-        null-> this -= MINIMUM
-        else-> {
+        null -> this -= MINIMUM
+        else -> {
           val limit: LimitKeyword = this[MINIMUM] ?: minimumKeyword()
           keywords[MINIMUM] = limit.copy(limit = value)
         }
@@ -336,8 +364,8 @@ class JsonSchemaBuilder(
     get() = this[MAXIMUM]?.exclusiveLimit
     set(value) {
       when (value) {
-        null-> this -= MAXIMUM
-        else-> {
+        null -> this -= MAXIMUM
+        else -> {
           val limit: LimitKeyword = this[MAXIMUM] ?: maximumKeyword()
           keywords[MAXIMUM] = limit.copy(exclusiveLimit = value)
         }
@@ -348,8 +376,8 @@ class JsonSchemaBuilder(
     get() = this[MAXIMUM]?.limit
     set(value) {
       when (value) {
-        null-> this -= MAXIMUM
-        else-> {
+        null -> this -= MAXIMUM
+        else -> {
           val limit: LimitKeyword = this[MAXIMUM] ?: maximumKeyword()
           keywords[MAXIMUM] = limit.copy(limit = value)
         }
@@ -370,14 +398,21 @@ class JsonSchemaBuilder(
 
   override var schemaOfAdditionalItems: SchemaBuilder?
     get() = this[ITEMS]?.additionalItemSchema?.toBuilder()
-    set(value) {}
+    set(value) {
+      val existing = this[ITEMS] ?: ItemsKeyword()
+      val additionalItemSchema = when (value) {
+        null -> null
+        else -> buildSubSchema(value, ITEMS)
+      }
+      this[ITEMS] = existing.copy(additionalItemSchema = additionalItemSchema)
+    }
 
   override var containsSchema: SchemaBuilder?
     get() = values[CONTAINS]?.toBuilder()
     set(value) = set(CONTAINS, value)
 
   override var itemSchemas: List<SchemaBuilder>
-    get() = values[ITEMS]?.map {it.toBuilder()} ?: emptyList()
+    get() = values[ITEMS]?.map { it.toBuilder() } ?: emptyList()
     set(value) {
       val items = this[ITEMS] ?: ItemsKeyword()
       keywords[ITEMS] = items.copy(indexedSchemas = buildSubSchemas(value, ITEMS))
@@ -388,8 +423,8 @@ class JsonSchemaBuilder(
     set(value) {
       val items = this[ITEMS] ?: ItemsKeyword()
       keywords[ITEMS] = when (value) {
-        null-> items.copy(allItemSchema = null)
-        else-> items.copy(allItemSchema = buildSubSchema(value, ITEMS))
+        null -> items.copy(allItemSchema = null)
+        else -> items.copy(allItemSchema = buildSubSchema(value, ITEMS))
       }
     }
 
@@ -488,18 +523,8 @@ class JsonSchemaBuilder(
     return toBuild.build(childLocation, loadingReport)
   }
 
-  private fun buildSubSchema(toBuild: SchemaBuilder, keyword: KeywordInfo<*>, path: String, vararg paths: String): Schema {
+  override fun buildSubSchema(toBuild: SchemaBuilder, keyword: KeywordInfo<*>, path: String, vararg paths: String): Schema {
     val childLocation = this.location.child(keyword).child(path).child(*paths)
-    return toBuild.build(childLocation, loadingReport)
-  }
-
-  private fun buildSubSchema(toBuild: SchemaBuilder, keyword: KeywordInfo<*>, idx: Int): Schema {
-    val childLocation = this.location.child(keyword).child(idx)
-    return toBuild.build(childLocation, loadingReport)
-  }
-
-  private fun buildSubSchema(toBuild: SchemaBuilder, keyword: KeywordInfo<*>, list: SchemaListKeyword): Schema {
-    val childLocation = this.location.child(keyword).child(list.subschemas.size)
     return toBuild.build(childLocation, loadingReport)
   }
 
@@ -523,5 +548,4 @@ class JsonSchemaBuilder(
   }
 
   override fun hashCode(): Int = hashKode(keywords)
-
 }

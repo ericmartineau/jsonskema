@@ -21,14 +21,13 @@ import io.mverse.jsonschema.assertj.asserts.isValid
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.validation.ValidationMocks.mockNullSchema
 import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.json
 import org.junit.Test
 
 class NullSchemaTest {
 
   @Test
   fun failure() {
-    ValidationTestSupport.failureOf(mockNullSchema())
+    ValidationTestSupport.failureOf(mockNullSchema)
         .expectedKeyword("type")
         .input("null")
         .expect()
@@ -37,13 +36,13 @@ class NullSchemaTest {
   @Test
   fun success() {
     val obj = JsonNull
-    mockNullSchema().build()
+    mockNullSchema.build()
         .validating(obj)
         .isValid()
   }
 
   @Test
   fun toStringTest() {
-    assert(mockNullSchema().build().toString()).isEqualTo("{\"type\":\"null\"}")
+    assert(mockNullSchema.build().toString()).isEqualTo("{\"type\":\"null\"}")
   }
 }

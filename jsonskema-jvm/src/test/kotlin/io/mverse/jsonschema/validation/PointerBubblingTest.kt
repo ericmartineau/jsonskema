@@ -19,14 +19,14 @@ import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.getValidator
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.schemaReader
+import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.validation.ValidationTestSupport.verifyFailure
 import org.junit.Assert
 import org.junit.Test
 
 class PointerBubblingTest {
   private val allSchemas = loader.readJsonObject("testschemas.json")
-  private val rectangleSchema = JsonSchema.schemaReader().readSchema(allSchemas.getObject("pointerResolution"))
+  private val rectangleSchema = JsonSchema.createSchemaReader().readSchema(allSchemas.getObject("pointerResolution"))
   private val testInputs = loader.readJsonObject("objecttestcases.json")
 
   @Test

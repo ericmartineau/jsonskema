@@ -6,7 +6,6 @@ import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.builder.JsonSchemaBuilder
 import io.mverse.jsonschema.enums.JsonSchemaVersion
-import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.REF
 import io.mverse.jsonschema.utils.JsonUtils
 import kotlinx.serialization.json.JsonObject
@@ -42,7 +41,7 @@ data class SubSchemaLoader(val extraKeywordLoaders: List<KeywordDigester<*>>,
    * @param loadingReport The report to write validation into
    * @return A builder loaded up with all the keywords.
    */
-  fun subSchemaBuilder(schemaJson: JsonValueWithPath, rootDocument: kotlinx.serialization.json.JsonObject, loadingReport: LoadingReport): SchemaBuilder {
+  fun subSchemaBuilder(schemaJson: JsonValueWithPath, rootDocument: JsonObject, loadingReport: LoadingReport): SchemaBuilder {
     // #############################################
     // #####  $ref: Overrides everything    ########
     // #############################################
@@ -74,11 +73,11 @@ data class SubSchemaLoader(val extraKeywordLoaders: List<KeywordDigester<*>>,
     return JsonSchemaBuilder(location).also { it.schemaLoader = this.schemaLoader }
   }
 
-  internal fun refSchemaBuilder(`$ref`: URI, currentDocument: kotlinx.serialization.json.JsonObject, location: SchemaLocation): SchemaBuilder {
+  internal fun refSchemaBuilder(ref: URI, currentDocument: JsonObject, location: SchemaLocation): SchemaBuilder {
     return JsonSchemaBuilder(location).also {
       it.currentDocument = currentDocument
       it.schemaLoader = this.schemaLoader
-      it.ref = `$ref`
+      it.ref = ref
     }
   }
 }

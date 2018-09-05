@@ -28,7 +28,7 @@ data class SchemaLoaderImpl(
   override val loader: SchemaLoader = this
   private val fragmentLoader: SubSchemaLoader = SubSchemaLoader(extraKeywordLoaders = additionalDigesters,
       defaultVersions = versions, strict = isStrict, schemaLoader = this)
-  private val refSchemaLoader: RefSchemaLoader = RefSchemaLoader(documentClient = this.documentClient, schemaLoader = this)
+  internal val refSchemaLoader: RefSchemaLoader = RefSchemaLoader(documentClient = this.documentClient, schemaLoader = this)
 
   // #############################################################
   // ########  LOADING SCHEMAS/SUBSCHEMAS FROM JSON    ###########

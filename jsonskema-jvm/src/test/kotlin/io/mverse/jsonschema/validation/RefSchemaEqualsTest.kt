@@ -23,7 +23,7 @@ import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.loading.parseJsonObject
 import io.mverse.jsonschema.resourceLoader
 import io.mverse.jsonschema.schemaBuilder
-import io.mverse.jsonschema.schemaReader
+import io.mverse.jsonschema.createSchemaReader
 import lang.URI
 import nl.jqno.equalsverifier.EqualsVerifier
 import nl.jqno.equalsverifier.Warning
@@ -35,7 +35,7 @@ class RefSchemaEqualsTest {
   @Test
   fun toStringTest() {
     val rawSchemaJson = JsonSchema.resourceLoader().readJsonObject("tostring/ref.json")
-    val schema = JsonSchema.schemaReader().readSchema(rawSchemaJson)
+    val schema = JsonSchema.createSchemaReader().readSchema(rawSchemaJson)
     val actual = schema.toString()
 
     assertThat(actual.parseJsonObject().getOrNull("properties")).isEqualTo(rawSchemaJson["properties"])
@@ -43,8 +43,8 @@ class RefSchemaEqualsTest {
 
   @Test
   fun toStringTest_Builder() {
-    val schema = JsonSchema.schemaBuilder().build {
-      propertySchema("foo") {
+    val schema = JsonSchema.schemaBuilder {
+      properties["foo"] = {
         ref = URI("#")
       }
     }

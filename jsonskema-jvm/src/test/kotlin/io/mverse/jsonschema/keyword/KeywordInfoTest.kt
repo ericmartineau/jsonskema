@@ -13,10 +13,11 @@ import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft5
 import kotlinx.serialization.json.ElementType
+import org.junit.Test
 
 class KeywordInfoTest {
 
-  @kotlin.test.Test
+  @Test
   fun testBuilder_WhenDeprecatedVersions_AllVersionsWorkProperly() {
     val keyword = KeywordInfo.builder<Keyword<*>>().key("enumeration")
         .expects(ElementType.STRING).since(JsonSchemaVersion.Draft6)

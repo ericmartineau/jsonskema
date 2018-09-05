@@ -13,7 +13,6 @@ data class DependenciesKeyword(val dependencySchemas: SchemaMapKeyword = SchemaM
   : SubschemaKeyword, Keyword<Map<String, Schema>> {
 
   override val value: Map<String, Schema> = dependencySchemas.value
-
   override val subschemas: List<Schema> get() = dependencySchemas.subschemas
 
   fun toBuilder(): DependenciesKeywordBuilder {

@@ -11,7 +11,7 @@ import io.mverse.jsonschema.assertj.asserts.isValid
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.schemaReader
+import io.mverse.jsonschema.createSchemaReader
 import kotlinx.serialization.json.json
 import org.junit.Test
 
@@ -20,7 +20,7 @@ class LogicValidatorTest {
   @Test
   fun testLogic_WhenStartsWithQ_ThenMaxLengthIs10() {
     val jsonObject = loader.readJsonObject("/draft7-keywords.json")
-    val schema = JsonSchema.schemaReader().readSchema(jsonObject).asDraft7()
+    val schema = JsonSchema.createSchemaReader().readSchema(jsonObject).asDraft7()
 
     assert(schema)
         .validating(json { "ifTest" to "quadrilateralus" })
@@ -32,7 +32,7 @@ class LogicValidatorTest {
   }
 
   fun kotlinx.serialization.json.JsonObject.toJsonSchema(): Draft7Schema =
-      JsonSchema.schemaReader().readSchema(this).asDraft7()
+      JsonSchema.createSchemaReader().readSchema(this).asDraft7()
 
   @Test
   fun testLogic_WhenStartsWithQ_ThenMaxLengthIs10_Success() {

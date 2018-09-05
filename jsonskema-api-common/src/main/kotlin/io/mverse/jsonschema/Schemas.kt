@@ -11,7 +11,7 @@ object Schemas {
   val emptySchema: Schema = JsonSchema.schema { }
 
   val falseSchema: Schema = JsonSchema.schema {
-    notSchema = JsonSchema.schemaBuilder{}
+    notSchema = JsonSchema.schemaBuilder
   }
 
   fun nullSchemaBuilder(): SchemaBuilder {

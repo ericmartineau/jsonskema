@@ -20,11 +20,11 @@ import io.mverse.jsonschema.assertj.asserts.isSchemaEqual
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
-import io.mverse.jsonschema.jsonschema
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.StringKeyword
 import io.mverse.jsonschema.loading.reference.DefaultJsonDocumentClient
 import io.mverse.jsonschema.resourceLoader
+import io.mverse.jsonschema.schema
 import io.mverse.jsonschema.schemaReader
 import kotlinx.serialization.json.json
 import lang.URI
@@ -99,7 +99,7 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   @Test(expected = SchemaException::class)
   fun invalidNumberSchema() {
     val input = getJsonObjectForKey("invalidNumberSchema")
-    JsonSchema.schemaReader().readSchema(input)
+    JsonSchema.createSchemaReader().readSchema(input)
   }
 
   @Test(expected = SchemaException::class)
@@ -235,7 +235,7 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   fun schemaPointerIsPopulated() {
     val rawSchema = JsonSchema.resourceLoader(this::class).readJsonObject("objecttestschemas.json")
         .getObject("objectWithSchemaDep")
-    val actual = JsonSchema.schemaReader().readSchema(rawSchema).asDraft6()
+    val actual = JsonSchema.createSchemaReader().readSchema(rawSchema).asDraft6()
 
     assertAll {
       assert(actual).isNotNull()
@@ -258,7 +258,7 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   @Test
   fun sniffByFormat() {
     val schemaJson = json { "format" to "hostname" }
-    val actual = JsonSchema.schemaReader().readSchema(schemaJson).asDraft6()
+    val actual = JsonSchema.createSchemaReader().readSchema(schemaJson).asDraft6()
     assert(actual.format).isEqualTo("hostname")
   }
 
@@ -325,10 +325,10 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
    */
   @Test
   fun testEqualsWithNumberPrecision() {
-    val schemaOne = jsonschema("https://storage.googleapis.com/mverse-test/mverse/petStore/0.0.1/schema/dog/jsonschema-draft6.json") {
-      withSchema()
-      propertySchema("maxNumber") {
-        minItems(32)
+    val schemaOne = JsonSchema.schema("https://storage.googleapis.com/mverse-test/mverse/petStore/0.0.1/schema/dog/jsonschema-draft6.json") {
+      isUseSchemaKeyword = true
+      properties["maxNumber"] = {
+        minItems = 32
       }
     }.asDraft7()
 

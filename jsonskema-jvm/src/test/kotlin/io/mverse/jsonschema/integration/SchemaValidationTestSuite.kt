@@ -18,9 +18,9 @@ package io.mverse.jsonschema.integration
 import com.google.common.base.Preconditions
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.SchemaException
-import io.mverse.jsonschema.ValidationMocks.createTestValidator
+import io.mverse.jsonschema.validation.ValidationMocks.createTestValidator
 import io.mverse.jsonschema.loading.parseJson
-import io.mverse.jsonschema.schemaReader
+import io.mverse.jsonschema.createSchemaReader
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.content
@@ -49,7 +49,7 @@ class SchemaValidationTestSuite(private val schemaDescription: String, private v
   @Test
   fun test() {
     try {
-      val schema = JsonSchema.schemaReader().readSchema(schemaJson)
+      val schema = JsonSchema.createSchemaReader().readSchema(schemaJson)
       val validator = createTestValidator(schema)
       val validationErrors = validator.validate(input)
       val failed = validationErrors != null

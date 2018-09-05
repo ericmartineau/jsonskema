@@ -8,6 +8,7 @@ import io.mverse.jsonschema.impl.RefSchemaImpl
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.loading.SchemaLoaderImpl
 import lang.URI
+import lang.json.toJsonLiteral
 import kotlin.test.Test
 
 class RefSchemaTest {
@@ -15,8 +16,8 @@ class RefSchemaTest {
   fun testRefSchemaToVersion() {
     val withRef = RefSchemaImpl(location = SchemaLocation.documentRoot("https://nonexistant.com/#/foo"),
         refURI = URI("https://nonexistant.com"),
-        refSchema = jsonschema {
-          constValueDouble(42.0)
+        refSchema = JsonSchema.schema {
+          constValue = 42.0.toJsonLiteral()
         })
 
     withRef.asDraft4()

@@ -31,7 +31,7 @@ class BooleanSchemaTest {
 
   @Test
   fun whenStringFalse_SchemaFailsValidation() {
-    mockBooleanSchema().build()
+    mockBooleanSchema.build()
         .validating("false".toJsonLiteral())
         .isNotValid()
         .hasKeyword(Keywords.TYPE)
@@ -39,11 +39,11 @@ class BooleanSchemaTest {
 
   @Test
   fun success() {
-    expectSuccess(mockBooleanSchema().build(), true)
+    expectSuccess(mockBooleanSchema.build(), true)
   }
 
   @Test
   fun toStringTest() {
-    Assert.assertEquals("{\"type\":\"boolean\"}", mockBooleanSchema().build().toString())
+    Assert.assertEquals("{\"type\":\"boolean\"}", mockBooleanSchema.build().toString())
   }
 }

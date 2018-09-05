@@ -18,7 +18,7 @@ package io.mverse.jsonschema.loading
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.integration.ServletSupport
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.schemaReader
+import io.mverse.jsonschema.createSchemaReader
 import org.junit.After
 import org.junit.Test
 import java.net.URISyntaxException
@@ -41,7 +41,7 @@ class RelativeURITest {
   }
 
   private fun runTests() {
-    val schemaLoader = JsonSchema.schemaReader()
+    val schemaLoader = JsonSchema.createSchemaReader()
     val jsonObject = JsonSchema.resourceLoader(this::class).readJsonObject("relative-uri/schema/main.json")
     schemaLoader.readSchema(jsonObject)
   }

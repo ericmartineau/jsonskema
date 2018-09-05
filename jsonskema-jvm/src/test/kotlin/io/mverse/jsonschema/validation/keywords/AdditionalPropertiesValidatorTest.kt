@@ -1,5 +1,6 @@
 package io.mverse.jsonschema.validation.keywords
 
+import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.assertj.asserts.assertValidation
 import io.mverse.jsonschema.assertj.asserts.hasErrorArguments
 import io.mverse.jsonschema.assertj.asserts.hasErrorCode
@@ -9,17 +10,17 @@ import io.mverse.jsonschema.assertj.asserts.isNotValid
 import io.mverse.jsonschema.assertj.asserts.isValid
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.enums.JsonSchemaType
-import io.mverse.jsonschema.jsonschema
 import io.mverse.jsonschema.keyword.Keywords.ADDITIONAL_PROPERTIES
+import io.mverse.jsonschema.schema
 import kotlinx.serialization.json.json
 import kotlin.test.Test
 
 class AdditionalPropertiesValidatorTest {
   @Test
   fun testValidationFailureMessage() {
-    val nameOnly = jsonschema {
+    val nameOnly = JsonSchema.schema {
       type = JsonSchemaType.OBJECT
-      propertySchema("name") {
+      properties["name"] = {
         type = JsonSchemaType.STRING
       }
       additionalProperties = false

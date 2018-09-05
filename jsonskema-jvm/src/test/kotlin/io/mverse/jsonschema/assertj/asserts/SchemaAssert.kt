@@ -9,7 +9,7 @@ import com.google.common.collect.Maps
 import io.mverse.jsonschema.Draft7Schema
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.Schema
-import io.mverse.jsonschema.ValidationMocks
+import io.mverse.jsonschema.validation.ValidationMocks
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
 import io.mverse.jsonschema.keyword.Keyword

@@ -21,7 +21,7 @@
 //import io.mverse.jsonschema.Schema
 //import io.mverse.jsonschema.SchemaException
 //import io.mverse.jsonschema.resourceLoader
-//import io.mverse.jsonschema.schemaReader
+//import io.mverse.jsonschema.createSchemaReader
 //import kotlinx.serialization.json.JsonElement
 //import kotlinx.serialization.json.JsonObject
 //import java.util.Optional
@@ -42,7 +42,7 @@
 //
 //  fun <S : Schema, E : Exception> expectFailure(failure: Failure<S, E>): E? {
 //    try {
-//      val schemaFactory = failure.schemaFactory() ?: (JsonSchema.schemaReader())
+//      val schemaFactory = failure.schemaFactory() ?: (JsonSchema.createSchemaReader())
 //      schemaFactory.readSchema(failure.input()!!)
 //    } catch (e: Throwable) {
 //      failure.expectedException()
