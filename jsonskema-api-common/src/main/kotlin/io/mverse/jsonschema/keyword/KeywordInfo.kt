@@ -210,6 +210,9 @@ data class KeywordInfo<K : Keyword<*>>(
     internal val forSchemas: MutableSet<JsonSchemaType> = mutableSetOf()
 
     fun build(): KeywordInfo<K> {
+      if(forSchemas.isEmpty()) {
+        forSchemas.addAll(JsonSchemaType.values())
+      }
       return KeywordInfo(key!!, forSchemas, expects!!, since, until)
     }
 

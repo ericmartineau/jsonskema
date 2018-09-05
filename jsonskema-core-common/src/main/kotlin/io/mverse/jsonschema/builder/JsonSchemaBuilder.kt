@@ -19,6 +19,7 @@ import io.mverse.jsonschema.keyword.JsonValueKeyword
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
+import io.mverse.jsonschema.keyword.Keywords.ADDITIONAL_ITEMS
 import io.mverse.jsonschema.keyword.Keywords.ADDITIONAL_PROPERTIES
 import io.mverse.jsonschema.keyword.Keywords.ALL_OF
 import io.mverse.jsonschema.keyword.Keywords.ANY_OF
@@ -402,7 +403,7 @@ class JsonSchemaBuilder(
       val existing = this[ITEMS] ?: ItemsKeyword()
       val additionalItemSchema = when (value) {
         null -> null
-        else -> buildSubSchema(value, ITEMS)
+        else -> buildSubSchema(value, ADDITIONAL_ITEMS)
       }
       this[ITEMS] = existing.copy(additionalItemSchema = additionalItemSchema)
     }
