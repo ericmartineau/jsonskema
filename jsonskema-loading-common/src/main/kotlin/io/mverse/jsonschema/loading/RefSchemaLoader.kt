@@ -61,7 +61,7 @@ data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoa
         }()
   }
 
-  internal fun findRefInRemoteDocument(referenceURI: URI, report: LoadingReport): SchemaBuilder<*> {
+  internal fun findRefInRemoteDocument(referenceURI: URI, report: LoadingReport): SchemaBuilder {
     val remoteDocumentURI = referenceURI.resolveUri("#")
     val remoteDocument = loadDocument(remoteDocumentURI)
     return findRefInDocument(remoteDocumentURI, referenceURI, remoteDocument, report)
@@ -69,7 +69,7 @@ data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoa
   }
 
   internal fun findRefInDocument(documentURI: URI, referenceURI: URI, parentDocument: kotlinx.serialization.json.JsonObject?,
-                                 report: LoadingReport): SchemaBuilder<*>? {
+                                 report: LoadingReport): SchemaBuilder? {
     var documentURIVar = documentURI
     var parentDocumentVar = parentDocument
     if (parentDocumentVar == null) {

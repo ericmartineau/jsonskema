@@ -1,6 +1,9 @@
 package io.mverse.jsonschema.loading
 
+import lang.Name
+
 data class LoadingReport(
+    @Name("issues")
     val issues: MutableList<LoadingIssue> = mutableListOf(),
     private var hasError: Boolean = false) {
 

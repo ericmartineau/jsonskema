@@ -5,8 +5,6 @@ import assertk.assert
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.key
-import assertk.assertions.support.fail
-import assertk.fail
 import com.google.common.collect.Maps
 import io.mverse.jsonschema.Draft7Schema
 import io.mverse.jsonschema.JsonSchema
@@ -14,7 +12,7 @@ import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.ValidationMocks
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
-import io.mverse.jsonschema.keyword.JsonSchemaKeyword
+import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.resourceLoader
@@ -61,7 +59,7 @@ fun SchemaAssert.isSchemaEqual(other:Schema) {
   }
 }
 
-inline fun <reified K : JsonSchemaKeyword<*>, reified I : KeywordInfo<K>> SchemaAssert.hasKeyword(keyword: I): Assert<K> {
+inline fun <reified K : Keyword<*>, reified I : KeywordInfo<K>> SchemaAssert.hasKeyword(keyword: I): Assert<K> {
   assert(actual.keywords, "schema.keywords")
       .key(keyword) { k ->
         k.isNotNull()

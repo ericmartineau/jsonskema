@@ -2,7 +2,7 @@ package io.mverse.jsonschema.validation
 
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.FormatType
-import io.mverse.jsonschema.keyword.JsonSchemaKeyword
+import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.utils.Schemas.falseSchema
@@ -174,7 +174,7 @@ class SchemaValidatorFactoryBuilder {
    * todo: Find a better way to do this in kotlin.  The main reason for the generics is enforcing that
    * the validator being created works for the keyword it thinks its for
    */
-  inline fun <reified K : JsonSchemaKeyword<*>, reified V : KeywordValidator<K>> addValidator(keyword: KeywordInfo<K>, noinline creator:(K, Schema, SchemaValidatorFactory) -> V?): SchemaValidatorFactoryBuilder {
+  inline fun <reified K : Keyword<*>, reified V : KeywordValidator<K>> addValidator(keyword: KeywordInfo<K>, noinline creator:(K, Schema, SchemaValidatorFactory) -> V?): SchemaValidatorFactoryBuilder {
     factories.add(keyword, KeywordValidatorCreator(creator))
     return this
   }

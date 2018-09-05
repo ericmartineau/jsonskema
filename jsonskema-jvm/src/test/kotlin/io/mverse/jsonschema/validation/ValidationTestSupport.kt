@@ -41,7 +41,7 @@ typealias ValidationErrorPredicater= (ValidationError)->Boolean
 
 object ValidationTestSupport {
 
-  fun buildWithLocation(builder: SchemaBuilder<*>): Schema {
+  fun buildWithLocation(builder: SchemaBuilder): Schema {
     return builder.build()
   }
 
@@ -133,7 +133,7 @@ object ValidationTestSupport {
     return Failure().schema(schema)
   }
 
-  fun failureOf(subjectBuilder: SchemaBuilder<*>): Failure {
+  fun failureOf(subjectBuilder: SchemaBuilder): Failure {
     return failureOf(buildWithLocation(subjectBuilder))
   }
 

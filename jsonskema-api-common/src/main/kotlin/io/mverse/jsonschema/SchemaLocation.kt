@@ -3,10 +3,7 @@ package io.mverse.jsonschema
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.utils.isGeneratedURI
 import io.mverse.jsonschema.utils.isJsonPointer
-import kotlinx.serialization.KInput
-import kotlinx.serialization.KOutput
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
 import lang.URI
 import lang.hashKode
 import lang.isAbsolute
@@ -147,14 +144,6 @@ class SchemaLocation(
                               private var resolutionScope: URI? = null,
                               private var id: URI? = null,
                               private var jsonPath: JsonPath? = null) {
-    private constructor(id: URI) :
-        this(documentURI=null, resolutionScope=null, id = id, jsonPath = null)
-
-    private constructor(documentURI: URI, resolutionScope: URI, jsonPath: JsonPath) :
-        this(documentURI = documentURI,
-            resolutionScope = resolutionScope,
-            id = null,
-            jsonPath = jsonPath)
 
     fun build(): SchemaLocation {
       // Initialize everything from the id

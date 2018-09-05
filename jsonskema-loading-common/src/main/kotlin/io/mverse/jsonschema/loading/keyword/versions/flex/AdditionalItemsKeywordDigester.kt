@@ -15,12 +15,12 @@ data class AdditionalItemsKeywordDigester(
     override val includedKeywords: List<KeywordInfo<ItemsKeyword>> = Keywords.ADDITIONAL_ITEMS.getTypeVariants(ElementType.OBJECT))
   : KeywordDigester<ItemsKeyword> {
 
-  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder<*>,
+  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder,
                               schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<ItemsKeyword>? {
 
     val additionalItems = jsonObject.path(Keywords.ADDITIONAL_ITEMS)
     val addtlItemsBuilder = schemaLoader.subSchemaBuilder(additionalItems, additionalItems.rootObject, report)
-    builder.schemaOfAdditionalItems(addtlItemsBuilder)
+    builder.schemaOfAdditionalItems = addtlItemsBuilder
 
     // empty because we added the vlaue to the builder manually
     return null

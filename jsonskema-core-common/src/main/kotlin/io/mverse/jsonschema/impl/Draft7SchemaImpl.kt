@@ -6,17 +6,18 @@ import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
 import io.mverse.jsonschema.keyword.IdKeyword
-import io.mverse.jsonschema.keyword.JsonSchemaKeyword
+import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.COMMENT
+import io.mverse.jsonschema.keyword.Keywords.CONTENT_ENCODING
+import io.mverse.jsonschema.keyword.Keywords.CONTENT_MEDIA_TYPE
 import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
 import io.mverse.jsonschema.keyword.Keywords.ELSE
 import io.mverse.jsonschema.keyword.Keywords.IF
 import io.mverse.jsonschema.keyword.Keywords.READ_ONLY
 import io.mverse.jsonschema.keyword.Keywords.THEN
 import io.mverse.jsonschema.keyword.Keywords.WRITE_ONLY
-import io.mverse.jsonschema.keyword.URIKeyword
 import kotlinx.serialization.json.JsonElement
 import lang.URI
 import lang.freezeMap
@@ -35,6 +36,8 @@ class Draft7SchemaImpl : JsonSchemaImpl<Draft7Schema>, Draft7Schema {
 
   override val isReadOnly: Boolean by keywords(READ_ONLY, false)
   override val isWriteOnly: Boolean by keywords(WRITE_ONLY, false)
+  override val contentEncoding: String? by keywords(CONTENT_ENCODING)
+  override val contentMediaType: String? by keywords(CONTENT_MEDIA_TYPE)
 
   // #####################################################
   // #####  KEYWORDS for Draft6    #######################
@@ -65,7 +68,7 @@ class Draft7SchemaImpl : JsonSchemaImpl<Draft7Schema>, Draft7Schema {
   constructor(from: Schema) : super(from, Draft7) {}
 
   constructor(location: SchemaLocation,
-              keywords: Map<KeywordInfo<*>, JsonSchemaKeyword<*>>,
+              keywords: Map<KeywordInfo<*>, Keyword<*>>,
               extraProperties: Map<String, JsonElement>) : super(location, keywords.freezeMap(), extraProperties.freezeMap(), Draft7)
 
   override val version: JsonSchemaVersion = Draft7

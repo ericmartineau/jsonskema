@@ -1,8 +1,9 @@
 package io.mverse.jsonschema.enums
 
+import lang.Field
 import lang.URI
 
-enum class JsonSchemaVersion private constructor(uri: String?) {
+enum class JsonSchemaVersion constructor(uri: String?) {
   Draft3("http://json-schema.org/draft-03/schema#"),
   Draft4("http://json-schema.org/draft-04/schema#"),
   Draft5("http://json-schema.org/draft-05/schema#"),
@@ -24,15 +25,11 @@ enum class JsonSchemaVersion private constructor(uri: String?) {
   }
 
   companion object {
-    private val PUBLIC_VERSIONS = JsonSchemaVersion.values()
+    @Field
+    val publicVersions = JsonSchemaVersion.values()
         .filter{ v -> v.metaschemaURI != null }
 
-    fun latest(): JsonSchemaVersion {
-      return Draft7
-    }
-
-    fun publicVersions(): List<JsonSchemaVersion> {
-      return PUBLIC_VERSIONS
-    }
+    @Field
+    val latest: JsonSchemaVersion = Draft7
   }
 }

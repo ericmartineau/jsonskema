@@ -9,8 +9,7 @@ import lang.URI
 /**
  * If you're trying to load a schema from an input source, you want [SchemaReader].
  *
- *
- * This interface is used within the different processing elements.  Instead of working on raw [JsonObject]
+ * This interface is used within the internals of the library.  Instead of working on raw [JsonObject]
  * instances, it works on [JsonValueWithPath] which means that the source document or fragment is already
  * being traversed.
  */
@@ -23,7 +22,7 @@ interface SchemaLoader {
    * @param loadingReport A place to log loading validation
    * @return A schema builder instance.
    */
-  fun schemaBuilder(forSchema: JsonValueWithPath, loadingReport: LoadingReport): SchemaBuilder<*> {
+  fun schemaBuilder(forSchema: JsonValueWithPath, loadingReport: LoadingReport): SchemaBuilder {
     return subSchemaBuilder(forSchema, forSchema.jsonObject, loadingReport)
   }
 
@@ -53,7 +52,7 @@ interface SchemaLoader {
    * @param loadingReport A place to log loading validation
    * @return A schema builder instance.
    */
-  fun subSchemaBuilder(schemaJson: JsonValueWithPath, inDocument: kotlinx.serialization.json.JsonObject, loadingReport: LoadingReport): SchemaBuilder<*>
+  fun subSchemaBuilder(schemaJson: JsonValueWithPath, inDocument: kotlinx.serialization.json.JsonObject, loadingReport: LoadingReport): SchemaBuilder
 
   /**
    * Looks for a schema that's already been loaded by this loader.
@@ -72,10 +71,10 @@ interface SchemaLoader {
 
   /**
    * Returns a new immutable builder with the provided document client.
-   * @param documentClient The new [JsonDocumentClient] to use for loading schemas
+   * @param client The new [JsonDocumentClient] to use for loading schemas
    * @return A new copy of this loader.
    */
-  fun withDocumentClient(documentClient: JsonDocumentClient): SchemaLoader
+  fun withDocumentClient(client: JsonDocumentClient): SchemaLoader
 
-  operator fun plusAssign(preloadedSchema: kotlinx.serialization.json.JsonObject)
+  operator fun plusAssign(preloadedSchema: JsonObject)
 }

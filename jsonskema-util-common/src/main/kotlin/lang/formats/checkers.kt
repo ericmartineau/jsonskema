@@ -11,7 +11,6 @@ val TIME_FORMATS_ACCEPTED = listOf("HH:mm:ssZ", "HH:mm:ss.[0-9]{1,9}Z")
 val PARTIAL_TIME_PATTERN = "HH:mm:ss"
 
 expect object FormatChecks {
-
   fun isValidIsoDateTime(str: String): Boolean
   fun isValidIsoDate(str: String): Boolean
   fun isValidIsoTime(str: String): Boolean

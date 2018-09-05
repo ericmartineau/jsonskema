@@ -10,7 +10,7 @@ import lang.URI
 
 object ValidationMocks {
 
-  fun ValidationMocks.createTestValidator(schema :SchemaBuilder<*>): SchemaValidator {
+  fun ValidationMocks.createTestValidator(schema :SchemaBuilder): SchemaValidator {
     return ValidationMocks.createTestValidator(schema.build())
   }
 
@@ -18,51 +18,51 @@ object ValidationMocks {
     return SchemaValidatorFactoryImpl.builder().build().createValidator(schema)
   }
 
-  fun mockArraySchema() :SchemaBuilder<*> {
+  fun mockArraySchema() :SchemaBuilder {
      return JsonSchema.schemaBuilder().type(JsonSchemaType.ARRAY)
   }
 
-  fun mockBooleanSchema() :SchemaBuilder<*> {
+  fun mockBooleanSchema() :SchemaBuilder {
      return JsonSchema.schemaBuilder().type(JsonSchemaType.BOOLEAN)
   }
 
-  fun mockBooleanSchema(id: URI) :SchemaBuilder<*> {
+  fun mockBooleanSchema(id: URI) :SchemaBuilder {
      return JsonSchema.schemaBuilder(id).type(JsonSchemaType.BOOLEAN)
   }
 
-  fun mockBooleanSchema(id: String) :SchemaBuilder<*> {
+  fun mockBooleanSchema(id: String) :SchemaBuilder {
      return JsonSchema.schemaBuilder(id).type(JsonSchemaType.BOOLEAN)
   }
 
-  fun mockIntegerSchema() :SchemaBuilder<*> {
+  fun mockIntegerSchema() :SchemaBuilder {
      return JsonSchema.schemaBuilder().type(JsonSchemaType.INTEGER)
   }
 
-  fun mockNullSchema() :SchemaBuilder<*> {
+  fun mockNullSchema() :SchemaBuilder {
      return JsonSchema.schemaBuilder().type(JsonSchemaType.NULL)
   }
 
-  fun mockNumberSchema() :SchemaBuilder<*> {
+  fun mockNumberSchema() :SchemaBuilder {
      return JsonSchema.schemaBuilder().type(JsonSchemaType.NUMBER)
   }
 
-  fun mockObjectSchema() :SchemaBuilder<*> {
+  fun mockObjectSchema() :SchemaBuilder {
      return JsonSchema.schemaBuilder().type(JsonSchemaType.OBJECT)
   }
 
-  fun mockObjectSchema(id: String) :SchemaBuilder<*> {
+  fun mockObjectSchema(id: String) :SchemaBuilder {
      return JsonSchema.schemaBuilder(id).type(JsonSchemaType.OBJECT)
   }
 
-  fun mockObjectSchema(id: URI) :SchemaBuilder<*> {
+  fun mockObjectSchema(id: URI) :SchemaBuilder {
      return JsonSchema.schemaBuilder(id).type(JsonSchemaType.OBJECT)
   }
 
-  fun mockSchema() :SchemaBuilder<*> {
+  fun mockSchema() :SchemaBuilder {
      return JsonSchema.schemaBuilder()
   }
 
-  fun mockStringSchema() :SchemaBuilder<*> {
+  fun mockStringSchema() :SchemaBuilder {
      return JsonSchema.schemaBuilder().type(JsonSchemaType.STRING)
   }
 }

@@ -1,17 +1,17 @@
 package io.mverse.jsonschema.loading
 
-import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.JsonValueWithPath.Companion.fromJsonValue
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
-import io.mverse.jsonschema.keyword.CustomKeywordLoader
-import io.mverse.jsonschema.keyword.JsonSchemaKeyword
+import io.mverse.jsonschema.keyword.KeywordLoader
+import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import kotlinx.io.InputStream
 import kotlinx.serialization.internal.readToByteBuffer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonTreeParser
+import lang.Name
 import lang.URI
 import lang.toString
 
@@ -30,11 +30,12 @@ interface SchemaReader {
   fun withPreloadedDocument(schemaObject: kotlinx.serialization.json.JsonObject): SchemaReader = this + schemaObject
   fun withStrictValidation(vararg versions: JsonSchemaVersion): SchemaReader
 
-  fun <K : JsonSchemaKeyword<*>> withCustomKeywordLoader(keyword: KeywordInfo<K>,
-                                                         keywordExtractor: CustomKeywordLoader<K>): SchemaReader
+  fun <K : Keyword<*>> withCustomKeywordLoader(keyword: KeywordInfo<K>,
+                                               keywordExtractor: KeywordLoader<K>): SchemaReader
 
-  operator fun <K : JsonSchemaKeyword<*>> plus(pair: Pair<KeywordInfo<K>, CustomKeywordLoader<K>>): SchemaReader
+  operator fun <K : Keyword<*>> plus(pair: Pair<KeywordInfo<K>, KeywordLoader<K>>): SchemaReader
 
+  @Name("readSchemaFromStream")
   fun readSchema(inputStream: InputStream): Schema {
     try {
       return readSchema(inputStream.parseJsonObject())
@@ -43,6 +44,7 @@ interface SchemaReader {
     }
   }
 
+  @Name("readSchemaFromURI")
   fun readSchema(schemaURI: URI): Schema {
     val existing = loader.findLoadedSchema(schemaURI)
     return when (existing) {
@@ -55,15 +57,13 @@ interface SchemaReader {
     }
   }
 
-  fun readSchema(jsonObject: kotlinx.serialization.json.JsonObject): Schema {
-    return readSchema(jsonObject, LoadingReport())
-  }
-
-  fun readSchema(jsonObject: kotlinx.serialization.json.JsonObject, loadingReport: LoadingReport): Schema {
+  @Name("readSchemaFromJsonObject")
+  fun readSchema(jsonObject: JsonObject, loadingReport: LoadingReport = LoadingReport()): Schema {
     val jsonDocument = fromJsonValue(jsonObject)
     return loader.schemaBuilder(jsonDocument, loadingReport).build()
   }
 
+  @Name("readSchemaFromString")
   fun readSchema(inputJson: String): Schema {
     return readSchema(inputJson.parseJsonObject())
   }
@@ -73,8 +73,7 @@ interface SchemaReader {
   operator fun plus(document:String):SchemaReader = this + document.parseJsonObject()
 }
 
-
-fun String.parseJsonObject(): kotlinx.serialization.json.JsonObject = JsonTreeParser(this).readFully().jsonObject
+fun String.parseJsonObject(): JsonObject = JsonTreeParser(this).readFully().jsonObject
 fun String.parseJson():JsonElement = JsonTreeParser(this).readFully()
 
 fun InputStream.parseJsonObject(): JsonObject = readFully().parseJsonObject()
@@ -83,7 +82,6 @@ fun InputStream.parseJson():JsonElement = readFully().parseJson()
 fun InputStream.readFully():String {
   try {
     return readToByteBuffer(this.available()).array().toString("UTF-8")
-    //
   } finally {
     close()
   }

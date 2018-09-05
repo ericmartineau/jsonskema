@@ -10,13 +10,14 @@ import io.mverse.jsonschema.loading.KeywordDigester
 import io.mverse.jsonschema.loading.LoadingIssues.typeMismatch
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
+import io.mverse.jsonschema.loading.digest
 import kotlinx.serialization.json.ElementType
 
 data class ListKeywordDigester(val keyword: KeywordInfo<SchemaListKeyword>) : KeywordDigester<SchemaListKeyword> {
 
   override val includedKeywords = listOf(keyword)
 
-  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder<*>,
+  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder,
                               schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<SchemaListKeyword>? {
     val schemas = mutableListOf<Schema>()
     val jsonArray = jsonObject.path(keyword)
@@ -28,6 +29,6 @@ data class ListKeywordDigester(val keyword: KeywordInfo<SchemaListKeyword>) : Ke
       }
     }
 
-    return KeywordDigest.ofNullable(keyword, SchemaListKeyword(schemas))
+    return keyword.digest(SchemaListKeyword(schemas))
   }
 }

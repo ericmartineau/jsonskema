@@ -49,12 +49,4 @@ interface FormatValidator {
    * [an empty optional][Optional.empty].
    */
   fun validate(subject: String): String?
-
-  /**
-   * No-operation implementation (never throws {always returns [Optional.empty]).
-   */
-  object NONE:FormatValidator {
-    override fun validate(subject: String): String? = null
-  }
-
 }

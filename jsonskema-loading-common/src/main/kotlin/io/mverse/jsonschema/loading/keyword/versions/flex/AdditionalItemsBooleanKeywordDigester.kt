@@ -16,10 +16,10 @@ class AdditionalItemsBooleanKeywordDigester(
     override val includedKeywords: List<KeywordInfo<ItemsKeyword>> = Keywords.ADDITIONAL_ITEMS.getTypeVariants(BOOLEAN)
 ) : KeywordDigester<ItemsKeyword> {
 
-  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder<*>, schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<ItemsKeyword>? {
+  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder, schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<ItemsKeyword>? {
     val additionalItems = jsonObject.path(Keywords.ADDITIONAL_ITEMS)
     if (additionalItems.isBoolean && additionalItems.boolean == false) {
-      builder.schemaOfAdditionalItems(Schemas.nullSchemaBuilder())
+      builder.schemaOfAdditionalItems = Schemas.nullSchemaBuilder()
     }
     return null
   }

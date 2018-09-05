@@ -6,10 +6,6 @@ import kotlinx.serialization.json.ElementType
 import lang.convert
 import lang.runLengths
 
-object JsonSchemaInspections {
-
-}
-
 fun Schema.calculateType(): JsonSchemaType? {
   val schema = this.asDraft6()
   if (schema.types.isNotEmpty()) {

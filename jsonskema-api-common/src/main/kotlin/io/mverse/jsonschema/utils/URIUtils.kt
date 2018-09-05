@@ -7,6 +7,8 @@ import lang.scheme
 import lang.schemeSpecificPart
 import lang.toHex
 
+const val SCHEME_AUTOASSIGN = "mverse"
+
 fun URI.trimEmptyFragment(): URI {
   return if (this.fragment.isNullOrEmpty())
     this.withoutFragment()
@@ -36,19 +38,18 @@ fun URI.withoutFragment(): URI {
   return withFragment(null)
 }
 
-
 fun generateUniqueURI(forInstance: Any): URI {
   val hashed = StringBuilder()
   hashed.append(forInstance.hashCode().toHex())
   hashed.append("-")
   hashed.append(forInstance.toString().length)
 
-  return URI(URIUtils.SCHEME_AUTOASSIGN, "//$hashed/schema", null)
+  return URI(SCHEME_AUTOASSIGN, "//$hashed/schema", null)
 }
 
 fun URI.isGeneratedURI(): Boolean {
   val uri = this
-  return URIUtils.SCHEME_AUTOASSIGN.equals(uri.scheme)
+  return SCHEME_AUTOASSIGN.equals(uri.scheme)
 }
 
 fun URI.withNewFragment(newFragment: URI): URI {
@@ -56,7 +57,3 @@ fun URI.withNewFragment(newFragment: URI): URI {
   return this.withFragment(newFragment.fragment)
 }
 
-object URIUtils {
-
-  val SCHEME_AUTOASSIGN = "mverse"
-}

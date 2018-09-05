@@ -23,7 +23,7 @@ data class SubSchemaLoader(val extraKeywordLoaders: List<KeywordDigester<*>>,
 
 
   val versions:Set<JsonSchemaVersion> = when {
-    defaultVersions == null || defaultVersions.isEmpty() -> JsonSchemaVersion.publicVersions().toSet()
+    defaultVersions == null || defaultVersions.isEmpty() -> JsonSchemaVersion.publicVersions.toSet()
     else -> defaultVersions
   }
 
@@ -42,7 +42,7 @@ data class SubSchemaLoader(val extraKeywordLoaders: List<KeywordDigester<*>>,
    * @param loadingReport The report to write validation into
    * @return A builder loaded up with all the keywords.
    */
-  fun subSchemaBuilder(schemaJson: JsonValueWithPath, rootDocument: kotlinx.serialization.json.JsonObject, loadingReport: LoadingReport): SchemaBuilder<*> {
+  fun subSchemaBuilder(schemaJson: JsonValueWithPath, rootDocument: kotlinx.serialization.json.JsonObject, loadingReport: LoadingReport): SchemaBuilder {
     // #############################################
     // #####  $ref: Overrides everything    ########
     // #############################################
@@ -56,26 +56,29 @@ data class SubSchemaLoader(val extraKeywordLoaders: List<KeywordDigester<*>>,
     val schemaBuilder = JsonUtils.extractIdFromObject(schemaJson.jsonObject)
         ?.let { schemaBuilder(schemaJson.location, it)}
         ?: schemaBuilder(schemaJson.location)
-    schemaBuilder
-        .withCurrentDocument(rootDocument)
-        .withLoadingReport(loadingReport)
+    schemaBuilder.also {
+      it.currentDocument =rootDocument
+      it.loadingReport = loadingReport
+    }
 
     allKeywordLoader.loadKeywordsForSchema(schemaJson, schemaBuilder, loadingReport)
     return schemaBuilder
   }
 
-  internal fun schemaBuilder(location: SchemaLocation, `$id`: URI): SchemaBuilder<*> {
-    return JsonSchemaBuilder(location, `$id`).withSchemaLoader(schemaLoader)
+  internal fun schemaBuilder(location: SchemaLocation, `$id`: URI): SchemaBuilder {
+    val loader = this.schemaLoader
+    return JsonSchemaBuilder(location, `$id`).also { it.schemaLoader = loader }
   }
 
-  internal fun schemaBuilder(location: SchemaLocation): SchemaBuilder<*> {
-    return JsonSchemaBuilder(location).withSchemaLoader(schemaLoader)
+  internal fun schemaBuilder(location: SchemaLocation): SchemaBuilder {
+    return JsonSchemaBuilder(location).also { it.schemaLoader = this.schemaLoader }
   }
 
-  internal fun refSchemaBuilder(`$ref`: URI, currentDocument: kotlinx.serialization.json.JsonObject, location: SchemaLocation): SchemaBuilder<*> {
-    return JsonSchemaBuilder(location)
-        .withCurrentDocument(currentDocument)
-        .withSchemaLoader(schemaLoader)
-        .ref(`$ref`)
+  internal fun refSchemaBuilder(`$ref`: URI, currentDocument: kotlinx.serialization.json.JsonObject, location: SchemaLocation): SchemaBuilder {
+    return JsonSchemaBuilder(location).also {
+      it.currentDocument = currentDocument
+      it.schemaLoader = this.schemaLoader
+      it.ref = `$ref`
+    }
   }
 }

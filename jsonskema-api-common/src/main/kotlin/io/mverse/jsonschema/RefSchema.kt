@@ -86,7 +86,7 @@ abstract class RefSchema(
       this(location, refURI, {refSchema})
 
   override fun toString(): String {
-    return toJson(version ?: JsonSchemaVersion.latest()).toString()
+    return toJson(version ?: JsonSchemaVersion.latest).toString()
   }
 
   abstract override fun toJson(version: JsonSchemaVersion): kotlinx.serialization.json.JsonObject

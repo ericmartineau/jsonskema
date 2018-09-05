@@ -26,7 +26,7 @@ interface Draft7Schema : DraftSchema<Draft7Schema> {
 
   override val description: String?
 
-  val examples: kotlinx.serialization.json.JsonArray
+  val examples: JsonArray
 
   val definitions: Map<String, Schema>
 
@@ -45,6 +45,10 @@ interface Draft7Schema : DraftSchema<Draft7Schema> {
   val isReadOnly: Boolean
 
   val isWriteOnly: Boolean
+
+  val contentEncoding: String?
+
+  val contentMediaType: String?
 
   // ###################################
   // #### Shared KEYWORDS ##############
@@ -129,8 +133,6 @@ interface Draft7Schema : DraftSchema<Draft7Schema> {
   val minProperties: Int?
 
   val requiredProperties: Set<String>
-
-
 
   override fun asDraft7(): Draft7Schema {
     return this

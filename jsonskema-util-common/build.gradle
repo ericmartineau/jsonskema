@@ -1,4 +1,5 @@
 mverse  {
+  setDefaultDependencies(false)
   dependencies {
     compile(kotlinStdlib())
     compile("kotlin-reflect")

@@ -43,9 +43,9 @@ interface JsonDocumentClient {
    * @return the input stream of the response
    * @throws java.io.UncheckedIOException if an IO error occurs.
    */
-  fun fetchDocument(uri: URI): kotlinx.serialization.json.JsonObject
+  fun fetchDocument(uri: URI): JsonObject
 
-  fun fetchDocument(url: String): kotlinx.serialization.json.JsonObject {
+  fun fetchDocument(url: String): JsonObject {
     return fetchDocument(URI(url))
   }
 }

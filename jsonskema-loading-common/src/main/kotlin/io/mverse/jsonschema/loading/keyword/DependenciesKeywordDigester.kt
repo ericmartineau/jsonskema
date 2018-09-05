@@ -2,22 +2,22 @@ package io.mverse.jsonschema.loading.keyword
 
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.SchemaBuilder
-import io.mverse.jsonschema.builder.DependenciesKeywordBuilder
 import io.mverse.jsonschema.keyword.DependenciesKeyword
-import io.mverse.jsonschema.keyword.Keywords
+import io.mverse.jsonschema.keyword.DependenciesKeywordBuilder
 import io.mverse.jsonschema.keyword.Keywords.DEPENDENCIES
 import io.mverse.jsonschema.loading.KeywordDigest
 import io.mverse.jsonschema.loading.KeywordDigester
 import io.mverse.jsonschema.loading.LoadingIssues.typeMismatch
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
+import io.mverse.jsonschema.loading.digest
 import kotlinx.serialization.json.ElementType
 
 class DependenciesKeywordDigester : KeywordDigester<DependenciesKeyword> {
 
   override val includedKeywords = listOf(DEPENDENCIES)
 
-  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder<*>,
+  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder,
                               schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<DependenciesKeyword>? {
 
     val dependencies = jsonObject.path(DEPENDENCIES)
@@ -36,6 +36,6 @@ class DependenciesKeywordDigester : KeywordDigester<DependenciesKeyword> {
       }
     }
 
-    return KeywordDigest.ofNullable(Keywords.DEPENDENCIES, depsBuilder.build())
+    return DEPENDENCIES.digest(depsBuilder.build())
   }
 }

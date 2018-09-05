@@ -31,20 +31,6 @@ object CharUtils {
     }
   }
 
-  fun areNullOrBlank(vararg toCheck: String?): Boolean {
-    check(toCheck.isNotEmpty()) { "Must check at least one item"}
-    for (s in toCheck) {
-      if (s.isNullOrBlank()) {
-        return false
-      }
-    }
-    return true
-  }
-
-  fun spacer(): Joiner {
-    return SPACER
-  }
-
   fun escapeForJsonPointerSegment(string: String): String {
     return jsonPointerSegmentEscaper().escape(string)
   }

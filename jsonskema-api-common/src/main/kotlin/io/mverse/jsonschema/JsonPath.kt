@@ -8,11 +8,11 @@ import io.mverse.jsonschema.utils.CharUtils.jsonPointerSegmentUnescaper
 import io.mverse.jsonschema.utils.CharUtils.urlSegmentUnescaper
 import kotlinx.serialization.KInput
 import kotlinx.serialization.KOutput
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 import lang.Escapers.Companion.urlPathSegmentEscaper
-import lang.Joiner
 import lang.Global
+import lang.Joiner
+import lang.Serializable
 import lang.URI
 import lang.Unescaper
 import lang.hashKode
@@ -178,7 +178,6 @@ class JsonPath : Iterable<String> {
 
   @Serializer(forClass = JsonPath::class)
   companion object {
-
     override fun save(output: KOutput, obj: JsonPath) {
       output.writeStringValue(obj.toJsonPointer())
     }
@@ -198,7 +197,7 @@ class JsonPath : Iterable<String> {
       check("".equals(uriFragment) || "#".equals(uriFragment) || uriFragment.startsWith("#/")) {
         "URI Fragment invalid: $uriFragment"
       }
-      return if (uriFragment.isNullOrEmpty() || uriFragment == "#") JsonPath.rootPath()
+      return if (uriFragment.isEmpty() || uriFragment == "#") JsonPath.rootPath()
       else JsonPath(uriFragment.substring(1), urlSegmentUnescaper())
     }
 

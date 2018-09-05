@@ -132,7 +132,7 @@ class BaseSchemaValidatorEnumTest {
     }
   }
 
-  private fun subjectBuilder(): SchemaBuilder<*> {
+  private fun subjectBuilder(): SchemaBuilder {
     return JsonSchema.schemaBuilder().enumValues(possibleValues)
   }
 

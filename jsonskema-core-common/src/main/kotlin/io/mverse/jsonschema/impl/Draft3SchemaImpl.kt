@@ -10,12 +10,13 @@ import io.mverse.jsonschema.keyword.Draft3Keywords
 import io.mverse.jsonschema.keyword.Draft3Keywords.EXTENDS
 import io.mverse.jsonschema.keyword.Draft3Keywords.REQUIRED_DRAFT3
 import io.mverse.jsonschema.keyword.IdKeyword
-import io.mverse.jsonschema.keyword.JsonSchemaKeyword
+import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
 import io.mverse.jsonschema.keyword.Keywords.ID
-import io.mverse.jsonschema.keyword.URIKeyword
+import io.mverse.jsonschema.keyword.Keywords.MAXIMUM
+import io.mverse.jsonschema.keyword.Keywords.MINIMUM
 import io.mverse.jsonschema.utils.Schemas.nullSchema
 import kotlinx.serialization.json.JsonElement
 import lang.URI
@@ -34,8 +35,8 @@ class Draft3SchemaImpl : JsonSchemaImpl<Draft3Schema>, Draft3Schema {
   override val disallow: Set<JsonSchemaType>
     get() = keyword(Draft3Keywords.DISALLOW)?.disallowedTypes ?: emptySet()
 
-  override val extendsSchema: Schema? by keywords(EXTENDS)
-  override val isRequired: Boolean by keywords(REQUIRED_DRAFT3, false)
+  override val extendsSchema: Schema? get() = values[EXTENDS]
+  override val isRequired: Boolean get() = values[REQUIRED_DRAFT3] ?: false
   override val divisibleBy: Number? get() = multipleOf
 
   // #####################################################
@@ -43,14 +44,10 @@ class Draft3SchemaImpl : JsonSchemaImpl<Draft3Schema>, Draft3Schema {
   // #####################################################
 
   override val isExclusiveMinimum: Boolean
-    get() {
-      return keyword(Keywords.MINIMUM)?.isExclusive ?: false
-    }
+    get() = this[MINIMUM]?.isExclusive ?: false
 
   override val isExclusiveMaximum: Boolean
-    get() {
-      return keyword(Keywords.MAXIMUM)?.isExclusive ?: false
-    }
+    get() = this[MAXIMUM]?.isExclusive ?: false
 
   override val isAllowAdditionalItems: Boolean
     get() = additionalItemsSchema != nullSchema
@@ -61,7 +58,7 @@ class Draft3SchemaImpl : JsonSchemaImpl<Draft3Schema>, Draft3Schema {
   constructor(from: Schema) : super(from.location, from.keywords.freezeMap(), from.extraProperties.freezeMap(), Draft3) {}
 
   constructor(location: SchemaLocation,
-              keywords: Map<KeywordInfo<*>, JsonSchemaKeyword<*>>,
+              keywords: Map<KeywordInfo<*>, Keyword<*>>,
               extraProperties: Map<String, JsonElement>) : super(location, keywords, extraProperties, Draft3)
 
   override fun asDraft3(): Draft3Schema = this

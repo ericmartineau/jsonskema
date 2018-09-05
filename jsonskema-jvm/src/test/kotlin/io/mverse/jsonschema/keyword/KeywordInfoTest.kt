@@ -18,7 +18,7 @@ class KeywordInfoTest {
 
   @kotlin.test.Test
   fun testBuilder_WhenDeprecatedVersions_AllVersionsWorkProperly() {
-    val keyword = KeywordInfo.builder<JsonSchemaKeyword<*>>().key("enumeration")
+    val keyword = KeywordInfo.builder<Keyword<*>>().key("enumeration")
         .expects(ElementType.STRING).since(JsonSchemaVersion.Draft6)
         .additionalDefinition().expects(ElementType.ARRAY).from(JsonSchemaVersion.Draft3).until(Draft5)
         .build()
@@ -51,7 +51,7 @@ class KeywordInfoTest {
 
   @kotlin.test.Test
   fun testBuilder_WhenDeprecatedVersions_DefaultsAreCopiedVersionsWorkProperly() {
-    val keyword = KeywordInfo.builder<JsonSchemaKeyword<*>>().key("enumeration")
+    val keyword = KeywordInfo.builder<Keyword<*>>().key("enumeration")
         .expects(ElementType.STRING).validates(JsonSchemaType.INTEGER).since(JsonSchemaVersion.Draft6)
         .additionalDefinition().expects(ElementType.ARRAY).from(JsonSchemaVersion.Draft3).until(Draft5)
         .build()

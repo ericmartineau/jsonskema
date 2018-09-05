@@ -2,192 +2,118 @@ package io.mverse.jsonschema
 
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.keyword.KeywordInfo
-import io.mverse.jsonschema.keyword.JsonSchemaKeyword
+import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import lang.Name
 import lang.Pattern
+import lang.SetMultimap
 import lang.URI
 
-interface SchemaBuilder<SELF : SchemaBuilder<SELF>> {
+interface SchemaBuilder {
 
   // ##################################################################
   // ########           COUPLE OF GETTERS                ##############
   // ##################################################################
 
+  @Name("id")
   val id: URI?
+
+  @Name("ref")
   var ref: Any?
   var refURI: URI?
   var title: String?
   var defaultValue: JsonElement?
   var description: String?
   var type: JsonSchemaType?
-  var format: String?
-  var pattern: String?
-  var additionalProperties: Boolean
-
-  // ##################################################################
-  // ########           METADATA KEYWORDS                ##############
-  // ##################################################################
-
-  fun withSchema(): SELF
-
-  fun withoutSchema(): SELF
-
-  fun ref(ref: URI): SELF
-  fun ref(ref: String): SELF
-
-  fun title(title: String): SELF
-
-  fun defaultValue(defaultValue: JsonElement): SELF
-
-  fun description(description: String): SELF
-
-  fun type(requiredType: JsonSchemaType): SELF
-
-  fun orType(requiredType: JsonSchemaType): SELF
-
-  fun types(requiredTypes: Set<JsonSchemaType>?): SELF
-
-  fun comment(comment: String): SELF
-
-  fun clearTypes(): SELF
-
-  fun readOnly(value: Boolean = true): SELF
-
-  fun writeOnly(value: Boolean = true): SELF
+  var types: Set<JsonSchemaType>
 
   // ##################################################################
   // ########           STRING KEYWORDS                  ##############
   // ##################################################################
 
-  fun pattern(pattern: String): SELF
+  var format: String?
+  var pattern: String?
+  var regex: Regex?
+  var minLength: Int?
+  var maxLength: Int?
 
-  fun pattern(pattern: Pattern): SELF
+  var additionalProperties: Boolean
+  var comment: String?
+  var readOnly: Boolean
+  var writeOnly: Boolean
+  var requiredProperties: Set<String>
 
-  fun minLength(minLength: Int): SELF
+  var contentEncoding: String?
+  var contentMediaType: String?
 
-  fun maxLength(maxLength: Int): SELF
+  // ##################################################################
+  // ########           METADATA KEYWORDS                ##############
+  // ##################################################################
 
-  fun format(format: String): SELF
+  var isUseSchemaKeyword:Boolean
 
   // ##################################################################
   // ########           OBJECT KEYWORDS                  ##############
   // ##################################################################
 
-  fun schemaOfAdditionalProperties(schemaOfAdditionalProperties: SchemaBuilder<*>): SELF
+  var schemaOfAdditionalProperties:SchemaBuilder?
+  var schemaDependencies: Map<String, SchemaBuilder>
+  var propertyDependencies: SetMultimap<String, String>
+  var propertySchemas: Map<String, SchemaBuilder>
 
-  fun schemaDependency(property: String, dependency: SchemaBuilder<*>): SELF
+  var propertyNameSchema:SchemaBuilder?
+  var patternProperties:Map<String, SchemaBuilder>
 
-  fun propertyDependency(ifPresent: String, thenRequireThisProperty: String): SELF
-
-  fun requiredProperty(requiredProperty: String): SELF
-
-  fun propertySchema(propertySchemaKey: String, propertySchemaValue: SchemaBuilder<*>): SELF
-  fun propertySchema(propertySchemaKey: String, block: SchemaBuilder<*>.() -> Unit): SELF
-
-  fun updatePropertySchema(propertyName: String, updater: (SchemaBuilder<*>)->SchemaBuilder<*>): SELF
-
-  fun propertyNameSchema(propertyNameSchema: SchemaBuilder<*>): SELF
-  fun propertyNameSchema(block: SchemaBuilder<*>.() -> Unit): SELF
-
-  fun patternProperty(pattern: String, schema: SchemaBuilder<*>): SELF
-  fun patternProperty(pattern: String, block: SchemaBuilder<*>.() -> Unit): SELF
-
-  fun patternProperty(pattern: Pattern, schema: SchemaBuilder<*>): SELF
-  fun patternProperty(pattern: Pattern, block: SchemaBuilder<*>.() -> Unit): SELF
-
-  fun minProperties(minProperties: Int): SELF
-
-  fun maxProperties(maxProperties: Int): SELF
-
-  fun clearRequiredProperties(): SELF
-
-  fun clearPropertySchemas(): SELF
+  var minProperties:Int?
+  var maxProperties:Int?
 
   // ##################################################################
   // ########           NUMBER KEYWORDS                  ##############
   // ##################################################################
 
-  fun multipleOf(multipleOf: Number): SELF
 
-  fun exclusiveMinimum(exclusiveMinimum: Number): SELF
-
-  fun minimum(minimum: Number): SELF
-
-  fun exclusiveMaximum(exclusiveMaximum: Number): SELF
-
-  fun maximum(maximum: Number): SELF
+  var multipleOf:Number?
+  var exclusiveMinimum:Number?
+  var minimum:Number?
+  var exclusiveMaximum:Number?
+  var maximum:Number?
 
   // ##################################################################
   // ########           ARRAY KEYWORDS                  ##############
   // ##################################################################
 
-  fun needsUniqueItems(needsUniqueItems: Boolean): SELF
+  var needsUniqueItems:Boolean
+  var maxItems:Int?
+  var minItems:Int?
 
-  fun maxItems(maxItems: Int): SELF
 
-  fun minItems(minItems: Int): SELF
+  var schemaOfAdditionalItems:SchemaBuilder?
+  var containsSchema:SchemaBuilder?
 
-  fun containsSchema(containsSchema: SchemaBuilder<*>): SELF
-  fun containsSchema(block: SchemaBuilder<*>.() -> Unit): SELF
-
-  fun noAdditionalItems(): SELF
-
-  fun schemaOfAdditionalItems(schemaOfAdditionalItems: SchemaBuilder<*>): SELF
-  fun schemaOfAdditionalItems(block: SchemaBuilder<*>.() -> Unit): SELF
-
-  fun itemSchemas(itemSchemas: List<SchemaBuilder<*>>): SELF
-
-  fun itemSchema(itemSchema: SchemaBuilder<*>): SELF
-  fun itemSchema(block: SchemaBuilder<*>.() -> Unit): SELF
-
-  fun allItemSchema(allItemSchema: SchemaBuilder<*>): SELF
-  fun allItemSchema(block: SchemaBuilder<*>.() -> Unit): SELF
+  var itemSchemas: List<SchemaBuilder>
+  var allItemSchema:SchemaBuilder?
 
   // ##################################################################
   // ########           COMMON KEYWORDS                  ##############
   // ##################################################################
 
-  fun notSchema(notSchema: SchemaBuilder<*>): SELF
-  fun notSchema(block: SchemaBuilder<*>.() -> Unit): SELF
+  var notSchema:SchemaBuilder?
+  var enumValues:JsonArray?
+  var const:Any?
+  var constValue:JsonElement?
 
-  fun enumValues(enumValues: JsonArray): SELF
-  fun enumValues(vararg enumValues: Any?): SELF
+  var oneOfSchemas: List<SchemaBuilder>
+  var anyOfSchemas: List<SchemaBuilder>
+  var allOfSchemas: List<SchemaBuilder>
+  var ifSchema:SchemaBuilder?
+  var thenSchema:SchemaBuilder?
+  var elseSchema:SchemaBuilder?
 
-  fun constValueString(constValue: String): SELF
-
-  fun constValueInt(constValue: Int): SELF
-
-  fun constValueDouble(constValue: Double): SELF
-
-  fun constValue(constValue: JsonElement): SELF
-
-  fun oneOfSchemas(oneOfSchemas: Collection<SchemaBuilder<*>>): SELF
-
-  fun oneOfSchema(oneOfSchema: SchemaBuilder<*>): SELF
-  fun oneOfSchema(block: SchemaBuilder<*>.() -> Unit): SELF
-
-  fun anyOfSchemas(anyOfSchemas: Collection<SchemaBuilder<*>>): SELF
-
-  fun anyOfSchema(anyOfSchema: SchemaBuilder<*>): SELF
-  fun anyOfSchema(block: SchemaBuilder<*>.() -> Unit): SELF
-
-  fun allOfSchemas(allOfSchemas: Collection<SchemaBuilder<*>>): SELF
-
-  fun allOfSchema(allOfSchema: SchemaBuilder<*>): SELF
-  fun allOfSchema(block: SchemaBuilder<*>.() -> Unit): SELF
-
-  fun ifSchema(ifSchema: SchemaBuilder<*>): SELF
-  fun ifSchema(block: SchemaBuilder<*>.() -> Unit): SELF
-
-  fun thenSchema(thenSchema: SchemaBuilder<*>): SELF
-  fun thenSchema(block: SchemaBuilder<*>.() -> Unit): SELF
-
-  fun elseSchema(elseSchema: SchemaBuilder<*>): SELF
-  fun elseSchema(block: SchemaBuilder<*>.() -> Unit): SELF
+  operator fun invoke(block: SchemaBuilder.()->Unit):SchemaBuilder
 
   // ##################################################################
   // ########           INNER KEYWORDS                   ##############
@@ -198,22 +124,21 @@ interface SchemaBuilder<SELF : SchemaBuilder<SELF>> {
    * keywords.
    * @return reference to self
    */
-//  fun <K : JsonSchemaKeyword<*>> keyword(keyword: KeywordInfo<K>, keywordValue: K): SELF
+//  fun <K : JsonSchemaKeyword<*>> keyword(keyword: KeywordInfo<K>, keywordValue: K)
 //
 //  fun <X : JsonSchemaKeyword<*>> getKeyword(keyword: KeywordInfo<X>): X?
 
-  fun extraProperty(propertyName: String, JsonElement: JsonElement): SELF
+  var extraProperties:Map<String, JsonElement>
 
+  @Name("buildWithLocation")
   fun build(itemsLocation: SchemaLocation? = null, report: LoadingReport): Schema
 
-  fun withLoadingReport(report: LoadingReport): SELF
+  var loadingReport:LoadingReport
+  var schemaLoader:SchemaLoader?
+  var currentDocument:JsonObject?
 
-  fun withSchemaLoader(factory: SchemaLoader): SELF
+  operator fun <K:Keyword<*>> set(keyword: KeywordInfo<K>, value: K)
 
-  fun withCurrentDocument(currentDocument: JsonObject): SELF
-
-  fun <K:JsonSchemaKeyword<*>> keyword(keyword: KeywordInfo<K>, keywordValue: K):SELF
-
-  fun build(block: SELF.() -> Unit = {}): Schema
+  @Name("build")
   fun build(): Schema
 }

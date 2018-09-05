@@ -10,6 +10,7 @@ import io.mverse.jsonschema.loading.KeywordDigest
 import io.mverse.jsonschema.loading.KeywordDigester
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
+import io.mverse.jsonschema.loading.digest
 import io.mverse.jsonschema.utils.Schemas.falseSchema
 import kotlinx.serialization.json.ElementType.BOOLEAN
 
@@ -17,11 +18,11 @@ data class AdditionalPropertiesBooleanKeywordDigester(
     override val includedKeywords: List<KeywordInfo<SingleSchemaKeyword>> = ADDITIONAL_PROPERTIES.getTypeVariants(BOOLEAN)
 ) : KeywordDigester<SingleSchemaKeyword> {
 
-  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder<*>,
+  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder,
                               schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<SingleSchemaKeyword>? {
     val additionalProperties = jsonObject.path(Keywords.ADDITIONAL_PROPERTIES)
     return if (additionalProperties.isBoolean && additionalProperties.boolean == false) {
-      KeywordDigest.ofNullable(includedKeywords[0], SingleSchemaKeyword(falseSchema))
+      includedKeywords[0].digest(SingleSchemaKeyword(falseSchema))
     } else null
   }
 }

@@ -19,12 +19,13 @@ import io.mverse.jsonschema.JsonPath
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.KeywordInfoSerializer
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonPrimitive
+import lang.Name
+import lang.Serializable
+import lang.SerializableWith
 import lang.URI
 import lang.format
 import lang.json.toJsonArray
@@ -40,13 +41,16 @@ data class ValidationError(
      * The schema that generated this error
      */
     @Transient
+    @Name("violatedSchema")
     val violatedSchema: Schema? = null,
 
     /**
      * A pointer to the violation within the input document we validated.
      */
+    @Name("pointerToViolation")
     private val pointerToViolation: JsonPath? = null,
 
+    @Name("code")
     val code: String? = null,
 
     /**
@@ -56,15 +60,20 @@ data class ValidationError(
      * @return the error description
      */
     @Transient
+    @Name("errorMessage")
     private val errorMessage: String? = null,
 
+    @Name("messageTemplate")
     private val messageTemplate: String? = null,
 
+    @Name("causes")
     val causes: List<ValidationError> = emptyList(),
 
-    @Serializable(with = KeywordInfoSerializer::class)
+    @Name("keyword")
+    @SerializableWith(KeywordInfoSerializer::class)
     val keyword: KeywordInfo<*>? = null,
 
+    @Name("arguments")
     val arguments: List<Any>? = null
 ) {
 

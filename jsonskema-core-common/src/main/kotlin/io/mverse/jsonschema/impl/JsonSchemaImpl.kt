@@ -13,14 +13,20 @@ import io.mverse.jsonschema.builder.JsonSchemaBuilder
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.keyword.IdKeyword
-import io.mverse.jsonschema.keyword.JsonSchemaKeyword
+import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.ADDITIONAL_ITEMS
 import io.mverse.jsonschema.keyword.Keywords.ADDITIONAL_PROPERTIES
 import io.mverse.jsonschema.keyword.Keywords.CONTAINS
+import io.mverse.jsonschema.keyword.Keywords.DEFAULT
+import io.mverse.jsonschema.keyword.Keywords.DEFINITIONS
 import io.mverse.jsonschema.keyword.Keywords.DEPENDENCIES
+import io.mverse.jsonschema.keyword.Keywords.DESCRIPTION
 import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
+import io.mverse.jsonschema.keyword.Keywords.ENUM
+import io.mverse.jsonschema.keyword.Keywords.EXAMPLES
+import io.mverse.jsonschema.keyword.Keywords.FORMAT
 import io.mverse.jsonschema.keyword.Keywords.ID
 import io.mverse.jsonschema.keyword.Keywords.ITEMS
 import io.mverse.jsonschema.keyword.Keywords.MAXIMUM
@@ -38,8 +44,11 @@ import io.mverse.jsonschema.keyword.Keywords.PROPERTIES
 import io.mverse.jsonschema.keyword.Keywords.PROPERTY_NAMES
 import io.mverse.jsonschema.keyword.Keywords.REF
 import io.mverse.jsonschema.keyword.Keywords.REQUIRED
+import io.mverse.jsonschema.keyword.Keywords.TITLE
+import io.mverse.jsonschema.keyword.Keywords.TYPE
 import io.mverse.jsonschema.keyword.Keywords.UNIQUE_ITEMS
 import io.mverse.jsonschema.utils.Schemas.nullSchema
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.json
@@ -48,14 +57,15 @@ import lang.Multimaps
 import lang.SetMultimap
 import lang.URI
 import lang.json.JsonSaver
+import lang.json.jsonArrayOf
 
 val log: Logger = Logger("JsonSchemaImpl")
 
 abstract class JsonSchemaImpl<D : DraftSchema<D>>(
     override val location: SchemaLocation,
-    override val keywords: Map<KeywordInfo<*>, JsonSchemaKeyword<*>> = emptyMap(),
+    override val keywords: Map<KeywordInfo<*>, Keyword<*>> = emptyMap(),
     override val extraProperties: Map<String, JsonElement> = emptyMap(),
-    override val version: JsonSchemaVersion = JsonSchemaVersion.latest())
+    override val version: JsonSchemaVersion = JsonSchemaVersion.latest)
 
   : DraftSchema<D>, KeywordContainer(keywords) {
 
@@ -64,48 +74,41 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
   // ######################################################
 
   override val id: URI? by lazy {
-    val kw = keywords()[DOLLAR_ID] ?: keywords()[ID]
+    val kw = keywords[DOLLAR_ID] ?: keywords[ID]
     (kw as? IdKeyword)?.value
   }
+
   override val schemaURI: URI? get() = version.metaschemaURI
-  override val title: String? by keywords(Keywords.TITLE)
-  override val description: String? by keywords(Keywords.DESCRIPTION)
-  override val types: Set<JsonSchemaType> by keywords(Keywords.TYPE, emptySet())
-  override val enumValues: kotlinx.serialization.json.JsonArray? by keywords(Keywords.ENUM)
-  override val defaultValue: JsonElement? by keywords(Keywords.DEFAULT)
-  override val format: String? by keywords(Keywords.FORMAT)
-  override val minLength: Int? by numberKeyword(MIN_LENGTH)
-  override val maxLength: Int? by numberKeyword(MAX_LENGTH)
-  override val pattern: String? by keywords(PATTERN)
-  override val minimum: Number? by lazy { keyword(MINIMUM)?.limit }
-  override val maximum: Number? by lazy { keyword(MAXIMUM)?.limit }
-  override val multipleOf: Number? by numberKeyword(MULTIPLE_OF)
-  override val minItems: Int? by numberKeyword(MIN_ITEMS)
-  override val maxItems: Int? by numberKeyword(MAX_ITEMS)
-  override val properties: Map<String, Schema> by keywords(PROPERTIES, emptyMap())
-  override val patternProperties: Map<String, Schema> by keywords(PATTERN_PROPERTIES, emptyMap())
-  override val additionalPropertiesSchema: D? by lazy { keyword(ADDITIONAL_PROPERTIES)?.value?.toDraftVersion() }
-  override val requiresUniqueItems: Boolean by keywords(UNIQUE_ITEMS, false)
+  override val title: String? get() = values[TITLE]
+  override val description: String? get() = values[DESCRIPTION]
+  override val types: Set<JsonSchemaType> get() = values[TYPE] ?: emptySet()
+  override val enumValues: JsonArray? get() = values[ENUM]
+  override val defaultValue: JsonElement? get() = values[DEFAULT]
+  override val format: String? get() = values[FORMAT]
+  override val minLength: Int? get() = values[MIN_LENGTH]?.toInt()
+  override val maxLength: Int? get() = values[MAX_LENGTH]?.toInt()
+  override val pattern: String? get() = values[PATTERN]
+  override val minimum: Number? get() = this[MINIMUM]?.limit
+  override val maximum: Number? get() = this[MAXIMUM]?.limit
+  override val multipleOf: Number? get() = values[MULTIPLE_OF]
+  override val minItems: Int? get() = values[MIN_ITEMS]?.toInt()
+  override val maxItems: Int? get() = values[MAX_ITEMS]?.toInt()
+  override val properties: Map<String, Schema> get() = values[PROPERTIES] ?: emptyMap()
+  override val patternProperties: Map<String, Schema> get() = values[PATTERN_PROPERTIES] ?: emptyMap()
+  override val additionalPropertiesSchema: D? get() = values[ADDITIONAL_PROPERTIES]?.toDraftVersion()
+  override val requiresUniqueItems: Boolean get() = values[UNIQUE_ITEMS] ?: false
 
-  override val additionalItemsSchema: D? by lazy {
-    keyword(ITEMS)?.additionalItemSchema?.toDraftVersion()
-  }
+  override val additionalItemsSchema: D? get() = this[ITEMS]?.additionalItemSchema?.toDraftVersion()
 
-  override val propertyDependencies: SetMultimap<String, String> by lazy {
-    keyword(DEPENDENCIES)?.propertyDependencies ?: Multimaps.emptySetMultimap()
-  }
+  override val propertyDependencies: SetMultimap<String, String>
+    get() = this[DEPENDENCIES]?.propertyDependencies ?: Multimaps.emptySetMultimap()
 
-  override val propertySchemaDependencies: Map<String, Schema> by lazy {
-    keyword(DEPENDENCIES)?.dependencySchemas?.value ?: emptyMap()
-  }
+  override val propertySchemaDependencies: Map<String, Schema>
+    get() = this[DEPENDENCIES]?.dependencySchemas?.value ?: emptyMap()
 
-  override val allItemSchema: D? by lazy {
-    keyword(Keywords.ITEMS)?.allItemSchema?.toDraftVersion()
-  }
+  override val allItemSchema: D? get() = this[ITEMS]?.allItemSchema?.toDraftVersion()
 
-  override val itemSchemas: List<Schema> by lazy {
-    keyword(Keywords.ITEMS)?.indexedSchemas ?: emptyList()
-  }
+  override val itemSchemas: List<Schema> get() = this[ITEMS]?.indexedSchemas ?: emptyList()
 
   private fun Schema.toDraftVersion(): D {
     return convertVersion(this)
@@ -165,46 +168,38 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
     return JsonSaver().serialize(this.toJson(version))
   }
 
-  override fun <X : SchemaBuilder<X>> toBuilder(): X {
-    @Suppress("unchecked_cast")
-    return JsonSchemaBuilder(fromSchema = this) as X
+  override fun toBuilder(): SchemaBuilder {
+    return JsonSchemaBuilder(fromSchema = this)
   }
 
-  override fun <X : SchemaBuilder<X>> toBuilder(id: URI): X {
-    @Suppress("unchecked_cast")
-    return JsonSchemaBuilder(fromSchema = this, id = id) as X
+  override fun  toBuilder(id: URI): SchemaBuilder {
+    return JsonSchemaBuilder(fromSchema = this, id = id)
   }
 
   // ##################################################################
   // ###### Helper methods for subclasses (accessing keywords) ########
   // ##################################################################
 
-  protected fun keywords(): Map<KeywordInfo<*>, JsonSchemaKeyword<*>> {
-    return keywords
-  }
+  protected open val examples: JsonArray get() = values[EXAMPLES] ?: jsonArrayOf()
+  protected open val definitions: Map<String, Schema> get() = values[DEFINITIONS] ?: emptyMap()
+  protected open val notSchema: Schema? get() =  values[Keywords.NOT]
+  protected open val constValue: JsonElement? get() = values[Keywords.CONST]
+  protected open val allOfSchemas: List<Schema> get() = values[Keywords.ALL_OF] ?: emptyList()
+  protected open val anyOfSchemas: List<Schema> get() = values[Keywords.ANY_OF] ?: emptyList()
+  protected open val oneOfSchemas: List<Schema> get() = values[Keywords.ONE_OF] ?: emptyList()
+  protected open val maxProperties: Int? get() = values[MAX_PROPERTIES]?.toInt()
+  protected open val minProperties: Int? get() = values[MIN_PROPERTIES]?.toInt()
+  protected open val requiredProperties: Set<String> get() = values[REQUIRED] ?: emptySet()
+  protected open val exclusiveMinimum: Number? get() = this[MINIMUM]?.exclusiveLimit
+  protected open val exclusiveMaximum: Number? get() = this[MAXIMUM]?.exclusiveLimit
+  protected open val containsSchema: Schema? get() = values[CONTAINS]
+  protected open val propertyNameSchema: Schema? get() = values[PROPERTY_NAMES]
 
-  protected open val examples: kotlinx.serialization.json.JsonArray by keywords(Keywords.EXAMPLES, kotlinx.serialization.json.JsonArray(emptyList()))
-  protected open val definitions: Map<String, Schema> by keywords(Keywords.DEFINITIONS, emptyMap())
-  protected open val notSchema: Schema? by keywords(Keywords.NOT)
-  protected open val constValue: JsonElement? by keywords(Keywords.CONST)
-  protected open val allOfSchemas: List<Schema> by keywords(Keywords.ALL_OF, emptyList())
-  protected open val anyOfSchemas: List<Schema> by keywords(Keywords.ANY_OF, emptyList())
-  protected open val oneOfSchemas: List<Schema> by keywords(Keywords.ONE_OF, emptyList())
-  protected open val maxProperties: Int? by numberKeyword(MAX_PROPERTIES)
-  protected open val minProperties: Int? by numberKeyword(MIN_PROPERTIES)
-  protected open val requiredProperties: Set<String> by keywords(REQUIRED, emptySet())
-  protected open val exclusiveMinimum: Number? by lazy { keyword(MINIMUM)?.exclusiveLimit }
-  protected open val exclusiveMaximum: Number? by lazy { keyword(MAXIMUM)?.exclusiveLimit }
-  protected open val containsSchema: Schema? by keywords(CONTAINS)
-  protected open val propertyNameSchema: Schema? by keywords(PROPERTY_NAMES)
+  protected open val isAllowAdditionalItems: Boolean
+    get() = this[ADDITIONAL_ITEMS]?.additionalItemSchema != nullSchema
 
-  protected open val isAllowAdditionalItems: Boolean by lazy {
-    keyword(ADDITIONAL_ITEMS)?.additionalItemSchema != nullSchema
-  }
-
-  protected open val isAllowAdditionalProperties: Boolean by lazy {
-    keyword(ADDITIONAL_PROPERTIES)?.value != nullSchema
-  }
+  protected open val isAllowAdditionalProperties: Boolean
+  get() = values[ADDITIONAL_PROPERTIES] != nullSchema
 
   override fun equals(other: Any?): Boolean {
     return when {

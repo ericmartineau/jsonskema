@@ -77,7 +77,7 @@ class EmptySchemaTest {
   private fun roundTripSchema(title: String? = null,
                               description: String? = null,
                               id: String? = null): kotlinx.serialization.json.JsonObject {
-    val builder: SchemaBuilder<*> = if (id?.isNotBlank() == true) {
+    val builder: SchemaBuilder = if (id?.isNotBlank() == true) {
       JsonSchema.schemaBuilder(id)
     } else {
       JsonSchema.schemaBuilder()

@@ -12,6 +12,7 @@ allprojects  {
     group = "io.mverse.jsonskema"
   }
   repositories {
+    jcenter()
     kotlinx()
   }
   dependencyManagement {
@@ -21,9 +22,10 @@ allprojects  {
       dependency("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.60.1")
 
       dependency("org.jetbrains.kotlinx:kotlinx-io:1.0.42")
-      dependency("org.jetbrains.kotlinx:kotlinx-io-js:1.0.42")
       dependency("org.jetbrains.kotlinx:kotlinx-io-common:1.0.42")
+
       dependency("org.jetbrains.kotlinx:kotlinx-io-js:1.0.42")
+
 
       // Immutable Collections Library for Kotlin
       dependency("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.1")
@@ -32,6 +34,7 @@ allprojects  {
 }
 
 mverse {
+  isDefaultDependencies = false
 }
 
 

@@ -1,4 +1,6 @@
 mverse  {
+  isDefaultDependencies = false
+
   dependencies {
     compile("kotlin-reflect")
     compile(kotlinImmutable())

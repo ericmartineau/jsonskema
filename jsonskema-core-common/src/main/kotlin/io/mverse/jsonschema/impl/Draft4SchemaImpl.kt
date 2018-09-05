@@ -6,14 +6,12 @@ import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft4
 import io.mverse.jsonschema.keyword.IdKeyword
-import io.mverse.jsonschema.keyword.JsonSchemaKeyword
+import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
-import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
 import io.mverse.jsonschema.keyword.Keywords.ID
 import io.mverse.jsonschema.keyword.Keywords.MAXIMUM
 import io.mverse.jsonschema.keyword.Keywords.MINIMUM
-import io.mverse.jsonschema.keyword.URIKeyword
 import kotlinx.serialization.json.JsonElement
 import lang.URI
 import lang.freezeMap
@@ -43,7 +41,7 @@ class Draft4SchemaImpl : JsonSchemaImpl<Draft4Schema>, Draft4Schema {
 
   constructor(from: Schema) : super(from, Draft4)
   constructor(location: SchemaLocation,
-              keywords: Map<KeywordInfo<*>, JsonSchemaKeyword<*>>,
+              keywords: Map<KeywordInfo<*>, Keyword<*>>,
               extraProperties: Map<String, JsonElement>) : super(location, keywords.freezeMap(), extraProperties.freezeMap(), Draft4)
 
   override val version: JsonSchemaVersion = Draft4

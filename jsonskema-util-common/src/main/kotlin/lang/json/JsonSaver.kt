@@ -18,6 +18,8 @@ class JsonSaver(spaces: Boolean = false,
     return save(StringBuilder(), obj)
   }
 
+  operator fun invoke(element:JsonElement):String = this.serialize(element)
+
   fun save(output: StringBuilder, obj: JsonElement): String {
     when (obj) {
       is kotlinx.serialization.json.JsonObject -> writeObject(output, obj, 0)

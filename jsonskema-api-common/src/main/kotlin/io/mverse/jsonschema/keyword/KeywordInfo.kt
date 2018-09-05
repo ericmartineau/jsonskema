@@ -5,13 +5,11 @@ import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.enums.appliesTo
 import kotlinx.serialization.KInput
 import kotlinx.serialization.KOutput
-import kotlinx.serialization.KSerialClassDesc
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.Transient
-import kotlinx.serialization.internal.SerialClassDescImpl
 import kotlinx.serialization.json.ElementType
+import lang.Serializable
 import lang.hashKode
 import lang.illegalState
 import lang.range
@@ -27,80 +25,69 @@ import lang.range
  * @param <K> The type of value this keyword produces (a schema, a string, an array, etc)
 </K> */
 @Serializable
-class KeywordInfo<K : JsonSchemaKeyword<*>> {
+data class KeywordInfo<K : Keyword<*>>(
+    val key: String,
 
-  val key: String
+    /**
+     * Which versions this keyword applies to.  eg. additionalProperties expects a boolean or an object
+     * up until Draft6, when it requires a schema.
+     */
+    val applicableVersions: Set<JsonSchemaVersion>,
 
-  /**
-   * Which versions this keyword applies to.  eg. additionalProperties expects a boolean or an object
-   * up until Draft6, when it requires a schema.
-   */
-  val applicableVersions: Set<JsonSchemaVersion>
+    /**
+     * The most recent version this keyword applies to.
+     */
+    val mostRecentVersion: JsonSchemaVersion,
 
-  /**
-   * The most recent version this configuration applies to.
-   */
-  val mostRecentVersion: JsonSchemaVersion
+    /**
+     * Which types of values this keyword applies to: string, boolean, object, array
+     */
+    private val forSchemas: Set<JsonSchemaType>,
 
-  /**
-   * Which types of values this keyword applies to: string, boolean, object, array
-   */
-  @Transient
-  private val forSchemas: Set<JsonSchemaType>
+    /**
+     * Which json types are validated by this keyword (correlates to [.forSchemas]
+     */
+    val applicableTypes: Set<ElementType>,
 
-  /**
-   * Which json types (correlates to [.forSchemas]
-   */
-  val applicableTypes: Set<ElementType>
+    /**
+     * The type of json value expected for this keyword.  Each instance of the keyword can only consuem
+     * a single type of value, but they can be linked together using variants.
+     */
+    val expects: ElementType,
 
-  /**
-   * The type of json value expected for this keyword.  Each instance of the keyword can only consuem
-   * a single type of value, but they can be linked together using variants.
-   */
-  val expects: ElementType
+    val variants: Map<ElementType, KeywordInfo<K>> = emptyMap()) {
 
-  val variants: Map<ElementType, KeywordInfo<K>>
+  internal constructor(mainInfo: KeywordInfo<K>, allVersions: List<KeywordVersionInfoBuilder<K>>)
+    : this(key = mainInfo.key,
+      forSchemas=mainInfo.forSchemas,
+      applicableTypes=mainInfo.applicableTypes,
+      expects = mainInfo.expects,
+      applicableVersions = mainInfo.applicableVersions,
+      mostRecentVersion = mainInfo.mostRecentVersion,
+      variants = allVersions
+          .map { mainInfo.copyDefaults(it) }
+          .map { it.build() }
+          .map { it.expects to it }
+          .toMap()
+      )
 
-  internal constructor(mainInfo: KeywordVersionInfoBuilder<K>, allVersions: List<KeywordVersionInfoBuilder<K>>) {
-
-    val mainDefinition = mainInfo.build()
-    // Copy values from most current builder
-    this.key = mainDefinition.key
-    this.forSchemas = mainDefinition.forSchemas
-    this.applicableTypes = mainDefinition.applicableTypes
-    this.expects = mainDefinition.expects
-    this.applicableVersions = mainDefinition.applicableVersions
-    this.mostRecentVersion = mainDefinition.mostRecentVersion
-
-    this.variants = allVersions
-        .map { mainDefinition.copyDefaults(it) }
-        .map { it.build() }
-        .map { it.expects to it }
-        .toMap()
-  }
+  internal constructor(mainInfo: KeywordVersionInfoBuilder<K>, allVersions: List<KeywordVersionInfoBuilder<K>>)
+    : this(mainInfo = mainInfo.build(), allVersions = allVersions)
 
   internal constructor(key: String,
-                       forSchemas: Collection<JsonSchemaType>,
+                       forSchemas: Collection<JsonSchemaType> = JsonSchemaType.values().toHashSet(),
                        expects: ElementType,
                        since: JsonSchemaVersion?,
-                       until: JsonSchemaVersion?) {
-    var sinceVar = since
-
-    sinceVar = sinceVar ?: JsonSchemaVersion.Draft3
-    this.mostRecentVersion = until ?: JsonSchemaVersion.latest()
-    if (forSchemas.isEmpty()) {
-      this.forSchemas = JsonSchemaType.values().toHashSet()
-    } else {
-      this.forSchemas = forSchemas.toHashSet()
-    }
-    this.applicableTypes = this.forSchemas
-        .map { it.appliesTo }
-        .toHashSet()
-    this.key = key
-    this.expects = expects
-    this.applicableVersions = JsonSchemaVersion.values().range(sinceVar, mostRecentVersion)
-    this.variants = emptyMap()
-  }
+                       until: JsonSchemaVersion?): this(
+      key = key,
+      expects = expects,
+      mostRecentVersion = until ?: JsonSchemaVersion.latest,
+      forSchemas = forSchemas.toHashSet(),
+      applicableTypes = forSchemas
+          .map { it.appliesTo }
+          .toHashSet(),
+      applicableVersions = JsonSchemaVersion.values().range(since ?: JsonSchemaVersion.Draft3, until ?: JsonSchemaVersion.latest)
+  )
 
   fun getTypeVariant(valueType: ElementType): KeywordInfo<K>? {
     return variants[valueType]
@@ -145,7 +132,7 @@ class KeywordInfo<K : JsonSchemaKeyword<*>> {
     return hashKode(key, expects)
   }
 
-  class KeywordInfoBuilder<K : JsonSchemaKeyword<*>> {
+  class KeywordInfoBuilder<K : Keyword<*>> {
 
     private lateinit var key: String
     private var main: KeywordVersionInfoBuilder<K>
@@ -210,12 +197,12 @@ class KeywordInfo<K : JsonSchemaKeyword<*>> {
 
   companion object {
 
-    inline fun <reified X : JsonSchemaKeyword<*>> builder(): KeywordInfoBuilder<X> {
+    inline fun <reified X : Keyword<*>> builder(): KeywordInfoBuilder<X> {
       return KeywordInfoBuilder()
     }
   }
 
-  class KeywordVersionInfoBuilder<K : JsonSchemaKeyword<*>> {
+  class KeywordVersionInfoBuilder<K : Keyword<*>> {
     private var since: JsonSchemaVersion? = null
     private var until: JsonSchemaVersion? = null
     private var key: String? = null

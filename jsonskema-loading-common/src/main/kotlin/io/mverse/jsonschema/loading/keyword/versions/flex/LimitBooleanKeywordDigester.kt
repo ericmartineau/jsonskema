@@ -10,6 +10,7 @@ import io.mverse.jsonschema.loading.KeywordDigest
 import io.mverse.jsonschema.loading.KeywordDigester
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
+import io.mverse.jsonschema.loading.digest
 
 /**
  * Class that handles extracting limit keywords (minimum,maximum,exclusiveMaximum,exclusiveMinimum) for all version
@@ -22,7 +23,7 @@ data class LimitBooleanKeywordDigester(
     override val includedKeywords: List<KeywordInfo<LimitKeyword>> = listOf(keyword, exclusiveKeyword))
   : KeywordDigester<LimitKeyword> {
 
-  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder<*>,
+  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder,
                               schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<LimitKeyword>? {
 
     val exclusiveValue = jsonObject.path(exclusiveKeyword.key)
@@ -33,7 +34,7 @@ data class LimitBooleanKeywordDigester(
       else->exclusiveValue.number
     }
 
-    return KeywordDigest.ofNullable(keyword, LimitKeyword(keyword, exclusiveKeyword, limitValue.number, exclusiveLimit))
+    return keyword.digest(LimitKeyword(keyword, exclusiveKeyword, limitValue.number, exclusiveLimit))
   }
 
   class LimitBooleanKeywordDigesterBuilder

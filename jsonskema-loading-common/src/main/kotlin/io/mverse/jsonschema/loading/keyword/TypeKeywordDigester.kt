@@ -11,6 +11,7 @@ import io.mverse.jsonschema.loading.KeywordDigest
 import io.mverse.jsonschema.loading.KeywordDigester
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
+import io.mverse.jsonschema.loading.digest
 import kotlinx.serialization.json.ElementType.ARRAY
 import kotlinx.serialization.json.ElementType.STRING
 
@@ -18,7 +19,7 @@ class TypeKeywordDigester : KeywordDigester<TypeKeyword> {
 
   override val includedKeywords = TYPE.getTypeVariants(STRING, ARRAY)
 
-  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder<*>,
+  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder,
                               schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<TypeKeyword>? {
     val type = jsonObject.path(Keywords.TYPE)
     val valueType = type.type
@@ -29,11 +30,11 @@ class TypeKeywordDigester : KeywordDigester<TypeKeyword> {
             .map { JsonSchemaTypes.fromString(it) }
             .toSet()
 
-        KeywordDigest.ofNullable(TYPE, TypeKeyword(typeArray))
+        TYPE.digest(TypeKeyword(typeArray))
       }
       else -> {
         val typeString = JsonSchemaTypes.fromString(type.string)
-        return KeywordDigest.ofNullable(Keywords.TYPE, TypeKeyword(typeString))
+        return TYPE.digest(TypeKeyword(typeString))
       }
     }
   }

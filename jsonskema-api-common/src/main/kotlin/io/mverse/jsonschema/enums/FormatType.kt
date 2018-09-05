@@ -222,7 +222,7 @@ enum class FormatType(key: String? = null,
 
   constructor(key: String? = null,
               since: JsonSchemaVersion = Draft3,
-              until: JsonSchemaVersion = latest()) :
+              until: JsonSchemaVersion = latest) :
       this(key, JsonSchemaVersion.values().range(since, until))
 
   override fun toString(): String {

@@ -4,6 +4,7 @@ import io.mverse.jsonschema.Draft3Schema
 import io.mverse.jsonschema.Draft4Schema
 import io.mverse.jsonschema.Draft6Schema
 import io.mverse.jsonschema.Draft7Schema
+import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaBuilder
@@ -11,11 +12,11 @@ import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.builder.JsonSchemaBuilder
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
-import io.mverse.jsonschema.jsonschema
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.URIKeyword
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
+import io.mverse.jsonschema.schema
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.json
 import lang.URI
@@ -76,19 +77,19 @@ open class RefSchemaImpl : RefSchema {
   override val refOnlySchema: Schema
     get() {
       val thisRefURI = this.refURI
-      return jsonschema {
+      return JsonSchema.schema {
         refURI = thisRefURI
       }
     }
 
-  override fun <X : SchemaBuilder<X>> toBuilder(): X {
+  override fun toBuilder(): SchemaBuilder {
     @Suppress("unchecked_cast")
-    return JsonSchemaBuilder(fromSchema = this) as X
+    return JsonSchemaBuilder(fromSchema = this)
   }
 
-  override fun <X : SchemaBuilder<X>> toBuilder(id: URI): X {
+  override fun toBuilder(id: URI): SchemaBuilder {
     @Suppress("unchecked_cast")
-    return JsonSchemaBuilder(fromSchema = this, id = id) as X
+    return JsonSchemaBuilder(fromSchema = this, id = id)
   }
 
   override fun toJson(version: JsonSchemaVersion): JsonObject {

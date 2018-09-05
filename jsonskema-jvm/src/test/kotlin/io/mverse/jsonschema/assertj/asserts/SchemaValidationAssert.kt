@@ -13,7 +13,7 @@ import io.mverse.jsonschema.assertj.subject.ValidationErrorPredicate.Companion.a
 import io.mverse.jsonschema.assertj.subject.ValidationErrorPredicate.Companion.codeEquals
 import io.mverse.jsonschema.assertj.subject.ValidationErrorPredicate.Companion.pointerToViolationEquals
 import io.mverse.jsonschema.assertj.subject.ValidationErrorPredicate.Companion.schemaLocationEquals
-import io.mverse.jsonschema.keyword.JsonSchemaKeyword
+import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.validation.ValidationError
 import lang.URI
@@ -108,7 +108,7 @@ fun SchemaValidationAssert.hasErrorArguments(vararg args: Any): SchemaValidation
   return apply {filter(argumentsContainsAll(*args))}
 }
 
-fun <K : JsonSchemaKeyword<*>, I : KeywordInfo<K>> SchemaValidationAssert.hasKeyword(keyword: I): SchemaValidationAssert {
+fun <K : Keyword<*>, I : KeywordInfo<K>> SchemaValidationAssert.hasKeyword(keyword: I): SchemaValidationAssert {
   assert(actual?.keyword, "Has keyword").isEqualTo(keyword)
   return this
 }

@@ -1,22 +1,22 @@
 package lang.time
 
 class Stopwatch() {
-  var start = currentTime()
-  var stop: Long? = null
+  var startedAt = currentTime()
+  var stoppedAt: Long? = null
   val elapsed: Long
     get() {
-      if (stop == null) {
+      if (stoppedAt == null) {
         stop()
       }
-      return stop!! - start
+      return stoppedAt!! - startedAt
     }
 
   fun stop() {
-    stop = currentTime()
+    stoppedAt = currentTime()
   }
 
   fun restart() {
-    start = currentTime()
-    stop = null
+    startedAt = currentTime()
+    stoppedAt = null
   }
 }

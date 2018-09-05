@@ -3,7 +3,7 @@ package io.mverse.jsonschema.loading
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.keyword.KeywordInfo
-import io.mverse.jsonschema.keyword.JsonSchemaKeyword
+import io.mverse.jsonschema.keyword.Keyword
 
 /**
  * Responsible for extracting a keyword or keywords from a json document and loading them into a [SchemaBuilder]
@@ -11,7 +11,7 @@ import io.mverse.jsonschema.keyword.JsonSchemaKeyword
  * These loaders specify the keywords they process via [.getIncludedKeywords], which allows for flexible or
  * strict loading
  */
-interface KeywordDigester<K : JsonSchemaKeyword<*>> {
+interface KeywordDigester<K : Keyword<*>> {
 
   /**
    * This list of keywords allows the processing system to handle most of the validation around "flexible" schema
@@ -33,7 +33,7 @@ interface KeywordDigester<K : JsonSchemaKeyword<*>> {
    * @return Optionally, a keyword digest that contains the results of the processing.
    */
   fun extractKeyword(jsonObject: JsonValueWithPath,
-                     builder: SchemaBuilder<*>,
+                     builder: SchemaBuilder,
                      schemaLoader: SchemaLoader,
                      report: LoadingReport): KeywordDigest<K>?
 }

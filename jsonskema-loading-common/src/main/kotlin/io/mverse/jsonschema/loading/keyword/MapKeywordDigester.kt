@@ -10,13 +10,14 @@ import io.mverse.jsonschema.loading.KeywordDigester
 import io.mverse.jsonschema.loading.LoadingIssues
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
+import io.mverse.jsonschema.loading.digest
 import kotlinx.serialization.json.ElementType
 
 data class MapKeywordDigester(val keyword: KeywordInfo<SchemaMapKeyword>) : KeywordDigester<SchemaMapKeyword> {
 
   override val includedKeywords get() = listOf(keyword)
 
-  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder<*>,
+  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder,
                               schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<SchemaMapKeyword>? {
     val keyedSchemas = mutableMapOf<String, Schema>()
     val propObject = jsonObject.path(keyword)
@@ -27,6 +28,6 @@ data class MapKeywordDigester(val keyword: KeywordInfo<SchemaMapKeyword>) : Keyw
         keyedSchemas[key] = schemaLoader.loadSubSchema(value, value.rootObject, report)
       }
     }
-    return KeywordDigest.ofNullable(keyword, SchemaMapKeyword(keyedSchemas))
+    return keyword.digest(SchemaMapKeyword(keyedSchemas))
   }
 }

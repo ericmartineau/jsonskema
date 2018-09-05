@@ -2,10 +2,9 @@ package io.mverse.jsonschema
 
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.keyword.KeywordInfo
-import io.mverse.jsonschema.keyword.JsonSchemaKeyword
-import kotlinx.serialization.json.JsonBuilder
+import io.mverse.jsonschema.keyword.Keyword
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
+import lang.Name
 import lang.URI
 
 interface Schema {
@@ -24,7 +23,7 @@ interface Schema {
 
   val extraProperties: Map<String, JsonElement>
 
-  val keywords: Map<KeywordInfo<*>, JsonSchemaKeyword<*>>
+  val keywords: Map<KeywordInfo<*>, Keyword<*>>
 
   val absoluteURI: URI
     get() = location.uniqueURI
@@ -35,9 +34,10 @@ interface Schema {
   /**
    * Creates a copy of this schema with the provided schema id
    */
+  @Name("withId")
   fun withId(id: URI): Schema
 
-  fun toJson(version: JsonSchemaVersion = JsonSchemaVersion.latest()): kotlinx.serialization.json.JsonObject
+  fun toJson(version: JsonSchemaVersion = JsonSchemaVersion.latest): kotlinx.serialization.json.JsonObject
 
   fun asVersion(version: JsonSchemaVersion): Schema {
     return when (version) {
@@ -50,16 +50,20 @@ interface Schema {
     }
   }
 
-  fun <X : SchemaBuilder<X>> toBuilder(): X
+  fun toBuilder(): SchemaBuilder
 
-  fun <X : SchemaBuilder<X>> toBuilder(id: URI): X
+  fun toBuilder(id: URI): SchemaBuilder
 
+  @Name("asDraft3")
   fun asDraft3(): Draft3Schema
 
+  @Name("asDraft4")
   fun asDraft4(): Draft4Schema
 
+  @Name("asDraft6")
   fun asDraft6(): Draft6Schema
 
+  @Name("asDraft7")
   fun asDraft7(): Draft7Schema
 
   fun toString(version:JsonSchemaVersion):String

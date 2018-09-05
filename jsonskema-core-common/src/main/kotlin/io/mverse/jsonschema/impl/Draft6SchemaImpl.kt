@@ -5,12 +5,10 @@ import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.keyword.IdKeyword
-import io.mverse.jsonschema.keyword.JsonSchemaKeyword
+import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
-import io.mverse.jsonschema.keyword.URIKeyword
-import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import lang.URI
 import lang.freezeMap
@@ -44,10 +42,13 @@ class Draft6SchemaImpl : JsonSchemaImpl<Draft6Schema>, Draft6Schema {
   override val exclusiveMinimum: Number? get() = super.exclusiveMinimum
   override val exclusiveMaximum: Number? get() = super.exclusiveMaximum
 
+  override val keywords: Map<KeywordInfo<*>, Keyword<*>>
+    get() = super.keywords
+
   constructor(from: Schema) : super(from, JsonSchemaVersion.Draft6)
 
   constructor(location: SchemaLocation,
-              keywords: Map<KeywordInfo<*>, JsonSchemaKeyword<*>>,
+              keywords: Map<KeywordInfo<*>, Keyword<*>>,
               extraProperties: Map<String, JsonElement> = emptyMap()) : super(location, keywords.freezeMap(), extraProperties.freezeMap(), JsonSchemaVersion.Draft6)
 
   override fun asDraft6(): Draft6Schema = this

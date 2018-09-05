@@ -10,23 +10,6 @@ fun JsonSchema.schemaBuilder():JsonSchemaBuilder = JsonSchemaBuilder()
 fun JsonSchema.schemaBuilder(id: URI):JsonSchemaBuilder = JsonSchemaBuilder(id)
 fun JsonSchema.schemaBuilder(id: String):JsonSchemaBuilder = JsonSchemaBuilder(URI(id))
 
-fun jsonschemaBuilder(id: Any? = null, init: SchemaBuilder<*>.() -> Unit): SchemaBuilder<*> {
-  val builder = when(id) {
-    null-> JsonSchemaBuilder()
-    else-> JsonSchemaBuilder(URI(id.toString()))
-  }
-  builder.init()
-  return builder
-}
-
-fun jsonschema(id: Any? = null, init: SchemaBuilder<*>.() -> Unit): Schema {
-  val builder = when(id) {
-    null-> JsonSchemaBuilder()
-    else-> JsonSchemaBuilder(URI(id.toString()))
-  }
-  return builder.build(init)
-}
-
 val JsonElement.int get() = this.primitive.intOrNull
 val JsonElement.double get() = this.primitive.doubleOrNull
 

@@ -1,11 +1,11 @@
 package lang
 
-expect class URI(uri: String?) {
-  constructor(scheme: String?, schemeSpecificPart: String?, fragment: String?)
+expect class URI(scheme: String?, schemeSpecificPart: String?, fragment: String?) {
+  constructor(uri: String?)
 
   fun isAbsolute(): Boolean
   fun isOpaque(): Boolean
-  fun relativize(uri: URI): URI
+  fun relativize(child: URI): URI
 
   fun getFragment(): String?
   fun getScheme(): String?
@@ -43,3 +43,4 @@ val URI.isFragmentOnly: Boolean
 expect object URLDecoder {
   fun decode(input: String, charset: String): String
 }
+

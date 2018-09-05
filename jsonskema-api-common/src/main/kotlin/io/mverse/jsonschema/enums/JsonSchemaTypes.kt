@@ -22,7 +22,6 @@ object JsonSchemaTypes {
   }
 }
 
-
 @Serializer(forClass = JsonSchemaType::class)
 class JsonSchemaTypeSerializer {
 

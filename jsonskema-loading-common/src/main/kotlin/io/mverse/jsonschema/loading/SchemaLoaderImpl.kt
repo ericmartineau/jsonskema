@@ -4,8 +4,8 @@ import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.enums.JsonSchemaVersion
-import io.mverse.jsonschema.keyword.CustomKeywordLoader
-import io.mverse.jsonschema.keyword.JsonSchemaKeyword
+import io.mverse.jsonschema.keyword.KeywordLoader
+import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.loading.keyword.versions.KeywordDigesterImpl
 import io.mverse.jsonschema.loading.reference.DefaultJsonDocumentClient
@@ -15,21 +15,20 @@ import kotlinx.serialization.json.JsonObject
 import lang.URI
 
 /**
- * Schema factories are responsible for extracting values from a json-object to produce an immutable [Schema]
+ * This class is responsible for extracting values from a json instance to produce an immutable [Schema]
  * instance.  This also includes looking up any referenced schemas.
  */
 data class SchemaLoaderImpl(
-    val schemaCache: SchemaCache = SchemaCache(),
+    internal val schemaCache: SchemaCache = SchemaCache(),
     override val documentClient: JsonDocumentClient = DefaultJsonDocumentClient(schemaCache = schemaCache),
-    val additionalKeywords: List<KeywordDigester<*>> = emptyList(),
-    val versions: Set<JsonSchemaVersion> = emptySet(),
-    val isStrict: Boolean = false) : SchemaReader, SchemaLoader {
+    private val additionalDigesters: List<KeywordDigester<*>> = emptyList(),
+    private val versions: Set<JsonSchemaVersion> = emptySet(),
+    private val isStrict: Boolean = false) : SchemaReader, SchemaLoader {
 
   override val loader: SchemaLoader = this
-
-  val fragmentLoader: SubSchemaLoader = SubSchemaLoader(extraKeywordLoaders = additionalKeywords,
+  private val fragmentLoader: SubSchemaLoader = SubSchemaLoader(extraKeywordLoaders = additionalDigesters,
       defaultVersions = versions, strict = isStrict, schemaLoader = this)
-  val refSchemaLoader: RefSchemaLoader = RefSchemaLoader(documentClient = this.documentClient, schemaLoader = this)
+  private val refSchemaLoader: RefSchemaLoader = RefSchemaLoader(documentClient = this.documentClient, schemaLoader = this)
 
   // #############################################################
   // ########  LOADING SCHEMAS/SUBSCHEMAS FROM JSON    ###########
@@ -49,7 +48,7 @@ data class SchemaLoaderImpl(
   // #######  LOADING  & CREATING SUBSCHEMA FACTORIES  ###########
   // #############################################################
 
-  override fun subSchemaBuilder(schemaJson: JsonValueWithPath, inDocument: kotlinx.serialization.json.JsonObject, loadingReport: LoadingReport): SchemaBuilder<*> {
+  override fun subSchemaBuilder(schemaJson: JsonValueWithPath, inDocument: kotlinx.serialization.json.JsonObject, loadingReport: LoadingReport): SchemaBuilder {
     return fragmentLoader.subSchemaBuilder(schemaJson, inDocument, loadingReport)
   }
 
@@ -66,8 +65,8 @@ data class SchemaLoaderImpl(
     return this
   }
 
-  override fun withDocumentClient(documentClient: JsonDocumentClient): SchemaLoaderImpl {
-    return this.copy(documentClient = documentClient)
+  override fun withDocumentClient(client: JsonDocumentClient): SchemaLoaderImpl {
+    return this.copy(documentClient = client)
   }
 
   // #############################################################
@@ -100,20 +99,20 @@ data class SchemaLoaderImpl(
     return this.copy(isStrict = true, versions = versions.toSet())
   }
 
-  override fun <K : JsonSchemaKeyword<*>> withCustomKeywordLoader(keyword: KeywordInfo<K>, keywordExtractor: CustomKeywordLoader<K>): SchemaReader {
+  override fun <K : Keyword<*>> withCustomKeywordLoader(keyword: KeywordInfo<K>, keywordExtractor:  KeywordLoader<K>): SchemaReader {
     val newKeywordDigester = KeywordDigesterImpl(keyword, keywordExtractor)
-    return this.copy(additionalKeywords = this.additionalKeywords + newKeywordDigester)
+    return this.copy(additionalDigesters = this.additionalDigesters + newKeywordDigester)
   }
 
-  override operator fun <K : JsonSchemaKeyword<*>> plus(pair: Pair<KeywordInfo<K>, CustomKeywordLoader<K>>): SchemaReader {
+  override operator fun <K : Keyword<*>> plus(pair: Pair<KeywordInfo<K>, KeywordLoader<K>>): SchemaReader {
     return withCustomKeywordLoader(pair.first, pair.second)
   }
 }
 
-fun <K : JsonSchemaKeyword<*>> customKeyword(keyword: KeywordInfo<K>, keywordExtractor: (JsonValueWithPath) -> K):
-    Pair<KeywordInfo<K>, CustomKeywordLoader<K>> {
-  return keyword to object : CustomKeywordLoader<K> {
-    override fun loadKeywordFromJsonValue(jsonValue: JsonValueWithPath): K? = keywordExtractor(jsonValue)
+fun <K : Keyword<*>> customKeyword(keyword: KeywordInfo<K>, keywordExtractor: (JsonValueWithPath) -> K):
+    Pair<KeywordInfo<K>, KeywordLoader<K>> {
+  return keyword to object : KeywordLoader<K> {
+    override fun loadKeyword(jsonValue: JsonValueWithPath): K? = keywordExtractor(jsonValue)
   }
 }
 

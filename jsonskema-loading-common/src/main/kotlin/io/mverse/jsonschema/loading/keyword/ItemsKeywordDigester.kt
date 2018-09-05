@@ -19,20 +19,16 @@ class ItemsKeywordDigester : KeywordDigester<ItemsKeyword> {
   override val includedKeywords: List<KeywordInfo<ItemsKeyword>>
     get() = ITEMS.getTypeVariants(OBJECT, ARRAY)
 
-  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder<*>,
+  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder,
                               schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<ItemsKeyword>? {
     val itemsValue = jsonObject.path(Keywords.ITEMS)
     when (itemsValue.type) {
-      OBJECT -> builder.allItemSchema(
-          schemaLoader.subSchemaBuilder(itemsValue, itemsValue.rootObject, report)
-      )
+      OBJECT -> builder.allItemSchema = schemaLoader.subSchemaBuilder(itemsValue, itemsValue.rootObject, report)
       ARRAY -> itemsValue.forEachIndex { _, idxValue ->
         if (idxValue.type !== OBJECT) {
           report.error(typeMismatch(Keywords.ITEMS, idxValue))
         } else {
-          builder.itemSchema(
-              schemaLoader.subSchemaBuilder(idxValue, idxValue.rootObject, report)
-          )
+          builder.itemSchemas += schemaLoader.subSchemaBuilder(idxValue, idxValue.rootObject, report)
         }
       }
       else -> report.error(typeMismatch(Keywords.ITEMS, itemsValue))

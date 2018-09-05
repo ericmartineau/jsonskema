@@ -7,7 +7,7 @@ import lang.URI
 
 object ValidationMocks {
 
-  fun createTestValidator(schema: SchemaBuilder<*>): SchemaValidator {
+  fun createTestValidator(schema: SchemaBuilder): SchemaValidator {
     return createTestValidator(schema.build())
   }
 
@@ -15,51 +15,51 @@ object ValidationMocks {
     return JsonSchema.createValidatorFactory().createValidator(schema)
   }
 
-  fun mockArraySchema(): SchemaBuilder<*> {
+  fun mockArraySchema(): SchemaBuilder {
     return JsonSchemaBuilder().type(JsonSchemaType.ARRAY)
   }
 
-  fun mockBooleanSchema(): SchemaBuilder<*> {
+  fun mockBooleanSchema(): SchemaBuilder {
     return JsonSchemaBuilder().type(JsonSchemaType.BOOLEAN)
   }
 
-  fun mockBooleanSchema(id: URI): SchemaBuilder<*> {
+  fun mockBooleanSchema(id: URI): SchemaBuilder {
     return JsonSchemaBuilder(id).type(JsonSchemaType.BOOLEAN)
   }
 
-  fun mockBooleanSchema(id: String): SchemaBuilder<*> {
+  fun mockBooleanSchema(id: String): SchemaBuilder {
     return JsonSchema.schemaBuilder(id).type(JsonSchemaType.BOOLEAN)
   }
 
-  fun mockIntegerSchema(): SchemaBuilder<*> {
+  fun mockIntegerSchema(): SchemaBuilder {
     return JsonSchemaBuilder().type(JsonSchemaType.INTEGER)
   }
 
-  fun mockNullSchema(): SchemaBuilder<*> {
+  fun mockNullSchema(): SchemaBuilder {
     return JsonSchemaBuilder().type(JsonSchemaType.NULL)
   }
 
-  fun mockNumberSchema(): SchemaBuilder<*> {
+  fun mockNumberSchema(): SchemaBuilder {
     return JsonSchemaBuilder().type(JsonSchemaType.NUMBER)
   }
 
-  fun mockObjectSchema(): SchemaBuilder<*> {
+  fun mockObjectSchema(): SchemaBuilder {
     return JsonSchemaBuilder().type(JsonSchemaType.OBJECT)
   }
 
-  fun mockObjectSchema(id: String): SchemaBuilder<*> {
+  fun mockObjectSchema(id: String): SchemaBuilder {
     return JsonSchema.schemaBuilder(id).type(JsonSchemaType.OBJECT)
   }
 
-  fun mockObjectSchema(id: URI): SchemaBuilder<*> {
+  fun mockObjectSchema(id: URI): SchemaBuilder {
     return JsonSchemaBuilder(id).type(JsonSchemaType.OBJECT)
   }
 
-  fun mockSchema(): SchemaBuilder<*> {
+  fun mockSchema(): SchemaBuilder {
     return JsonSchemaBuilder()
   }
 
-  fun mockStringSchema(): SchemaBuilder<*> {
+  fun mockStringSchema(): SchemaBuilder {
     return JsonSchemaBuilder().type(JsonSchemaType.STRING)
   }
 }

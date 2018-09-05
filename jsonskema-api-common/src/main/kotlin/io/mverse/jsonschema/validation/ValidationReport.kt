@@ -9,15 +9,16 @@ import kotlinx.io.StringWriter
 import kotlinx.io.Writer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import lang.Name
 
 @Serializable
 class ValidationReport {
 
+  @Name("errors")
   val errors = mutableListOf<ValidationError>()
   private var foundError: Boolean = false
 
-  @Transient
-  val flattenedErrors: List<ValidationError> get() = errors.map { it.allMessages }.flatten()
+  @Name("isValid")
   val isValid: Boolean get() = !foundError
 
   operator fun plus(validationError: ValidationError): ValidationReport {
@@ -30,25 +31,6 @@ class ValidationReport {
   operator fun plusAssign(validationError: ValidationError) {
     errors += validationError
     foundError=true
-  }
-
-  fun addReport(schema: Schema,
-                subject: JsonValueWithPath,
-                keyword: KeywordInfo<*>,
-                message: String,
-                report: ValidationReport): Boolean {
-    val errors = report.errors
-    if (report.errors.isNotEmpty()) {
-      this += ValidationError(
-          violatedSchema = schema,
-          causes = errors,
-          keyword = keyword,
-          errorMessage = message,
-          code = "validation.keyword.${keyword.key}",
-          pointerToViolation = subject.path)
-      return false
-    }
-    return true
   }
 
   fun addReport(schema: Schema, subject: JsonValueWithPath, report: ValidationReport): Boolean {

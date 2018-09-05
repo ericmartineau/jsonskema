@@ -8,31 +8,6 @@ import kotlinx.serialization.json.JsonNull
 
 object LoadingIssues {
 
-  fun conflictingKeyword(foundKeyword: KeywordInfo<*>, conflictingKeyword: KeywordInfo<*>): LoadingIssue {
-    return LoadingIssue(
-        code = "keyword.conflicting",
-        value = JsonNull,
-        message = "Found keyword [%s] ($3s), but also found conflicting keyword [%s]",
-        arguments = listOf(foundKeyword.key, conflictingKeyword.key)
-    )
-  }
-
-  fun invalidKeywordValue(keyword: KeywordInfo<*>, message: String): LoadingIssue {
-    return LoadingIssue(
-        code = "keyword.invalid",
-        value = JsonNull,
-        message = "Invalid keyword [%s]: $message",
-        arguments = listOf(keyword))
-  }
-
-  fun missingKeywordIssue(foundKeyword: KeywordInfo<*>, expectedKeyword: KeywordInfo<*>): LoadingIssue {
-    return LoadingIssue(
-        code = "keyword.missing",
-        value = JsonNull,
-        message = "Found keyword [%s], was expecting [%s]",
-        arguments = listOf(foundKeyword.key, expectedKeyword.key))
-  }
-
   fun keywordNotFoundIssue(foundKeywordName: String, foundValue: JsonValueWithPath): LoadingIssue {
     return LoadingIssue(
         code = "keyword.notFound",
