@@ -4,3 +4,4 @@ waypoints-multi.iml
 build/
 .gradletasknamecache
 out/
+node_modules/
