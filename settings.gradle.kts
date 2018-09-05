@@ -1,6 +1,6 @@
 rootProject.name = "jsonskema"
 
-include("jsonskema-js")
+//include("jsonskema-js")
 include("jsonskema-util-common")
 include("jsonskema-core-common")
 include("jsonskema-loading-common")
