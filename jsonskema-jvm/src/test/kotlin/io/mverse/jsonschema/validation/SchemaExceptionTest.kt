@@ -33,6 +33,6 @@ class SchemaExceptionTest {
   }
 
   companion object {
-    private val NULL_SCHEMA = JsonSchema.schemaBuilder { type = (NULL) }
+    private val NULL_SCHEMA = JsonSchema.schema { type = (NULL) }
   }
 }

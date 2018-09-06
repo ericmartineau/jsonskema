@@ -20,6 +20,7 @@ import assertk.assertions.containsExactly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchema.schema
 import io.mverse.jsonschema.JsonSchema.schemaBuilder
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.assertj.asserts.asserting
@@ -40,8 +41,6 @@ import io.mverse.jsonschema.loading.parseJsonObject
 import io.mverse.jsonschema.minus
 import io.mverse.jsonschema.plus
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.schema
-import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.schemaReader
 import io.mverse.jsonschema.validation.ValidationMocks.mockArraySchema
 import io.mverse.jsonschema.validation.ValidationMocks.mockBooleanSchema
@@ -119,7 +118,7 @@ class ArraySchemaValidatorTest {
 
   @Test
   fun maxItems() {
-    val subject = buildWithLocation(schemaBuilder.apply { maxItems = 0 })
+    val subject = buildWithLocation(schemaBuilder { maxItems = 0 })
     failureOf(subject)
         .schema(subject)
         .expectedPointer("#")
@@ -131,7 +130,7 @@ class ArraySchemaValidatorTest {
 
   @Test
   fun minItems() {
-    val subject = buildWithLocation(schemaBuilder.apply { minItems = 2 })
+    val subject = buildWithLocation(schemaBuilder { minItems = 2 })
     failureOf(subject)
         .expectedPointer("#")
         .expectedKeyword("minItems")
@@ -141,13 +140,13 @@ class ArraySchemaValidatorTest {
 
   @Test
   fun noItemSchema() {
-    val schema = schemaBuilder {}
-    expectSuccess(schema, arrayTestCases.get("noItemSchema"))
+    val schema = schema()
+    expectSuccess(schema, arrayTestCases["noItemSchema"])
   }
 
   @Test
   fun nonUniqueArrayOfArrays() {
-    val subject = buildWithLocation(schemaBuilder.apply { needsUniqueItems = true })
+    val subject = buildWithLocation(schemaBuilder { needsUniqueItems = true })
     failureOf(subject)
         .expectedPointer("#")
         .expectedKeyword("uniqueItems")
@@ -216,7 +215,7 @@ class ArraySchemaValidatorTest {
 
   @Test
   fun uniqueItemsObjectViolation() {
-    val subject = schemaBuilder { needsUniqueItems = true }
+    val subject = schema { needsUniqueItems = true }
     expectFailure(subject, "#", arrayTestCases.get("nonUniqueObjects"))
   }
 
@@ -240,14 +239,14 @@ class ArraySchemaValidatorTest {
 
   @Test
   fun validate_WhenEqualNumbersWithDifferentLexicalRepresentations_ThenUnique() {
-    val arraySchema = mockArraySchema { needsUniqueItems = true }
+    val arraySchema = mockArraySchema.build { needsUniqueItems = true }
     arraySchema.validating("[1.0, 1, 1.00]".parseJson())
         .isValid()
   }
 
   @Test
   fun validate_WhenEqualNumbersWithSameLexicalRepresentations_ThenNotUnique() {
-    val arraySchema = mockArraySchema { needsUniqueItems = true }
+    val arraySchema = mockArraySchema.build { needsUniqueItems = true }
     val subject = "[1.0, 1.0, 1.00]".parseJson().jsonArray
     arraySchema.validating(subject)
         .isNotValid()
@@ -260,7 +259,7 @@ class ArraySchemaValidatorTest {
       enumValues = jsonArrayOf(12, 24.3, 65)
     }
 
-    val arraySchema = schemaBuilder {
+    val arraySchema = schema {
       allItemSchema = enumSchema
     }
 
@@ -281,7 +280,7 @@ class ArraySchemaValidatorTest {
       enumValues = "[12, 24.3, 65]".parseJson().jsonArray
     }
 
-    val arraySchema = schemaBuilder {
+    val arraySchema = schema {
       allItemSchema = enumSchema
     }
 
@@ -296,7 +295,7 @@ class ArraySchemaValidatorTest {
       enumValues = jsonArrayOf(12, 24.3, 65)
     }
 
-    val arraySchema = schemaBuilder {
+    val arraySchema = schema {
       allItemSchema = enumSchema
     }
 
@@ -306,9 +305,5 @@ class ArraySchemaValidatorTest {
         .hasViolationAt("#/1")
         .hasKeyword(ENUM)
         .hasSchemaLocation("#/items")
-  }
-
-  private fun ValidationMocks.createTestValidator(schema: Schema): SchemaValidator {
-    return SchemaValidatorFactoryImpl.builder().build().createValidator(schema)
   }
 }

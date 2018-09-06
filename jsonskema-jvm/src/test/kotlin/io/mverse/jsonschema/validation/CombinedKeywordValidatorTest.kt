@@ -33,7 +33,7 @@ class CombinedKeywordValidatorTest {
 
   @Test
   fun reportCauses() {
-    val parentSchema = JsonSchema.schemaBuilder {
+    val parentSchema = JsonSchema.schema {
       allOfSchemas = SUBSCHEMAS
     }
     val subject = "24".parseJson()
@@ -45,21 +45,21 @@ class CombinedKeywordValidatorTest {
 
   @Test
   fun validateAll() {
-    JsonSchema.schemaBuilder { allOfSchemas = SUBSCHEMAS }
+    JsonSchema.schema { allOfSchemas = SUBSCHEMAS }
         .validating(20.toJsonLiteral())
         .hasKeyword(ALL_OF)
   }
 
   @Test
   fun validateAny() {
-    JsonSchema.schemaBuilder { anyOfSchemas = SUBSCHEMAS }
+    JsonSchema.schema { anyOfSchemas = SUBSCHEMAS }
         .validating(5.toJsonLiteral())
         .hasKeyword(ANY_OF)
   }
 
   @Test
   fun validateOne() {
-    JsonSchema.schemaBuilder { oneOfSchemas = SUBSCHEMAS }
+    JsonSchema.schema { oneOfSchemas = SUBSCHEMAS }
         .validating(30.toJsonLiteral())
         .hasKeyword(ONE_OF)
   }

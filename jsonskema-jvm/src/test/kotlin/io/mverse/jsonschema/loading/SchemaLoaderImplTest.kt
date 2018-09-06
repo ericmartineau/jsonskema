@@ -24,7 +24,6 @@ import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.StringKeyword
 import io.mverse.jsonschema.loading.reference.DefaultJsonDocumentClient
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.schema
 import io.mverse.jsonschema.schemaReader
 import kotlinx.serialization.json.json
 import lang.URI

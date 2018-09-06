@@ -8,7 +8,6 @@ import io.mverse.jsonschema.assertj.asserts.isValid
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.keyword.Keywords
-import io.mverse.jsonschema.schema
 import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.ValidationMocks
 import lang.json.jsonArrayOf
@@ -21,11 +20,11 @@ class ArrayContainsValidatorTest {
   fun validate_DoesntContains() {
     val containsSchema = JsonSchema.schema {
       type = JsonSchemaType.ARRAY
-      containsSchema = JsonSchema.schemaBuilder.apply {
+      containsSchema = JsonSchema.schemaBuilder  {
         anyOfSchemas = listOf(
-            JsonSchema.schemaBuilder.apply { constValue = 3.toJsonLiteral() },
-            JsonSchema.schemaBuilder.apply { constValue = 4.0.toJsonLiteral() },
-            JsonSchema.schemaBuilder.apply { constValue = "5".toJsonLiteral() })
+            schemaBuilder { constValue = 3.toJsonLiteral() },
+            schemaBuilder { constValue = 4.0.toJsonLiteral() },
+            schemaBuilder  { constValue = "5".toJsonLiteral() })
       }
     }
 
@@ -44,9 +43,9 @@ class ArrayContainsValidatorTest {
       type = JsonSchemaType.ARRAY
       containsSchema = JsonSchema.schemaBuilder().apply {
         anyOfSchemas = listOf(
-            JsonSchema.schemaBuilder.apply { constValue = 3.toJsonLiteral() },
-            JsonSchema.schemaBuilder.apply { constValue = 4.0.toJsonLiteral() },
-            JsonSchema.schemaBuilder.apply { constValue = "5".toJsonLiteral() })
+            schemaBuilder { constValue = 3.toJsonLiteral() },
+            schemaBuilder { constValue = 4.0.toJsonLiteral() },
+            schemaBuilder { constValue = "5".toJsonLiteral() })
       }
     }
 

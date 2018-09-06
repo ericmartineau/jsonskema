@@ -5,6 +5,7 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchema.schemaBuilder
 import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.assertj.asserts.isValid
 import io.mverse.jsonschema.assertj.asserts.validating
@@ -44,7 +45,7 @@ class BaseSchemaValidatorEnumTest {
   @Test
   fun objectInArrayMatches() {
     val possibleValues = (this.possibleValues + json { "a" to true }).toJsonArray()
-    val subject = subjectBuilder().invoke { enumValues = possibleValues }
+    val subject = subjectBuilder().build { enumValues = possibleValues }
 
     val testValues = json { "a" to true }
     subject.validating(testValues)
@@ -80,7 +81,7 @@ class BaseSchemaValidatorEnumTest {
     val testEnum = "[1, 1.0, 1.00]".parseJson().jsonArray
     val testValNotSame = "1.000".toJsonLiteral()
 
-    val schema = JsonSchema.schemaBuilder { enumValues = testEnum }
+    val schema = JsonSchema.schema { enumValues = testEnum }
 
     val validate = ValidationMocks.createTestValidator(schema).validate(testValNotSame)
 
@@ -93,7 +94,7 @@ class BaseSchemaValidatorEnumTest {
     val testEnum = "[1, 1.0, 1.00]".parseJson().jsonArray
     val testValNotSame = "1.00".parseJson()
 
-    val schema = mockSchema { enumValues = testEnum }
+    val schema = mockSchema.build { enumValues = testEnum }
     schema.validating(testValNotSame)
         .isValid()
   }
@@ -107,7 +108,7 @@ class BaseSchemaValidatorEnumTest {
         possibleValues + json { "a" to true },
         42)
 
-    val subject = subjectBuilder().invoke { enumValues = (possibleValuesContainer) }
+    val subject = subjectBuilder().build { enumValues = (possibleValuesContainer) }
     val testValues = jsonArrayOf(true, "foo", json { "a" to true })
 
     expectSuccess {
@@ -120,7 +121,7 @@ class BaseSchemaValidatorEnumTest {
   fun validate_WhenSubjectIsArray_AndEnumIsAppliedToTheArray_ThenTheArrayFailsToValidate() {
     val possibleValues = this.possibleValues + json { "a" to true }
 
-    val subject = subjectBuilder().invoke { enumValues = (possibleValues) }
+    val subject = subjectBuilder().build { enumValues = (possibleValues) }
 
     val testValues = jsonArrayOf(json { "a" to true })
 
@@ -130,7 +131,7 @@ class BaseSchemaValidatorEnumTest {
   }
 
   private fun subjectBuilder(): SchemaBuilder {
-    return JsonSchema.schemaBuilder.apply { enumValues = possibleValues }
+    return schemaBuilder { enumValues = possibleValues }
   }
 
   operator fun JsonArray.plus(iterable: Iterable<Any?>): JsonArray = (this.content + iterable).toJsonArray()

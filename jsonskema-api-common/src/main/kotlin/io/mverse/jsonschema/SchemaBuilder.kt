@@ -110,7 +110,7 @@ interface SchemaBuilder {
   var thenSchema: SchemaBuilder?
   var elseSchema: SchemaBuilder?
 
-  operator fun invoke(block: SchemaBuilder.() -> Unit): Schema
+  operator fun invoke(block: SchemaBuilder.() -> Unit): SchemaBuilder
 
   // ##################################################################
   // ########           INNER KEYWORDS                   ##############
@@ -120,6 +120,8 @@ interface SchemaBuilder {
 
   @Name("buildWithLocation")
   fun build(itemsLocation: SchemaLocation? = null, report: LoadingReport): Schema
+
+  fun build(block:SchemaBuilder.()->Unit):Schema
 
   var loadingReport: LoadingReport
   var schemaLoader: SchemaLoader?

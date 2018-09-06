@@ -26,12 +26,12 @@ object ValidationMocks {
 
   val mockArraySchema: SchemaBuilder
     get() {
-      return schemaBuilder.apply { type = ARRAY }
+      return schemaBuilder { type = ARRAY }
     }
 
   val mockBooleanSchema: SchemaBuilder
     get() {
-      return schemaBuilder.apply { type = BOOLEAN }
+      return schemaBuilder { type = BOOLEAN }
     }
 
   fun mockBooleanSchema(id: URI): SchemaBuilder {
@@ -44,22 +44,22 @@ object ValidationMocks {
 
   val mockIntegerSchema: SchemaBuilder
     get() {
-      return schemaBuilder.apply { type = INTEGER }
+      return schemaBuilder { type = INTEGER }
     }
 
   val mockNullSchema: SchemaBuilder
     get() {
-      return schemaBuilder.apply { type = NULL }
+      return schemaBuilder { type = NULL }
     }
 
   val mockNumberSchema: SchemaBuilder
     get() {
-      return schemaBuilder.apply { type = NUMBER }
+      return schemaBuilder { type = NUMBER }
     }
 
   val mockObjectSchema: SchemaBuilder
     get() {
-      return schemaBuilder.apply { type = OBJECT }
+      return schemaBuilder { type = OBJECT }
     }
 
   val mockSchema:SchemaBuilder get() = JsonSchemaBuilder()
@@ -77,6 +77,6 @@ object ValidationMocks {
 
   val mockStringSchema: SchemaBuilder
     get() {
-      return schemaBuilder.apply { type = STRING }
+      return schemaBuilder { type = STRING }
     }
 }

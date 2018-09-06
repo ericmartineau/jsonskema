@@ -16,7 +16,6 @@ import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.URIKeyword
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
-import io.mverse.jsonschema.schema
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.json
 import lang.URI

@@ -7,7 +7,6 @@ import assertk.assertions.isNotNull
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.assertj.asserts.asserting
 import io.mverse.jsonschema.enums.JsonSchemaType
-import io.mverse.jsonschema.schema
 import org.junit.Test
 
 /**

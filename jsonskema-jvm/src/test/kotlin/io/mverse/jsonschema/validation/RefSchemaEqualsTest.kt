@@ -43,7 +43,7 @@ class RefSchemaEqualsTest {
 
   @Test
   fun toStringTest_Builder() {
-    val schema = JsonSchema.schemaBuilder {
+    val schema = JsonSchema.schema {
       properties["foo"] = {
         ref = URI("#")
       }

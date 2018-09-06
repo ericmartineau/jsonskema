@@ -11,7 +11,7 @@ class JsonSchemaValidatorTest {
 
   @Test
   fun validate_WhenValueIsNull_AppliesNullValidators() {
-    val constSchema = JsonSchema.schemaBuilder {
+    val constSchema = JsonSchema.schema {
       constValue = 3.0.toJsonLiteral()
     }
 

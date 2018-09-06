@@ -11,7 +11,6 @@ import io.mverse.jsonschema.assertj.asserts.isValid
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.keyword.Keywords.ADDITIONAL_PROPERTIES
-import io.mverse.jsonschema.schema
 import kotlinx.serialization.json.json
 import kotlin.test.Test
 

@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.validation
 
 import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchema.schema
 import io.mverse.jsonschema.JsonSchema.schemaBuilder
 import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.ValidationMocks.createTestValidator
@@ -12,7 +13,7 @@ import org.junit.Test
 class BaseSchemaValidatorNotSchemaTest {
   @Test
   fun failure() {
-    val subject = schemaBuilder { notSchema = mockBooleanSchema }
+    val subject = schema { notSchema = mockBooleanSchema }
     ValidationTestSupport.failureOf(subject)
         .validator(createTestValidator(subject))
         .input(true.toJsonLiteral())

@@ -6,7 +6,6 @@ import io.mverse.jsonschema.assertj.asserts.isNotValid
 import io.mverse.jsonschema.assertj.asserts.isValid
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.keyword.Keywords
-import io.mverse.jsonschema.schema
 import lang.json.jsonArrayOf
 import lang.json.toJsonLiteral
 import kotlin.test.Test

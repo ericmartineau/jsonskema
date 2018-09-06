@@ -239,7 +239,7 @@ class ObjectKeywordsValidatorTest {
 
   @Test
   fun patternPropertyViolation() {
-    val subject = mockObjectSchema {
+    val subject = mockObjectSchema.build {
       patternProperties["^b_.*"] = mockBooleanSchema
       patternProperties["^s_.*"] = mockStringSchema
     }
@@ -249,7 +249,7 @@ class ObjectKeywordsValidatorTest {
 
   @Test
   fun patternPropsOverrideAdditionalProps() {
-    val schema = mockObjectSchema {
+    val schema = mockObjectSchema.build {
       patternProperties["^v.*"] = mockSchema
       schemaOfAdditionalProperties = mockBooleanSchema.apply { constValue = false.toJsonLiteral() }
 
@@ -293,16 +293,17 @@ class ObjectKeywordsValidatorTest {
 
   @Test
   fun propertySchemaViolation() {
-    val subject = mockObjectSchema {
+    val subject = mockObjectSchema.build() {
        properties["boolProp"] = mockBooleanSchema
     }
+
     expectFailure(subject, mockBooleanSchema.build(), "#/boolProp",
         objectTestCases.get("propertySchemaViolation"))
   }
 
   @Test
   fun requireObject() {
-    expectFailure(mockObjectSchema {}, "#", "foo".toJsonLiteral())
+    expectFailure(mockObjectSchema.build {}, "#", "foo".toJsonLiteral())
   }
 
   @Test
@@ -329,7 +330,8 @@ class ObjectKeywordsValidatorTest {
       properties["name"] = mockStringSchema
       properties["credit_card"] = mockNumberSchema
     }
-    val subject = schemaBuilder {
+
+    val subject = schemaBuilder.build {
       schemaDependencies += "credit_card" to mockObjectSchema.apply {
         requiredProperties += "billing_address"
       }

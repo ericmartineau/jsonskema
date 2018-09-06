@@ -41,7 +41,7 @@ class NumberSchemaTest {
 
   @Test
   fun exclusiveMaximum() {
-    val schema = mockNumberSchema { exclusiveMaximum = (20) }
+    val schema = mockNumberSchema.build { exclusiveMaximum = (20) }
     schema.validating(20.toJsonLiteral())
         .isNotValid()
         .hasKeyword(EXCLUSIVE_MAXIMUM)
@@ -91,7 +91,7 @@ class NumberSchemaTest {
 
   @Test
   fun notRequiresNumber() {
-    val numberSchema = mockSchema {}
+    val numberSchema = mockSchema.build()
     expectSuccess { JsonSchema.getValidator(numberSchema).validate("foo".toJsonLiteral()) }
   }
 
@@ -103,13 +103,13 @@ class NumberSchemaTest {
 
   @Test
   fun requiresIntegerFailure() {
-    val subject = mockIntegerSchema {}
+    val subject = mockIntegerSchema.build()
     ValidationTestSupport.expectFailure(subject, 10.2f.toJsonLiteral())
   }
 
   @Test
   fun smallMultipleOf() {
-    val schema = mockNumberSchema {
+    val schema = mockNumberSchema.build {
       multipleOf = 0.0001
     }
 
@@ -118,7 +118,7 @@ class NumberSchemaTest {
 
   @Test
   fun success() {
-    val schema = mockNumberSchema {
+    val schema = mockNumberSchema.build {
       minimum = 10.0
       exclusiveMaximum = 11.0
       multipleOf = (10)

@@ -8,7 +8,6 @@ import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaException
 import io.mverse.jsonschema.enums.JsonSchemaType
-import io.mverse.jsonschema.schema
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 

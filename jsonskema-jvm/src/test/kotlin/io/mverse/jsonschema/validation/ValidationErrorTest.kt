@@ -82,7 +82,7 @@ class ValidationErrorTest {
 
   @Test
   fun throwForMultipleFailures() {
-    val failedSchema = mockNullSchema{}
+    val failedSchema = mockNullSchema.build{}
     val input1 = ValidationError(
         violatedSchema = failedSchema,
         code = "code",
@@ -115,7 +115,7 @@ class ValidationErrorTest {
 
   @Test
   fun collectError_WhenSingleFailure_ThenFailureIsReturned() {
-    val failedSchema = mockNullSchema {}
+    val failedSchema = mockNullSchema.build()
     val input = ValidationError(
         violatedSchema = failedSchema,
         code = "code",
@@ -143,7 +143,7 @@ class ValidationErrorTest {
   @Test
   fun toJsonWithCauses() {
     val cause = ValidationError(
-        violatedSchema = mockNullSchema {},
+        violatedSchema = mockNullSchema.build(),
         code = "code",
         messageTemplate = "cause msg %s",
         keyword = Keywords.TYPE,
@@ -151,7 +151,7 @@ class ValidationErrorTest {
         arguments = listOf("foo", "bar"))
 
     val subject = ValidationError(
-        violatedSchema = mockNullSchema {},
+        violatedSchema = mockNullSchema.build(),
         errorMessage = "exception message",
         keyword = null,
         causes = listOf(cause),

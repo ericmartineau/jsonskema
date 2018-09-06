@@ -51,12 +51,13 @@ class StringSchemaTest {
 
   @Test
   fun formatSuccess() {
-    val schemaValidator = validatorFactory.createValidator(mockStringSchema { format = "test-format-success" })
+    val schemaValidator = validatorFactory
+        .createValidator(mockStringSchema.build { format = "test-format-success" })
     expectSuccess { schemaValidator.validate("string".toJsonLiteral()) }
   }
 
   fun issue38Pattern() {
-    val schema = mockStringSchema { pattern = "\\+?\\d+" }
+    val schema = mockStringSchema.build { pattern = "\\+?\\d+" }
     val validator = ValidationMocks.createTestValidator(schema)
     verifyFailure { validator.validate("aaa".toJsonLiteral()) }
   }
@@ -94,7 +95,7 @@ class StringSchemaTest {
 
   @Test
   fun notRequiresString() {
-    val schema = mockSchema {}
+    val schema = mockSchema.build {}
     expectSuccess(schema, 2)
   }
 
@@ -107,14 +108,14 @@ class StringSchemaTest {
   @Test
   fun patternSuccess() {
 
-    val schema = mockStringSchema { pattern = ("^a*$") }
+    val schema = mockStringSchema.build { pattern = ("^a*$") }
     expectSuccess(schema, "aaaa")
   }
 
   @Test
   fun success() {
 
-    expectSuccess(mockStringSchema {}, "foo")
+    expectSuccess(mockStringSchema.build {}, "foo")
   }
 
   @Test

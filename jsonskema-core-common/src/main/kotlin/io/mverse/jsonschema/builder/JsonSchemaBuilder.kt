@@ -165,8 +165,8 @@ class JsonSchemaBuilder(
     }
   }
 
-  override fun invoke(block: SchemaBuilder.() -> Unit): Schema {
-    return apply(block).build()
+  override fun invoke(block: SchemaBuilder.() -> Unit): SchemaBuilder {
+    return apply(block)
   }
 
   // #######  KEYWORDS  ########  //
@@ -499,7 +499,7 @@ class JsonSchemaBuilder(
 
   override fun build(): Schema = this.build(block = {})
 
-  fun build(block: JsonSchemaBuilder.() -> Unit): Schema {
+  override fun build(block: SchemaBuilder.() -> Unit): Schema {
     this.block()
     val location: SchemaLocation = @Suppress("USELESS_ELVIS")
     when {

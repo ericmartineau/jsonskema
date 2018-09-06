@@ -10,7 +10,6 @@ import io.mverse.jsonschema.enums.JsonSchemaType.NULL
 import io.mverse.jsonschema.enums.JsonSchemaType.NUMBER
 import io.mverse.jsonschema.enums.JsonSchemaType.OBJECT
 import io.mverse.jsonschema.enums.JsonSchemaType.STRING
-import io.mverse.jsonschema.schema
 import kotlinx.serialization.json.JsonNull
 import lang.json.jsonArrayOf
 import org.junit.Test
