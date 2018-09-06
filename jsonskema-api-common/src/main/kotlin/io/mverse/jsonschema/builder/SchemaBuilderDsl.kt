@@ -55,7 +55,10 @@ open class SchemaBuilderDsl(val schemaBuilder: SchemaBuilder = createSchemaBuild
 
   infix fun String.optional(schema: SchemaBuilderDsl) {
     val key = this
-    schema.types += JsonSchemaType.NULL
+    if (!schema.types.isEmpty()) {
+      schema.types += JsonSchemaType.NULL
+    }
+
     this@SchemaBuilderDsl.properties[key] = schema
   }
 
@@ -66,7 +69,7 @@ open class SchemaBuilderDsl(val schemaBuilder: SchemaBuilder = createSchemaBuild
   infix fun String.ref(uri: URI) {
     val key = this
     this@SchemaBuilderDsl.properties[key] = {
-      ref(uri)
+      ref = uri
     }
     this@SchemaBuilderDsl.requiredProperties += key
   }
@@ -74,7 +77,7 @@ open class SchemaBuilderDsl(val schemaBuilder: SchemaBuilder = createSchemaBuild
   infix fun String.optionalref(uri: URI) {
     val key = this
     this@SchemaBuilderDsl.properties[key] = {
-      ref(uri)
+      ref = uri
     }
   }
 
