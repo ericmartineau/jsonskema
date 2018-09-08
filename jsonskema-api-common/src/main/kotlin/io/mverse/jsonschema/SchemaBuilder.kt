@@ -66,6 +66,7 @@ interface SchemaBuilder {
 
   var propertyNameSchema: SchemaBuilder?
   var patternProperties: MutableSchemaMap
+  var definitions: MutableSchemaMap
 
   var minProperties: Int?
   var maxProperties: Int?

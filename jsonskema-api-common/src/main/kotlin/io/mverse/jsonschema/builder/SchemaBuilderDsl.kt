@@ -1,6 +1,5 @@
 package io.mverse.jsonschema.builder
 
-import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.JsonSchema.createSchemaBuilder
 import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.enums.FormatType

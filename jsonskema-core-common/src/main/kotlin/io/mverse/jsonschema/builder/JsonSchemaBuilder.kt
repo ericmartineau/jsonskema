@@ -29,6 +29,7 @@ import io.mverse.jsonschema.keyword.Keywords.CONTAINS
 import io.mverse.jsonschema.keyword.Keywords.CONTENT_ENCODING
 import io.mverse.jsonschema.keyword.Keywords.CONTENT_MEDIA_TYPE
 import io.mverse.jsonschema.keyword.Keywords.DEFAULT
+import io.mverse.jsonschema.keyword.Keywords.DEFINITIONS
 import io.mverse.jsonschema.keyword.Keywords.DEPENDENCIES
 import io.mverse.jsonschema.keyword.Keywords.DESCRIPTION
 import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
@@ -316,6 +317,7 @@ class JsonSchemaBuilder(
 
   override var properties: MutableSchemaMap = MutableSchemaMap(PROPERTIES, this)
   override var patternProperties = MutableSchemaMap(PATTERN_PROPERTIES, this)
+  override var definitions = MutableSchemaMap(DEFINITIONS, this)
 
   override var propertyNameSchema: SchemaBuilder?
     get() = values[PROPERTY_NAMES]?.toBuilder()
