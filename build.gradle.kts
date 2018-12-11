@@ -11,6 +11,7 @@ allprojects  {
   plugins.apply("kotlinx-serialization")
   mverse {
     isDefaultDependencies = false
+    coverageRequirement = 0.63
     bom = "io.mverse:mverse-bom:0.5.13"
   }
 
