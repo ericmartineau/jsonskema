@@ -2,11 +2,17 @@ package io.mverse.jsonschema.enums
 
 import assertk.assert
 import assertk.assertions.isEqualTo
+import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.json.JSON
+import kotlinx.serialization.parse
+import kotlinx.serialization.stringify
+import lang.json.JSON
+import lang.json.kjson
 import org.junit.Test
 
 class JsonSchemaTypeTest {
   @Test
+  @UseExperimental(ImplicitReflectionSerializer::class)
   fun testSerialization() {
     val serialized = JSON.stringify(JsonSchemaType.NUMBER)
     assert(serialized).isEqualTo("\"number\"")

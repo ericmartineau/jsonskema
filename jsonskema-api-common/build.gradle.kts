@@ -4,8 +4,8 @@ mverse  {
     compile(kotlinStdlib())
     compile("kotlin-reflect")
     compile(kotlinTest())
-    compile(kotlinSerialization())
     compile(kotlinImmutable())
+    compile("kotlinx-serialization-runtime-common")
   }
 }
 

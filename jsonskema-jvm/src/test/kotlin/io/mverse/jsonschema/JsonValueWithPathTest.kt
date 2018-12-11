@@ -14,6 +14,7 @@ import io.mverse.jsonschema.TestUtils.createValue
 import io.mverse.jsonschema.enums.JsonSchemaType
 import kotlinx.serialization.json.ElementType.NULL
 import kotlinx.serialization.json.ElementType.OBJECT
+import kotlinx.serialization.json.JsonElementTypeMismatchException
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.json
 import lang.json.toJsonLiteral
@@ -85,7 +86,7 @@ class JsonValueWithPathTest {
     assert {
       createJsonObjectWithLocation().jsonArray
     }.thrownError {
-      isInstanceOf(IllegalStateException::class)
+      isInstanceOf(JsonElementTypeMismatchException::class)
     }
   }
 
@@ -94,7 +95,7 @@ class JsonValueWithPathTest {
     assert(createJsonNumberWithLocation(34.4).number).isNotNull()
   }
 
-  @Test(expected = IllegalStateException::class)
+  @Test(expected = JsonElementTypeMismatchException::class)
   fun testAsJsonNumber_WhenNotNumber_ThrowsUVE() {
     createJsonObjectWithLocation().number
   }
@@ -104,7 +105,7 @@ class JsonValueWithPathTest {
     assert(createJsonObjectWithLocation().jsonObject).isNotNull()
   }
 
-  @Test(expected = IllegalStateException::class)
+  @Test(expected = JsonElementTypeMismatchException::class)
   fun testAsJsonObject_WhenNotObject_ThrowsUVE() {
     createJsonArrayWithLocation().jsonObject
   }

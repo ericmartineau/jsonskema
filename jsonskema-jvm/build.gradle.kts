@@ -5,8 +5,8 @@ plugins {
 mverse  {
   dependencies {
     compile("kotlin-reflect")
-    compile(kotlinSerialization())
     compile(kotlinIO())
+    compile("kotlinx-serialization-runtime")
   }
 }
 
@@ -15,7 +15,7 @@ dependencies {
 //  compile("org.glassfish:javax.json:1.1.2")
 
 
-  compile("com.github.pvdberg1998:hashkode:1.2.3")
+  compile("io.mverse:hashkode:1.0.1")
 
   // Guava is a suite of core and expanded libraries that include
   //utility classes, google's collections, io classes, and much

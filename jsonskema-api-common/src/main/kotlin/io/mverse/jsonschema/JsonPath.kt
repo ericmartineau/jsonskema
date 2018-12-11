@@ -6,9 +6,16 @@ import io.mverse.jsonschema.utils.CharUtils.forwardSlashSeparator
 import io.mverse.jsonschema.utils.CharUtils.jsonPointerSegmentEscaper
 import io.mverse.jsonschema.utils.CharUtils.jsonPointerSegmentUnescaper
 import io.mverse.jsonschema.utils.CharUtils.urlSegmentUnescaper
+import kotlinx.serialization.Decoder
+import kotlinx.serialization.Encoder
 import kotlinx.serialization.KInput
 import kotlinx.serialization.KOutput
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.Serializer
+import kotlinx.serialization.internal.SerialClassDescImpl
+import kotlinx.serialization.internal.StringDescriptor
+import kotlinx.serialization.withName
 import lang.Escapers.Companion.urlPathSegmentEscaper
 import lang.Global
 import lang.Joiner
@@ -177,13 +184,15 @@ class JsonPath : Iterable<String> {
   }
 
   @Serializer(forClass = JsonPath::class)
-  companion object {
-    override fun save(output: KOutput, obj: JsonPath) {
-      output.writeStringValue(obj.toJsonPointer())
+  companion object: KSerializer<JsonPath> {
+    override val descriptor: SerialDescriptor = StringDescriptor.withName("JsonPath")
+
+    override fun deserialize(input: Decoder): JsonPath {
+      return JsonPath.parseJsonPointer(input.decodeString())
     }
 
-    override fun load(input: KInput): JsonPath {
-      return JsonPath.parseJsonPointer(input.readStringValue())
+    override fun serialize(output: Encoder, obj: JsonPath) {
+      output.encodeString(obj.toJsonPointer())
     }
 
     @Global

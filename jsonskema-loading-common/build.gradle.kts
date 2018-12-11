@@ -4,7 +4,7 @@ mverse  {
   dependencies {
     compile("kotlin-reflect")
     compile(kotlinIO())
-    compile(kotlinIO())
+    compile("kotlinx-serialization-runtime-common")
   }
 }
 

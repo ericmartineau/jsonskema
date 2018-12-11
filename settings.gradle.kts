@@ -20,7 +20,7 @@ pluginManagement {
   resolutionStrategy {
     this.eachPlugin {
       if (requested.id.id == "kotlinx-serialization") {
-        this.useModule("org.jetbrains.kotlinx:kotlinx-gradle-serialization-plugin:${requested.version}")
+        useModule("org.jetbrains.kotlin:kotlin-serialization:${requested.version}")
       }
     }
   }

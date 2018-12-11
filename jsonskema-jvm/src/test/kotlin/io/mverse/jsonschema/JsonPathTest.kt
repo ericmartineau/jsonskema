@@ -8,12 +8,16 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
+import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.json.JSON
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.json
+import kotlinx.serialization.parse
+import kotlinx.serialization.stringify
 import lang.json.toJsonArray
 import lang.json.get
+import lang.json.kjson
 import kotlin.test.Test
 
 class JsonPathTest {
@@ -33,11 +37,12 @@ class JsonPathTest {
   }
 
   @Test
+  @UseExperimental(ImplicitReflectionSerializer::class)
   fun testSerialize() {
     val path = JsonPath.parseJsonPointer("/bob/jones/richard")
-    val serialized = JSON.stringify(path)
+    val serialized = kjson.stringify(JsonPath.serializer(), path)
     assert(serialized).isEqualTo("\"/bob/jones/richard\"")
-    val parsed = JSON.parse<JsonPath>("/bob/jones/richard")
+    val parsed = kjson.parse<JsonPath>("/bob/jones/richard")
     assert(parsed).isEqualTo(path)
   }
 

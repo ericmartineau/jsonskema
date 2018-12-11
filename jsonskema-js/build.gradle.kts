@@ -19,15 +19,12 @@ mverse  {
   dependencies {
     compile("kotlin-reflect")
     compile(kotlinStdlib())
-    compile(kotlinSerialization())
     compile(kotlinImmutable())
-//    compile("kotlinx-io-js")
   }
 }
 
 dependencies {
   compile("com.willowtreeapps.assertk:assertk-js:0.12")
-  compile("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.60.1")
   compile("org.jetbrains.kotlin:kotlin-stdlib-js")
   expectedBy(project(":jsonskema-util-common"))
   expectedBy(project(":jsonskema-api-common"))

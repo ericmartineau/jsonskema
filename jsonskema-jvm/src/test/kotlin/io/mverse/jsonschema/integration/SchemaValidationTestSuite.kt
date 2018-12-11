@@ -23,6 +23,7 @@ import io.mverse.jsonschema.loading.parseJson
 import io.mverse.jsonschema.createSchemaReader
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.content
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletHandler

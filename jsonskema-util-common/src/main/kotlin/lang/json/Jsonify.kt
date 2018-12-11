@@ -1,5 +1,7 @@
 package lang.json
 
+import kotlinx.serialization.context.SimpleModule
+import kotlinx.serialization.json.JSON
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonLiteral
@@ -7,6 +9,9 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import lang.illegalState
+
+
+val kjson = JSON.nonstrict
 
 enum class ElementType {
   NUMBER,

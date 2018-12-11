@@ -26,6 +26,7 @@ import io.mverse.jsonschema.loading.parseJsonObject
 import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.ValidationMocks.createTestValidator
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
+import kotlinx.serialization.json.content
 import lang.json.toJsonLiteral
 import org.junit.Assert
 import org.junit.Test
@@ -47,21 +48,21 @@ class EmptySchemaTest {
   fun testOnlyId() {
     val actual = roundTripSchema(id = "my/id")
     assert(actual.keys).hasSize(1)
-    assert(actual[Keywords.DOLLAR_ID_KEY].string).isEqualTo("my/id")
+    assert(actual[Keywords.DOLLAR_ID_KEY].content).isEqualTo("my/id")
   }
 
   @Test
   fun testOnlySchemaDescription() {
     val actual = roundTripSchema(description = "descr")
     assert(actual.keys).hasSize(1)
-    assert(actual["description"].string).isEqualTo("descr")
+    assert(actual["description"].content).isEqualTo("descr")
   }
 
   @Test
   fun testOnlyTitle() {
     val actual = roundTripSchema("my title", null, null)
     assert(actual.keys).containsAll("title")
-    assert(actual["title"].string).isEqualTo("my title")
+    assert(actual["title"].content).isEqualTo("my title")
   }
 
   @Test

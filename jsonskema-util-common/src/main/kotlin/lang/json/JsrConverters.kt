@@ -46,7 +46,7 @@ fun JsonElement.toJsonValueJsr(): JsrValue = when (this) {
       is Long -> createJsrNumber(this.number as Long)
       else -> createJsrNumber(this.number.toDouble())
     }
-    ElementType.STRING -> createJsrString(this.string)
+    ElementType.STRING -> createJsrString(this.toString())
     ElementType.BOOLEAN -> when (this.boolean) {
       true -> JsrTrue
       false -> JsrFalse

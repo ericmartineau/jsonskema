@@ -3,13 +3,18 @@ package io.mverse.jsonschema.keyword
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.enums.appliesTo
-import kotlinx.serialization.KInput
-import kotlinx.serialization.KOutput
+import kotlinx.serialization.Decoder
+import kotlinx.serialization.Encoder
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.Serializer
-import kotlinx.serialization.Transient
+import kotlinx.serialization.internal.SerialClassDescImpl
+import kotlinx.serialization.internal.StringDescriptor
+import kotlinx.serialization.internal.StringSerializer
 import kotlinx.serialization.json.ElementType
+import kotlinx.serialization.withName
 import lang.Serializable
+import lang.SerializableWith
 import lang.hashKode
 import lang.illegalState
 import lang.range
@@ -24,7 +29,7 @@ import lang.range
  *
  * @param <K> The type of value this keyword produces (a schema, a string, an array, etc)
 </K> */
-@Serializable
+@SerializableWith(KeywordInfoSerializer::class)
 data class KeywordInfo<K : Keyword<*>>(
     val key: String,
 
@@ -58,9 +63,9 @@ data class KeywordInfo<K : Keyword<*>>(
     val variants: Map<ElementType, KeywordInfo<K>> = emptyMap()) {
 
   internal constructor(mainInfo: KeywordInfo<K>, allVersions: List<KeywordVersionInfoBuilder<K>>)
-    : this(key = mainInfo.key,
-      forSchemas=mainInfo.forSchemas,
-      applicableTypes=mainInfo.applicableTypes,
+      : this(key = mainInfo.key,
+      forSchemas = mainInfo.forSchemas,
+      applicableTypes = mainInfo.applicableTypes,
       expects = mainInfo.expects,
       applicableVersions = mainInfo.applicableVersions,
       mostRecentVersion = mainInfo.mostRecentVersion,
@@ -69,16 +74,16 @@ data class KeywordInfo<K : Keyword<*>>(
           .map { it.build() }
           .map { it.expects to it }
           .toMap()
-      )
+  )
 
   internal constructor(mainInfo: KeywordVersionInfoBuilder<K>, allVersions: List<KeywordVersionInfoBuilder<K>>)
-    : this(mainInfo = mainInfo.build(), allVersions = allVersions)
+      : this(mainInfo = mainInfo.build(), allVersions = allVersions)
 
   internal constructor(key: String,
                        forSchemas: Collection<JsonSchemaType> = JsonSchemaType.values().toHashSet(),
                        expects: ElementType,
                        since: JsonSchemaVersion?,
-                       until: JsonSchemaVersion?): this(
+                       until: JsonSchemaVersion?) : this(
       key = key,
       expects = expects,
       mostRecentVersion = until ?: JsonSchemaVersion.latest,
@@ -86,7 +91,8 @@ data class KeywordInfo<K : Keyword<*>>(
       applicableTypes = forSchemas
           .map { it.appliesTo }
           .toHashSet(),
-      applicableVersions = JsonSchemaVersion.values().range(since ?: JsonSchemaVersion.Draft3, until ?: JsonSchemaVersion.latest)
+      applicableVersions = JsonSchemaVersion.values().range(since ?: JsonSchemaVersion.Draft3, until
+          ?: JsonSchemaVersion.latest)
   )
 
   fun getTypeVariant(valueType: ElementType): KeywordInfo<K>? {
@@ -195,8 +201,8 @@ data class KeywordInfo<K : Keyword<*>>(
     }
   }
 
-  companion object {
 
+  companion object {
     inline fun <reified X : Keyword<*>> builder(): KeywordInfoBuilder<X> {
       return KeywordInfoBuilder()
     }
@@ -210,7 +216,7 @@ data class KeywordInfo<K : Keyword<*>>(
     internal val forSchemas: MutableSet<JsonSchemaType> = mutableSetOf()
 
     fun build(): KeywordInfo<K> {
-      if(forSchemas.isEmpty()) {
+      if (forSchemas.isEmpty()) {
         forSchemas.addAll(JsonSchemaType.values())
       }
       return KeywordInfo(key!!, forSchemas, expects!!, since, until)
@@ -262,13 +268,17 @@ data class KeywordInfo<K : Keyword<*>>(
   }
 }
 
-@Serializer(forClass = KeywordInfo::class)
-class KeywordInfoSerializer : KSerializer<KeywordInfo<*>> {
-  override fun save(output: KOutput, obj: KeywordInfo<*>) {
-    output.writeStringValue(obj.key)
+
+class KeywordInfoSerializer(): KSerializer<KeywordInfo<out Keyword<*>>> {
+  constructor(ser: KSerializer<Any>):this()
+
+  override val descriptor: SerialDescriptor = StringDescriptor.withName("KeywordInfo")
+
+  override fun deserialize(input: Decoder): KeywordInfo<Keyword<*>> {
+    illegalState("Unable to deserialize keyword info")
   }
 
-  override fun load(input: KInput): KeywordInfo<*> {
-    illegalState("Unable to deserialize keyword info")
+  override fun serialize(output: Encoder, obj: KeywordInfo<out Keyword<*>>) {
+    output.encodeString(obj.key)
   }
 }

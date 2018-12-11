@@ -3,11 +3,17 @@ import io.mverse.gradle.kotlinx
 plugins {
   id("io.mverse.project") version "0.5.32"
   id("io.mverse.multi-platform") version "0.5.32"
-  id("kotlinx-serialization") version "0.6.1"
+  kotlin("jvm").version("1.3.10")
+  id("kotlinx-serialization").version("1.3.10")
 }
 
 allprojects  {
   plugins.apply("kotlinx-serialization")
+  mverse {
+    isDefaultDependencies = false
+    bom = "io.mverse:mverse-bom:0.5.13"
+  }
+
   afterEvaluate {
     group = "io.mverse.jsonskema"
   }
@@ -15,16 +21,37 @@ allprojects  {
     jcenter()
     kotlinx()
   }
+
   dependencyManagement {
     dependencies {
       // None
-      dependency("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.60.1")
-      dependency("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.60.1")
 
-      dependency("org.jetbrains.kotlinx:kotlinx-io:1.0.42")
-      dependency("org.jetbrains.kotlinx:kotlinx-io-common:1.0.42")
+      dependencySet("org.jetbrains.kotlin:1.3.10") {
+        entry("kotlin-stdlib")
+        entry("kotlin-runtime")
+        entry("kotlin-stdlib-common")
+        entry("kotlin-stdlib-jdk7")
+        entry("kotlin-stdlib-jdk8")
+        entry("kotlin-reflect")
+        entry("kotlin-test-annotations-common")
+        entry("kotlin-test")
+        entry("kotlin-test-junit")
+      }
 
-      dependency("org.jetbrains.kotlinx:kotlinx-io-js:1.0.42")
+      dependencySet("org.jetbrains.kotlinx:0.90.1") {
+        entry("kotlinx-serialization-runtime")
+        entry("kotlinx-serialization-runtime-common")
+        entry("kotlinx-serialization-runtime-jsonparser")
+      }
+
+      dependencySet("org.jetbrains.kotlinx:0.9.1") {
+        entry("kotlinx-serialization-runtime-jsonparser")
+      }
+
+      dependency("org.jetbrains.kotlinx:kotlinx-io:0.1.2-dev-6")
+      dependency("org.jetbrains.kotlinx:kotlinx-io-common:0.1.2-dev-6")
+
+      dependency("org.jetbrains.kotlinx:kotlinx-io-js:0.1.2-dev-6")
 
 
       // Immutable Collections Library for Kotlin
@@ -33,8 +60,6 @@ allprojects  {
   }
 }
 
-mverse {
-  isDefaultDependencies = false
-}
+
 
 

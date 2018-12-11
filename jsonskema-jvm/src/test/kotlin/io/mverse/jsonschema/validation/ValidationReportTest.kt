@@ -9,8 +9,10 @@ import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.validation.ValidationErrorHelper.buildKeywordFailure
-import kotlinx.serialization.json.JSON
+import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.json.json
+import kotlinx.serialization.stringify
+import lang.json.JSON
 import org.junit.Test
 
 class ValidationReportTest {
@@ -30,6 +32,7 @@ class ValidationReportTest {
   }
 
   @Test
+  @UseExperimental(ImplicitReflectionSerializer::class)
   fun testSerialization() {
     val report = ValidationReport()
 

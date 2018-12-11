@@ -4,6 +4,7 @@ mverse  {
   dependencies {
     compile("kotlin-reflect")
     compile(kotlinImmutable())
+    compile("kotlinx-serialization-runtime-common")
   }
 }
 
