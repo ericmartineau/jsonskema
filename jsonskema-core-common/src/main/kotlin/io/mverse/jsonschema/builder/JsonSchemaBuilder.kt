@@ -109,6 +109,9 @@ class JsonSchemaBuilder(
   constructor(fromSchema: Schema) : this(fromSchema, fromSchema.location)
 
   constructor(fromSchema: RefSchema) : this(location = fromSchema.location) {
+    if (fromSchema.refSchemaOrNull != null) {
+      this.refSchema = fromSchema.refSchemaOrNull!!
+    }
     this.ref = fromSchema.refURI
   }
 
@@ -182,6 +185,8 @@ class JsonSchemaBuilder(
       }
       set(REF, uri)
     }
+
+  override var refSchema:Schema? = null
 
   override var refURI: URI?
     get() = values[Keywords.REF]
@@ -490,6 +495,9 @@ class JsonSchemaBuilder(
     }
 
     return when {
+      this.refSchema != null-> RefSchemaImpl(refURI = this.refSchema!!.id!!,
+          location = finalLocation,
+          refSchema = this.refSchema!!)
       this.ref != null -> RefSchemaImpl(refURI = this.refURI!!,
           factory = schemaLoader,
           currentDocument = currentDocument,

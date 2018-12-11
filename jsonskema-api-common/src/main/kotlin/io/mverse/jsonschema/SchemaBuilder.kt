@@ -24,6 +24,7 @@ interface SchemaBuilder {
   @Name("ref")
   var ref: Any?
   var refURI: URI?
+  var refSchema: Schema?
   var title: String?
   var defaultValue: JsonElement?
   var description: String?

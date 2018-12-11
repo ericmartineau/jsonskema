@@ -27,7 +27,7 @@ abstract class RefSchema(
      * This class can be used as either a resolved schema, or as a reference.  This callback function
      * allows for lazy loading the schema, while still leveraging the "this" value
      */
-    refSchemaLoader: ((RefSchema)-> Schema?)?): Schema {
+    refSchemaLoader: ((RefSchema) -> Schema?)?) : Schema {
 
   /**
    * Contains a reference to the actual loaded schema, or null if it hasn't been resolved
@@ -42,7 +42,7 @@ abstract class RefSchema(
   /**
    * A non-resolved schema that contains just the ref keyword
    */
-  abstract val refOnlySchema:Schema
+  abstract val refOnlySchema: Schema
 
   override val id: URI? get() = refSchema.id
   override val schemaURI: URI? get() = refSchema.schemaURI
@@ -57,7 +57,7 @@ abstract class RefSchema(
               location: SchemaLocation,
               refURI: URI,
               currentDocument: JsonObject?,
-              report: LoadingReport): this(location, refURI, loader@{ thisSchema ->
+              report: LoadingReport) : this(location, refURI, loader@{ thisSchema ->
     var infiniteLoopPrevention = 0
 
     when (factory) {
@@ -82,8 +82,8 @@ abstract class RefSchema(
     this.refSchemaOrNull != null
   }
 
-  protected constructor(location: SchemaLocation, refURI: URI, refSchema: Schema):
-      this(location, refURI, {refSchema})
+  protected constructor(location: SchemaLocation, refURI: URI, refSchema: Schema) :
+      this(location, refURI, { refSchema })
 
   override fun toString(): String {
     return toJson(version ?: JsonSchemaVersion.latest).toString()

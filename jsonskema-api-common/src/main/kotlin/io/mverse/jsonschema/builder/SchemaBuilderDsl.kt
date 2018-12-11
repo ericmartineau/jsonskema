@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.builder
 
 import io.mverse.jsonschema.JsonSchema.createSchemaBuilder
+import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.enums.FormatType
 import io.mverse.jsonschema.enums.JsonSchemaType
@@ -69,6 +70,14 @@ open class SchemaBuilderDsl(val schemaBuilder: SchemaBuilder = createSchemaBuild
     val key = this
     this@SchemaBuilderDsl.properties[key] = {
       ref = uri
+    }
+    this@SchemaBuilderDsl.requiredProperties += key
+  }
+
+  infix fun String.ref(refSchema: Schema) {
+    val key = this
+    this@SchemaBuilderDsl.properties[key] = {
+      this.refSchema = refSchema
     }
     this@SchemaBuilderDsl.requiredProperties += key
   }
