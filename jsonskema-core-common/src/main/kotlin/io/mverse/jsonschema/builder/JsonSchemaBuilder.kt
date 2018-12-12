@@ -495,7 +495,7 @@ class JsonSchemaBuilder(
     }
 
     return when {
-      this.refSchema != null-> RefSchemaImpl(refURI = this.refSchema!!.id!!,
+      this.refSchema != null-> RefSchemaImpl(refURI = this.refSchema!!.absoluteURI,
           location = finalLocation,
           refSchema = this.refSchema!!)
       this.ref != null -> RefSchemaImpl(refURI = this.refURI!!,
