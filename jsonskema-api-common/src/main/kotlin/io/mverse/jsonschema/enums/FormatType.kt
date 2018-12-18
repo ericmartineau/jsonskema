@@ -218,18 +218,14 @@ enum class FormatType(key: String? = null,
    */
   IP_ADDRESS(since = Draft3, until = Draft3);
 
-  private val key: String = key ?: name.toLowerHyphen()
+  val value: String = key ?: name.toLowerHyphen()
 
   constructor(key: String? = null,
               since: JsonSchemaVersion = Draft3,
               until: JsonSchemaVersion = latest) :
       this(key, JsonSchemaVersion.values().range(since, until))
 
-  override fun toString(): String {
-    return key
-  }
-
-
+  override fun toString(): String = value
 
   companion object {
     fun fromFormat(format: String?): FormatType? {

@@ -112,6 +112,23 @@ open class SchemaBuilderDsl(val schemaBuilder: SchemaBuilder = createSchemaBuild
     }
   }
 
+  infix fun String.optional(format: FormatType) {
+    val key = this
+    this@SchemaBuilderDsl.properties[key] = {
+      this.type = JsonSchemaType.STRING
+      this.format = format.value
+    }
+  }
+
+  infix fun String.required(format: FormatType) {
+    val key = this
+    this@SchemaBuilderDsl.properties[key] = {
+      this.type = JsonSchemaType.STRING
+      this.format = format.value
+    }
+    this@SchemaBuilderDsl.requiredProperties += key
+  }
+
   val datetime: () -> SchemaBuilderDsl
     get() = {
       SchemaBuilderDsl().apply {
