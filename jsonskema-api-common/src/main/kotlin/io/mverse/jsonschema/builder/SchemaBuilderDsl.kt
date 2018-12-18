@@ -82,7 +82,30 @@ open class SchemaBuilderDsl(val schemaBuilder: SchemaBuilder = createSchemaBuild
     this@SchemaBuilderDsl.requiredProperties += key
   }
 
-  infix fun String.optionalref(uri: URI) {
+  infix fun String.required(refSchema: Schema) {
+    val key = this
+    this@SchemaBuilderDsl.properties[key] = {
+      this.refSchema = refSchema
+    }
+    this@SchemaBuilderDsl.requiredProperties += key
+  }
+
+  infix fun String.required(uri: URI) {
+    val key = this
+    this@SchemaBuilderDsl.properties[key] = {
+      ref = uri
+    }
+    this@SchemaBuilderDsl.requiredProperties += key
+  }
+
+  infix fun String.optional(refSchema: Schema) {
+    val key = this
+    this@SchemaBuilderDsl.properties[key] = {
+      this.refSchema = refSchema
+    }
+  }
+
+  infix fun String.optional(uri: URI) {
     val key = this
     this@SchemaBuilderDsl.properties[key] = {
       ref = uri
