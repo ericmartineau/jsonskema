@@ -25,6 +25,7 @@ class StringFormatValidator(keyword: StringKeyword, schema: Schema, factory: Sch
       parentReport += ValidationError(violatedSchema = schema,
           pointerToViolation = subject.path,
           arguments = listOf(stringSubject),
+          keyword = FORMAT,
           code = "validation.format." + formatValidator.formatName())
           .withError(error)
     }
