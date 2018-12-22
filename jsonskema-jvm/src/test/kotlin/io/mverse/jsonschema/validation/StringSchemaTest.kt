@@ -44,7 +44,6 @@ class StringSchemaTest {
         buildWithLocation(mockStringSchema { format = ("test-format-failure") })
     )
     failureOf(schemaValidator)
-        .expectedKeyword("format")
         .input("string")
         .expect()
   }

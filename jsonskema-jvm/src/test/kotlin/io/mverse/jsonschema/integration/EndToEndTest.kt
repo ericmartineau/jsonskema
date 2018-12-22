@@ -39,7 +39,7 @@ class EndToEndTest {
               .hasErrorArguments("badbadleroybrown", "^#?(?:(?:[0-9a-fA-F]{2}){3}|(?:[0-9a-fA-F]){3})$")
           hasViolationAt("#/contact/email")
               .hasKeyword(Keywords.FORMAT)
-              .hasErrorCode("validation.keyword.format")
+              .hasErrorCode("validation.format.email")
           hasViolationAt("#/contact")
               .hasErrorArguments("first_name")
           hasViolationAt("#/contact")
