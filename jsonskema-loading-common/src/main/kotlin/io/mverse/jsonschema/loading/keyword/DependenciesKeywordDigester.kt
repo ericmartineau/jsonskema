@@ -29,7 +29,7 @@ class DependenciesKeywordDigester : KeywordDigester<DependenciesKeyword> {
           val dependencySchema = schemaLoader.loadSubSchema(pathValue, pathValue.rootObject, report)
           depsBuilder.addDependencySchema(key, dependencySchema)
         }
-        ElementType.ARRAY -> pathValue.jsonArray.forEach { arrayItem ->
+        ElementType.ARRAY -> pathValue.jsonArray!!.forEach { arrayItem ->
           depsBuilder.propertyDependency(key, arrayItem.primitive.content)
         }
         else -> report.error(typeMismatch(DEPENDENCIES, pathValue.wrapped, pathValue.location))

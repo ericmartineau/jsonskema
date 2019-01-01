@@ -23,7 +23,7 @@ interface SchemaLoader {
    * @return A schema builder instance.
    */
   fun schemaBuilder(forSchema: JsonValueWithPath, loadingReport: LoadingReport): SchemaBuilder {
-    return subSchemaBuilder(forSchema, forSchema.jsonObject, loadingReport)
+    return subSchemaBuilder(forSchema, forSchema.jsonObject!!, loadingReport)
   }
 
   /**

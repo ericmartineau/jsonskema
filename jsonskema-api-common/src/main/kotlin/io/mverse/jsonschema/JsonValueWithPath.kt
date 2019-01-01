@@ -5,10 +5,13 @@ import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.utils.JsonUtils.extractIdFromObject
 import io.mverse.jsonschema.utils.SchemaPaths
 import io.mverse.jsonschema.utils.toJsonSchemaType
+import kotlinx.serialization.Transient
 import kotlinx.serialization.json.ElementType
+import kotlinx.serialization.json.JsonArray as KJsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonObject as KJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.int
 import lang.Serializable
@@ -18,7 +21,7 @@ import lang.hashKode
 /**
  * This class is used for convenience in accessing data within a JsonObject.
  *
- * It wraps the JSR353 [JsonObject] and adds some extra methods that allow more fluent usage.
+ * It wraps a kotlin.serialization [JsonElement] and adds some extra methods that allow more fluent usage.
  */
 @Serializable
 data class JsonValueWithPath(
@@ -26,31 +29,31 @@ data class JsonValueWithPath(
     val wrapped: JsonElement,
     val location: SchemaLocation) : Map<String, JsonElement> {
 
-  val jsonObject by lazy {
-    wrapped.jsonObject
-  }
+  @Transient val jsonObject:KJsonObject? get() = if(wrapped is JsonObject) wrapped else null
+  @Transient val jsonArray: KJsonArray? get() = if(wrapped is KJsonArray) wrapped else null
 
-  val rootObject by lazy {
-    root.jsonObject
-  }
+  @Transient
+  val rootObject get() = root.jsonObject
 
+  @Transient
   val jsonSchemaType: JsonSchemaType
     get() = wrapped.type.toJsonSchemaType()
 
+  @Transient
   val isBoolean: Boolean
     get() = wrapped.booleanOrNull ?: false
 
-  val isNull: Boolean
+  @Transient val isNull: Boolean
     get() = wrapped.isNull
 
-  val isNotNull: Boolean
+  @Transient val isNotNull: Boolean
     get() = !wrapped.isNull
 
-  val path: JsonPath
+  @Transient val path: JsonPath
     get() = location.jsonPath
 
   override fun isEmpty(): Boolean {
-    return jsonObject.isEmpty()
+    return if(jsonObject==null) true else jsonObject!!.isEmpty()
   }
 
   override fun equals(other: Any?): Boolean = other is JsonValueWithPath &&
@@ -58,28 +61,24 @@ data class JsonValueWithPath(
 
   override fun hashCode(): Int = hashKode(wrapped, location)
 
-  val jsonArray: kotlinx.serialization.json.JsonArray by lazy {
-    wrapped.jsonArray
-  }
-
   fun containsKey(keywordType: KeywordInfo<*>): Boolean {
     return containsKey(keywordType.key)
   }
 
-  override val entries: Set<Map.Entry<String, JsonElement>> get() = jsonObject.entries
-  override val keys: Set<String> get() = jsonObject.keys
-  override val values: Collection<JsonElement> get() = jsonObject.values
+  override val entries: Set<Map.Entry<String, JsonElement>> get() = jsonObject?.entries ?: emptySet()
+  override val keys: Set<String> get() = jsonObject?.keys ?: emptySet()
+  override val values: Collection<JsonElement> get() = jsonObject?.values ?: emptySet()
 
   override fun containsKey(key: String): Boolean {
-    return jsonObject.containsKey(key)
+    return jsonObject?.containsKey(key)==true
   }
 
   override fun containsValue(value: JsonElement): Boolean {
-    return jsonObject.containsValue(value)
+    return jsonObject?.containsValue(value)==true
   }
 
   override operator fun get(key: String): JsonElement {
-    return if (jsonObject.containsKey(key)) jsonObject[key] else JsonNull
+    return if (containsKey(key)) jsonObject!![key] else JsonNull
   }
 
   operator fun get(prop: KeywordInfo<*>): JsonElement {
@@ -90,14 +89,14 @@ data class JsonValueWithPath(
     return path(keyword.key)
   }
 
-  override val size: Int get() = jsonObject.size
-  val type: ElementType get() = wrapped.type
-  val number: Number? get() = wrapped.primitive.doubleOrNull
-  val string: String? get() = wrapped.primitive.contentOrNull
-  val boolean: Boolean? get() = wrapped.primitive.booleanOrNull
-  val int: Int? get() = wrapped.primitive.intOrNull
-  val double: Double? get() = wrapped.primitive.doubleOrNull
-  val arraySize: Int get() = wrapped.jsonArray.size
+  @Transient override val size: Int get() = jsonObject?.size ?: 0
+  @Transient val type: ElementType get() = wrapped.type
+  @Transient val number: Number? get() = wrapped.primitive.doubleOrNull
+  @Transient val string: String? get() = wrapped.primitive.contentOrNull
+  @Transient val boolean: Boolean? get() = wrapped.primitive.booleanOrNull
+  @Transient val int: Int? get() = wrapped.primitive.intOrNull
+  @Transient val double: Double? get() = wrapped.primitive.doubleOrNull
+  @Transient val arraySize: Int get() = wrapped.jsonArray.size
 
   fun forEachIndex(action: (Int, JsonValueWithPath) -> Unit) {
     var i = 0
@@ -133,11 +132,11 @@ data class JsonValueWithPath(
   }
 
   fun numberOfProperties(): Int {
-    return jsonObject.keys.size
+    return jsonObject?.keys?.size ?: 0
   }
 
   fun propertyNames(): Set<String> {
-    return jsonObject.keys
+    return jsonObject?.keys ?: emptySet()
   }
 
   companion object {

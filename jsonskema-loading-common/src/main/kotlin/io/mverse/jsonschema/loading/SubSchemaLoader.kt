@@ -52,7 +52,7 @@ data class SubSchemaLoader(val extraKeywordLoaders: List<KeywordDigester<*>>,
       return refSchemaBuilder(URI(ref.primitive.content), rootDocument, schemaJson.location)
     }
 
-    val schemaBuilder = JsonUtils.extractIdFromObject(schemaJson.jsonObject)
+    val schemaBuilder = JsonUtils.extractIdFromObject(schemaJson.jsonObject!!)
         ?.let { schemaBuilder(schemaJson.location, it)}
         ?: schemaBuilder(schemaJson.location)
     schemaBuilder.also {

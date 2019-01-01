@@ -18,7 +18,7 @@ data class ArrayContainsValidator(val keyword: SingleSchemaKeyword,
 
 
   override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
-    for (i in 0 until subject.jsonArray.size) {
+    for (i in 0 until subject.jsonArray!!.size) {
       val trap = parentReport.createChildReport()
       val item = subject[i]
       if (containsValidator.validate(item, trap)) {

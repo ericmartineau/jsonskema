@@ -18,7 +18,7 @@ class PropertyNameValidator(keyword: SingleSchemaKeyword, schema: Schema, factor
   override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
 
     val report = parentReport.createChildReport()
-    val subjectProperties = subject.jsonObject.keys
+    val subjectProperties = subject.jsonObject!!.keys
     for (subjectProperty in subjectProperties) {
       val value = subjectProperty.toJsonLiteral()
       propertyNameValidator.validate(fromJsonValue(subject.root, value, subject.location), report)

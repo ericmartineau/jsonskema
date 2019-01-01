@@ -25,7 +25,7 @@ data class ArrayUniqueItemsValidator(val keyword: BooleanKeyword,
     }
 
     val uniqueItems = mutableListOf<JsonElement>()
-    val arrayItems = subject.jsonArray
+    val arrayItems = subject.jsonArray!!
 
     for (item in arrayItems) {
       for (contained in uniqueItems) {

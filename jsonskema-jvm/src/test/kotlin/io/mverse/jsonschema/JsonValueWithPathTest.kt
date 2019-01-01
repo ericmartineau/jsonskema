@@ -2,7 +2,6 @@ package io.mverse.jsonschema
 
 import assertk.assert
 import assertk.assertions.isEqualTo
-import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import io.mverse.jsonschema.JsonValueWithPath.Companion.fromJsonValue
@@ -52,7 +51,7 @@ class JsonValueWithPathTest {
   fun testAsJsonObject_HasValue() {
     val value = createJsonObjectWithLocation()
     val jsonObject = value.jsonObject
-    assert(jsonObject["foo"].primitive.contentOrNull).isEqualTo("bar")
+    assert(jsonObject!!["foo"].primitive.contentOrNull).isEqualTo("bar")
   }
 
   @Test
@@ -60,7 +59,7 @@ class JsonValueWithPathTest {
     val value = createJsonArrayWithLocation()
     val jsonArray = value.jsonArray
     val expected = "foo".toJsonLiteral()
-    assert(jsonArray[0]).isEqualTo(expected)
+    assert(jsonArray!![0]).isEqualTo(expected)
   }
 
   @Test
@@ -78,16 +77,17 @@ class JsonValueWithPathTest {
   @Test
   fun testArraySize_WhenArray_ReturnsSize() {
     val value = createJsonArrayWithLocation()
-    assert(value.jsonArray.size).isEqualTo(5)
+    assert(value.jsonArray!!.size).isEqualTo(5)
   }
 
   @Test
-  fun testArraySize_WhenNotArray_ReturnsSize() {
-    assert {
-      createJsonObjectWithLocation().jsonArray
-    }.thrownError {
-      isInstanceOf(JsonElementTypeMismatchException::class)
-    }
+  fun testArraySize_WhenNotArray_ReturnsZero() {
+    assert(createJsonObjectWithLocation().size).isEqualTo(2)
+  }
+
+  @Test
+  fun testJsonArray_WhenNotArray_ReturnsNull() {
+    assert(createJsonObjectWithLocation().jsonArray).isNull()
   }
 
   @Test
@@ -105,9 +105,9 @@ class JsonValueWithPathTest {
     assert(createJsonObjectWithLocation().jsonObject).isNotNull()
   }
 
-  @Test(expected = JsonElementTypeMismatchException::class)
-  fun testAsJsonObject_WhenNotObject_ThrowsUVE() {
-    createJsonArrayWithLocation().jsonObject
+  @Test
+  fun testAsJsonObject_WhenNotObject_ReturnsNull() {
+    assert(createJsonArrayWithLocation().jsonObject).isNull()
   }
 
   @Test

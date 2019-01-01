@@ -25,7 +25,7 @@ class TypeKeywordDigester : KeywordDigester<TypeKeyword> {
     val valueType = type.type
     return when (valueType) {
       ARRAY -> {
-        val typeArray = type.jsonArray
+        val typeArray = type.jsonArray!!
             .map { it.primitive.content }
             .map { JsonSchemaTypes.fromString(it) }
             .toSet()

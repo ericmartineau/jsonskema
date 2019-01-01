@@ -13,11 +13,15 @@ allprojects  {
     isDefaultDependencies = false
     coverageRequirement = 0.63
     bom = "io.mverse:mverse-bom:0.5.13"
+    dependencies {
+      compile(kotlinSerialization())
+    }
   }
 
   afterEvaluate {
     group = "io.mverse.jsonskema"
   }
+
   repositories {
     jcenter()
     kotlinx()
