@@ -43,13 +43,12 @@ allprojects  {
         entry("kotlin-test-junit")
       }
 
-      dependencySet("org.jetbrains.kotlinx:0.90.1") {
+      /**
+       * 0.90.3 is a custom version that preserves order of keys
+       */
+      dependencySet("org.jetbrains.kotlinx:0.90.3") {
         entry("kotlinx-serialization-runtime")
         entry("kotlinx-serialization-runtime-common")
-        entry("kotlinx-serialization-runtime-jsonparser")
-      }
-
-      dependencySet("org.jetbrains.kotlinx:0.9.1") {
         entry("kotlinx-serialization-runtime-jsonparser")
       }
 
