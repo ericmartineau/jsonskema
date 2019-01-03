@@ -8,7 +8,7 @@ enum class JsonSchemaVersion constructor(uri: String?) {
   Draft4("http://json-schema.org/draft-04/schema#"),
   Draft5("http://json-schema.org/draft-05/schema#"),
   Draft6("http://json-schema.org/draft-06/schema#"),
-  Draft7("http://json-schema.org/draft-06/schema#"),
+  Draft7("http://json-schema.org/draft-07/schema#"),
   Custom(null),
   Unknown(null);
 

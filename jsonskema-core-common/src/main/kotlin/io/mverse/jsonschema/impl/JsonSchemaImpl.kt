@@ -124,7 +124,7 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
   // ###### Base Schema Methods Implemented  ##############
   // ######################################################
 
-  override fun toJson(version: JsonSchemaVersion): JsonObject {
+  override fun toJson(version: JsonSchemaVersion, includeExtraProperties: Boolean): JsonObject {
     return json {
       if (keywords.containsKey(REF)) {
         // Output as ref
@@ -132,9 +132,14 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
       } else {
         keywords.forEach { (keyword, keywordValue) ->
           if (keyword.applicableVersions.contains(version)) {
-            keywordValue.toJson(keyword, this, version)
+            keywordValue.toJson(keyword, this, version, includeExtraProperties)
           } else {
             log.warn("Keyword ${keyword.key} does not apply to version: [$version], only for ${keyword.applicableVersions}")
+          }
+        }
+        if (includeExtraProperties) {
+          extraProperties.forEach { (prop,value)->
+            prop to value
           }
         }
       }
@@ -164,8 +169,8 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
 
   override fun toString(): String = toString(version)
 
-  override fun toString(version: JsonSchemaVersion): String {
-    return JsonSaver().serialize(this.toJson(version))
+  override fun toString(version: JsonSchemaVersion, includeExtraProperties: Boolean): String {
+    return JsonSaver().serialize(this.toJson(version, includeExtraProperties))
   }
 
   override fun toBuilder(): SchemaBuilder {

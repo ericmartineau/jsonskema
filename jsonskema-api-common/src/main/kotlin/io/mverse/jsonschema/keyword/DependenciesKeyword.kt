@@ -19,7 +19,7 @@ data class DependenciesKeyword(val dependencySchemas: SchemaMapKeyword = SchemaM
     return DependenciesKeywordBuilder(this)
   }
 
-  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion) {
+  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
     builder.run {
       Keywords.DEPENDENCIES.key to json {
         propertyDependencies.asMap().forEach { (prop:String, setOfDependentProps:Collection<String>) ->

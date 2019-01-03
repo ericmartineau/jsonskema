@@ -12,13 +12,13 @@ data class SchemaMapKeyword(override val value: Map<String, Schema> = emptyMap()
   override val subschemas: List<Schema>
     get() = value.values.toList()
 
-  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion) {
+  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
     builder.run {
       keyword.key to json {
         for ((key,schema) in value) {
           val schemaJson = when (schema) {
-            is RefSchema-> schema.toJson()
-            else-> schema.asVersion(version).toJson()
+            is RefSchema-> schema.toJson(includeExtraProperties = includeExtraProperties)
+            else-> schema.asVersion(version).toJson(includeExtraProperties = includeExtraProperties)
           }
 
           // Writes the key to the json builder

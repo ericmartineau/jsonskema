@@ -91,11 +91,11 @@ open class RefSchemaImpl : RefSchema {
     return JsonSchemaBuilder(fromSchema = this, id = id)
   }
 
-  override fun toJson(version: JsonSchemaVersion): JsonObject {
+  override fun toJson(version: JsonSchemaVersion, includeExtraProperties:Boolean): JsonObject {
     return json {
       "\$ref" to refURI.toString()
     }
   }
 
-  override fun toString(version: JsonSchemaVersion): String = toString()
+  override fun toString(version: JsonSchemaVersion, includeExtraProperties:Boolean): String = toString()
 }

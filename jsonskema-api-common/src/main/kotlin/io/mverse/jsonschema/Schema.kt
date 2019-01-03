@@ -37,7 +37,8 @@ interface Schema {
   @Name("withId")
   fun withId(id: URI): Schema
 
-  fun toJson(version: JsonSchemaVersion = JsonSchemaVersion.latest): kotlinx.serialization.json.JsonObject
+  fun toJson(version: JsonSchemaVersion = JsonSchemaVersion.latest,
+             includeExtraProperties:Boolean = false): kotlinx.serialization.json.JsonObject
 
   fun asVersion(version: JsonSchemaVersion): Schema {
     return when (version) {
@@ -66,5 +67,5 @@ interface Schema {
   @Name("asDraft7")
   fun asDraft7(): Draft7Schema
 
-  fun toString(version:JsonSchemaVersion):String
+  fun toString(version:JsonSchemaVersion, includeExtraProperties: Boolean = false):String
 }

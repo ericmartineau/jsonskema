@@ -2,6 +2,7 @@ package io.mverse.jsonschema.keyword
 
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft6
+import kotlinx.serialization.json.JsonBuilder
 import kotlinx.serialization.json.json
 import lang.illegalState
 import lang.isIntegral
@@ -19,7 +20,7 @@ data class LimitKeyword(val keyword: KeywordInfo<LimitKeyword>,
 
   val isExclusive:Boolean = exclusiveLimit != null
 
-  override fun toJson(keyword: KeywordInfo<*>, builder: kotlinx.serialization.json.JsonBuilder, version: JsonSchemaVersion) {
+  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
     when {
       version.isBefore(Draft6) -> writeDraft3And4(builder)
       version.isPublic -> writeDraft6AndUp(builder)
@@ -30,7 +31,7 @@ data class LimitKeyword(val keyword: KeywordInfo<LimitKeyword>,
   override fun toString(): String {
     val self = this
     return json {
-      self.toJson(keyword, this, JsonSchemaVersion.latest)
+      self.toJson(keyword, this, JsonSchemaVersion.latest, false)
     }.toString()
   }
 

@@ -8,6 +8,6 @@ import kotlinx.serialization.json.JsonBuilder
  */
 interface Keyword<P> {
   val value: P
-  fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion)
+  fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion, includeExtraProperties: Boolean)
   fun withValue(value:P):Keyword<P>
 }

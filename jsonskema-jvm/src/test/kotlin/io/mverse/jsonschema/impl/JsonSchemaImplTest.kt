@@ -7,6 +7,8 @@ import io.mverse.jsonschema.Draft3Schema
 import io.mverse.jsonschema.Draft4Schema
 import io.mverse.jsonschema.Draft6Schema
 import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.enums.JsonSchemaVersion
+import kotlinx.serialization.json.JsonPrimitive
 import lang.URI
 import org.junit.Test
 
@@ -46,5 +48,41 @@ class JsonSchemaImplTest {
     val newURI = URI("https://google.com/hosted/foo/blah")
     val withId = theSchema.withId(newURI).asDraft3()
     assert(withId.id).isEqualTo(newURI)
+  }
+
+  @Test
+  fun testToStringExtraProperties() {
+    val schema = JsonSchema.schema {
+      extraProperties += ("bobTheBuilder" to JsonPrimitive(true))
+
+      properties["childSchema"] = schemaBuilder {
+        extraProperties += ("bobsType" to JsonPrimitive("Chainsaw Murderer"))
+
+        properties["grandchildSchema"] = schemaBuilder {
+          extraProperties += ("theNestStatus" to JsonPrimitive("FULL"))
+        }
+      }
+    }
+
+    val schemaString = schema.toString(includeExtraProperties = true, version=JsonSchemaVersion.Draft7)
+    assert(schemaString).isEqualTo("{\"properties\":{\"childSchema\":{\"properties\":{\"grandchildSchema\":{\"theNestStatus\":\"FULL\"}},\"bobsType\":\"Chainsaw Murderer\"}},\"bobTheBuilder\":true}")
+  }
+
+  @Test
+  fun testToStringNoExtraProperties() {
+    val schema = JsonSchema.schema {
+      extraProperties += ("bobTheBuilder" to JsonPrimitive(true))
+
+      properties["childSchema"] = schemaBuilder {
+        extraProperties += ("bobsType" to JsonPrimitive("Chainsaw Murderer"))
+
+        properties["grandchildSchema"] = schemaBuilder {
+          extraProperties += ("theNestStatus" to JsonPrimitive("FULL"))
+        }
+      }
+    }
+
+    val schemaString = schema.toString(includeExtraProperties = false, version=JsonSchemaVersion.Draft7)
+    assert(schemaString).isEqualTo("{\"properties\":{\"childSchema\":{\"properties\":{\"grandchildSchema\":{}}}}}")
   }
 }

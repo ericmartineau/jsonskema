@@ -13,7 +13,7 @@ import lang.json.toJsonLiteral
 abstract class KeywordImpl<T> : Keyword<T> {
   abstract override fun withValue(value: T): Keyword<T>
 
-  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion) {
+  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
     val jsonKey = keyword.key
     val keywordValue = value
     builder.run {

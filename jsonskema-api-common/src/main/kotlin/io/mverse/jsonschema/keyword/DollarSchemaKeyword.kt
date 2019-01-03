@@ -12,7 +12,7 @@ open class DollarSchemaKeyword : Keyword<URI> {
 
   override val value: URI = URI("")
 
-  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion) {
+  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
     version.metaschemaURI?.let { schemaUri ->
       builder.run {
         SCHEMA_KEYWORD to schemaUri.toString()

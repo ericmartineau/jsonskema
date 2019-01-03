@@ -7,7 +7,7 @@ import lang.URI
 data class IdKeyword(override val value: URI) : KeywordImpl<URI>() {
   override fun withValue(value: URI): Keyword<URI> = this.copy(value=value)
 
-  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion) {
+  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
     builder.run {
       when {
         version.isBefore(JsonSchemaVersion.Draft5) -> ID to value.toString()

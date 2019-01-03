@@ -21,7 +21,7 @@ data class TypeKeyword(val types:Set<JsonSchemaType> = emptySet(),
     return TypeKeyword(types + another)
   }
 
-  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion) {
+  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
     val type = Keywords.TYPE.key
     builder.apply {
       when {
