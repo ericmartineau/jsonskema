@@ -1,15 +1,17 @@
 package io.mverse.jsonschema
 
 import assertk.assertions.containsAll
+import lang.URI
 import org.junit.Test
 
 class SchemaExtensionsTest {
   @Test fun testAllProperties() {
-    val schema = JsonSchema.schema {
+    val schema = JsonSchema.schema("http://schema.org/test") {
       "EMAILS" required string
       "NUMBER" optional number
       "OBJECT" required schemaBuilder {
         "NAME" required string
+        "MAIN" required URI("#/properties/OBJECT")
         "PHONE" optional string
         "ADDRESS" optional schemaBuilder {
           "STREET1" required string

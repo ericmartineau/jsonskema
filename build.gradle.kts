@@ -1,4 +1,5 @@
 import io.mverse.gradle.kotlinx
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   id("io.mverse.project") version "0.5.32"
@@ -16,6 +17,11 @@ allprojects  {
     dependencies {
       compile(kotlinSerialization())
     }
+  }
+
+  tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.suppressWarnings = true
   }
 
   afterEvaluate {

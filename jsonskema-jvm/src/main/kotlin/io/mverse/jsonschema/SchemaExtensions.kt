@@ -21,7 +21,7 @@ fun recurseProperties(schema: Draft7Schema, currentPath: String, isRequired: Boo
                       processed: MutableSet<String>): Map<String, SchemaWithRequiredStatus> {
 
   if (!processed.contains(currentPath)) {
-    processed += currentPath
+//    processed += currentPath
 
     // If this property is a deterministic primitive, add it
     val calculateType = schema.calculateType()
