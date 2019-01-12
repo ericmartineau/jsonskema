@@ -6,8 +6,8 @@ import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.enums.FormatType
 import io.mverse.jsonschema.enums.JsonSchemaType
 import kotlinx.serialization.json.JsonArray
-import lang.URI
-import lang.json.toJsonArray
+import lang.net.URI
+import lang.json.toKtArray
 
 open class SchemaBuilderDsl(val schemaBuilder: SchemaBuilder = createSchemaBuilder(),
                             val parent: SchemaBuilder? = null,
@@ -129,30 +129,6 @@ open class SchemaBuilderDsl(val schemaBuilder: SchemaBuilder = createSchemaBuild
     this@SchemaBuilderDsl.requiredProperties += key
   }
 
-  val datetime: () -> SchemaBuilderDsl
-    get() = {
-      SchemaBuilderDsl().apply {
-        type = JsonSchemaType.STRING
-        format = FormatType.DATE_TIME.toString()
-      }
-    }
-
-  val ip: () -> SchemaBuilderDsl
-    get() = {
-      SchemaBuilderDsl().apply {
-        type = JsonSchemaType.STRING
-        format = FormatType.IPV4.toString()
-      }
-    }
-
-  val date: () -> SchemaBuilderDsl
-    get() = {
-      SchemaBuilderDsl().apply {
-        type = JsonSchemaType.STRING
-        format = FormatType.DATE.toString()
-      }
-    }
-
   val string: () -> SchemaBuilderDsl
     get() = {
       SchemaBuilderDsl().apply {
@@ -211,7 +187,7 @@ open class SchemaBuilderDsl(val schemaBuilder: SchemaBuilder = createSchemaBuild
   fun enum(vararg enumValues: String): SchemaBuilderDsl {
     return SchemaBuilderDsl().apply {
       this.type = JsonSchemaType.STRING
-      this.enumValues = enumValues.toList().toJsonArray()
+      this.enumValues = enumValues.toList().toKtArray()
     }
   }
 

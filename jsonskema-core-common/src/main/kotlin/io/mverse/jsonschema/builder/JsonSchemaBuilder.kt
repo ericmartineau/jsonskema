@@ -81,13 +81,13 @@ import io.mverse.jsonschema.utils.Schemas.nullSchema
 import io.mverse.jsonschema.utils.Schemas.nullSchemaBuilder
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
-import lang.Multimaps
-import lang.SetMultimap
-import lang.URI
+import lang.collection.Multimaps
+import lang.collection.SetMultimap
+import lang.exception.illegalState
 import lang.hashKode
-import lang.illegalState
 import lang.json.toJsonElement
-import lang.randomUUID
+import lang.net.URI
+import lang.uuid.randomUUID
 
 class JsonSchemaBuilder(
     keywords: MutableMap<KeywordInfo<*>, Keyword<*>> = mutableMapOf(),
@@ -151,6 +151,7 @@ class JsonSchemaBuilder(
   }
 
   operator fun <X, K : Keyword<X>> set(keyword: KeywordInfo<K>, value: X?) {
+    @Suppress("unchecked_cast")
     when (value) {
       null -> keywords.remove(keyword)
       else -> keywords[keyword] = when (value) {
@@ -186,7 +187,7 @@ class JsonSchemaBuilder(
       set(REF, uri)
     }
 
-  override var refSchema:Schema? = null
+  override var refSchema: Schema? = null
 
   override var refURI: URI?
     get() = values[Keywords.REF]
@@ -495,7 +496,7 @@ class JsonSchemaBuilder(
     }
 
     return when {
-      this.refSchema != null-> RefSchemaImpl(refURI = this.refSchema!!.absoluteURI,
+      this.refSchema != null -> RefSchemaImpl(refURI = this.refSchema!!.absoluteURI,
           location = finalLocation,
           refSchema = this.refSchema!!)
       this.ref != null -> RefSchemaImpl(refURI = this.refURI!!,

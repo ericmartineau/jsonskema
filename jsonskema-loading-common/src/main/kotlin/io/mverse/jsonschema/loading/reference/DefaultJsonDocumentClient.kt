@@ -15,29 +15,30 @@
  */
 package io.mverse.jsonschema.loading.reference
 
-import io.mverse.jsonschema.JsonPath
 import io.mverse.jsonschema.loading.JsonDocumentClient
-import io.mverse.jsonschema.loading.parseJsonObject
+import io.mverse.jsonschema.loading.parseKtObject
 import kotlinx.serialization.json.JsonObject
-import lang.URI
-import lang.readFully
+import lang.json.JsonPath
+import lang.json.KtObject
+import lang.net.URI
+import lang.net.readFully
 
 /**
  * A [JsonDocumentClient] implementation which uses [URL] for reading the remote content.
  */
 open class DefaultJsonDocumentClient(val schemaCache: SchemaCache = SchemaCache()) : JsonDocumentClient {
 
-  override fun findLoadedDocument(documentLocation: URI): JsonObject? {
+  override fun findLoadedDocument(documentLocation: URI): KtObject? {
     return schemaCache.lookupDocument(documentLocation)
   }
 
-  override fun registerLoadedDocument(documentLocation: URI, document: JsonObject) {
+  override fun registerLoadedDocument(documentLocation: URI, document: KtObject) {
     schemaCache.cacheDocument(documentLocation, document)
   }
 
-  override fun resolveSchemaWithinDocument(documentURI: URI, schemaURI: URI, document: JsonObject): JsonPath? {
+  override fun resolveSchemaWithinDocument(documentURI: URI, schemaURI: URI, document: KtObject): JsonPath? {
     return schemaCache.resolveURIToDocumentUsingLocalIdentifiers(documentURI, schemaURI, document)
   }
 
-  override fun fetchDocument(uri: URI): JsonObject = uri.readFully().parseJsonObject()
+  override fun fetchDocument(uri: URI): KtObject = uri.readFully().parseKtObject()
 }

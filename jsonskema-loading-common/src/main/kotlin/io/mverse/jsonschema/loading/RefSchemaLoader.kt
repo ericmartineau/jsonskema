@@ -1,6 +1,5 @@
 package io.mverse.jsonschema.loading
 
-import io.mverse.jsonschema.JsonPath
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaBuilder
@@ -11,15 +10,17 @@ import io.mverse.jsonschema.SchemaLocation.Companion.ROOT_URI
 import io.mverse.jsonschema.utils.JsonUtils
 import io.mverse.jsonschema.utils.isJsonPointer
 import io.mverse.jsonschema.utils.withoutFragment
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
-import lang.URI
-import lang.fragment
+import lang.json.JsonPath
+import lang.json.KtObject
 import lang.json.get
-import lang.resolveUri
-import lang.scheme
+import lang.net.URI
+import lang.net.fragment
+import lang.net.resolveUri
+import lang.net.scheme
 
 data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoader: SchemaLoader) {
-
 
   fun loadRefSchema(referencedFrom: Schema, refURI: URI, currentDocument: kotlinx.serialization.json.JsonObject?, report: LoadingReport): Schema {
     // Cache ahead to deal with any infinite recursion.
@@ -65,16 +66,14 @@ data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoa
     val remoteDocumentURI = referenceURI.resolveUri("#")
     val remoteDocument = loadDocument(remoteDocumentURI)
     return findRefInDocument(remoteDocumentURI, referenceURI, remoteDocument, report)
-        ?: throw SchemaException(referenceURI, "Unable to locate fragment: \n\tFragment: '#%s' in document\n\tDocument:'%s'", referenceURI.fragment ?: "", remoteDocument)
+        ?: throw SchemaException(referenceURI, "Unable to locate fragment: \n\tFragment: '#%s' in document\n\tDocument:'%s'", referenceURI.fragment
+            ?: "", remoteDocument)
   }
 
-  internal fun findRefInDocument(documentURI: URI, referenceURI: URI, parentDocument: kotlinx.serialization.json.JsonObject?,
+  fun findRefInDocument(documentURI: URI, referenceURI: URI, parentDocument: KtObject?,
                                  report: LoadingReport): SchemaBuilder? {
     var documentURIVar = documentURI
-    var parentDocumentVar = parentDocument
-    if (parentDocumentVar == null) {
-      parentDocumentVar = loadDocument(referenceURI)
-    }
+    val parentDocumentVar = parentDocument ?: loadDocument(referenceURI)
 
     //Remove any fragments from the parentDocument URI
     documentURIVar = documentURIVar.withoutFragment()
@@ -86,22 +85,22 @@ data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoa
     val pathWithinDocument: JsonPath?
     if (relativeURL.equals(ROOT_URI) || relativeURL.equals(BLANK_URI)) {
       // The parentDocument is the target
-      pathWithinDocument = JsonPath.rootPath()
+      pathWithinDocument = JsonPath.rootPath
     } else if (relativeURL.isJsonPointer()) {
       //This is a json fragment
-      pathWithinDocument = JsonPath.parseFromURIFragment(relativeURL)
+      pathWithinDocument = JsonPath.fromURI(relativeURL)
     } else {
       //This must be a reference $id somewhere in the parentDocument.
       pathWithinDocument = documentClient.resolveSchemaWithinDocument(documentURIVar, referenceURI, parentDocumentVar)
     }
     if (pathWithinDocument != null) {
 
-      val jsonElement = parentDocumentVar[pathWithinDocument]
+      val jsonElement: JsonElement? = parentDocumentVar[pathWithinDocument]
 
       val schemaObject: kotlinx.serialization.json.JsonObject = when (jsonElement) {
-        JsonNull->throw SchemaException(referenceURI, "Unable to resolve '#$relativeURL' as JSON Pointer within '$documentURIVar'")
+        JsonNull -> throw SchemaException(referenceURI, "Unable to resolve '#$relativeURL' as JSON Pointer within '$documentURIVar'")
         is kotlinx.serialization.json.JsonObject -> jsonElement.jsonObject
-        else-> throw SchemaException(referenceURI, "Expecting JsonObject at #$relativeURL, but found ${jsonElement.type}")
+        else -> throw SchemaException(referenceURI, "Expecting JsonObject at #$relativeURL, but found ${jsonElement!!.type}")
       }
 
       val foundId = JsonUtils.extractIdFromObject(schemaObject)

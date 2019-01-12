@@ -1,7 +1,0 @@
-mverse {
-  setDefaultDependencies(false)
-}
-dependencies {
-  compile project(":jsonskema-api-common")
-  compile project(":jsonskema-core-common")
-}

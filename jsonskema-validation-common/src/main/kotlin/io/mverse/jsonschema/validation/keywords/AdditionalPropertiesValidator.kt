@@ -9,7 +9,6 @@ import io.mverse.jsonschema.validation.SchemaValidator
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.ValidationError
 import io.mverse.jsonschema.validation.ValidationReport
-import lang.Pattern
 
 class AdditionalPropertiesValidator(keyword: SingleSchemaKeyword, schema: Schema, factory: SchemaValidatorFactory) : KeywordValidator<SingleSchemaKeyword>(Keywords.ADDITIONAL_PROPERTIES, schema) {
 
@@ -17,13 +16,13 @@ class AdditionalPropertiesValidator(keyword: SingleSchemaKeyword, schema: Schema
 
   private val propertySchemaKeys: Set<String>
 
-  private val patternProperties: Set<Pattern>
+  private val patternProperties: Set<Regex>
 
   init {
     val draft6Schema = schema.asDraft6()
     this.additionalPropertiesValidator = factory.createValidator(keyword.value)
     this.patternProperties = draft6Schema.patternProperties.keys
-        .map { Pattern(it) }
+        .map { Regex(it) }
         .toSet()
 
     this.propertySchemaKeys = draft6Schema.properties.keys
@@ -34,7 +33,7 @@ class AdditionalPropertiesValidator(keyword: SingleSchemaKeyword, schema: Schema
 
     prop@ for (propName in subject.propertyNames()) {
       for (pattern in patternProperties) {
-        if (pattern.find(propName)) {
+        if (pattern.containsMatchIn(propName)) {
           continue@prop
         }
       }
@@ -52,7 +51,7 @@ class AdditionalPropertiesValidator(keyword: SingleSchemaKeyword, schema: Schema
           .copy(keyword = ADDITIONAL_PROPERTIES,
               code = "validation.keyword.additionalProperties",
               messageTemplate = "Invalid additional property '%s'",
-              arguments = listOf(subject.path.toJsonPointer()),
+              arguments = listOf(subject.path.jsonPtr),
               pointerToViolation = subject.path
           )
     }

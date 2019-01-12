@@ -2,7 +2,7 @@ package io.mverse.jsonschema.loading
 
 import io.mverse.jsonschema.SchemaException
 import lang.Name
-import lang.URI
+import lang.net.URI
 
 /**
  * Exception raised during the loading of a schema, if the provided document is invalid.

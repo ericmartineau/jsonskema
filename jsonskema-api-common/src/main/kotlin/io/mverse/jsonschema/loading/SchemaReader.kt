@@ -3,17 +3,18 @@ package io.mverse.jsonschema.loading
 import io.mverse.jsonschema.JsonValueWithPath.Companion.fromJsonValue
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
-import io.mverse.jsonschema.keyword.KeywordLoader
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
+import io.mverse.jsonschema.keyword.KeywordLoader
 import kotlinx.io.InputStream
 import kotlinx.serialization.internal.readToByteBuffer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonTreeParser
 import lang.Name
-import lang.URI
-import lang.toString
+import lang.net.URI
+import lang.string.Charsets
+import lang.string.toString
 
 /**
  * Main interface for reading a schema from an input source.
@@ -38,7 +39,7 @@ interface SchemaReader {
   @Name("readSchemaFromStream")
   fun readSchema(inputStream: InputStream): Schema {
     try {
-      return readSchema(inputStream.parseJsonObject())
+      return readSchema(inputStream.parseKtObject())
     } finally {
       inputStream.close()
     }
@@ -48,12 +49,12 @@ interface SchemaReader {
   fun readSchema(schemaURI: URI): Schema {
     val existing = loader.findLoadedSchema(schemaURI)
     return when (existing) {
-      null-> {
+      null -> {
         val fetchedDocument = documentClient.findLoadedDocument(schemaURI)
             ?: documentClient.fetchDocument(schemaURI)
         readSchema(fetchedDocument)
       }
-      else-> existing
+      else -> existing
     }
   }
 
@@ -65,23 +66,23 @@ interface SchemaReader {
 
   @Name("readSchemaFromString")
   fun readSchema(inputJson: String): Schema {
-    return readSchema(inputJson.parseJsonObject())
+    return readSchema(inputJson.parseKtObject())
   }
 
-  operator fun plus(document: JsonObject):SchemaReader
-  operator fun plus(document:InputStream):SchemaReader = this + document.parseJsonObject()
-  operator fun plus(document:String):SchemaReader = this + document.parseJsonObject()
+  operator fun plus(document: JsonObject): SchemaReader
+  operator fun plus(document: InputStream): SchemaReader = this + document.parseKtObject()
+  operator fun plus(document: String): SchemaReader = this + document.parseKtObject()
 }
 
-fun String.parseJsonObject(): JsonObject = JsonTreeParser(this).readFully().jsonObject
-fun String.parseJson():JsonElement = JsonTreeParser(this).readFully()
+fun String.parseKtObject(): JsonObject = JsonTreeParser(this).readFully().jsonObject
+fun String.parseKtJson(): JsonElement = JsonTreeParser(this).readFully()
 
-fun InputStream.parseJsonObject(): JsonObject = readFully().parseJsonObject()
-fun InputStream.parseJson():JsonElement = readFully().parseJson()
+fun InputStream.parseKtObject(): JsonObject = readFully().parseKtObject()
+fun InputStream.parseKtJson(): JsonElement = readFully().parseKtJson()
 
-fun InputStream.readFully():String {
+fun InputStream.readFully(): String {
   try {
-    return readToByteBuffer(this.available()).array().toString("UTF-8")
+    return readToByteBuffer(this.available()).array().toString(Charsets.UTF_8)
   } finally {
     close()
   }

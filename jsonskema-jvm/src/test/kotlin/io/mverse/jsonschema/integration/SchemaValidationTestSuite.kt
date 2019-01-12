@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.SchemaException
 import io.mverse.jsonschema.validation.ValidationMocks.createTestValidator
-import io.mverse.jsonschema.loading.parseJson
+import io.mverse.jsonschema.loading.parseKtJson
 import io.mverse.jsonschema.createSchemaReader
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -124,6 +124,6 @@ class SchemaValidationTestSuite(private val schemaDescription: String, private v
       }
     }
 
-    private fun loadTests(input: InputStream): JsonArray = input.parseJson().jsonArray
+    private fun loadTests(input: InputStream): JsonArray = input.parseKtJson().jsonArray
   }
 }

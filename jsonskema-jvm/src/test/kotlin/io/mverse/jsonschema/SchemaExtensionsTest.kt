@@ -1,7 +1,7 @@
 package io.mverse.jsonschema
 
 import assertk.assertions.containsAll
-import lang.URI
+import lang.net.URI
 import org.junit.Test
 
 class SchemaExtensionsTest {

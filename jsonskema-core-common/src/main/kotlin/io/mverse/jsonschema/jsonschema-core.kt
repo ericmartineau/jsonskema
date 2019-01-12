@@ -3,7 +3,7 @@ package io.mverse.jsonschema
 import io.mverse.jsonschema.builder.JsonSchemaBuilder
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
-import lang.URI
+import lang.net.URI
 import lang.json.toJsonObject
 
 fun JsonSchema.schemaBuilder():JsonSchemaBuilder = JsonSchemaBuilder()

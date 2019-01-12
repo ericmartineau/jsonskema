@@ -16,8 +16,8 @@
 package io.mverse.jsonschema.validation.keywords.string.formatValidators
 
 import io.mverse.jsonschema.validation.FormatValidator
-import lang.format
-import lang.formats.FormatChecks
+import lang.string.format
+import io.mverse.jsonschema.formats.FormatChecks
 
 /**
  * Implementation of the "hostname" format value.

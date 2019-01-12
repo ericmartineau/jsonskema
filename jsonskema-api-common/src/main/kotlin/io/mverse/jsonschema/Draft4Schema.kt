@@ -2,10 +2,9 @@ package io.mverse.jsonschema
 
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaVersion
-import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
-import lang.SetMultimap
-import lang.URI
+import lang.collection.SetMultimap
+import lang.net.URI
 
 interface Draft4Schema : DraftSchema<Draft4Schema> {
 

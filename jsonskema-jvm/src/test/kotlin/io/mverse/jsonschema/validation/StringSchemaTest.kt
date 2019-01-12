@@ -17,7 +17,7 @@ package io.mverse.jsonschema.validation
 
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.createSchemaReader
-import io.mverse.jsonschema.loading.parseJsonObject
+import io.mverse.jsonschema.loading.parseKtObject
 import io.mverse.jsonschema.minus
 import io.mverse.jsonschema.resourceLoader
 import io.mverse.jsonschema.validation.ValidationMocks.mockSchema
@@ -122,14 +122,14 @@ class StringSchemaTest {
     val rawSchemaJson = JsonSchema.resourceLoader().readJsonObject("tostring/stringschema.json") - "type"
     val schema = JsonSchema.createSchemaReader().readSchema(rawSchemaJson)
     val actual = JsonSchema.createSchemaReader().readSchema(schema.toString()).toString()
-    assertEquals(rawSchemaJson, actual.parseJsonObject())
+    assertEquals(rawSchemaJson, actual.parseKtObject())
   }
 
   @Test
   fun toStringTest() {
     val rawSchemaJson = JsonSchema.resourceLoader().readJsonObject("tostring/stringschema.json")
     val actual = JsonSchema.createSchemaReader().readSchema(rawSchemaJson).toString()
-    assertEquals(rawSchemaJson, actual.parseJsonObject())
+    assertEquals(rawSchemaJson, actual.parseKtObject())
   }
 
   @Test

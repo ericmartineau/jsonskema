@@ -2,7 +2,7 @@ package io.mverse.jsonschema.loading
 
 import assertk.assert
 import assertk.assertions.isEqualTo
-import lang.URI
+import lang.net.URI
 import org.junit.Test
 
 class SubschemaPropertyOrderTest {

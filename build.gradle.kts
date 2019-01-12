@@ -9,6 +9,8 @@ plugins {
 }
 
 allprojects  {
+  val msharedVersion by extra { "0.5.75" }
+
   plugins.apply("kotlinx-serialization")
   mverse {
     isDefaultDependencies = false
@@ -49,6 +51,12 @@ allprojects  {
         entry("kotlin-test-junit")
       }
 
+      dependencySet("io.mverse:$msharedVersion") {
+        entry("mverse-json")
+        entry("mverse-lang-jvm")
+        entry("mverse-lang-common")
+      }
+
       /**
        * 0.90.3 is a custom version that preserves order of keys
        */
@@ -58,9 +66,9 @@ allprojects  {
         entry("kotlinx-serialization-runtime-jsonparser")
       }
 
+
       dependency("org.jetbrains.kotlinx:kotlinx-io:0.1.2-dev-6")
       dependency("org.jetbrains.kotlinx:kotlinx-io-common:0.1.2-dev-6")
-
       dependency("org.jetbrains.kotlinx:kotlinx-io-js:0.1.2-dev-6")
 
 

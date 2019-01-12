@@ -4,10 +4,10 @@ import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.utils.isGeneratedURI
 import io.mverse.jsonschema.utils.isJsonPointer
 import kotlinx.serialization.Serializable
-import lang.URI
+import lang.net.URI
 import lang.hashKode
-import lang.isAbsolute
-import lang.resolveUri
+import lang.json.JsonPath
+import lang.net.resolveUri
 
 /**
  * Provides location information for any given schema or validation context, including:
@@ -50,11 +50,7 @@ class SchemaLocation(
     documentURI.resolveUri(jsonPointerFragment)
   }
 
-  val jsonPointerFragment: URI by lazy {
-    jsonPath.toURIFragment()
-  }
-
-
+  val jsonPointerFragment:URI get() = jsonPath.uriFragment
 
   /**
    * @return Whether this location has an auto-generated root URI.
@@ -63,8 +59,8 @@ class SchemaLocation(
     get() = this.documentURI.isGeneratedURI()
 
   init {
-    check(documentURI.isAbsolute) { "documentURI should be absolute" }
-    check(resolutionScope.isAbsolute) { "resolutionScope should be absolute" }
+    check(documentURI.isAbsolute()) { "documentURI should be absolute" }
+    check(resolutionScope.isAbsolute()) { "resolutionScope should be absolute" }
   }
 
   /**
@@ -72,7 +68,7 @@ class SchemaLocation(
    */
   val canonicalURI: URI by lazy {
     _canonicalURI ?: when (isGenerated) {
-        true -> jsonPath.toURIFragment()
+        true -> jsonPath.uriFragment
         false -> _uniqueURI ?: this.absoluteJsonPointerURI
       }
   }
@@ -148,7 +144,7 @@ class SchemaLocation(
     fun build(): SchemaLocation {
       // Initialize everything from the id
       if (this.documentURI == null && this.id != null) {
-        check(id!!.isAbsolute) { "ID must be absolute" }
+        check(id!!.isAbsolute()) { "ID must be absolute" }
         val baseURI = id
         return SchemaLocation(
             _canonicalURI = baseURI,
@@ -193,14 +189,14 @@ class SchemaLocation(
   }
 
   companion object {
-    val ROOT_PATH = JsonPath.rootPath()
+    val ROOT_PATH = JsonPath.rootPath
     val ROOT_URI = URI("#")
     val BLANK_URI = URI("")
 
     fun documentRoot(id: URI): SchemaLocation {
       val path: JsonPath
       if (id.isJsonPointer()) {
-        path = JsonPath.parseFromURIFragment(id)
+        path = JsonPath.fromURI(id)
       } else {
         path = ROOT_PATH
       }

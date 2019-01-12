@@ -2,8 +2,10 @@ package io.mverse.jsonschema.utils
 
 import assertk.assert
 import assertk.assertions.isEqualTo
-import lang.Random
 import lang.time.Stopwatch
+import lang.time.currentTime
+import kotlin.random.Random
+import kotlin.random.nextInt
 import kotlin.test.Test
 
 class CharUtilsTest {
@@ -48,13 +50,13 @@ class CharUtilsTest {
   fun testtryParsePositiveInt_Perf() {
     val attempts = arrayOfNulls<String>(2000000)
     val combinations = charArrayOf('1', '2', '3', '4', '5', '6', '.', '3', '-')
-    val random = Random()
+    val random = Random(currentTime())
     var i = 0
     for (attempt in attempts) {
       val string = StringBuilder()
       val digits = random.nextInt(1..6)
       for (d in 0 until digits) {
-        val pickedChar = combinations[random.nextInt(0 until combinations.size-1)]
+        val pickedChar = combinations[random.nextInt(0 until combinations.size - 1)]
         string.append(pickedChar)
       }
       attempts[i++] = string.toString()

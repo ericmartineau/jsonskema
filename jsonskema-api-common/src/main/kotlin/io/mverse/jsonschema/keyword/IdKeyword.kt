@@ -2,10 +2,10 @@ package io.mverse.jsonschema.keyword
 
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import kotlinx.serialization.json.JsonBuilder
-import lang.URI
+import lang.net.URI
 
 data class IdKeyword(override val value: URI) : KeywordImpl<URI>() {
-  override fun withValue(value: URI): Keyword<URI> = this.copy(value=value)
+  override fun withValue(value: URI): Keyword<URI> = this.copy(value = value)
 
   override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
     builder.run {

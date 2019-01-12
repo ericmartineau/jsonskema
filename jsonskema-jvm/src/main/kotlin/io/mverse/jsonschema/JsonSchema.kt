@@ -4,7 +4,7 @@ import io.mverse.jsonschema.builder.JsonSchemaBuilder
 import io.mverse.jsonschema.builder.SchemaBuilderDsl
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.SchemaValidatorFactoryBuilder
-import lang.URI
+import lang.net.URI
 
 actual object JsonSchema {
   actual val validatorFactory: SchemaValidatorFactory get() = defaultValidatorFactory

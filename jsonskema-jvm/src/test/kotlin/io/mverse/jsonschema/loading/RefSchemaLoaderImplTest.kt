@@ -6,10 +6,9 @@ import assertk.assertions.isNull
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.createSchemaReader
 import kotlinx.serialization.json.JsonObject
-import lang.URI
-import lang.resolveUri
+import lang.net.URI
+import lang.net.resolveUri
 import org.junit.Before
 import org.junit.Test
 

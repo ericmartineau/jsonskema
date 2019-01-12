@@ -6,7 +6,7 @@ import assertk.assertions.containsAll
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.fail
-import io.mverse.jsonschema.JsonPath
+import lang.json.JsonPath
 import io.mverse.jsonschema.assertThat
 import io.mverse.jsonschema.assertj.subject.ValidationErrorPredicate
 import io.mverse.jsonschema.assertj.subject.ValidationErrorPredicate.Companion.argumentsContainsAll
@@ -16,7 +16,7 @@ import io.mverse.jsonschema.assertj.subject.ValidationErrorPredicate.Companion.s
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.validation.ValidationError
-import lang.URI
+import lang.net.URI
 
 typealias SchemaValidationAssert = Assert<ValidationError?>
 typealias ValidationListAssert = Assert<List<ValidationError>>
@@ -98,7 +98,7 @@ fun SchemaValidationAssert.hasErrorCode(errorCode: String): SchemaValidationAsse
 fun SchemaValidationAssert.hasViolationAt(pointerToViolation: String): SchemaValidationAssert {
   val filtered = filter(pointerToViolationEquals(pointerToViolation))
   return ValidationError.collectErrors(actual!!.violatedSchema!!,
-      JsonPath.parseFromURIFragment(pointerToViolation),
+      JsonPath.fromURI(pointerToViolation),
       filtered)
       .assertThat()
 

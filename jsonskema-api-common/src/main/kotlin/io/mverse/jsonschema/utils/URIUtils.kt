@@ -1,10 +1,10 @@
 package io.mverse.jsonschema.utils
 
-import lang.URI
-import lang.fragment
-import lang.isFragmentOnly
-import lang.scheme
-import lang.schemeSpecificPart
+import lang.net.URI
+import lang.net.fragment
+import lang.net.isFragmentOnly
+import lang.net.scheme
+import lang.net.schemeSpecificPart
 import lang.toHex
 
 const val SCHEME_AUTOASSIGN = "mverse"

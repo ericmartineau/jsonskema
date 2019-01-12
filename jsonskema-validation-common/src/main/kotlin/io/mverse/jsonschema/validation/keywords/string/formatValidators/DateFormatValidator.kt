@@ -15,10 +15,10 @@
  */
 package io.mverse.jsonschema.validation.keywords.string.formatValidators
 
+import io.mverse.jsonschema.formats.FormatChecks
+import io.mverse.jsonschema.formats.ISO_DATE_FORMAT
 import io.mverse.jsonschema.validation.FormatValidator
-import lang.format
-import lang.formats.FormatChecks
-import lang.formats.ISO_DATE_FORMAT
+import lang.string.format
 
 /**
  * Implementation of the "date-time" format value.

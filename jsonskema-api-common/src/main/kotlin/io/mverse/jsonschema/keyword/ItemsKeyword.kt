@@ -4,7 +4,7 @@ import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.utils.isFalseSchema
 import kotlinx.serialization.json.JsonBuilder
-import lang.json.toJsonArray
+import lang.json.toKtArray
 
 data class ItemsKeyword(val indexedSchemas: List<Schema> = emptyList(),
                         val allItemSchema: Schema? = null,
@@ -16,7 +16,7 @@ data class ItemsKeyword(val indexedSchemas: List<Schema> = emptyList(),
   override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
     if (!indexedSchemas.isEmpty()) {
       builder.run {
-        Keywords.ITEMS.key to indexedSchemas.map { it.asVersion(version).toJson() }.toJsonArray()
+        Keywords.ITEMS.key to indexedSchemas.map { it.asVersion(version).toJson() }.toKtArray()
       }
     } else {
       allItemSchema?.let { schema ->

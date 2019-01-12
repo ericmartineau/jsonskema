@@ -7,16 +7,14 @@ import io.mverse.jsonschema.utils.SchemaPaths
 import io.mverse.jsonschema.utils.toJsonSchemaType
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.ElementType
-import kotlinx.serialization.json.JsonArray as KJsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonObject as KJsonObject
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.int
 import lang.Serializable
-import lang.convert
 import lang.hashKode
+import lang.json.JsonPath
+import kotlinx.serialization.json.JsonArray as KJsonArray
+import kotlinx.serialization.json.JsonObject as KJsonObject
 
 /**
  * This class is used for convenience in accessing data within a JsonObject.
@@ -29,11 +27,12 @@ data class JsonValueWithPath(
     val wrapped: JsonElement,
     val location: SchemaLocation) : Map<String, JsonElement> {
 
-  @Transient val jsonObject:KJsonObject? get() = if(wrapped is JsonObject) wrapped else null
-  @Transient val jsonArray: KJsonArray? get() = if(wrapped is KJsonArray) wrapped else null
+  @Transient val jsonObject: KJsonObject? get() = if (wrapped is JsonObject) wrapped else null
+  @Transient val jsonArray: KJsonArray? get() = if (wrapped is KJsonArray) wrapped else null
 
   @Transient
-  val rootObject get() = root.jsonObject
+  val rootObject
+    get() = root.jsonObject
 
   @Transient
   val jsonSchemaType: JsonSchemaType
@@ -53,7 +52,7 @@ data class JsonValueWithPath(
     get() = location.jsonPath
 
   override fun isEmpty(): Boolean {
-    return if(jsonObject==null) true else jsonObject!!.isEmpty()
+    return if (jsonObject == null) true else jsonObject!!.isEmpty()
   }
 
   override fun equals(other: Any?): Boolean = other is JsonValueWithPath &&
@@ -65,16 +64,17 @@ data class JsonValueWithPath(
     return containsKey(keywordType.key)
   }
 
-  override val entries: Set<Map.Entry<String, JsonElement>> get() = jsonObject?.entries ?: emptySet()
+  override val entries: Set<Map.Entry<String, JsonElement>>
+    get() = jsonObject?.entries ?: emptySet()
   override val keys: Set<String> get() = jsonObject?.keys ?: emptySet()
   override val values: Collection<JsonElement> get() = jsonObject?.values ?: emptySet()
 
   override fun containsKey(key: String): Boolean {
-    return jsonObject?.containsKey(key)==true
+    return jsonObject?.containsKey(key) == true
   }
 
   override fun containsValue(value: JsonElement): Boolean {
-    return jsonObject?.containsValue(value)==true
+    return jsonObject?.containsValue(value) == true
   }
 
   override operator fun get(key: String): JsonElement {
@@ -146,7 +146,7 @@ data class JsonValueWithPath(
       if (jsonObject is JsonObject) {
         val asJsonObject = jsonObject.jsonObject
         locationVar = extractIdFromObject(asJsonObject, "\$id", "id")
-            .convert { locationVar.withId(it) }
+            ?.let { locationVar.withId(it) }
             ?: locationVar
       }
       return JsonValueWithPath(root, jsonObject, locationVar)

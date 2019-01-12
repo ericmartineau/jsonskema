@@ -12,7 +12,7 @@ import io.mverse.jsonschema.enums.JsonSchemaType.NULL
 import io.mverse.jsonschema.enums.JsonSchemaType.NUMBER
 import io.mverse.jsonschema.enums.JsonSchemaType.OBJECT
 import io.mverse.jsonschema.enums.JsonSchemaType.STRING
-import lang.URI
+import lang.net.URI
 
 object ValidationMocks {
 

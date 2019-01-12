@@ -18,7 +18,7 @@ package io.mverse.jsonschema.loading
 import assertk.assertions.isEqualTo
 import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.assertThat
-import lang.URI
+import lang.net.URI
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized

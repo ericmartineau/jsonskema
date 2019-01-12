@@ -21,20 +21,17 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.fail
 import com.google.common.collect.Lists.newArrayList
-import io.mverse.jsonschema.JsonPath
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.assertThat
 import io.mverse.jsonschema.keyword.Keywords
-import io.mverse.jsonschema.loading.readFully
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.ValidationMocks.mockBooleanSchema
 import io.mverse.jsonschema.validation.ValidationMocks.mockNullSchema
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import io.mverse.jsonschema.validation.ValidationTestSupport.verifyFailure
-import kotlinx.serialization.json.JSON
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
+import lang.json.JsonPath
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -56,7 +53,7 @@ class ValidationErrorTest {
   fun testToJson() {
     val subject = ValidationError(
         violatedSchema = mockBooleanSchema.build(),
-        pointerToViolation = JsonPath.parseFromURIFragment("#/a/b"),
+        pointerToViolation = JsonPath.fromURI("#/a/b"),
         errorMessage = "exception message",
         keyword = Keywords.TYPE)
 
@@ -73,7 +70,7 @@ class ValidationErrorTest {
         code = "code",
         errorMessage = "exception message",
         keyword = Keywords.TYPE,
-        pointerToViolation = JsonPath.parseFromURIFragment("#/a/b"))
+        pointerToViolation = JsonPath.fromURI("#/a/b"))
 
     val expected = loader.readJsonObject("exception-to-json-with-schema-location.json")
     val actual = subject.toJson()
@@ -82,7 +79,7 @@ class ValidationErrorTest {
 
   @Test
   fun throwForMultipleFailures() {
-    val failedSchema = mockNullSchema.build{}
+    val failedSchema = mockNullSchema.build {}
     val input1 = ValidationError(
         violatedSchema = failedSchema,
         code = "code",
@@ -97,7 +94,7 @@ class ValidationErrorTest {
         keyword = Keywords.TYPE,
         pointerToViolation = "#".toJsonPointer())
 
-    val e = ValidationError.collectErrors(rootSchema, JsonPath.rootPath(), Arrays.asList(input1, input2))
+    val e = ValidationError.collectErrors(rootSchema, JsonPath.rootPath, Arrays.asList(input1, input2))
     assert(e).isNotNull()
 
     Assert.assertSame(rootSchema, e!!.violatedSchema)
@@ -110,7 +107,7 @@ class ValidationErrorTest {
 
   @Test
   fun throwForNoFailure() {
-    expectSuccess { ValidationError.collectErrors(rootSchema, JsonPath.rootPath(), emptyList()) }
+    expectSuccess { ValidationError.collectErrors(rootSchema, JsonPath.rootPath, emptyList()) }
   }
 
   @Test
@@ -123,7 +120,7 @@ class ValidationErrorTest {
         keyword = Keywords.TYPE,
         pointerToViolation = "#".toJsonPointer())
 
-    val actual = verifyFailure { ValidationError.collectErrors(rootSchema, JsonPath.rootPath(), newArrayList(input)) }
+    val actual = verifyFailure { ValidationError.collectErrors(rootSchema, JsonPath.rootPath, newArrayList(input)) }
     Assert.assertSame(input, actual)
   }
 
@@ -217,14 +214,14 @@ class ValidationErrorTest {
           errorMessage = "Failure",
           keyword = Keywords.TYPE,
           pointerToViolation = "#".toJsonPointer())
-    } else ValidationError.collectErrors(rootSchema, JsonPath.rootPath(), causes.filterNotNull().toList())
+    } else ValidationError.collectErrors(rootSchema, JsonPath.rootPath, causes.filterNotNull().toList())
   }
 
-  private fun String.toJsonPointer(): JsonPath = JsonPath.parseFromURIFragment(this)
+  private fun String.toJsonPointer(): JsonPath = JsonPath.fromURI(this)
 }
 
 fun assertk.Assert<JsonObject>.isEqualTo(other: JsonObject, path: String = "") {
-  val prefix = if(!path.isBlank()) "" else "$path: "
+  val prefix = if (!path.isBlank()) "" else "$path: "
 
   if (actual.keys != other.keys) {
     fail("${prefix}Key mismatch: Extra:${actual.keys.minus(other.keys)}, Missing:${other.keys.minus(actual.keys)}")

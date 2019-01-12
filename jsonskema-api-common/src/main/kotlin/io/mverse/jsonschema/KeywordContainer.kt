@@ -2,7 +2,7 @@ package io.mverse.jsonschema
 
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
-import lang.newInstance
+import lang.reflect.newInstance
 import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty

@@ -31,14 +31,13 @@ class JsonPointerValidatorTest {
   @Test
   fun validate_WhenDoubleSlash_ValidationFails() {
     val validate = JsonPointerValidator().validate("/bob//is/cool")
-    assert(validate).isNotNull()
+    assert(validate, validate).isNotNull()
   }
 
   @Test
-  @Throws(Exception::class)
   fun validate_WhenEndsInSlash_ValidationFails() {
 
     val validate = JsonPointerValidator().validate("/bob/is/cool/")
-    assert(validate).isNotNull()
+    assert(validate, validate).isNotNull()
   }
 }

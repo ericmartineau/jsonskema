@@ -1,10 +1,9 @@
-package lang.formats
+package io.mverse.jsonschema.formats
 
 import com.damnhandy.uri.template.UriTemplate
 import com.google.common.net.InetAddresses
 import com.google.common.net.InternetDomainName
 import com.google.i18n.phonenumbers.PhoneNumberUtil
-import lang.illegalState
 import org.apache.commons.validator.routines.EmailValidator
 import java.net.InetAddress
 import java.time.format.DateTimeFormatter
@@ -91,7 +90,7 @@ actual object FormatChecks {
    * @param subject the string to be validated.
    * @return the optional validation failure message
    */
-  private  fun asInetAddress(subject: String):InetAddress? {
+  private fun asInetAddress(subject: String): InetAddress? {
     try {
       return if (InetAddresses.isInetAddress(subject)) {
         InetAddresses.forString(subject)
@@ -102,5 +101,4 @@ actual object FormatChecks {
       return null
     }
   }
-
 }

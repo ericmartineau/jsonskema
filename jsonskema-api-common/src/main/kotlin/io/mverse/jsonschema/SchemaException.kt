@@ -1,8 +1,8 @@
 package io.mverse.jsonschema
 
 import io.mverse.jsonschema.utils.JsonUtils
-import lang.URI
-import lang.format
+import lang.net.URI
+import lang.string.format
 
 open class SchemaException : RuntimeException {
   val schemaLocation: String?

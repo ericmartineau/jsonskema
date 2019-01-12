@@ -8,13 +8,12 @@ import io.mverse.jsonschema.validation.SchemaValidator
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.ValidationReport
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
-import lang.Pattern
 
 class PatternPropertiesValidator(keyword: SchemaMapKeyword, schema: Schema, factory: SchemaValidatorFactory) : KeywordValidator<SchemaMapKeyword>(Keywords.PATTERN_PROPERTIES, schema) {
 
   private val patternValidators = keyword.value
       .map { (regex, schema) ->
-        val pattern = Pattern(regex)
+        val pattern = Regex(regex)
         val validator = factory.createValidator(schema)
         PatternPropertyValidator(pattern, validator)
       }
@@ -30,7 +29,7 @@ class PatternPropertiesValidator(keyword: SchemaMapKeyword, schema: Schema, fact
       val pattern = patternValidator.pattern
       val validator = patternValidator.validator
       for (propertyName in subjectProperties) {
-        if (pattern.find(propertyName)) {
+        if (pattern.containsMatchIn(propertyName)) {
           val propertyValue = subject.path(propertyName)
           success = success && validator.validate(propertyValue, report)
         }
@@ -39,5 +38,5 @@ class PatternPropertiesValidator(keyword: SchemaMapKeyword, schema: Schema, fact
     return parentReport.addReport(schema, subject, report)
   }
 
-  class PatternPropertyValidator(val pattern: Pattern, val validator: SchemaValidator)
+  class PatternPropertyValidator(val pattern: Regex, val validator: SchemaValidator)
 }

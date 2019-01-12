@@ -15,9 +15,9 @@
  */
 package io.mverse.jsonschema.loading
 
-import io.mverse.jsonschema.JsonPath
 import kotlinx.serialization.json.JsonObject
-import lang.URI
+import lang.json.JsonPath
+import lang.net.URI
 
 /**
  * This interface is used by [io.mverse.jsonschema.loading.SchemaReader] to fetch the contents denoted by remote JSON

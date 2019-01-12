@@ -15,8 +15,8 @@
  */
 package io.mverse.jsonschema.validation.keywords.string.formatValidators
 
-import io.mverse.jsonschema.JsonPath
 import io.mverse.jsonschema.validation.FormatValidator
+import lang.json.JsonPath
 
 /**
  * Implementation of the "email" format value.
@@ -27,14 +27,12 @@ class RelativeJsonPointerValidator : FormatValidator {
     return "relative-json-pointer"
   }
 
-  override fun validate(subject: String): String? {
-    try {
-      JsonPath.parseRelativeJsonPointer(subject)
-      return null
-    } catch (e: NullPointerException) {
-      return "invalid json-pointer. Can't be null"
-    } catch (e: IllegalArgumentException) {
-      return e.message
-    }
+  override fun validate(subject: String): String? = try {
+    JsonPath(subject, true)
+    null
+  } catch (e: NullPointerException) {
+    "invalid json-pointer. Can't be null"
+  } catch (e: IllegalArgumentException) {
+    e.message
   }
 }

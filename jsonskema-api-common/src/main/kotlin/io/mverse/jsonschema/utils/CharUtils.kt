@@ -1,55 +1,6 @@
 package io.mverse.jsonschema.utils
 
-import lang.Escaper
-import lang.Escapers.Companion.urlPathSegmentEscaper
-import lang.Joiner
-import lang.Splitter
-import lang.URLDecoder
-import lang.Unescaper
-
 object CharUtils {
-
-  private val SPACER = Joiner(" ")
-
-  private val JSON_POINTER_SEGMENT_ESCAPER = Escaper(
-      '~' to "~0",
-      '/' to "~1",
-      '"' to "\\",
-      '\\' to "\\\\")
-
-  private val JSON_POINTER_SEGMENT_UNESCAPER = Unescaper(
-      "~0" to "~",
-      "~1" to "/",
-      "\\" to "\"",
-      "\\\\" to "\\")
-
-  private val FORWARD_SLASH_SEPARATOR = Splitter('/')
-
-  private object UrlSegmentUnscaper : Unescaper() {
-    override fun unescape(string: CharSequence?): String {
-      return URLDecoder.decode(string.toString(), "UTF-8")
-    }
-  }
-
-  fun escapeForJsonPointerSegment(string: String): String {
-    return jsonPointerSegmentEscaper().escape(string)
-  }
-
-  fun escapeForURIPointerSegment(string: String): String {
-    return urlPathSegmentEscaper().escape(escapeForJsonPointerSegment(string))
-  }
-
-  fun forwardSlashSeparator(): Splitter {
-    return FORWARD_SLASH_SEPARATOR
-  }
-
-  fun jsonPointerSegmentEscaper(): Escaper {
-    return JSON_POINTER_SEGMENT_ESCAPER
-  }
-
-  fun jsonPointerSegmentUnescaper(): Unescaper {
-    return JSON_POINTER_SEGMENT_UNESCAPER
-  }
 
   fun tryParsePositiveInt(s: String?): Int {
     if (s == null) {
@@ -77,9 +28,5 @@ object CharUtils {
       num -= d
     }
     return -1 * num
-  }
-
-  fun urlSegmentUnescaper(): Unescaper {
-    return UrlSegmentUnscaper
   }
 }

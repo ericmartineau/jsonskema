@@ -3,8 +3,8 @@ package io.mverse.jsonschema.utils
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonLiteral
 import kotlinx.serialization.json.JsonObject
-import lang.Logger
-import lang.URI
+import lang.logging.Logger
+import lang.net.URI
 
 object JsonUtils {
   private val log = Logger("io.mverse.jsonschema.utils.JsonUtils")
@@ -30,22 +30,22 @@ object JsonUtils {
     if (uriValue is JsonLiteral) {
       uriValue.contentOrNull
     }
-    return when(uriValue) {
-      is JsonLiteral-> try {
+    return when (uriValue) {
+      is JsonLiteral -> try {
         URI(uriValue.contentOrNull)
-      } catch(e:Exception) {
+      } catch (e: Exception) {
         log.warn("Failed to parse URI: ${uriValue.contentOrNull}")
         return null
       }
-      else->null
+      else -> null
     }
   }
 
   fun prettyPrintArgs(args: Iterable<Any>): Array<Any> {
     return args.map {
       when (it) {
-        is JsonElement->it.toString()
-        else-> it
+        is JsonElement -> it.toString()
+        else -> it
       }
     }.toTypedArray()
   }

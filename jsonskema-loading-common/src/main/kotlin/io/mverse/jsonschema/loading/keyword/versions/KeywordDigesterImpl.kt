@@ -2,15 +2,14 @@ package io.mverse.jsonschema.loading.keyword.versions
 
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.SchemaBuilder
-import io.mverse.jsonschema.keyword.KeywordLoader
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
+import io.mverse.jsonschema.keyword.KeywordLoader
 import io.mverse.jsonschema.loading.KeywordDigest
 import io.mverse.jsonschema.loading.KeywordDigester
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
 import io.mverse.jsonschema.loading.digest
-import lang.convert
 
 class KeywordDigesterImpl<T : Keyword<*>>(val keyword: KeywordInfo<T>, private val loader: KeywordLoader<T>) : KeywordDigester<T> {
 
@@ -22,6 +21,6 @@ class KeywordDigesterImpl<T : Keyword<*>>(val keyword: KeywordInfo<T>, private v
                               report: LoadingReport): KeywordDigest<T>? {
     return loader
         .loadKeyword(jsonObject.path(keyword))
-        ?.convert { k -> keyword.digest(k) }
+        ?.let { k -> keyword.digest(k) }
   }
 }

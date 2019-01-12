@@ -4,8 +4,8 @@ import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
-import lang.SetMultimap
-import lang.URI
+import lang.collection.SetMultimap
+import lang.net.URI
 
 interface Draft6Schema : DraftSchema<Draft6Schema> {
 

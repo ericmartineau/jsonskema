@@ -26,7 +26,7 @@ import io.mverse.jsonschema.loading.reference.DefaultJsonDocumentClient
 import io.mverse.jsonschema.resourceLoader
 import io.mverse.jsonschema.schemaReader
 import kotlinx.serialization.json.json
-import lang.URI
+import lang.net.URI
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test

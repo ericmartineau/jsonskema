@@ -1,4 +1,4 @@
-package lang.formats
+package io.mverse.jsonschema.formats
 
 val ISO_DATE_FORMAT = "yyyy-MM-dd"
 val DATETIME_FORMATS_ACCEPTED = listOf(

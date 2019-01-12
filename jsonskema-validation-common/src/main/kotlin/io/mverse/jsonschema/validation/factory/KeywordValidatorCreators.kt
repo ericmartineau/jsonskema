@@ -1,7 +1,7 @@
 package io.mverse.jsonschema.validation.factory
 
 import io.mverse.jsonschema.keyword.KeywordInfo
-import lang.SetMultimap
+import lang.collection.SetMultimap
 
 /**
  * Extracts any necessary validation keywords from a [io.mverse.jsonschema.Schema] instance.

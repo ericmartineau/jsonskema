@@ -4,7 +4,7 @@ import io.mverse.jsonschema.Draft3Schema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.enums.JsonSchemaVersion
-import lang.URI
+import lang.net.URI
 
 @Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
 class Draft3RefSchemaImpl(location: SchemaLocation,

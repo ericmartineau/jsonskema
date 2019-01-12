@@ -5,21 +5,21 @@ import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.validation.factory.KeywordValidatorCreator
 import io.mverse.jsonschema.validation.factory.KeywordValidatorCreators
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
-import lang.ListMultimap
-import lang.MutableListMultimap
 import kotlinx.serialization.json.ElementType
+import lang.collection.ListMultimap
+import lang.collection.MutableListMultimap
 
 /**
  * Main validation processing controller.  There will be a single instance of this class for each json-schema, but each
  * keyword is broken out into a separate processor.
  */
 data class JsonSchemaValidator(val factories: KeywordValidatorCreators,
-            /**
-             * The underlying schema being validated.  This instance isn't actually used for validation, it's primarily
-             * here for metadata when recording validation.
-             */
-            override val schema: Schema,
-            val validatorFactory: SchemaValidatorFactoryImpl) : SchemaValidator {
+                               /**
+                                * The underlying schema being validated.  This instance isn't actually used for validation, it's primarily
+                                * here for metadata when recording validation.
+                                */
+                               override val schema: Schema,
+                               val validatorFactory: SchemaValidatorFactoryImpl) : SchemaValidator {
 
   private val arrayValidators: List<KeywordValidator<*>>
   private val objectValidators: List<KeywordValidator<*>>
@@ -128,6 +128,4 @@ data class JsonSchemaValidator(val factories: KeywordValidatorCreators,
     }
     return validatorsByType.freeze()
   }
-
-
 }

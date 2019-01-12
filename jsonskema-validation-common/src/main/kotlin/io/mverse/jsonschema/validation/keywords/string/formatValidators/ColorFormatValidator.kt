@@ -16,18 +16,17 @@
 package io.mverse.jsonschema.validation.keywords.string.formatValidators
 
 import io.mverse.jsonschema.validation.FormatValidator
-import lang.Pattern
-import lang.format
+import lang.string.format
 
 /**
  * Implementation of the "color" format value.
  */
-internal val COLOR_PATTERN = Pattern("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
+internal val COLOR_PATTERN = Regex("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
 
 class ColorFormatValidator : FormatValidator {
 
   override fun validate(subject: String): String? {
-    return if (!COLOR_PATTERN.find(subject)) {
+    return if (!COLOR_PATTERN.matches(subject)) {
       "[%s] is not a valid color. Expected %s".format(subject, "#FFFFFF")
     } else {
       null

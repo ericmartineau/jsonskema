@@ -6,7 +6,7 @@ import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft4
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft5
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft6
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
-import lang.range
+import lang.enums.range
 
 /**
  * Represents each of the built-in format types in the json-schema specification.
@@ -237,7 +237,6 @@ enum class FormatType(key: String? = null,
       }
     }
   }
-
 }
 
 internal fun String.toLowerHyphen(): String {

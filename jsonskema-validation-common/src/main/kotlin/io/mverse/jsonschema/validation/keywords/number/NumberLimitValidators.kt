@@ -2,7 +2,6 @@ package io.mverse.jsonschema.validation.keywords.number
 
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.keyword.LimitKeyword
-import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
 
 object NumberLimitValidators {

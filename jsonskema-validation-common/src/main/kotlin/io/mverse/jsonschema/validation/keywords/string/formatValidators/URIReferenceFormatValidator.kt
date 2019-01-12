@@ -16,8 +16,8 @@
 package io.mverse.jsonschema.validation.keywords.string.formatValidators
 
 import io.mverse.jsonschema.validation.FormatValidator
-import lang.URI
-import lang.format
+import lang.net.URI
+import lang.string.format
 
 /**
  * Implementation of the "uri" format value.

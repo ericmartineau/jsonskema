@@ -1,7 +1,7 @@
 package io.mverse.jsonschema.enums
 
 import lang.Field
-import lang.URI
+import lang.net.URI
 
 enum class JsonSchemaVersion constructor(uri: String?) {
   Draft3("http://json-schema.org/draft-03/schema#"),

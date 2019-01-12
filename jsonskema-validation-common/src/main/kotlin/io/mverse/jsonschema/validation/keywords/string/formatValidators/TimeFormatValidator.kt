@@ -15,23 +15,21 @@
  */
 package io.mverse.jsonschema.validation.keywords.string.formatValidators
 
+import io.mverse.jsonschema.formats.FormatChecks
+import io.mverse.jsonschema.formats.TIME_FORMATS_ACCEPTED
 import io.mverse.jsonschema.validation.FormatValidator
-import lang.format
-import lang.formats.FormatChecks
-import lang.formats.TIME_FORMATS_ACCEPTED
+import lang.string.format
 
 /**
  * Implementation of the "date-time" format value.
  */
 class TimeFormatValidator : FormatValidator {
 
-  override fun validate(subject: String): String? {
-    try {
-      FormatChecks.isValidIsoTime(subject)
-      return null
-    } catch (e: Exception) {
-      return "[%s] is not a valid time. Expected %s".format(subject, TIME_FORMATS_ACCEPTED)
-    }
+  override fun validate(subject: String): String? = try {
+    FormatChecks.isValidIsoTime(subject)
+    null
+  } catch (e: Exception) {
+    "[%s] is not a valid time. Expected %s".format(subject, TIME_FORMATS_ACCEPTED)
   }
 
   override fun formatName(): String {

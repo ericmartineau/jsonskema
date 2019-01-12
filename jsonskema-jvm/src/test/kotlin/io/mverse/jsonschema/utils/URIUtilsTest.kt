@@ -6,11 +6,11 @@ import assertk.assertions.isFalse
 import assertk.assertions.isSameAs
 import assertk.assertions.isTrue
 import kotlinx.serialization.json.json
-import lang.URI
-import lang.isFragmentOnly
-import lang.json.toJsonArray
 import lang.json.toJsonObject
-import lang.resolveUri
+import lang.json.toKtArray
+import lang.net.URI
+import lang.net.isFragmentOnly
+import lang.net.resolveUri
 import kotlin.test.Test
 
 class URIUtilsTest {
@@ -24,14 +24,14 @@ class URIUtilsTest {
   @Test
   fun resolve_AgainstURN_WithFragmentOnly() {
     val uriToTest = URI("urn:jsonschema:com:zzzzz:tests:commons:jsonschema:models:Person")
-    assert(uriToTest.resolveUri( URI("#/some/pointer")))
+    assert(uriToTest.resolveUri(URI("#/some/pointer")))
         .isEqualTo(URI("urn:jsonschema:com:zzzzz:tests:commons:jsonschema:models:Person#/some/pointer"))
   }
 
   @Test
   fun withNewFragment_FromURI_FragmentAppended() {
     val uriToTest = URI("https://www.mysite.com/some/url.html#/oldpath/to/stuff")
-    assert(uriToTest.withNewFragment( URI("#/new/path")))
+    assert(uriToTest.withNewFragment(URI("#/new/path")))
         .isEqualTo(URI("https://www.mysite.com/some/url.html#/new/path"))
   }
 
@@ -120,10 +120,10 @@ class URIUtilsTest {
 
   @Test
   fun generateAbsoluteURI() {
-    val jsonObject= json {
+    val jsonObject = json {
       "bob" to "jones"
       "age" to 34
-      "sub" to listOf(3, 5, 67).toJsonArray()
+      "sub" to listOf(3, 5, 67).toKtArray()
     }
 
     val uri = generateUniqueURI(jsonObject)
@@ -133,11 +133,11 @@ class URIUtilsTest {
 
   @Test
   fun generateUniqueURI_ForSameRootObject_ReturnsSameURI() {
-    val jsonObject= json {
+    val jsonObject = json {
       "bob" to "jones"
       "age" to 34
       val numbers = listOf<Number>(3, 5, 67)
-      "sub" to numbers.toJsonArray()
+      "sub" to numbers.toKtArray()
     }
 
     val uri = generateUniqueURI(jsonObject)

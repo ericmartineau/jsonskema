@@ -12,7 +12,7 @@ import io.mverse.jsonschema.loading.reference.DefaultJsonDocumentClient
 import io.mverse.jsonschema.loading.reference.SchemaCache
 import io.mverse.jsonschema.utils.JsonUtils
 import kotlinx.serialization.json.JsonObject
-import lang.URI
+import lang.net.URI
 
 /**
  * This class is responsible for extracting values from a json instance to produce an immutable [Schema]

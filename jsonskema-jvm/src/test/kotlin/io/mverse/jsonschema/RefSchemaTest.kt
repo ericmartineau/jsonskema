@@ -7,7 +7,7 @@ import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.impl.RefSchemaImpl
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.loading.SchemaLoaderImpl
-import lang.URI
+import lang.net.URI
 import lang.json.toJsonLiteral
 import kotlin.test.Test
 

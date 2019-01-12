@@ -5,7 +5,7 @@ import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keyword
 import kotlinx.serialization.json.JsonElement
 import lang.Name
-import lang.URI
+import lang.net.URI
 
 interface Schema {
 

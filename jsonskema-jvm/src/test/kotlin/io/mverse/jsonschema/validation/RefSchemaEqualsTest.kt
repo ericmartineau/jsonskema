@@ -17,14 +17,12 @@ package io.mverse.jsonschema.validation
 
 import assertk.assert
 import assertk.assertions.hasToString
-import assertk.assertions.isEqualTo
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.RefSchema
-import io.mverse.jsonschema.loading.parseJsonObject
+import io.mverse.jsonschema.loading.parseKtObject
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.createSchemaReader
-import lang.URI
+import lang.net.URI
 import nl.jqno.equalsverifier.EqualsVerifier
 import nl.jqno.equalsverifier.Warning
 import org.assertj.core.api.Assertions.assertThat
@@ -38,7 +36,7 @@ class RefSchemaEqualsTest {
     val schema = JsonSchema.createSchemaReader().readSchema(rawSchemaJson)
     val actual = schema.toString()
 
-    assertThat(actual.parseJsonObject().getOrNull("properties")).isEqualTo(rawSchemaJson["properties"])
+    assertThat(actual.parseKtObject().getOrNull("properties")).isEqualTo(rawSchemaJson["properties"])
   }
 
   @Test

@@ -15,22 +15,22 @@
  */
 package io.mverse.jsonschema.validation
 
-import io.mverse.jsonschema.JsonPath
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.KeywordInfoSerializer
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonPrimitive
 import lang.Name
-import lang.Serializable
 import lang.SerializableWith
-import lang.URI
-import lang.format
-import lang.json.toJsonArray
+import lang.json.JsonPath
 import lang.json.toJsonLiteral
 import lang.json.toJsonObject
+import lang.json.toKtArray
+import lang.net.URI
+import lang.string.format
 
 /**
  * Thrown by [Schema] subclasses on validation failure.
@@ -96,7 +96,8 @@ data class ValidationError(
    * @return the error description
    */
   @Transient
-  val message: String get () = "$pathToViolation: $resolvedMessage"
+  val message: String
+    get () = "$pathToViolation: $resolvedMessage"
 
   @Transient
   val resolvedMessage: String
@@ -116,7 +117,7 @@ data class ValidationError(
    * @return the JSON pointer
    */
   val pathToViolation: String?
-    get() = pointerToViolation?.toURIFragment()?.toString()
+    get() = pointerToViolation?.uriFragment?.toString()
 
   val schemaLocation: URI?
     get() = violatedSchema!!.pointerFragmentURI
@@ -146,7 +147,7 @@ data class ValidationError(
     }
 
     if (arguments?.isNotEmpty() == true) {
-      errorJson["arguments"] = arguments.map { it.toString() }.toJsonArray()
+      errorJson["arguments"] = arguments.map { it.toString() }.toKtArray()
     }
 
     if (this.keyword != null) {
@@ -154,7 +155,7 @@ data class ValidationError(
     }
 
     if (withCauses && causes.isNotEmpty()) {
-      errorJson["causes"] = causes.map { it.toJson() }.toJsonArray()
+      errorJson["causes"] = causes.map { it.toJson() }.toKtArray()
     }
 
     errorJson["message"] = this.resolvedMessage.toJsonLiteral()
@@ -185,7 +186,7 @@ data class ValidationError(
   fun toJsonErrors(): kotlinx.serialization.json.JsonArray {
     return this.allMessages
         .map { e -> e.toJson(false) }
-        .toJsonArray()
+        .toKtArray()
   }
 
   override fun toString(): String {

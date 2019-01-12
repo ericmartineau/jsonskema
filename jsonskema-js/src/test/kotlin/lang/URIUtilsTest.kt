@@ -9,9 +9,9 @@ import io.mverse.jsonschema.utils.generateUniqueURI
 import io.mverse.jsonschema.utils.isJsonPointer
 import io.mverse.jsonschema.utils.withoutFragment
 import kotlinx.serialization.json.json
-import lang.URI
+import lang.net.URI
 import lang.isFragmentOnly
-import lang.json.toJsonArray
+import lang.json.toKtArray
 import lang.json.toJsonObject
 import lang.resolveUri
 import kotlin.test.Test

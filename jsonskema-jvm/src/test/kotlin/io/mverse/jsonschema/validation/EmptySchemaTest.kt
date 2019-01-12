@@ -22,9 +22,7 @@ import assertk.assertions.isEqualTo
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.keyword.Keywords
-import io.mverse.jsonschema.loading.parseJsonObject
-import io.mverse.jsonschema.schemaBuilder
-import io.mverse.jsonschema.validation.ValidationMocks.createTestValidator
+import io.mverse.jsonschema.loading.parseKtObject
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import kotlinx.serialization.json.content
 import lang.json.toJsonLiteral
@@ -85,6 +83,6 @@ class EmptySchemaTest {
     }
     if (title != null) builder.title= title
     if (description != null) builder.description= description
-    return builder.build().toString().parseJsonObject()
+    return builder.build().toString().parseKtObject()
   }
 }

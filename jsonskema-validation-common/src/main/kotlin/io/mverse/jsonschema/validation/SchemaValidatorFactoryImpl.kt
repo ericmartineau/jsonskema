@@ -52,21 +52,20 @@ import io.mverse.jsonschema.validation.keywords.string.formatValidators.NoopForm
 import io.mverse.jsonschema.validation.keywords.string.formatValidators.PatternBasedValidator
 import io.mverse.jsonschema.validation.keywords.string.formatValidators.PhoneFormatValidator
 import io.mverse.jsonschema.validation.keywords.string.formatValidators.RegexFormatValidator
+import io.mverse.jsonschema.validation.keywords.string.formatValidators.RelativeJsonPointerValidator
 import io.mverse.jsonschema.validation.keywords.string.formatValidators.TimeFormatValidator
 import io.mverse.jsonschema.validation.keywords.string.formatValidators.URIFormatValidator
 import io.mverse.jsonschema.validation.keywords.string.formatValidators.URIReferenceFormatValidator
 import io.mverse.jsonschema.validation.keywords.string.formatValidators.URITemplateFormatValidator
-import lang.MutableSetMultimap
-import lang.Pattern
-import lang.URI
-import lang.isAbsolute
+import lang.collection.MutableSetMultimap
+import lang.net.URI
 
 class SchemaValidatorFactoryImpl(private val validatorCache: MutableMap<URI, SchemaValidator> = hashMapOf(),
                                  private val customFormatValidators: Map<String, FormatValidator>,
                                  private val validators: KeywordValidatorCreators) : SchemaValidatorFactory {
 
   internal fun cacheValidator(schemaURI: URI, validator: SchemaValidator) {
-    if (schemaURI.isAbsolute) {
+    if (schemaURI.isAbsolute()) {
       validatorCache.getOrPut(schemaURI) { validator }
     }
   }
@@ -144,7 +143,7 @@ class SchemaValidatorFactoryImpl(private val validatorCache: MutableMap<URI, Sch
         "ip-address" -> return IPV4Validator()
         "ipv6" -> return IPV6Validator()
         "json-pointer" -> return JsonPointerValidator()
-        "relative-json-pointer" -> return JsonPointerValidator()
+        "relative-json-pointer" -> return RelativeJsonPointerValidator()
         "uri-template" -> return URITemplateFormatValidator()
         "uri-reference" -> return URIReferenceFormatValidator()
         "iri-reference" -> return IRIReferenceFormatValidator()
@@ -153,7 +152,7 @@ class SchemaValidatorFactoryImpl(private val validatorCache: MutableMap<URI, Sch
         "color" -> return ColorFormatValidator()
         "phone" -> return PhoneFormatValidator()
         "regex" -> return RegexFormatValidator()
-        "utc-millisec" -> return PatternBasedValidator(Pattern("^[0-9]+$"), "utc-millisex")
+        "utc-millisec" -> return PatternBasedValidator(Regex("^[0-9]+$"), "utc-millisex")
         else -> throw IllegalArgumentException("unsupported format: $formatName")
       }
     }

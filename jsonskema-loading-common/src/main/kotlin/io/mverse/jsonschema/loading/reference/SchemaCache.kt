@@ -1,6 +1,5 @@
 package io.mverse.jsonschema.loading.reference
 
-import io.mverse.jsonschema.JsonPath
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.keyword.Keywords
@@ -8,9 +7,9 @@ import io.mverse.jsonschema.utils.JsonUtils.tryParseURI
 import io.mverse.jsonschema.utils.recurse
 import io.mverse.jsonschema.utils.trimEmptyFragment
 import kotlinx.serialization.json.JsonObject
-import lang.URI
-import lang.isAbsolute
-import lang.resolveUri
+import lang.json.JsonPath
+import lang.net.URI
+import lang.net.resolveUri
 
 /**
  * Responsible for caching resolved schemas.  Due to the possibility of self-referencing schemas, this
@@ -28,13 +27,13 @@ data class SchemaCache(
   operator fun plus(pair: Pair<URI, Schema>): SchemaCache = apply { cacheSchema(pair.first, pair.second) }
 
   fun cacheSchema(schemaURI: URI, schema: Schema) {
-    check(schemaURI.isAbsolute) { "Must be an absolute URI" }
+    check(schemaURI.isAbsolute()) { "Must be an absolute URI" }
     absoluteSchemaCache[schemaURI.trimEmptyFragment()] = schema
   }
 
   fun cacheDocument(documentURI: URI, document: JsonObject) {
     val docURI = documentURI.trimEmptyFragment()
-    if (docURI.isAbsolute) {
+    if (docURI.isAbsolute()) {
       absoluteDocumentCache[docURI] = document
     }
   }
@@ -63,7 +62,7 @@ data class SchemaCache(
 
   fun getSchema(vararg schemaURI: URI): Schema? {
     for (uri in schemaURI) {
-      if (uri.isAbsolute) {
+      if (uri.isAbsolute()) {
         val hit = absoluteSchemaCache[uri.trimEmptyFragment()]
         if (hit != null) {
           return hit

@@ -23,7 +23,7 @@ import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.keyword.Keywords.ALL_OF
 import io.mverse.jsonschema.keyword.Keywords.ANY_OF
 import io.mverse.jsonschema.keyword.Keywords.ONE_OF
-import io.mverse.jsonschema.loading.parseJson
+import io.mverse.jsonschema.loading.parseKtJson
 import io.mverse.jsonschema.validation.ValidationMocks.mockNumberSchema
 import lang.json.toJsonLiteral
 import org.junit.Test
@@ -36,7 +36,7 @@ class CombinedKeywordValidatorTest {
     val parentSchema = JsonSchema.schema {
       allOfSchemas = SUBSCHEMAS
     }
-    val subject = "24".parseJson()
+    val subject = "24".parseKtJson()
     parentSchema.validating(subject)
         .isNotValid()
         .hasViolationCount(1)

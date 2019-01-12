@@ -3,7 +3,7 @@ package io.mverse.jsonschema
 import io.mverse.jsonschema.builder.SchemaBuilderDsl
 import io.mverse.jsonschema.validation.SchemaValidator
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
-import lang.URI
+import lang.net.URI
 
 expect object JsonSchema {
   fun createValidatorFactory(): SchemaValidatorFactory

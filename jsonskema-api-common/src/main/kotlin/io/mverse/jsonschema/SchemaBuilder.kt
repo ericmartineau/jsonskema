@@ -9,8 +9,8 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import lang.Name
-import lang.SetMultimap
-import lang.URI
+import lang.collection.SetMultimap
+import lang.net.URI
 
 interface SchemaBuilder {
 

@@ -5,9 +5,9 @@ import assertk.assert
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.json
-import lang.illegalState
+import lang.exception.illegalState
 import lang.json.toJsonLiteral
-import lang.json.toJsonArray
+import lang.json.toKtArray
 import kotlin.test.assert
 
 object TestUtils {
@@ -35,7 +35,7 @@ object TestUtils {
   }
 
   fun createJsonArrayWithLocation(): JsonValueWithPath {
-    val jsonElement = listOf( "foo", "bar", 3, true, JsonNull).toJsonArray()
+    val jsonElement = listOf( "foo", "bar", 3, true, JsonNull).toKtArray()
 
     return JsonValueWithPath.fromJsonValue(jsonElement)
   }

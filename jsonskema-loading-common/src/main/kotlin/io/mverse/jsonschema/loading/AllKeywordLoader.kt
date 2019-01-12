@@ -6,8 +6,8 @@ import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.loading.LoadingIssues.keywordNotFoundIssue
-import lang.MutableSetMultimap
-import lang.SetMultimap
+import lang.collection.MutableSetMultimap
+import lang.collection.SetMultimap
 
 typealias KeywordInfoAndDigester = Pair<KeywordInfo<*>, KeywordDigester<*>>
 

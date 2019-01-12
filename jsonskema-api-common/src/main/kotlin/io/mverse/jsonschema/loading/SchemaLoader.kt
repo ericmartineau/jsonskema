@@ -4,7 +4,7 @@ import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaBuilder
 import kotlinx.serialization.json.JsonObject
-import lang.URI
+import lang.net.URI
 
 /**
  * If you're trying to load a schema from an input source, you want [SchemaReader].

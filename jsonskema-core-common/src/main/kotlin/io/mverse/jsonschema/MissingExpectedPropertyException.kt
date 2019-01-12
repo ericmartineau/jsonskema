@@ -1,6 +1,6 @@
 package io.mverse.jsonschema
 
-import kotlinx.serialization.json.JsonObject
+import lang.json.KtObject
 
-class MissingExpectedPropertyException(source: kotlinx.serialization.json.JsonObject, property: String) :
+class MissingExpectedPropertyException(source: KtObject, property: String) :
     RuntimeException("Found ${source.keys}, but was expecting $property")

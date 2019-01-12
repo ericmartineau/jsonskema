@@ -7,17 +7,13 @@ import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialDescriptor
-import kotlinx.serialization.Serializer
-import kotlinx.serialization.internal.SerialClassDescImpl
 import kotlinx.serialization.internal.StringDescriptor
-import kotlinx.serialization.internal.StringSerializer
 import kotlinx.serialization.json.ElementType
 import kotlinx.serialization.withName
-import lang.Serializable
 import lang.SerializableWith
+import lang.enums.range
+import lang.exception.illegalState
 import lang.hashKode
-import lang.illegalState
-import lang.range
 
 /**
  * Represents a single keyword and its applicable versions, and acceptable input types.
@@ -201,7 +197,6 @@ data class KeywordInfo<K : Keyword<*>>(
     }
   }
 
-
   companion object {
     inline fun <reified X : Keyword<*>> builder(): KeywordInfoBuilder<X> {
       return KeywordInfoBuilder()
@@ -268,9 +263,8 @@ data class KeywordInfo<K : Keyword<*>>(
   }
 }
 
-
-class KeywordInfoSerializer(): KSerializer<KeywordInfo<out Keyword<*>>> {
-  constructor(ser: KSerializer<Any>):this()
+class KeywordInfoSerializer() : KSerializer<KeywordInfo<out Keyword<*>>> {
+  constructor(ser: KSerializer<Any>) : this()
 
   override val descriptor: SerialDescriptor = StringDescriptor.withName("KeywordInfo")
 

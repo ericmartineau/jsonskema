@@ -11,11 +11,11 @@ import io.mverse.jsonschema.DraftSchema
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.createSchemaReader
-import io.mverse.jsonschema.loading.parseJsonObject
+import io.mverse.jsonschema.loading.parseKtObject
 import io.mverse.unit.junit.TestParam
 import junitparams.JUnitParamsRunner
 import junitparams.Parameters
-import lang.URI
+import lang.net.URI
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -425,7 +425,7 @@ class DraftSchemaTest {
 
     init {
       val resourceAsStream = DraftSchemaTest::class.java.getResourceAsStream("/kitchen-sink-schema.json")
-      val schemaJson = resourceAsStream.parseJsonObject()
+      val schemaJson = resourceAsStream.parseKtObject()
       schemaReader.withPreloadedDocument(schemaJson)
       kitchenSinkSchema = schemaReader.readSchema(schemaJson)
     }

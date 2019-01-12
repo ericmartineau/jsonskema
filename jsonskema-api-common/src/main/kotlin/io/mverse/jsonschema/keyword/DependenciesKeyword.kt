@@ -4,9 +4,9 @@ import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import kotlinx.serialization.json.JsonBuilder
 import kotlinx.serialization.json.json
-import lang.Multimaps
-import lang.SetMultimap
-import lang.json.toJsonArray
+import lang.collection.Multimaps
+import lang.collection.SetMultimap
+import lang.json.toKtArray
 
 data class DependenciesKeyword(val dependencySchemas: SchemaMapKeyword = SchemaMapKeyword(),
                                val propertyDependencies: SetMultimap<String, String> = Multimaps.emptySetMultimap())
@@ -22,11 +22,11 @@ data class DependenciesKeyword(val dependencySchemas: SchemaMapKeyword = SchemaM
   override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
     builder.run {
       Keywords.DEPENDENCIES.key to json {
-        propertyDependencies.asMap().forEach { (prop:String, setOfDependentProps:Collection<String>) ->
-          prop to setOfDependentProps.toJsonArray()
+        propertyDependencies.asMap().forEach { (prop: String, setOfDependentProps: Collection<String>) ->
+          prop to setOfDependentProps.toKtArray()
         }
 
-        dependencySchemas.value.forEach{ (key, schema) ->
+        dependencySchemas.value.forEach { (key, schema) ->
           key to schema.asVersion(version).toJson()
         }
       }

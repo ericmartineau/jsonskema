@@ -22,7 +22,7 @@ import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.getValidator
 import io.mverse.jsonschema.keyword.Keywords.EXCLUSIVE_MAXIMUM
-import io.mverse.jsonschema.loading.parseJsonObject
+import io.mverse.jsonschema.loading.parseKtObject
 import io.mverse.jsonschema.minus
 import io.mverse.jsonschema.plus
 import io.mverse.jsonschema.resourceLoader
@@ -132,21 +132,21 @@ class NumberSchemaTest {
     val rawSchemaJson = loader.readJsonObject("tostring/numberschema.json") - "type"
     val schemaFromJson = JsonSchema.createSchemaReader().readSchema(rawSchemaJson)
     val actual = schemaFromJson.toString()
-    assertEquals(rawSchemaJson, actual.parseJsonObject())
+    assertEquals(rawSchemaJson, actual.parseKtObject())
   }
 
   @Test
   fun toStringReqInteger() {
     val rawSchemaJson: kotlinx.serialization.json.JsonObject = loader.readJsonObject("tostring/numberschema.json") + ("type" to "number".toJsonLiteral())
     val actual = JsonSchema.createSchemaReader().readSchema(rawSchemaJson).toString()
-    assertEquals(rawSchemaJson, actual.parseJsonObject())
+    assertEquals(rawSchemaJson, actual.parseKtObject())
   }
 
   @Test
   fun toStringTest() {
     val rawSchemaJson = loader.readJsonObject("tostring/numberschema.json")
     val actual = JsonSchema.createSchemaReader().readSchema(rawSchemaJson).toString()
-    assertEquals(rawSchemaJson, actual.parseJsonObject())
+    assertEquals(rawSchemaJson, actual.parseKtObject())
   }
 
   @Test

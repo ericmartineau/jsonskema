@@ -52,12 +52,12 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.json
-import lang.Logger
-import lang.Multimaps
-import lang.SetMultimap
-import lang.URI
+import lang.collection.Multimaps
+import lang.collection.SetMultimap
+import lang.net.URI
 import lang.json.JsonSaver
 import lang.json.jsonArrayOf
+import lang.logging.Logger
 
 val log: Logger = Logger("JsonSchemaImpl")
 

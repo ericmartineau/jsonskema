@@ -3,7 +3,7 @@ package io.mverse.jsonschema.keyword
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import kotlinx.serialization.json.JsonBuilder
-import lang.json.toJsonArray
+import lang.json.toKtArray
 
 data class TypeKeyword(val types:Set<JsonSchemaType> = emptySet(),
                        val disallowedTypes: Set<JsonSchemaType> = JsonSchemaType.values().toSet().minus(types)) :
@@ -26,7 +26,7 @@ data class TypeKeyword(val types:Set<JsonSchemaType> = emptySet(),
     builder.apply {
       when {
         types.size == 1-> type to types.first().name.toLowerCase()
-        else-> type to types.map { it.name.toLowerCase() }.toJsonArray()
+        else-> type to types.map { it.name.toLowerCase() }.toKtArray()
       }
     }
   }

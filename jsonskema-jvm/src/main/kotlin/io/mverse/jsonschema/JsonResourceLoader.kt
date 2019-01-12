@@ -1,8 +1,7 @@
 package io.mverse.jsonschema
 
-import io.mverse.jsonschema.loading.readFully
-import io.mverse.jsonschema.loading.parseJson
-import io.mverse.jsonschema.loading.parseJsonObject
+import io.mverse.jsonschema.loading.parseKtJson
+import io.mverse.jsonschema.loading.parseKtObject
 import kotlinx.io.InputStream
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
@@ -19,10 +18,10 @@ class JsonResourceLoader(private val loadFrom: KClass<*>) {
   }
 
   fun readJson(relPath: String): JsonElement {
-    return loadFrom.java.getResourceAsStream(relPath).readFully().parseJson()
+    return loadFrom.java.getResourceAsStream(relPath).bufferedReader().readText().parseKtJson()
   }
 
   fun readJsonObject(relPath: String): JsonObject {
-    return loadFrom.java.getResourceAsStream(relPath).readFully().parseJsonObject()
+    return loadFrom.java.getResourceAsStream(relPath).bufferedReader().readText().parseKtObject()
   }
 }

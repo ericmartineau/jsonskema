@@ -11,7 +11,7 @@ import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.ValidationMocks
 import lang.json.jsonArrayOf
-import lang.json.toJsonArray
+import lang.json.toKtArray
 import lang.json.toJsonLiteral
 import org.junit.Test
 
@@ -29,7 +29,7 @@ class ArrayContainsValidatorTest {
     }
 
     val testValidator = ValidationMocks.createTestValidator(containsSchema)
-    val invalidArray = listOf(24, "Bob", 5).toJsonArray()
+    val invalidArray = listOf(24, "Bob", 5).toKtArray()
 
     val validate = testValidator.validate(invalidArray)
     assert(validate).isNotNull()

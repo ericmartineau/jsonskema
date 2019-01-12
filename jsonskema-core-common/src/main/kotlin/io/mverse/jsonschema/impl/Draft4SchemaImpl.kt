@@ -13,8 +13,8 @@ import io.mverse.jsonschema.keyword.Keywords.ID
 import io.mverse.jsonschema.keyword.Keywords.MAXIMUM
 import io.mverse.jsonschema.keyword.Keywords.MINIMUM
 import kotlinx.serialization.json.JsonElement
-import lang.URI
-import lang.freezeMap
+import lang.net.URI
+import lang.collection.freezeMap
 
 class Draft4SchemaImpl : JsonSchemaImpl<Draft4Schema>, Draft4Schema {
 

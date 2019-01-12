@@ -9,7 +9,7 @@ import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.keyword.Keywords.REF
 import io.mverse.jsonschema.utils.JsonUtils
 import kotlinx.serialization.json.JsonObject
-import lang.URI
+import lang.net.URI
 
 /**
  * Schema factories are responsible for extracting values from a json-object to produce an immutable [Schema]

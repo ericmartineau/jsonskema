@@ -1,13 +1,12 @@
 package io.mverse.jsonschema.utils
 
-import io.mverse.jsonschema.JsonPath
 import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.utils.JsonUtils.extractIdFromObject
-import lang.URI
-import lang.isAbsolute
-import lang.randomUUID
-import lang.resolveUri
+import lang.json.JsonPath
+import lang.net.URI
+import lang.net.resolveUri
+import lang.uuid.randomUUID
 
 /**
  * Helper class for creating schema paths for different situations.
@@ -19,13 +18,13 @@ object SchemaPaths {
    * we prepend a unique URI so we can still take advantage of caching.
    */
   fun fromIdNonAbsolute(id: URI): SchemaLocation {
-    if (id.isAbsolute) {
+    if (id.isAbsolute()) {
       return SchemaLocation.builderFromId(id).build()
     } else {
       val resolvedFromUnique = generateUniqueURI(randomUUID()).resolveUri(id)
       val locationBuilder = SchemaLocation.builderFromId(resolvedFromUnique)
       if (id.isJsonPointer()) {
-        locationBuilder.jsonPath(JsonPath.parseFromURIFragment(id))
+        locationBuilder.jsonPath(JsonPath.fromURI(id))
       }
       return locationBuilder.build()
     }
@@ -43,7 +42,7 @@ object SchemaPaths {
    * This builds an instance from an absolute $id URI.
    */
   fun fromId(id: URI): SchemaLocation {
-    check(id.isAbsolute) { "\$id must be absolute" }
+    check(id.isAbsolute()) { "\$id must be absolute" }
     return SchemaLocation.builderFromId(id).build()
   }
 
@@ -78,7 +77,7 @@ object SchemaPaths {
         val resolvedFromUnique = uniqueURI.resolveUri(id)
         val locationBuilder = SchemaLocation.builderFromId(resolvedFromUnique)
         if (id.isJsonPointer()) {
-          locationBuilder.jsonPath(JsonPath.parseFromURIFragment(id))
+          locationBuilder.jsonPath(JsonPath.fromURI(id))
         }
         locationBuilder.build()
       }

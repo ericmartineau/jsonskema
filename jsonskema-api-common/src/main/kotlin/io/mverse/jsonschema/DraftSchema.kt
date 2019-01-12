@@ -3,8 +3,7 @@ package io.mverse.jsonschema
 import io.mverse.jsonschema.enums.JsonSchemaType
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
-import lang.SetMultimap
-import lang.convert
+import lang.collection.SetMultimap
 
 /**
  * This interface provides convenience methods for retrieving subschemas in the same version as the
@@ -60,12 +59,12 @@ interface DraftSchema<SELF : DraftSchema<SELF>> : Schema {
 
   fun findPropertySchema(schemaName: String): SELF? {
     val found = properties[schemaName]
-    return found?.convert { convertVersion(it) }
+    return found?.let { convertVersion(it) }
   }
 
   fun findPatternSchema(pattern: String): SELF? {
     val found = patternProperties[pattern]
-    return found.convert { convertVersion(it) }
+    return found?.let { convertVersion(it) }
   }
 
   fun getPropertySchema(property: String): SELF {

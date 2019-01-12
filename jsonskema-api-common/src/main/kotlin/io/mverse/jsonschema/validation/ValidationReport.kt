@@ -2,13 +2,11 @@ package io.mverse.jsonschema.validation
 
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.Schema
-import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.validation.ValidationError.Companion.collectErrors
 import kotlinx.io.PrintWriter
 import kotlinx.io.StringWriter
 import kotlinx.io.Writer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import lang.Name
 
 @Serializable
@@ -19,18 +17,19 @@ class ValidationReport {
   private var foundError: Boolean = false
 
   @Name("isValid")
-  val isValid: Boolean get() = !foundError
+  val isValid: Boolean
+    get() = !foundError
 
   operator fun plus(validationError: ValidationError): ValidationReport {
     return apply {
       errors += validationError
-      foundError=true
+      foundError = true
     }
   }
 
   operator fun plusAssign(validationError: ValidationError) {
     errors += validationError
-    foundError=true
+    foundError = true
   }
 
   fun addReport(schema: Schema, subject: JsonValueWithPath, report: ValidationReport): Boolean {

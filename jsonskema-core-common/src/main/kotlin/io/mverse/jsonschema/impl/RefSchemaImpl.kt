@@ -18,7 +18,7 @@ import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.json
-import lang.URI
+import lang.net.URI
 
 open class RefSchemaImpl : RefSchema {
 

@@ -16,21 +16,19 @@
 package io.mverse.jsonschema.validation.keywords.string.formatValidators
 
 import io.mverse.jsonschema.validation.FormatValidator
-import lang.URI
-import lang.format
+import lang.net.URI
+import lang.string.format
 
 /**
  * Implementation of the "uri" format value.
  */
 open class URIFormatValidator : FormatValidator {
 
-  override fun validate(subject: String): String? {
-    try {
-      URI(subject)
-      return null
-    } catch (e: Exception) {
-      return "[%s] is not a valid URI".format(subject)
-    }
+  override fun validate(subject: String): String? = try {
+    URI(subject)
+    null
+  } catch (e: Exception) {
+    "[%s] is not a valid URI".format(subject)
   }
 
   override fun formatName(): String {

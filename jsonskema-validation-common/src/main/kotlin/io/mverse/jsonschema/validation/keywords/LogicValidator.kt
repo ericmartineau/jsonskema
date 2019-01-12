@@ -6,15 +6,14 @@ import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.SingleSchemaKeyword
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.ValidationReport
-import lang.convert
 
 data class LogicValidator(val keyword: SingleSchemaKeyword,
                           val parent: Schema,
                           val factory: SchemaValidatorFactory) : KeywordValidator<SingleSchemaKeyword>(Keywords.IF, parent) {
 
-  private val ifValidator = schema.asDraft7().ifSchema?.convert { factory.createValidator(it) }
-  private val thenValidator = schema.asDraft7().thenSchema?.convert { factory.createValidator(it) }
-  private val elseValidator = schema.asDraft7().elseSchema?.convert { factory.createValidator(it) }
+  private val ifValidator = schema.asDraft7().ifSchema?.let { factory.createValidator(it) }
+  private val thenValidator = schema.asDraft7().thenSchema?.let { factory.createValidator(it) }
+  private val elseValidator = schema.asDraft7().elseSchema?.let { factory.createValidator(it) }
 
   override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     if (ifValidator == null) {

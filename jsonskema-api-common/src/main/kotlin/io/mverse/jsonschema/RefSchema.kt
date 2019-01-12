@@ -4,9 +4,9 @@ import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
 import kotlinx.serialization.json.JsonObject
-import lang.URI
+import lang.exception.illegalState
 import lang.hashKode
-import lang.illegalState
+import lang.net.URI
 
 /**
  * This class is used to resolve JSON pointers. during the construction of the schema. This class has been made mutable

@@ -9,7 +9,7 @@ import io.mverse.jsonschema.Draft6Schema
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import kotlinx.serialization.json.JsonPrimitive
-import lang.URI
+import lang.net.URI
 import org.junit.Test
 
 class JsonSchemaImplTest {

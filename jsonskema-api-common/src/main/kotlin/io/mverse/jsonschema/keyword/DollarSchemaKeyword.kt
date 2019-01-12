@@ -2,7 +2,7 @@ package io.mverse.jsonschema.keyword
 
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import kotlinx.serialization.json.JsonBuilder
-import lang.URI
+import lang.net.URI
 
 open class DollarSchemaKeyword : Keyword<URI> {
 

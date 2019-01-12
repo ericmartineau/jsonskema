@@ -4,7 +4,7 @@ import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.utils.JsonUtils
 import kotlinx.serialization.json.JsonElement
 import lang.Name
-import lang.format
+import lang.string.format
 
 data class LoadingIssue(
     @Name("code") val code: String? = null,

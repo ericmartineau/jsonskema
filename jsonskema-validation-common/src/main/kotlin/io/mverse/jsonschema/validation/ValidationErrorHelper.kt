@@ -6,7 +6,6 @@ import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.TYPE
-import lang.Joiner
 
 object ValidationErrorHelper {
 
@@ -25,7 +24,7 @@ object ValidationErrorHelper {
       return buildTypeMismatchError(subject, schema, expectedTypes.iterator().next())
     }
 
-    val commaSeparatedTypes = Joiner(",").join(expectedTypes)
+    val commaSeparatedTypes = expectedTypes.joinToString(",")
 
     return ValidationError(violatedSchema = schema,
         pointerToViolation = subject.path,

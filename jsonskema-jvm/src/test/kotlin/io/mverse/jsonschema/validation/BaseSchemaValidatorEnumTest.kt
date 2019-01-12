@@ -10,8 +10,8 @@ import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.assertj.asserts.isValid
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.keyword.Keywords
-import io.mverse.jsonschema.loading.parseJson
-import io.mverse.jsonschema.loading.parseJsonObject
+import io.mverse.jsonschema.loading.parseKtJson
+import io.mverse.jsonschema.loading.parseKtObject
 import io.mverse.jsonschema.validation.ValidationMocks.mockSchema
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import io.mverse.jsonschema.validation.ValidationTestSupport.failureOf
@@ -20,8 +20,8 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.json
 import lang.json.jsonArrayOf
-import lang.json.toJsonArray
 import lang.json.toJsonLiteral
+import lang.json.toKtArray
 import org.junit.Before
 import org.junit.Test
 
@@ -30,7 +30,7 @@ class BaseSchemaValidatorEnumTest {
 
   @Before
   fun before() {
-    possibleValues = listOf(true, "foo").toJsonArray()
+    possibleValues = listOf(true, "foo").toKtArray()
   }
 
   @Test
@@ -44,7 +44,7 @@ class BaseSchemaValidatorEnumTest {
 
   @Test
   fun objectInArrayMatches() {
-    val possibleValues = (this.possibleValues + json { "a" to true }).toJsonArray()
+    val possibleValues = (this.possibleValues + json { "a" to true }).toKtArray()
     val subject = subjectBuilder().build { enumValues = possibleValues }
 
     val testValues = json { "a" to true }
@@ -70,7 +70,7 @@ class BaseSchemaValidatorEnumTest {
   @Test
   fun toStringTest() {
     val toString = subjectBuilder().build().toString()
-    val actual = toString.parseJsonObject()
+    val actual = toString.parseKtObject()
     assert(actual).hasSize(1)
     val pv = jsonArrayOf(true, "foo")
     assert(actual["enum"]).isEqualTo(pv)
@@ -78,7 +78,7 @@ class BaseSchemaValidatorEnumTest {
 
   @Test
   fun validate_WhenNumbersHaveDifferentLexicalValues_EnumDoesntMatch() {
-    val testEnum = "[1, 1.0, 1.00]".parseJson().jsonArray
+    val testEnum = "[1, 1.0, 1.00]".parseKtJson().jsonArray
     val testValNotSame = "1.000".toJsonLiteral()
 
     val schema = JsonSchema.schema { enumValues = testEnum }
@@ -91,8 +91,8 @@ class BaseSchemaValidatorEnumTest {
 
   @Test
   fun validate_WhenNumbersHaveSameLexicalValues_EnumMatches() {
-    val testEnum = "[1, 1.0, 1.00]".parseJson().jsonArray
-    val testValNotSame = "1.00".parseJson()
+    val testEnum = "[1, 1.0, 1.00]".parseKtJson().jsonArray
+    val testValNotSame = "1.00".parseKtJson()
 
     val schema = mockSchema.build { enumValues = testEnum }
     schema.validating(testValNotSame)
@@ -134,6 +134,6 @@ class BaseSchemaValidatorEnumTest {
     return schemaBuilder { enumValues = possibleValues }
   }
 
-  operator fun JsonArray.plus(iterable: Iterable<Any?>): JsonArray = (this.content + iterable).toJsonArray()
-  operator fun JsonArray.plus(element: JsonObject): JsonArray = (this.content + element).toJsonArray()
+  operator fun JsonArray.plus(iterable: Iterable<Any?>): JsonArray = (this.content + iterable).toKtArray()
+  operator fun JsonArray.plus(element: JsonObject): JsonArray = (this.content + element).toKtArray()
 }

@@ -16,8 +16,8 @@
 package io.mverse.jsonschema.validation.keywords.string.formatValidators
 
 import io.mverse.jsonschema.validation.FormatValidator
-import lang.format
-import lang.formats.FormatChecks
+import io.mverse.jsonschema.formats.FormatChecks
+import lang.string.format
 
 /**
  * Implementation of the "email" format value.
@@ -25,7 +25,7 @@ import lang.formats.FormatChecks
 open class EmailFormatValidator : FormatValidator {
 
   override fun validate(subject: String): String? {
-    return if(FormatChecks.isValidEmail(subject)) {
+    return if (FormatChecks.isValidEmail(subject)) {
       null
     } else "[%s] is not a valid email address".format(subject)
   }

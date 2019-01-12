@@ -4,10 +4,9 @@ import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.NumberKeyword
-import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.ValidationReport
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
-import lang.codePointCount
+import lang.string.codePointCount
 
 class StringMaxLengthValidator(keyword: NumberKeyword, schema: Schema) : KeywordValidator<NumberKeyword>(Keywords.MAX_LENGTH, schema) {
   private val maxLength: Int = keyword.integer

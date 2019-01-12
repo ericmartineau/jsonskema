@@ -19,8 +19,8 @@ import io.mverse.jsonschema.keyword.Keywords.READ_ONLY
 import io.mverse.jsonschema.keyword.Keywords.THEN
 import io.mverse.jsonschema.keyword.Keywords.WRITE_ONLY
 import kotlinx.serialization.json.JsonElement
-import lang.URI
-import lang.freezeMap
+import lang.net.URI
+import lang.collection.freezeMap
 
 class Draft7SchemaImpl : JsonSchemaImpl<Draft7Schema>, Draft7Schema {
 

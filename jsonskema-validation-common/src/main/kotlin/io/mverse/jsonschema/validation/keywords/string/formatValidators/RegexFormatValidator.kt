@@ -16,8 +16,7 @@
 package io.mverse.jsonschema.validation.keywords.string.formatValidators
 
 import io.mverse.jsonschema.validation.FormatValidator
-import lang.Pattern
-import lang.format
+import lang.string.format
 
 /**
  * Implementation of the "date-time" format value.
@@ -26,7 +25,7 @@ class RegexFormatValidator : FormatValidator {
 
   override fun validate(subject: String): String? {
     try {
-      Pattern(subject)
+      Regex(subject)
       return null
     } catch (e: Exception) {
       return "[%s] is not a valid regex".format(subject)

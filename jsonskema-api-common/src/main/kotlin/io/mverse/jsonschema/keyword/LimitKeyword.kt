@@ -4,7 +4,7 @@ import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft6
 import kotlinx.serialization.json.JsonBuilder
 import kotlinx.serialization.json.json
-import lang.illegalState
+import lang.exception.illegalState
 import lang.isIntegral
 
 data class LimitKeyword(val keyword: KeywordInfo<LimitKeyword>,

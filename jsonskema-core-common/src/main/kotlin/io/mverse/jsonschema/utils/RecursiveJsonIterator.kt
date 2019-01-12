@@ -1,17 +1,18 @@
 package io.mverse.jsonschema.utils
 
-import io.mverse.jsonschema.JsonPath
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
-import lang.noop
+import lang.json.JsonPath
+import lang.json.KtArray
+import lang.json.KtObject
 
-fun kotlinx.serialization.json.JsonObject.recurse(visit: Visitor) {
-  val rootPath = JsonPath.rootPath()
+fun KtObject.recurse(visit: Visitor) {
+  val rootPath = JsonPath.rootPath
   visitObject(rootPath, visit)
 }
 
-internal fun kotlinx.serialization.json.JsonArray.visitArray(path: JsonPath, visitIndex: Visitor) {
+internal fun KtArray.visitArray(path: JsonPath, visitIndex: Visitor) {
   var idx: Int = 0
   this.forEach { v ->
     val currIdx = idx++
@@ -19,19 +20,21 @@ internal fun kotlinx.serialization.json.JsonArray.visitArray(path: JsonPath, vis
     when (v) {
       is JsonObject -> v.visitObject(path.child(currIdx), visitIndex)
       is JsonArray -> v.visitArray(path.child(currIdx), visitIndex)
-      else -> noop()
+      else -> {
+      }
     }
   }
 }
 
-internal fun kotlinx.serialization.json.JsonObject.visitObject(path: JsonPath, visitProperty: Visitor) {
+internal fun KtObject.visitObject(path: JsonPath, visitProperty: Visitor) {
 
   content.forEach { (k, v) ->
     visitProperty(k, v, path)
     when (v) {
       is JsonObject -> v.visitObject(path.child(k), visitProperty)
       is JsonArray -> v.visitArray(path.child(k), visitProperty)
-      else -> noop()
+      else -> {
+      }
     }
   }
 }

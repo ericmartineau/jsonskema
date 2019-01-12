@@ -1,5 +1,6 @@
 plugins {
-  id("org.jetbrains.kotlin.jvm")
+  kotlin("jvm")
+  id("kotlinx-serialization")
 }
 
 mverse  {
@@ -7,6 +8,8 @@ mverse  {
     compile("kotlin-reflect")
     compile(kotlinIO())
     compile("kotlinx-serialization-runtime")
+    compile("mverse-json")
+    compile("mverse-lang-jvm")
   }
 }
 
@@ -28,15 +31,13 @@ dependencies {
   compile("com.googlecode.libphonenumber:libphonenumber:8.9.0")
   compile("com.damnhandy:handy-uri-templates:2.1.6")
 
-  //  compile 'commons-validator:commons-validator'
-
   compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-  expectedBy(project(":jsonskema-util-common"))
 
   expectedBy(project(":jsonskema-api-common"))
   expectedBy(project(":jsonskema-core-common"))
   expectedBy(project(":jsonskema-loading-common"))
   expectedBy(project(":jsonskema-validation-common"))
+
   testCompile("junit:junit:4.12")
 
   compile("org.assertj:assertj-core:3.10.0")

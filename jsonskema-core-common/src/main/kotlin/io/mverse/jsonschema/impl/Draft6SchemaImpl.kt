@@ -10,8 +10,8 @@ import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
 import kotlinx.serialization.json.JsonElement
-import lang.URI
-import lang.freezeMap
+import lang.net.URI
+import lang.collection.freezeMap
 
 class Draft6SchemaImpl : JsonSchemaImpl<Draft6Schema>, Draft6Schema {
 

@@ -8,7 +8,7 @@ import io.mverse.jsonschema.validation.SchemaValidator
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.ValidationReport
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
-import lang.SetMultimap
+import lang.collection.SetMultimap
 
 class DependenciesValidator(keyword: DependenciesKeyword, schema: Schema, factory: SchemaValidatorFactory) : KeywordValidator<DependenciesKeyword>(Keywords.DEPENDENCIES, schema) {
 

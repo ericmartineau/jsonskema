@@ -22,7 +22,6 @@ import assertk.assertions.isNotNull
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.JsonSchema.schema
 import io.mverse.jsonschema.JsonSchema.schemaBuilder
-import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.assertj.asserts.asserting
 import io.mverse.jsonschema.assertj.asserts.hasKeyword
 import io.mverse.jsonschema.assertj.asserts.hasSchemaLocation
@@ -36,8 +35,8 @@ import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.ENUM
 import io.mverse.jsonschema.keyword.Keywords.TYPE
 import io.mverse.jsonschema.keyword.Keywords.UNIQUE_ITEMS
-import io.mverse.jsonschema.loading.parseJson
-import io.mverse.jsonschema.loading.parseJsonObject
+import io.mverse.jsonschema.loading.parseKtJson
+import io.mverse.jsonschema.loading.parseKtObject
 import io.mverse.jsonschema.minus
 import io.mverse.jsonschema.plus
 import io.mverse.jsonschema.resourceLoader
@@ -163,28 +162,28 @@ class ArraySchemaValidatorTest {
         .plus("additionalItems" to addtlProps)
         .toJsonObject()
     val actual = JsonSchema.schemaReader.readSchema(rawSchemaJson).toString()
-    assertEquals(addtlProps, actual.parseJsonObject()["additionalItems"])
+    assertEquals(addtlProps, actual.parseKtObject()["additionalItems"])
   }
 
   @Test
   fun toStringNoExplicitType() {
     val rawSchemaJson = loader.readJsonObject("tostring/arrayschema-list.json") - "type"
     val serializedSchema = JsonSchema.schemaReader.readSchema(rawSchemaJson.toJsonObject()).toString()
-    assertEquals(rawSchemaJson, serializedSchema.parseJsonObject())
+    assertEquals(rawSchemaJson, serializedSchema.parseKtObject())
   }
 
   @Test
   fun toStringTest() {
     val rawSchemaJson = loader.readJsonObject("tostring/arrayschema-list.json")
     val serializedSchema = JsonSchema.schemaReader.readSchema(rawSchemaJson).toString()
-    assertEquals(rawSchemaJson, serializedSchema.parseJsonObject())
+    assertEquals(rawSchemaJson, serializedSchema.parseKtObject())
   }
 
   @Test
   fun toStringTupleSchema() {
     val rawSchemaJson = loader.readJsonObject("tostring/arrayschema-tuple.json")
     val serializaedSchema = JsonSchema.schemaReader.readSchema(rawSchemaJson).toString()
-    assertEquals(rawSchemaJson, serializaedSchema.parseJsonObject())
+    assertEquals(rawSchemaJson, serializaedSchema.parseKtObject())
   }
 
   @Test
@@ -240,14 +239,14 @@ class ArraySchemaValidatorTest {
   @Test
   fun validate_WhenEqualNumbersWithDifferentLexicalRepresentations_ThenUnique() {
     val arraySchema = mockArraySchema.build { needsUniqueItems = true }
-    arraySchema.validating("[1.0, 1, 1.00]".parseJson())
+    arraySchema.validating("[1.0, 1, 1.00]".parseKtJson())
         .isValid()
   }
 
   @Test
   fun validate_WhenEqualNumbersWithSameLexicalRepresentations_ThenNotUnique() {
     val arraySchema = mockArraySchema.build { needsUniqueItems = true }
-    val subject = "[1.0, 1.0, 1.00]".parseJson().jsonArray
+    val subject = "[1.0, 1.0, 1.00]".parseKtJson().jsonArray
     arraySchema.validating(subject)
         .isNotValid()
         .hasKeyword(UNIQUE_ITEMS)
@@ -277,14 +276,14 @@ class ArraySchemaValidatorTest {
   fun validate_WhenItemsSchemaHasEnum_ThenDontEnforceLexicalMatching() {
 
     val enumSchema = mockNumberSchema.apply {
-      enumValues = "[12, 24.3, 65]".parseJson().jsonArray
+      enumValues = "[12, 24.3, 65]".parseKtJson().jsonArray
     }
 
     val arraySchema = schema {
       allItemSchema = enumSchema
     }
 
-    val arrayValues = "[24.3, 12]".parseJson().jsonArray
+    val arrayValues = "[24.3, 12]".parseKtJson().jsonArray
     arraySchema.validating(arrayValues)
         .isValid()
   }
