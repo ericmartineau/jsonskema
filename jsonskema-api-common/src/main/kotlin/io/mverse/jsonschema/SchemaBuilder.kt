@@ -21,6 +21,8 @@ interface SchemaBuilder {
   @Name("id")
   val id: URI?
 
+  var metaSchema: URI?
+
   @Name("ref")
   var ref: Any?
   var refURI: URI?

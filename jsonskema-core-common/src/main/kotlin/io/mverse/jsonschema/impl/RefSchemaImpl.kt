@@ -18,6 +18,7 @@ import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
 import lang.json.JsrObject
 import lang.json.jsrObject
+import lang.json.writeJson
 import lang.net.URI
 
 open class RefSchemaImpl : RefSchema {
@@ -97,5 +98,6 @@ open class RefSchemaImpl : RefSchema {
     }
   }
 
-  override fun toString(version: JsonSchemaVersion, includeExtraProperties: Boolean): String = toString()
+  override fun toString(version: JsonSchemaVersion, includeExtraProperties: Boolean, indent: Boolean): String =
+      if (indent) toJson(version, includeExtraProperties).writeJson(indent) else toString()
 }

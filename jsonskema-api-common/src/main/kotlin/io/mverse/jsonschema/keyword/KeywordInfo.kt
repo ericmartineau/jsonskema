@@ -57,7 +57,7 @@ data class KeywordInfo<K : Keyword<*>>(
      */
     val expects: JsrType,
 
-    val variants: Map<JsrType, KeywordInfo<K>> = emptyMap()):Comparable<KeywordInfo<K>> {
+    val variants: Map<JsrType, KeywordInfo<K>> = emptyMap()) : Comparable<KeywordInfo<K>> {
 
   internal constructor(mainInfo: KeywordInfo<K>, allVersions: List<KeywordVersionInfoBuilder<K>>)
       : this(sortOrder = mainInfo.sortOrder, key = mainInfo.key,
@@ -76,7 +76,7 @@ data class KeywordInfo<K : Keyword<*>>(
   internal constructor(mainInfo: KeywordVersionInfoBuilder<K>, allVersions: List<KeywordVersionInfoBuilder<K>>)
       : this(mainInfo = mainInfo.build(), allVersions = allVersions)
 
-  internal constructor(sortOrder:Int, key: String,
+  internal constructor(sortOrder: Int, key: String,
                        forSchemas: Collection<JsonSchemaType> = JsonSchemaType.values().toHashSet(),
                        expects: JsrType,
                        since: JsonSchemaVersion?,
@@ -140,7 +140,7 @@ data class KeywordInfo<K : Keyword<*>>(
     return hashKode(key, expects)
   }
 
-  class KeywordInfoBuilder<K : Keyword<*>>(var sortOrder: Int) {
+  class KeywordInfoBuilder<K : Keyword<*>>(var sortOrder: Int = nextSortOrder()) {
 
     private lateinit var key: String
     private var main: KeywordVersionInfoBuilder<K>
@@ -205,12 +205,16 @@ data class KeywordInfo<K : Keyword<*>>(
 
   companion object {
     var sortOrder = 0
+    fun nextSortOrder(): Int {
+      return sortOrder++
+    }
+
     inline fun <reified X : Keyword<*>> builder(): KeywordInfoBuilder<X> {
       return KeywordInfoBuilder(sortOrder++)
     }
   }
 
-  class KeywordVersionInfoBuilder<K : Keyword<*>>(var sortOrder: Int) {
+  class KeywordVersionInfoBuilder<K : Keyword<*>>(var sortOrder: Int = nextSortOrder()) {
     private var since: JsonSchemaVersion? = null
     private var until: JsonSchemaVersion? = null
     private var key: String? = null

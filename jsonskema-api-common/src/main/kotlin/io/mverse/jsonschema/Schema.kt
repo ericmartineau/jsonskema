@@ -68,5 +68,5 @@ interface Schema {
   @Name("asDraft7")
   fun asDraft7(): Draft7Schema
 
-  fun toString(version: JsonSchemaVersion, includeExtraProperties: Boolean = false): String
+  fun toString(version: JsonSchemaVersion, includeExtraProperties: Boolean = false, indent:Boolean = false): String
 }

@@ -44,7 +44,6 @@ import io.mverse.jsonschema.keyword.Keywords.PROPERTIES
 import io.mverse.jsonschema.keyword.Keywords.PROPERTY_NAMES
 import io.mverse.jsonschema.keyword.Keywords.REF
 import io.mverse.jsonschema.keyword.Keywords.REQUIRED
-import io.mverse.jsonschema.keyword.Keywords.SCHEMA
 import io.mverse.jsonschema.keyword.Keywords.TITLE
 import io.mverse.jsonschema.keyword.Keywords.TYPE
 import io.mverse.jsonschema.keyword.Keywords.UNIQUE_ITEMS
@@ -56,6 +55,7 @@ import lang.json.JsrObject
 import lang.json.JsrValue
 import lang.json.jsrArrayOf
 import lang.json.jsrObject
+import lang.json.writeJson
 import lang.logging.Logger
 import lang.net.URI
 
@@ -131,7 +131,7 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
         // Output as ref
         REF.key *= keyword(REF)?.value?.toString()!!
       } else {
-        keywords.forEach { (keyword, keywordValue) ->
+        forEachSortedKeyword { keyword, keywordValue ->
           if (keyword.applicableVersions.contains(version)) {
             keywordValue.toJson(keyword, this, version, includeExtraProperties)
           } else {
@@ -147,9 +147,12 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
     }
   }
 
-  fun forEachSortedKeyword(block: (KeywordInfo<*>, Keyword<*>)->Unit) {
-    keywords.map{it.key to it.value}
+  fun forEachSortedKeyword(block: (KeywordInfo<*>, Keyword<*>) -> Unit) {
+    keywords.map { it.key to it.value }
         .sortedBy { it.first.sortOrder }
+        .forEach { (first, second) ->
+          block(first, second)
+        }
   }
 
   // ######################################################
@@ -175,8 +178,8 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
 
   override fun toString(): String = toString(version)
 
-  override fun toString(version: JsonSchemaVersion, includeExtraProperties: Boolean): String {
-    return this.toJson(version, includeExtraProperties).toString()
+  override fun toString(version: JsonSchemaVersion, includeExtraProperties: Boolean, indent:Boolean): String {
+    return toJson(version, includeExtraProperties).writeJson(indent)
   }
 
   override fun toBuilder(): SchemaBuilder {

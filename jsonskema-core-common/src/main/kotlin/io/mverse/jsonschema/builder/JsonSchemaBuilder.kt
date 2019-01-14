@@ -12,6 +12,7 @@ import io.mverse.jsonschema.impl.RefSchemaImpl
 import io.mverse.jsonschema.keyword.BooleanKeyword
 import io.mverse.jsonschema.keyword.DependenciesKeyword
 import io.mverse.jsonschema.keyword.DollarSchemaKeyword
+import io.mverse.jsonschema.keyword.DollarSchemaKeyword.Companion.emptyUri
 import io.mverse.jsonschema.keyword.IdKeyword
 import io.mverse.jsonschema.keyword.ItemsKeyword
 import io.mverse.jsonschema.keyword.JsonArrayKeyword
@@ -189,6 +190,17 @@ class JsonSchemaBuilder(
       set(REF, uri)
     }
 
+  override var metaSchema: URI?
+    get() {
+      return values[SCHEMA]
+    }
+    set(value) {
+      when (value) {
+        null -> keywords.remove(SCHEMA)
+        else -> set(SCHEMA, value)
+      }
+    }
+
   override var refSchema: Schema? = null
 
   override var refURI: URI?
@@ -290,7 +302,7 @@ class JsonSchemaBuilder(
     get() = keywords.containsKey(SCHEMA)
     set(value) {
       when (value) {
-        true -> keywords[SCHEMA] = DollarSchemaKeyword()
+        true -> if (!keywords.containsKey(SCHEMA)) keywords[SCHEMA] = DollarSchemaKeyword(emptyUri)
         false -> keywords.remove(SCHEMA)
       }
     }
