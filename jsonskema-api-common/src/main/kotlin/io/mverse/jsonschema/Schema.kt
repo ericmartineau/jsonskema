@@ -1,10 +1,11 @@
 package io.mverse.jsonschema
 
 import io.mverse.jsonschema.enums.JsonSchemaVersion
-import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keyword
-import kotlinx.serialization.json.JsonElement
+import io.mverse.jsonschema.keyword.KeywordInfo
 import lang.Name
+import lang.json.JsrObject
+import lang.json.JsrValue
 import lang.net.URI
 
 interface Schema {
@@ -21,7 +22,7 @@ interface Schema {
 
   val version: JsonSchemaVersion?
 
-  val extraProperties: Map<String, JsonElement>
+  val extraProperties: Map<String, JsrValue>
 
   val keywords: Map<KeywordInfo<*>, Keyword<*>>
 
@@ -38,7 +39,7 @@ interface Schema {
   fun withId(id: URI): Schema
 
   fun toJson(version: JsonSchemaVersion = JsonSchemaVersion.latest,
-             includeExtraProperties:Boolean = false): kotlinx.serialization.json.JsonObject
+             includeExtraProperties: Boolean = false): JsrObject
 
   fun asVersion(version: JsonSchemaVersion): Schema {
     return when (version) {
@@ -67,5 +68,5 @@ interface Schema {
   @Name("asDraft7")
   fun asDraft7(): Draft7Schema
 
-  fun toString(version:JsonSchemaVersion, includeExtraProperties: Boolean = false):String
+  fun toString(version: JsonSchemaVersion, includeExtraProperties: Boolean = false): String
 }

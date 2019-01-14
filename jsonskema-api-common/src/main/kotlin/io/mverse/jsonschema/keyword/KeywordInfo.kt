@@ -8,12 +8,12 @@ import kotlinx.serialization.Encoder
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.internal.StringDescriptor
-import kotlinx.serialization.json.ElementType
 import kotlinx.serialization.withName
 import lang.SerializableWith
 import lang.enums.range
 import lang.exception.illegalState
 import lang.hashKode
+import lang.json.JsrType
 
 /**
  * Represents a single keyword and its applicable versions, and acceptable input types.
@@ -48,15 +48,15 @@ data class KeywordInfo<K : Keyword<*>>(
     /**
      * Which json types are validated by this keyword (correlates to [.forSchemas]
      */
-    val applicableTypes: Set<ElementType>,
+    val applicableTypes: Set<JsrType>,
 
     /**
      * The type of json value expected for this keyword.  Each instance of the keyword can only consuem
      * a single type of value, but they can be linked together using variants.
      */
-    val expects: ElementType,
+    val expects: JsrType,
 
-    val variants: Map<ElementType, KeywordInfo<K>> = emptyMap()) {
+    val variants: Map<JsrType, KeywordInfo<K>> = emptyMap()) {
 
   internal constructor(mainInfo: KeywordInfo<K>, allVersions: List<KeywordVersionInfoBuilder<K>>)
       : this(key = mainInfo.key,
@@ -77,7 +77,7 @@ data class KeywordInfo<K : Keyword<*>>(
 
   internal constructor(key: String,
                        forSchemas: Collection<JsonSchemaType> = JsonSchemaType.values().toHashSet(),
-                       expects: ElementType,
+                       expects: JsrType,
                        since: JsonSchemaVersion?,
                        until: JsonSchemaVersion?) : this(
       key = key,
@@ -91,7 +91,7 @@ data class KeywordInfo<K : Keyword<*>>(
           ?: JsonSchemaVersion.latest)
   )
 
-  fun getTypeVariant(valueType: ElementType): KeywordInfo<K>? {
+  fun getTypeVariant(valueType: JsrType): KeywordInfo<K>? {
     return variants[valueType]
   }
 
@@ -100,7 +100,7 @@ data class KeywordInfo<K : Keyword<*>>(
    * @param types List of types we're looking for
    * @return A list
    */
-  fun getTypeVariants(vararg types: ElementType): List<KeywordInfo<K>> {
+  fun getTypeVariants(vararg types: JsrType): List<KeywordInfo<K>> {
     val versionsForType = types
         .map { variants[it] }
         .filterNotNull()
@@ -181,7 +181,7 @@ data class KeywordInfo<K : Keyword<*>>(
       return this
     }
 
-    fun expects(firstType: ElementType): KeywordInfoBuilder<K> {
+    fun expects(firstType: JsrType): KeywordInfoBuilder<K> {
       current.expects(firstType)
       return this
     }
@@ -207,7 +207,7 @@ data class KeywordInfo<K : Keyword<*>>(
     private var since: JsonSchemaVersion? = null
     private var until: JsonSchemaVersion? = null
     private var key: String? = null
-    private var expects: ElementType? = null
+    private var expects: JsrType? = null
     internal val forSchemas: MutableSet<JsonSchemaType> = mutableSetOf()
 
     fun build(): KeywordInfo<K> {
@@ -245,7 +245,7 @@ data class KeywordInfo<K : Keyword<*>>(
       return this
     }
 
-    fun expects(firstType: ElementType): KeywordVersionInfoBuilder<K> {
+    fun expects(firstType: JsrType): KeywordVersionInfoBuilder<K> {
       this.expects = firstType
       return this
     }

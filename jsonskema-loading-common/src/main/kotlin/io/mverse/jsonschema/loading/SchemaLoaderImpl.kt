@@ -4,14 +4,14 @@ import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.enums.JsonSchemaVersion
-import io.mverse.jsonschema.keyword.KeywordLoader
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
+import io.mverse.jsonschema.keyword.KeywordLoader
 import io.mverse.jsonschema.loading.keyword.versions.KeywordDigesterImpl
 import io.mverse.jsonschema.loading.reference.DefaultJsonDocumentClient
 import io.mverse.jsonschema.loading.reference.SchemaCache
 import io.mverse.jsonschema.utils.JsonUtils
-import kotlinx.serialization.json.JsonObject
+import lang.json.JsrObject
 import lang.net.URI
 
 /**
@@ -34,11 +34,11 @@ data class SchemaLoaderImpl(
   // ########  LOADING SCHEMAS/SUBSCHEMAS FROM JSON    ###########
   // #############################################################
 
-  override fun loadRefSchema(referencedFrom: Schema, refURI: URI, currentDocument: JsonObject?, report: LoadingReport): Schema {
+  override fun loadRefSchema(referencedFrom: Schema, refURI: URI, currentDocument: JsrObject?, report: LoadingReport): Schema {
     return refSchemaLoader.loadRefSchema(referencedFrom, refURI, currentDocument, report)
   }
 
-  override fun loadSubSchema(schemaJson: JsonValueWithPath, inDocument: kotlinx.serialization.json.JsonObject, loadingReport: LoadingReport): Schema {
+  override fun loadSubSchema(schemaJson: JsonValueWithPath, inDocument: lang.json.JsrObject, loadingReport: LoadingReport): Schema {
     return schemaCache.getSchema(schemaJson.location)
         ?: subSchemaBuilder(schemaJson, inDocument, loadingReport).build()
             .apply { schemaCache.cacheSchema(this) }
@@ -48,7 +48,7 @@ data class SchemaLoaderImpl(
   // #######  LOADING  & CREATING SUBSCHEMA FACTORIES  ###########
   // #############################################################
 
-  override fun subSchemaBuilder(schemaJson: JsonValueWithPath, inDocument: kotlinx.serialization.json.JsonObject, loadingReport: LoadingReport): SchemaBuilder {
+  override fun subSchemaBuilder(schemaJson: JsonValueWithPath, inDocument: lang.json.JsrObject, loadingReport: LoadingReport): SchemaBuilder {
     return fragmentLoader.subSchemaBuilder(schemaJson, inDocument, loadingReport)
   }
 
@@ -73,21 +73,21 @@ data class SchemaLoaderImpl(
   // #####  FACTORY METHODS (FOR CUSTOMIZING THE LOADER)   #######
   // #############################################################
 
-  override fun withPreloadedDocument(schemaObject: JsonObject): SchemaReader {
+  override fun withPreloadedDocument(schemaObject: JsrObject): SchemaReader {
     JsonUtils.extractIdFromObject(schemaObject)?.also { id ->
       documentClient.registerLoadedDocument(id, schemaObject)
     }
     return this
   }
 
-  override operator fun plus(document: JsonObject): SchemaReader {
+  override operator fun plus(document: JsrObject): SchemaReader {
     JsonUtils.extractIdFromObject(document)?.also { id ->
       documentClient.registerLoadedDocument(id, document)
     }
     return this
   }
 
-  override operator fun plusAssign(preloadedSchema: JsonObject) {
+  override operator fun plusAssign(preloadedSchema: JsrObject) {
     JsonUtils.extractIdFromObject(preloadedSchema)?.also { id ->
       documentClient.registerLoadedDocument(id, preloadedSchema)
     }
@@ -99,7 +99,7 @@ data class SchemaLoaderImpl(
     return this.copy(isStrict = true, versions = versions.toSet())
   }
 
-  override fun <K : Keyword<*>> withCustomKeywordLoader(keyword: KeywordInfo<K>, keywordExtractor:  KeywordLoader<K>): SchemaReader {
+  override fun <K : Keyword<*>> withCustomKeywordLoader(keyword: KeywordInfo<K>, keywordExtractor: KeywordLoader<K>): SchemaReader {
     val newKeywordDigester = KeywordDigesterImpl(keyword, keywordExtractor)
     return this.copy(additionalDigesters = this.additionalDigesters + newKeywordDigester)
   }

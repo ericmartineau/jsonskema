@@ -4,9 +4,9 @@ import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.utils.isGeneratedURI
 import io.mverse.jsonschema.utils.isJsonPointer
 import kotlinx.serialization.Serializable
-import lang.net.URI
 import lang.hashKode
 import lang.json.JsonPath
+import lang.net.URI
 import lang.net.resolveUri
 
 /**
@@ -50,7 +50,7 @@ class SchemaLocation(
     documentURI.resolveUri(jsonPointerFragment)
   }
 
-  val jsonPointerFragment:URI get() = jsonPath.uriFragment
+  val jsonPointerFragment: URI get() = jsonPath.uriFragment
 
   /**
    * @return Whether this location has an auto-generated root URI.
@@ -68,9 +68,9 @@ class SchemaLocation(
    */
   val canonicalURI: URI by lazy {
     _canonicalURI ?: when (isGenerated) {
-        true -> jsonPath.uriFragment
-        false -> _uniqueURI ?: this.absoluteJsonPointerURI
-      }
+      true -> jsonPath.uriFragment
+      false -> _uniqueURI ?: this.absoluteJsonPointerURI
+    }
   }
 
   /**
@@ -164,7 +164,7 @@ class SchemaLocation(
       }
 
       // Just changing jsonPath
-      return SchemaLocation(documentURI= documentURI!!,
+      return SchemaLocation(documentURI = documentURI!!,
           resolutionScope = resolutionScope ?: documentURI!!,
           jsonPath = jsonPath!!)
     }
@@ -215,7 +215,7 @@ class SchemaLocation(
       } else {
         resolutionScope = documentURI
       }
-      return SchemaLocationBuilder(documentURI=documentURI,
+      return SchemaLocationBuilder(documentURI = documentURI,
           resolutionScope = resolutionScope,
           jsonPath = refPath).build()
     }

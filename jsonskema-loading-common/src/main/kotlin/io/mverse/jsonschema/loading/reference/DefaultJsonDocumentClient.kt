@@ -16,9 +16,9 @@
 package io.mverse.jsonschema.loading.reference
 
 import io.mverse.jsonschema.loading.JsonDocumentClient
-import io.mverse.jsonschema.loading.parseKtObject
-import kotlinx.serialization.json.JsonObject
+import io.mverse.jsonschema.loading.parseJsrObject
 import lang.json.JsonPath
+import lang.json.JsrObject
 import lang.json.KtObject
 import lang.net.URI
 import lang.net.readFully
@@ -28,17 +28,17 @@ import lang.net.readFully
  */
 open class DefaultJsonDocumentClient(val schemaCache: SchemaCache = SchemaCache()) : JsonDocumentClient {
 
-  override fun findLoadedDocument(documentLocation: URI): KtObject? {
+  override fun findLoadedDocument(documentLocation: URI): JsrObject? {
     return schemaCache.lookupDocument(documentLocation)
   }
 
-  override fun registerLoadedDocument(documentLocation: URI, document: KtObject) {
+  override fun registerLoadedDocument(documentLocation: URI, document: JsrObject) {
     schemaCache.cacheDocument(documentLocation, document)
   }
 
-  override fun resolveSchemaWithinDocument(documentURI: URI, schemaURI: URI, document: KtObject): JsonPath? {
+  override fun resolveSchemaWithinDocument(documentURI: URI, schemaURI: URI, document: JsrObject): JsonPath? {
     return schemaCache.resolveURIToDocumentUsingLocalIdentifiers(documentURI, schemaURI, document)
   }
 
-  override fun fetchDocument(uri: URI): KtObject = uri.readFully().parseKtObject()
+  override fun fetchDocument(uri: URI): JsrObject = uri.readFully().parseJsrObject()
 }

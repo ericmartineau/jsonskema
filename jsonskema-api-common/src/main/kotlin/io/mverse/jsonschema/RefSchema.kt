@@ -3,9 +3,9 @@ package io.mverse.jsonschema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
-import kotlinx.serialization.json.JsonObject
 import lang.exception.illegalState
 import lang.hashKode
+import lang.json.JsrObject
 import lang.net.URI
 
 /**
@@ -56,7 +56,7 @@ abstract class RefSchema(
   constructor(factory: SchemaLoader?,
               location: SchemaLocation,
               refURI: URI,
-              currentDocument: JsonObject?,
+              currentDocument: JsrObject?,
               report: LoadingReport) : this(location, refURI, loader@{ thisSchema ->
     var infiniteLoopPrevention = 0
 
@@ -89,7 +89,7 @@ abstract class RefSchema(
     return toJson(version ?: JsonSchemaVersion.latest).toString()
   }
 
-  abstract override fun toJson(version: JsonSchemaVersion, includeExtraProperties: Boolean): kotlinx.serialization.json.JsonObject
+  abstract override fun toJson(version: JsonSchemaVersion, includeExtraProperties: Boolean): JsrObject
   abstract override fun asDraft6(): Draft6Schema
   abstract override fun asDraft3(): Draft3Schema
   abstract override fun asDraft4(): Draft4Schema

@@ -5,10 +5,10 @@ import io.mverse.jsonschema.loading.SchemaReader
 import lang.Name
 
 internal val defaultSchemaReader = SchemaLoaderImpl()
-val JsonSchema.schemaReader:SchemaReader get() = defaultSchemaReader
+val JsonSchema.schemaReader: SchemaReader get() = defaultSchemaReader
 
 @Name("readJsonSchema")
-fun readSchema(schema:String): Schema {
+fun readSchema(schema: String): Schema {
   return defaultSchemaReader.readSchema(schema)
 }
 

@@ -4,11 +4,12 @@ import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.keyword.BooleanKeyword
 import io.mverse.jsonschema.keyword.Keywords
+import io.mverse.jsonschema.utils.equalsLexically
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.ValidationReport
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonLiteral
+import lang.json.JsrValue
+import lang.json.values
 
 data class ArrayUniqueItemsValidator(val keyword: BooleanKeyword,
                                      override val schema: Schema,
@@ -24,19 +25,15 @@ data class ArrayUniqueItemsValidator(val keyword: BooleanKeyword,
       return true
     }
 
-    val uniqueItems = mutableListOf<JsonElement>()
+    val uniqueItems = mutableListOf<JsrValue>()
     val arrayItems = subject.jsonArray!!
 
-    for (item in arrayItems) {
-      for (contained in uniqueItems) {
-        val equals = when(contained) {
-          is JsonLiteral-> contained.equalsLexically(item)
-          else-> contained == item
-        }
-        if (equals) {
+    for (item in arrayItems.values) {
+      for (contained: JsrValue in uniqueItems) {
+        if (contained.equalsLexically(item)) {
           parentReport += buildKeywordFailure(subject)
               .copy(errorMessage = "array items are not unique",
-                    arguments = listOf(item, contained))
+                  arguments = listOf(item, contained))
           return false
         }
       }

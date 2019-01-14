@@ -2,8 +2,9 @@ package io.mverse.jsonschema
 
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaVersion
-import kotlinx.serialization.json.JsonElement
 import lang.collection.SetMultimap
+import lang.json.JsrArray
+import lang.json.JsrValue
 import lang.net.URI
 
 interface Draft4Schema : DraftSchema<Draft4Schema> {
@@ -28,9 +29,9 @@ interface Draft4Schema : DraftSchema<Draft4Schema> {
 
   override val types: Set<JsonSchemaType>
 
-  override val enumValues: kotlinx.serialization.json.JsonArray?
+  override val enumValues: JsrArray?
 
-  override val defaultValue: JsonElement?
+  override val defaultValue: JsrValue?
 
   val notSchema: Draft4Schema?
 

@@ -12,7 +12,6 @@ import lang.collection.SetMultimap
 
 class DependenciesValidator(keyword: DependenciesKeyword, schema: Schema, factory: SchemaValidatorFactory) : KeywordValidator<DependenciesKeyword>(Keywords.DEPENDENCIES, schema) {
 
-
   private val dependencyValidators: Map<String, SchemaValidator> = keyword.dependencySchemas.value
       .entries.map { it.key to factory.createValidator(it.value) }
       .toMap()
@@ -26,12 +25,11 @@ class DependenciesValidator(keyword: DependenciesKeyword, schema: Schema, factor
       }
     }
 
-    propertyDependencies.asMap().forEach { (ifThisPropertyExists, set)->
+    propertyDependencies.asMap().forEach { (ifThisPropertyExists, set) ->
       for (thenThisMustAlsoExist in set) {
         if (subject.containsKey(ifThisPropertyExists) && !subject.containsKey(thenThisMustAlsoExist)) {
           parentReport += buildKeywordFailure(subject)
               .withError("property [%s] is required because [%s] was present", thenThisMustAlsoExist, ifThisPropertyExists)
-
         }
       }
     }

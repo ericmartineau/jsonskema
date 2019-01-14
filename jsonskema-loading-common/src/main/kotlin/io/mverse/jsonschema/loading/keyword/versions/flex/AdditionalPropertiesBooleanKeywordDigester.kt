@@ -12,10 +12,10 @@ import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
 import io.mverse.jsonschema.loading.digest
 import io.mverse.jsonschema.utils.Schemas.falseSchema
-import kotlinx.serialization.json.ElementType.BOOLEAN
+import lang.json.JsrType
 
 data class AdditionalPropertiesBooleanKeywordDigester(
-    override val includedKeywords: List<KeywordInfo<SingleSchemaKeyword>> = ADDITIONAL_PROPERTIES.getTypeVariants(BOOLEAN)
+    override val includedKeywords: List<KeywordInfo<SingleSchemaKeyword>> = ADDITIONAL_PROPERTIES.getTypeVariants(JsrType.BOOLEAN)
 ) : KeywordDigester<SingleSchemaKeyword> {
 
   override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder,

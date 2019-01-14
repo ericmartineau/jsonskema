@@ -12,6 +12,7 @@ import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.keyword.Keywords.ADDITIONAL_PROPERTIES
 import kotlinx.serialization.json.json
+import lang.json.jsrObject
 import kotlin.test.Test
 
 class AdditionalPropertiesValidatorTest {
@@ -25,13 +26,13 @@ class AdditionalPropertiesValidatorTest {
       additionalProperties = false
     }
 
-    val goodJson = json {
-      "name" to "John Doe"
+    val goodJson = jsrObject {
+      "name" *= "John Doe"
     }
 
-    val badJson = json {
-      "named" to "John Doe"
-      "bogus" to "Bardage"
+    val badJson = jsrObject {
+      "named" *= "John Doe"
+      "bogus" *= "Bardage"
     }
 
     nameOnly.validating(goodJson)

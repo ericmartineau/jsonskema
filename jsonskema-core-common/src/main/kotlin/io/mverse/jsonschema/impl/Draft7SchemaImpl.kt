@@ -18,9 +18,10 @@ import io.mverse.jsonschema.keyword.Keywords.IF
 import io.mverse.jsonschema.keyword.Keywords.READ_ONLY
 import io.mverse.jsonschema.keyword.Keywords.THEN
 import io.mverse.jsonschema.keyword.Keywords.WRITE_ONLY
-import kotlinx.serialization.json.JsonElement
-import lang.net.URI
 import lang.collection.freezeMap
+import lang.json.JsrArray
+import lang.json.JsrValue
+import lang.net.URI
 
 class Draft7SchemaImpl : JsonSchemaImpl<Draft7Schema>, Draft7Schema {
 
@@ -43,11 +44,11 @@ class Draft7SchemaImpl : JsonSchemaImpl<Draft7Schema>, Draft7Schema {
   // #####  KEYWORDS for Draft6    #######################
   // #####################################################
 
-  override val examples: kotlinx.serialization.json.JsonArray get() = super.examples
+  override val examples: JsrArray get() = super.examples
   override val definitions: Map<String, Schema> get() = super.definitions
 
   override val notSchema: Schema? get() = super.notSchema
-  override val constValue: JsonElement? get() = super.constValue
+  override val constValue: JsrValue? get() = super.constValue
   override val allOfSchemas: List<Schema> get() = super.allOfSchemas
   override val anyOfSchemas: List<Schema> get() = super.anyOfSchemas
   override val oneOfSchemas: List<Schema> get() = super.oneOfSchemas
@@ -69,7 +70,7 @@ class Draft7SchemaImpl : JsonSchemaImpl<Draft7Schema>, Draft7Schema {
 
   constructor(location: SchemaLocation,
               keywords: Map<KeywordInfo<*>, Keyword<*>>,
-              extraProperties: Map<String, JsonElement>) : super(location, keywords.freezeMap(), extraProperties.freezeMap(), Draft7)
+              extraProperties: Map<String, JsrValue>) : super(location, keywords.freezeMap(), extraProperties.freezeMap(), Draft7)
 
   override val version: JsonSchemaVersion = Draft7
   override fun asDraft7(): Draft7Schema = this

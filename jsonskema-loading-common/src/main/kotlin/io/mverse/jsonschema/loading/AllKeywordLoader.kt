@@ -36,15 +36,15 @@ data class AllKeywordLoader(val allExtractors: List<KeywordDigester<*>>,
 
   fun loadKeywordsForSchema(jsonObject: JsonValueWithPath, builder: SchemaBuilder, report: LoadingReport) {
     //Process keywords we know:
-    jsonObject.forEachKey { prop, jsonElement ->
+    jsonObject.forEachKey { prop, jsrValue ->
       val matches = mutableMapOf<JsonSchemaVersion, KeywordDigester<*>>()
       val nonMatches = mutableListOf<LoadingIssue>()
       for (infoAndLoader in filteredExtractors[prop]) {
         val possibleKeyword = infoAndLoader.first
         val keywordLoader = infoAndLoader.second
         val expectedType = possibleKeyword.expects
-        if (jsonElement.type !== expectedType) {
-          nonMatches.add(LoadingIssues.typeMismatch(possibleKeyword, jsonElement)
+        if (jsrValue.type !== expectedType) {
+          nonMatches.add(LoadingIssues.typeMismatch(possibleKeyword, jsrValue)
               .copy(level = LoadingIssueLevel.ERROR))
         } else {
           matches[possibleKeyword.mostRecentVersion] = keywordLoader
@@ -62,21 +62,21 @@ data class AllKeywordLoader(val allExtractors: List<KeywordDigester<*>>,
       } else if (nonMatches.size > 0) {
         nonMatches.forEach { report.log(it) }
       } else if (!strict) {
-        report.warn(keywordNotFoundIssue(prop, jsonElement))
-        builder.extraProperties += prop to jsonElement.wrapped
+        report.warn(keywordNotFoundIssue(prop, jsrValue))
+        builder.extraProperties += prop to jsrValue.wrapped
       } else {
-        report.error(keywordNotFoundIssue(prop, jsonElement))
+        report.error(keywordNotFoundIssue(prop, jsrValue))
       }
     }
   }
 
-  private fun <K : Keyword<*>> processKeyword(digester: KeywordDigester<K>, jsonElement: JsonValueWithPath,
+  private fun <K : Keyword<*>> processKeyword(digester: KeywordDigester<K>, JsrValue: JsonValueWithPath,
                                               builder: SchemaBuilder, factory: SchemaLoader,
                                               report: LoadingReport): Boolean {
-    val digest = digester.extractKeyword(jsonElement, builder, factory, report)
-    return when(digest) {
-      null-> false
-      else-> {
+    val digest = digester.extractKeyword(JsrValue, builder, factory, report)
+    return when (digest) {
+      null -> false
+      else -> {
         builder[digest.keyword] = digest.kvalue
         true
       }

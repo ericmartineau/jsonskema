@@ -5,11 +5,11 @@ import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
 import lang.Name
 import lang.collection.SetMultimap
+import lang.json.JsrArray
+import lang.json.JsrObject
+import lang.json.JsrValue
 import lang.net.URI
 
 interface SchemaBuilder {
@@ -26,7 +26,7 @@ interface SchemaBuilder {
   var refURI: URI?
   var refSchema: Schema?
   var title: String?
-  var defaultValue: JsonElement?
+  var defaultValue: JsrValue?
   var description: String?
   var type: JsonSchemaType?
   var types: Set<JsonSchemaType>
@@ -101,9 +101,9 @@ interface SchemaBuilder {
   // ##################################################################
 
   var notSchema: SchemaBuilder?
-  var enumValues: JsonArray?
+  var enumValues: JsrArray?
   var const: Any?
-  var constValue: JsonElement?
+  var constValue: JsrValue?
 
   var oneOfSchemas: List<SchemaBuilder>
   var anyOfSchemas: List<SchemaBuilder>
@@ -118,16 +118,16 @@ interface SchemaBuilder {
   // ########           INNER KEYWORDS                   ##############
   // ##################################################################
 
-  var extraProperties: Map<String, JsonElement>
+  var extraProperties: Map<String, JsrValue>
 
   @Name("buildWithLocation")
   fun build(itemsLocation: SchemaLocation? = null, report: LoadingReport): Schema
 
-  fun build(block:SchemaBuilder.()->Unit):Schema
+  fun build(block: SchemaBuilder.() -> Unit): Schema
 
   var loadingReport: LoadingReport
   var schemaLoader: SchemaLoader?
-  var currentDocument: JsonObject?
+  var currentDocument: JsrObject?
 
   operator fun <K : Keyword<*>> set(keyword: KeywordInfo<K>, value: K)
   operator fun <X, K : Keyword<X>> get(keyword: KeywordInfo<K>): K?

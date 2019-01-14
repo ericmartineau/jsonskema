@@ -9,7 +9,8 @@ import io.mverse.jsonschema.validation.SchemaValidator
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.ValidationReport
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
-import lang.json.toJsonLiteral
+import lang.json.jsrString
+import lang.json.propNames
 
 class PropertyNameValidator(keyword: SingleSchemaKeyword, schema: Schema, factory: SchemaValidatorFactory) : KeywordValidator<SingleSchemaKeyword>(Keywords.PROPERTY_NAMES, schema) {
 
@@ -18,9 +19,9 @@ class PropertyNameValidator(keyword: SingleSchemaKeyword, schema: Schema, factor
   override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
 
     val report = parentReport.createChildReport()
-    val subjectProperties = subject.jsonObject!!.keys
+    val subjectProperties = subject.jsonObject!!.propNames
     for (subjectProperty in subjectProperties) {
-      val value = subjectProperty.toJsonLiteral()
+      val value = jsrString(subjectProperty)
       propertyNameValidator.validate(fromJsonValue(subject.root, value, subject.location), report)
     }
 

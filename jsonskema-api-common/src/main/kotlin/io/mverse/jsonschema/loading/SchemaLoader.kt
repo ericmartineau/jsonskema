@@ -3,13 +3,13 @@ package io.mverse.jsonschema.loading
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaBuilder
-import kotlinx.serialization.json.JsonObject
+import lang.json.JsrObject
 import lang.net.URI
 
 /**
  * If you're trying to load a schema from an input source, you want [SchemaReader].
  *
- * This interface is used within the internals of the library.  Instead of working on raw [JsonObject]
+ * This interface is used within the internals of the library.  Instead of working on raw [JsrObject]
  * instances, it works on [JsonValueWithPath] which means that the source document or fragment is already
  * being traversed.
  */
@@ -34,7 +34,7 @@ interface SchemaLoader {
    * @param report A place to log loading validation
    * @return A loaded ref schema
    */
-  fun loadRefSchema(referencedFrom: Schema, refURI: URI, currentDocument: JsonObject?, report: LoadingReport): Schema
+  fun loadRefSchema(referencedFrom: Schema, refURI: URI, currentDocument: JsrObject?, report: LoadingReport): Schema
 
   /**
    * Loads a subschema within a document
@@ -43,7 +43,7 @@ interface SchemaLoader {
    * @param loadingReport A place to log validation
    * @return The loaded schema
    */
-  fun loadSubSchema(schemaJson: JsonValueWithPath, inDocument: kotlinx.serialization.json.JsonObject, loadingReport: LoadingReport): Schema
+  fun loadSubSchema(schemaJson: JsonValueWithPath, inDocument: JsrObject, loadingReport: LoadingReport): Schema
 
   /**
    * Loads all the values of a subschema into a builder.  This builder can then be modified before calling build()
@@ -52,7 +52,7 @@ interface SchemaLoader {
    * @param loadingReport A place to log loading validation
    * @return A schema builder instance.
    */
-  fun subSchemaBuilder(schemaJson: JsonValueWithPath, inDocument: kotlinx.serialization.json.JsonObject, loadingReport: LoadingReport): SchemaBuilder
+  fun subSchemaBuilder(schemaJson: JsonValueWithPath, inDocument: JsrObject, loadingReport: LoadingReport): SchemaBuilder
 
   /**
    * Looks for a schema that's already been loaded by this loader.
@@ -76,5 +76,5 @@ interface SchemaLoader {
    */
   fun withDocumentClient(client: JsonDocumentClient): SchemaLoader
 
-  operator fun plusAssign(preloadedSchema: JsonObject)
+  operator fun plusAssign(preloadedSchema: JsrObject)
 }

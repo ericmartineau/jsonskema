@@ -8,11 +8,13 @@ import io.mverse.jsonschema.assertj.asserts.isValid
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.keyword.Keywords
-import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.ValidationMocks
-import lang.json.jsonArrayOf
+import lang.json.jsrArrayOf
+import lang.json.jsrJson
+import lang.json.jsrNumber
+import lang.json.jsrString
+import lang.json.toJsrValue
 import lang.json.toKtArray
-import lang.json.toJsonLiteral
 import org.junit.Test
 
 class ArrayContainsValidatorTest {
@@ -20,16 +22,16 @@ class ArrayContainsValidatorTest {
   fun validate_DoesntContains() {
     val containsSchema = JsonSchema.schema {
       type = JsonSchemaType.ARRAY
-      containsSchema = JsonSchema.schemaBuilder  {
+      containsSchema = JsonSchema.schemaBuilder {
         anyOfSchemas = listOf(
-            schemaBuilder { constValue = 3.toJsonLiteral() },
-            schemaBuilder { constValue = 4.0.toJsonLiteral() },
-            schemaBuilder  { constValue = "5".toJsonLiteral() })
+            schemaBuilder { constValue = jsrNumber(3) },
+            schemaBuilder { constValue = jsrNumber(4.0) },
+            schemaBuilder { constValue = jsrString("5") })
       }
     }
 
     val testValidator = ValidationMocks.createTestValidator(containsSchema)
-    val invalidArray = listOf(24, "Bob", 5).toKtArray()
+    val invalidArray = jsrArrayOf(24, "Bob", 5)
 
     val validate = testValidator.validate(invalidArray)
     assert(validate).isNotNull()
@@ -39,18 +41,20 @@ class ArrayContainsValidatorTest {
 
   @Test
   fun validate_Contains() {
-    val containsSchema = JsonSchema.schema {
-      type = JsonSchemaType.ARRAY
-      containsSchema = JsonSchema.schemaBuilder().apply {
-        anyOfSchemas = listOf(
-            schemaBuilder { constValue = 3.toJsonLiteral() },
-            schemaBuilder { constValue = 4.0.toJsonLiteral() },
-            schemaBuilder { constValue = "5".toJsonLiteral() })
+    jsrJson {
+      val containsSchema = JsonSchema.schema {
+        type = JsonSchemaType.ARRAY
+        containsSchema = JsonSchema.schemaBuilder().apply {
+          anyOfSchemas = listOf(
+              schemaBuilder { constValue = 3.toJsrJson() },
+              schemaBuilder { constValue = 4.0.toJsrJson() },
+              schemaBuilder { constValue = "5".toJsrJson() })
+        }
       }
-    }
 
-    containsSchema
-        .validating(jsonArrayOf(24, "Bob", 5, 3))
-        .isValid()
+      containsSchema
+          .validating(jsrArrayOf(24, "Bob", 5, 3))
+          .isValid()
+    }
   }
 }

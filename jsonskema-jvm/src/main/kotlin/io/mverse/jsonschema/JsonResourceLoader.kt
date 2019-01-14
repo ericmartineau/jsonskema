@@ -1,10 +1,10 @@
 package io.mverse.jsonschema
 
-import io.mverse.jsonschema.loading.parseKtJson
-import io.mverse.jsonschema.loading.parseKtObject
+import io.mverse.jsonschema.loading.parseJsrJson
+import io.mverse.jsonschema.loading.parseJsrObject
 import kotlinx.io.InputStream
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
+import lang.json.JsrValue
+import lang.json.JsrObject
 import kotlin.reflect.KClass
 
 
@@ -17,11 +17,11 @@ class JsonResourceLoader(private val loadFrom: KClass<*>) {
     return loadFrom.java.getResourceAsStream(relPath)
   }
 
-  fun readJson(relPath: String): JsonElement {
-    return loadFrom.java.getResourceAsStream(relPath).bufferedReader().readText().parseKtJson()
+  fun readJson(relPath: String): JsrValue {
+    return loadFrom.java.getResourceAsStream(relPath).bufferedReader().readText().parseJsrJson()
   }
 
-  fun readJsonObject(relPath: String): JsonObject {
-    return loadFrom.java.getResourceAsStream(relPath).bufferedReader().readText().parseKtObject()
+  fun readJsonObject(relPath: String): JsrObject {
+    return loadFrom.java.getResourceAsStream(relPath).bufferedReader().readText().parseJsrObject()
   }
 }

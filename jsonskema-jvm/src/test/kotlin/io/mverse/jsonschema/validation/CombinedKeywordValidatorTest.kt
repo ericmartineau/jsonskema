@@ -23,9 +23,10 @@ import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.keyword.Keywords.ALL_OF
 import io.mverse.jsonschema.keyword.Keywords.ANY_OF
 import io.mverse.jsonschema.keyword.Keywords.ONE_OF
-import io.mverse.jsonschema.loading.parseKtJson
+import io.mverse.jsonschema.loading.parseJsrJson
 import io.mverse.jsonschema.validation.ValidationMocks.mockNumberSchema
-import lang.json.toJsonLiteral
+import lang.json.toJsrValue
+import lang.json.toJsrValue
 import org.junit.Test
 import java.util.Arrays.asList
 
@@ -36,7 +37,7 @@ class CombinedKeywordValidatorTest {
     val parentSchema = JsonSchema.schema {
       allOfSchemas = SUBSCHEMAS
     }
-    val subject = "24".parseKtJson()
+    val subject = "24".parseJsrJson()
     parentSchema.validating(subject)
         .isNotValid()
         .hasViolationCount(1)
@@ -46,21 +47,21 @@ class CombinedKeywordValidatorTest {
   @Test
   fun validateAll() {
     JsonSchema.schema { allOfSchemas = SUBSCHEMAS }
-        .validating(20.toJsonLiteral())
+        .validating(20.toJsrValue())
         .hasKeyword(ALL_OF)
   }
 
   @Test
   fun validateAny() {
     JsonSchema.schema { anyOfSchemas = SUBSCHEMAS }
-        .validating(5.toJsonLiteral())
+        .validating(5.toJsrValue())
         .hasKeyword(ANY_OF)
   }
 
   @Test
   fun validateOne() {
     JsonSchema.schema { oneOfSchemas = SUBSCHEMAS }
-        .validating(30.toJsonLiteral())
+        .validating(30.toJsrValue())
         .hasKeyword(ONE_OF)
   }
 

@@ -16,8 +16,8 @@ import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.URIKeyword
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.json
+import lang.json.JsrObject
+import lang.json.jsrObject
 import lang.net.URI
 
 open class RefSchemaImpl : RefSchema {
@@ -27,7 +27,7 @@ open class RefSchemaImpl : RefSchema {
   constructor(factory: SchemaLoader?,
               location: SchemaLocation,
               refURI: URI,
-              currentDocument: JsonObject?,
+              currentDocument: JsrObject?,
               report: LoadingReport) : super(factory, location, refURI, currentDocument, report)
 
   constructor(location: SchemaLocation, refURI: URI, refSchema: Schema) : super(location, refURI, refSchema)
@@ -91,11 +91,11 @@ open class RefSchemaImpl : RefSchema {
     return JsonSchemaBuilder(fromSchema = this, id = id)
   }
 
-  override fun toJson(version: JsonSchemaVersion, includeExtraProperties:Boolean): JsonObject {
-    return json {
-      "\$ref" to refURI.toString()
+  override fun toJson(version: JsonSchemaVersion, includeExtraProperties: Boolean): JsrObject {
+    return jsrObject {
+      "\$ref" *= refURI.toString()
     }
   }
 
-  override fun toString(version: JsonSchemaVersion, includeExtraProperties:Boolean): String = toString()
+  override fun toString(version: JsonSchemaVersion, includeExtraProperties: Boolean): String = toString()
 }

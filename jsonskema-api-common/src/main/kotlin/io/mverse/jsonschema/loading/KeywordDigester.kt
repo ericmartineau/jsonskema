@@ -2,8 +2,8 @@ package io.mverse.jsonschema.loading
 
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.SchemaBuilder
-import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keyword
+import io.mverse.jsonschema.keyword.KeywordInfo
 
 /**
  * Responsible for extracting a keyword or keywords from a json document and loading them into a [SchemaBuilder]

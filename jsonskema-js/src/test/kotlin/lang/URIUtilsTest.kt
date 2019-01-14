@@ -123,7 +123,7 @@ class URIUtilsTest {
 
   @Test
   fun generateAbsoluteURI() {
-    val jsonObject= json {
+    val jsonObject= jsrObject {
       "bob" to "jones"
       "age" to 34
       "sub" to listOf(3, 5, 67).toJsonArray()
@@ -136,7 +136,7 @@ class URIUtilsTest {
 
   @Test
   fun generateUniqueURI_ForSameRootObject_ReturnsSameURI() {
-    val jsonObject= json {
+    val jsonObject= jsrObject {
       "bob" to "jones"
       "age" to 34
       val numbers = listOf<Number>(3, 5, 67)

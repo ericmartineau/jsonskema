@@ -7,7 +7,6 @@ import io.mverse.jsonschema.keyword.StringKeyword
 import io.mverse.jsonschema.validation.FormatValidator
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.ValidationError
-import io.mverse.jsonschema.validation.ValidationErrorHelper
 import io.mverse.jsonschema.validation.ValidationReport
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
 

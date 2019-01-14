@@ -11,14 +11,14 @@ import io.mverse.jsonschema.enums.JsonSchemaType.NUMBER
 import io.mverse.jsonschema.enums.JsonSchemaType.OBJECT
 import io.mverse.jsonschema.enums.JsonSchemaType.STRING
 import kotlinx.serialization.json.JsonNull
-import lang.json.jsonArrayOf
+import lang.json.jsrArrayOf
 import org.junit.Test
 
 class JsonSchemaInspectionsTest {
   @Test
   fun testAmbiguous_EnumValues() {
     val draft6Schema = JsonSchema.schema {
-      enumValues = jsonArrayOf(1, true)
+      enumValues = jsrArrayOf(1, true)
     }.asDraft6()
     assert(draft6Schema.calculateType()).isEqualTo(NULL)
   }
@@ -42,7 +42,7 @@ class JsonSchemaInspectionsTest {
   @Test
   fun testBooleanSchema_EnumValues() {
     val draft6Schema = JsonSchema.schema {
-      enumValues = jsonArrayOf(true, false)
+      enumValues = jsrArrayOf(true, false)
     }.asDraft6()
     assert(draft6Schema.calculateType()).isEqualTo(BOOLEAN)
   }
@@ -58,7 +58,7 @@ class JsonSchemaInspectionsTest {
   @Test
   fun testNullSchema_EnumValues() {
     val draft6Schema = JsonSchema.schema {
-      enumValues = jsonArrayOf(JsonNull)
+      enumValues = jsrArrayOf(JsonNull)
     }.asDraft6()
     assert(draft6Schema.calculateType()).isEqualTo(NULL)
   }
@@ -74,7 +74,7 @@ class JsonSchemaInspectionsTest {
   @Test
   fun testNumberSchema_EnumValues() {
     val draft6Schema = JsonSchema.schema {
-      enumValues = jsonArrayOf(1, 4)
+      enumValues = jsrArrayOf(1, 4)
     }.asDraft6()
     assert(draft6Schema.calculateType()).isEqualTo(NUMBER)
   }

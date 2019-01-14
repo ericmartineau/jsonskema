@@ -5,17 +5,14 @@ import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft3
 import io.mverse.jsonschema.keyword.Keywords.booleanKeyword
 import io.mverse.jsonschema.keyword.Keywords.keyword
 import io.mverse.jsonschema.keyword.Keywords.singleSchemaKeyword
-import kotlinx.serialization.json.ElementType.ARRAY
-import kotlinx.serialization.json.ElementType.NUMBER
-import kotlinx.serialization.json.ElementType.OBJECT
-import kotlinx.serialization.json.ElementType.STRING
 import lang.Field
 import lang.Global
+import lang.json.JsrType
 
 object Draft3Keywords {
   //todo:ericm get docs
   @Field val DIVISIBLE_BY = Keywords.numberKeyword("divisibleBy")
-      .expects(NUMBER)
+      .expects(JsrType.NUMBER)
       .validates(JsonSchemaType.NUMBER, JsonSchemaType.INTEGER)
       .onlyForVersion(Draft3)
       .build()
@@ -42,8 +39,8 @@ object Draft3Keywords {
    * is not valid.
    */
   @Global
-  val DISALLOW = keyword<TypeKeyword>().key("disallow").expects(STRING).onlyForVersion(Draft3)
-      .additionalDefinition().expects(ARRAY)
+  val DISALLOW = keyword<TypeKeyword>().key("disallow").expects(JsrType.STRING).onlyForVersion(Draft3)
+      .additionalDefinition().expects(JsrType.ARRAY)
       .build()
 
   /**
@@ -80,5 +77,5 @@ object Draft3Keywords {
    * "extends":"http://json-schema.org/draft-03/schema"
    * }
    */
-  val EXTENDS = singleSchemaKeyword("extends").expects(OBJECT).onlyForVersion(Draft3).build()
+  val EXTENDS = singleSchemaKeyword("extends").expects(JsrType.OBJECT).onlyForVersion(Draft3).build()
 }

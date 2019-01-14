@@ -6,15 +6,15 @@ import io.mverse.jsonschema.keyword.SchemaMapKeyword
 class MutableSchemaMap(val keyword: KeywordInfo<SchemaMapKeyword>,
                        val builder: SchemaBuilder) {
 
-  operator fun set(key:String, schema:SchemaBuilder) {
+  operator fun set(key: String, schema: SchemaBuilder) {
     val existing = builder[keyword] ?: SchemaMapKeyword()
     builder[keyword] = existing + (key to builder.buildSubSchema(schema, keyword, key))
   }
 
-  operator fun set(key:String, block:SchemaBuilder.()->Unit) {
+  operator fun set(key: String, block: SchemaBuilder.() -> Unit) {
     val existing = builder[keyword] ?: SchemaMapKeyword()
     builder[keyword] = existing + (key to builder.buildSubSchema(JsonSchema.schemaBuilder(block), keyword, key))
   }
 
-  fun toSchemaMap():Map<String, Schema> = builder[keyword]?.value ?: emptyMap()
+  fun toSchemaMap(): Map<String, Schema> = builder[keyword]?.value ?: emptyMap()
 }

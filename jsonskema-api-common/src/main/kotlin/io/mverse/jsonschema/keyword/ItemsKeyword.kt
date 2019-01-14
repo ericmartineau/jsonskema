@@ -3,8 +3,8 @@ package io.mverse.jsonschema.keyword
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.utils.isFalseSchema
-import kotlinx.serialization.json.JsonBuilder
-import lang.json.toKtArray
+import lang.json.MutableJsrObject
+import lang.json.createJsrArray
 
 data class ItemsKeyword(val indexedSchemas: List<Schema> = emptyList(),
                         val allItemSchema: Schema? = null,
@@ -13,24 +13,24 @@ data class ItemsKeyword(val indexedSchemas: List<Schema> = emptyList(),
 
   val hasIndexedSchemas: Boolean get() = indexedSchemas.isNotEmpty()
 
-  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
+  override fun toJson(keyword: KeywordInfo<*>, builder: MutableJsrObject, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
     if (!indexedSchemas.isEmpty()) {
-      builder.run {
-        Keywords.ITEMS.key to indexedSchemas.map { it.asVersion(version).toJson() }.toKtArray()
+      builder.apply {
+        Keywords.ITEMS.key *= createJsrArray(indexedSchemas.map { it.asVersion(version).toJson() })
       }
     } else {
       allItemSchema?.let { schema ->
         builder.run {
-          Keywords.ITEMS.key to schema.asVersion(version).toJson()
+          Keywords.ITEMS.key *= schema.asVersion(version).toJson()
         }
       }
     }
     additionalItemSchema?.also { schema ->
       builder.apply {
         if (version.isBefore(JsonSchemaVersion.Draft6) && schema.isFalseSchema) {
-          Keywords.ADDITIONAL_ITEMS.key to false
+          Keywords.ADDITIONAL_ITEMS.key *= false
         } else {
-          Keywords.ADDITIONAL_ITEMS.key to additionalItemSchema.asVersion(version).toJson()
+          Keywords.ADDITIONAL_ITEMS.key *= additionalItemSchema.asVersion(version).toJson()
         }
       }
 

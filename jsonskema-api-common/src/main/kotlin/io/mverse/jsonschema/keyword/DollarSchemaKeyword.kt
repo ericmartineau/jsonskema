@@ -1,7 +1,7 @@
 package io.mverse.jsonschema.keyword
 
 import io.mverse.jsonschema.enums.JsonSchemaVersion
-import kotlinx.serialization.json.JsonBuilder
+import lang.json.MutableJsrObject
 import lang.net.URI
 
 open class DollarSchemaKeyword : Keyword<URI> {
@@ -12,10 +12,10 @@ open class DollarSchemaKeyword : Keyword<URI> {
 
   override val value: URI = URI("")
 
-  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
+  override fun toJson(keyword: KeywordInfo<*>, builder: MutableJsrObject, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
     version.metaschemaURI?.let { schemaUri ->
       builder.run {
-        SCHEMA_KEYWORD to schemaUri.toString()
+        SCHEMA_KEYWORD *= schemaUri.toString()
       }
     }
   }

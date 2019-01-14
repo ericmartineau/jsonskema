@@ -1,17 +1,10 @@
 package io.mverse.jsonschema.enums;
 
 import io.mverse.jsonschema.SchemaException
-import kotlinx.serialization.Decoder
-import kotlinx.serialization.Encoder
-import kotlinx.serialization.KInput
-import kotlinx.serialization.KOutput
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialDescriptor
-import kotlinx.serialization.Serializer
 import kotlinx.serialization.Transient
-import kotlinx.serialization.internal.SerialClassDescImpl
-import kotlinx.serialization.json.ElementType
 import lang.Global
+import lang.collection.asList
+import lang.json.JsrType
 
 object JsonSchemaTypes {
   @Global
@@ -28,15 +21,15 @@ object JsonSchemaTypes {
 }
 
 @Transient
-val JsonSchemaType.appliesTo: ElementType
+val JsonSchemaType.appliesTo: JsrType
   get() {
     return when (this) {
-      JsonSchemaType.INTEGER -> ElementType.NUMBER
-      JsonSchemaType.BOOLEAN -> ElementType.BOOLEAN
-      JsonSchemaType.STRING -> ElementType.STRING
-      JsonSchemaType.NUMBER -> ElementType.NUMBER
-      JsonSchemaType.NULL -> ElementType.NULL
-      JsonSchemaType.OBJECT -> ElementType.OBJECT
-      JsonSchemaType.ARRAY -> ElementType.ARRAY
+      JsonSchemaType.INTEGER -> JsrType.NUMBER
+      JsonSchemaType.BOOLEAN -> JsrType.BOOLEAN
+      JsonSchemaType.STRING -> JsrType.STRING
+      JsonSchemaType.NUMBER -> JsrType.NUMBER
+      JsonSchemaType.NULL -> JsrType.NULL
+      JsonSchemaType.OBJECT -> JsrType.OBJECT
+      JsonSchemaType.ARRAY -> JsrType.ARRAY
     }
   }

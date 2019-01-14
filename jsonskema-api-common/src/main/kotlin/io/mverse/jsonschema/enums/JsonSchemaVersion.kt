@@ -27,7 +27,7 @@ enum class JsonSchemaVersion constructor(uri: String?) {
   companion object {
     @Field
     val publicVersions = JsonSchemaVersion.values()
-        .filter{ v -> v.metaschemaURI != null }
+        .filter { v -> v.metaschemaURI != null }
 
     @Field
     val latest: JsonSchemaVersion = Draft7

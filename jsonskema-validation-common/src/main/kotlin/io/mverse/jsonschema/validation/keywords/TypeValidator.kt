@@ -9,7 +9,6 @@ import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.ValidationErrorHelper.buildTypeMismatchError
 import io.mverse.jsonschema.validation.ValidationReport
 import lang.isIntegral
-import kotlinx.serialization.json.ElementType.NUMBER
 
 class TypeValidator(val keyword: TypeKeyword,
                     private val parent: Schema,
@@ -21,7 +20,7 @@ class TypeValidator(val keyword: TypeKeyword,
   override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     val valueType = subject.type
     val schemaType: JsonSchemaType
-    if (requiresInteger && valueType == NUMBER) {
+    if (requiresInteger && valueType.name == "NUMBER") {
       schemaType = if (subject.number!!.isIntegral()) JsonSchemaType.INTEGER else JsonSchemaType.NUMBER
     } else {
       schemaType = subject.jsonSchemaType

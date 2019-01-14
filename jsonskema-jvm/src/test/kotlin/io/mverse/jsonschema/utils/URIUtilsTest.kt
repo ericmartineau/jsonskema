@@ -6,7 +6,9 @@ import assertk.assertions.isFalse
 import assertk.assertions.isSameAs
 import assertk.assertions.isTrue
 import kotlinx.serialization.json.json
-import lang.json.toJsonObject
+import lang.json.jsrArray
+import lang.json.jsrArrayOf
+import lang.json.jsrObject
 import lang.json.toKtArray
 import lang.net.URI
 import lang.net.isFragmentOnly
@@ -120,7 +122,7 @@ class URIUtilsTest {
 
   @Test
   fun generateAbsoluteURI() {
-    val jsonObject = json {
+    val jsonObject = jsrObject {
       "bob" to "jones"
       "age" to 34
       "sub" to listOf(3, 5, 67).toKtArray()
@@ -133,15 +135,13 @@ class URIUtilsTest {
 
   @Test
   fun generateUniqueURI_ForSameRootObject_ReturnsSameURI() {
-    val jsonObject = json {
-      "bob" to "jones"
-      "age" to 34
-      val numbers = listOf<Number>(3, 5, 67)
-      "sub" to numbers.toKtArray()
+    val jsonObject = jsrObject {
+      "bob" *= "jones"
+      "age" *= 34
+      "sub" *= jsrArrayOf(3, 5, 67)
     }
 
     val uri = generateUniqueURI(jsonObject)
-    val fromString = jsonObject.toJsonObject()
-    assert(uri).isEqualTo(generateUniqueURI(fromString))
+    assert(uri).isEqualTo(generateUniqueURI(jsonObject))
   }
 }

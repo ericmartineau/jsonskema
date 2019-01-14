@@ -9,9 +9,10 @@ import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
-import kotlinx.serialization.json.JsonElement
-import lang.net.URI
 import lang.collection.freezeMap
+import lang.json.JsrArray
+import lang.json.JsrValue
+import lang.net.URI
 
 class Draft6SchemaImpl : JsonSchemaImpl<Draft6Schema>, Draft6Schema {
 
@@ -19,9 +20,9 @@ class Draft6SchemaImpl : JsonSchemaImpl<Draft6Schema>, Draft6Schema {
   // #####  KEYWORDS for Draft6    #######################
   // #####################################################
 
-  override val examples: kotlinx.serialization.json.JsonArray get() = super.examples
+  override val examples: JsrArray get() = super.examples
   override val definitions: Map<String, Schema> get() = super.definitions
-  override val constValue: JsonElement? get() = super.constValue
+  override val constValue: JsrValue? get() = super.constValue
   override val notSchema: Draft6Schema? get() = super.notSchema?.asDraft6()
   override val allOfSchemas: List<Schema> get() = super.allOfSchemas
   override val anyOfSchemas: List<Schema> get() = super.anyOfSchemas
@@ -35,7 +36,7 @@ class Draft6SchemaImpl : JsonSchemaImpl<Draft6Schema>, Draft6Schema {
   override val minProperties: Int? get() = super.minProperties
   override val requiredProperties: Set<String> get() = super.requiredProperties
   override val isAllowAdditionalItems: Boolean get() = super.isAllowAdditionalItems
-  override val isAllowAdditionalProperties: Boolean get() =super.isAllowAdditionalProperties
+  override val isAllowAdditionalProperties: Boolean get() = super.isAllowAdditionalProperties
   override val containsSchema: Draft6Schema? get() = super.containsSchema?.asDraft6()
   override val propertyNameSchema: Draft6Schema? get() = super.propertyNameSchema?.asDraft6()
   override val version: JsonSchemaVersion = JsonSchemaVersion.Draft6
@@ -49,11 +50,11 @@ class Draft6SchemaImpl : JsonSchemaImpl<Draft6Schema>, Draft6Schema {
 
   constructor(location: SchemaLocation,
               keywords: Map<KeywordInfo<*>, Keyword<*>>,
-              extraProperties: Map<String, JsonElement> = emptyMap()) : super(location, keywords.freezeMap(), extraProperties.freezeMap(), JsonSchemaVersion.Draft6)
+              extraProperties: Map<String, JsrValue> = emptyMap()) : super(location, keywords.freezeMap(), extraProperties.freezeMap(), JsonSchemaVersion.Draft6)
 
   override fun asDraft6(): Draft6Schema = this
   override fun convertVersion(source: Schema): Draft6Schema = source.asDraft6()
-  override fun withId(id: URI): Schema = Draft6SchemaImpl(location=location.withId(id),
+  override fun withId(id: URI): Schema = Draft6SchemaImpl(location = location.withId(id),
       keywords = keywords.toMutableMap().also {
         it.remove(Keywords.ID)
         it[DOLLAR_ID] = IdKeyword(id)

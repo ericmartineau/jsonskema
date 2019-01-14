@@ -12,8 +12,9 @@ import io.mverse.jsonschema.assertj.asserts.isNotValid
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.keyword.Keywords
-import io.mverse.jsonschema.loading.parseKtObject
+import io.mverse.jsonschema.loading.parseJsrObject
 import io.mverse.jsonschema.resourceLoader
+import lang.json.JsrObject
 import org.junit.Test
 
 class EndToEndTest {
@@ -22,8 +23,8 @@ class EndToEndTest {
   fun testParseAndValidate() {
     val primitives = JsonSchema.resourceLoader().getStream("primitives.json")
     val jsonSchema = JsonSchema.resourceLoader().getStream("mverse-account-profile.json")
-    val jsonData = JsonSchema.resourceLoader().readJson("account-data.json").jsonObject
-    val preloadedSchema = primitives.parseKtObject()
+    val jsonData = JsonSchema.resourceLoader().readJson("account-data.json") as JsrObject
+    val preloadedSchema = primitives.parseJsrObject()
     val loadedSchema = JsonSchema.createSchemaReader()
         .withPreloadedDocument(preloadedSchema)
         .readSchema(jsonSchema)

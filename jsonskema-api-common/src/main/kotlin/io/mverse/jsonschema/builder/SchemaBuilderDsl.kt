@@ -5,9 +5,12 @@ import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.enums.FormatType
 import io.mverse.jsonschema.enums.JsonSchemaType
-import kotlinx.serialization.json.JsonArray
+import lang.json.JsrArray
+import lang.json.KtArray
+import lang.json.createJsrArray
+import lang.json.jsrString
+import lang.json.toJsrArray
 import lang.net.URI
-import lang.json.toKtArray
 
 open class SchemaBuilderDsl(val schemaBuilder: SchemaBuilder = createSchemaBuilder(),
                             val parent: SchemaBuilder? = null,
@@ -169,7 +172,7 @@ open class SchemaBuilderDsl(val schemaBuilder: SchemaBuilder = createSchemaBuild
   }
 
   fun integer(title: String? = null, block: SchemaBuilderDsl.() -> Unit = {}): SchemaBuilderDsl {
-    return  SchemaBuilderDsl().apply {
+    return SchemaBuilderDsl().apply {
       this.type = JsonSchemaType.INTEGER
       this.title = title
       this.block()
@@ -187,13 +190,20 @@ open class SchemaBuilderDsl(val schemaBuilder: SchemaBuilder = createSchemaBuild
   fun enum(vararg enumValues: String): SchemaBuilderDsl {
     return SchemaBuilderDsl().apply {
       this.type = JsonSchemaType.STRING
-      this.enumValues = enumValues.toList().toKtArray()
+      this.enumValues = createJsrArray(enumValues.map { jsrString(it) })
     }
   }
 
-  fun enum(values: JsonArray, block: SchemaBuilderDsl.() -> Unit = {}): SchemaBuilderDsl {
+  fun enum(values: JsrArray, block: SchemaBuilderDsl.() -> Unit = {}): SchemaBuilderDsl {
     return SchemaBuilderDsl().apply {
       enumValues = values
+      block()
+    }
+  }
+
+  fun enum(values: KtArray, block: SchemaBuilderDsl.() -> Unit = {}): SchemaBuilderDsl {
+    return SchemaBuilderDsl().apply {
+      enumValues = values.toJsrArray()
       block()
     }
   }
@@ -216,8 +226,8 @@ open class SchemaBuilderDsl(val schemaBuilder: SchemaBuilder = createSchemaBuild
     }
   }
 
-  fun schemaBuilder(id:URI? = null, block: SchemaBuilderDsl.()->Unit): SchemaBuilderDsl = when (id) {
-    null-> SchemaBuilderDsl(createSchemaBuilder(), this).apply(block)
-    else-> SchemaBuilderDsl(createSchemaBuilder(id), this).apply(block)
+  fun schemaBuilder(id: URI? = null, block: SchemaBuilderDsl.() -> Unit): SchemaBuilderDsl = when (id) {
+    null -> SchemaBuilderDsl(createSchemaBuilder(), this).apply(block)
+    else -> SchemaBuilderDsl(createSchemaBuilder(id), this).apply(block)
   }
 }

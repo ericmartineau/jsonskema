@@ -4,6 +4,7 @@ import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.utils.JsonUtils.extractIdFromObject
 import lang.json.JsonPath
+import lang.json.JsrObject
 import lang.net.URI
 import lang.net.resolveUri
 import lang.uuid.randomUUID
@@ -60,14 +61,14 @@ object SchemaPaths {
    * based on that.  If no $id is found, then a location that is unique to the json document will
    * be created.
    */
-  fun fromDocument(documentJson: kotlinx.serialization.json.JsonObject, idKey: String, vararg otherIdKeys: String): SchemaLocation {
+  fun fromDocument(documentJson: JsrObject, idKey: String, vararg otherIdKeys: String): SchemaLocation {
     // There are three cases here.
 
     val id = extractIdFromObject(documentJson, idKey, *otherIdKeys)
     return fromDocumentWithProvidedId(documentJson, id)
   }
 
-  fun fromDocumentWithProvidedId(documentRoot: kotlinx.serialization.json.JsonObject, id: URI?): SchemaLocation {
+  fun fromDocumentWithProvidedId(documentRoot: JsrObject, id: URI?): SchemaLocation {
 
     return when {
       id == null -> SchemaLocation.builderFromId(generateUniqueURI(documentRoot)).build()

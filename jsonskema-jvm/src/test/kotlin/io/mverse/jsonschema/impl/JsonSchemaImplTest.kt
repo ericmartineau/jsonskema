@@ -8,7 +8,8 @@ import io.mverse.jsonschema.Draft4Schema
 import io.mverse.jsonschema.Draft6Schema
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
-import kotlinx.serialization.json.JsonPrimitive
+import lang.json.JsrTrue
+import lang.json.jsrString
 import lang.net.URI
 import org.junit.Test
 
@@ -53,36 +54,36 @@ class JsonSchemaImplTest {
   @Test
   fun testToStringExtraProperties() {
     val schema = JsonSchema.schema {
-      extraProperties += ("bobTheBuilder" to JsonPrimitive(true))
+      extraProperties += ("bobTheBuilder" to JsrTrue)
 
       properties["childSchema"] = schemaBuilder {
-        extraProperties += ("bobsType" to JsonPrimitive("Chainsaw Murderer"))
+        extraProperties += ("bobsType" to jsrString("Chainsaw Murderer"))
 
         properties["grandchildSchema"] = schemaBuilder {
-          extraProperties += ("theNestStatus" to JsonPrimitive("FULL"))
+          extraProperties += ("theNestStatus" to jsrString("FULL"))
         }
       }
     }
 
-    val schemaString = schema.toString(includeExtraProperties = true, version=JsonSchemaVersion.Draft7)
+    val schemaString = schema.toString(includeExtraProperties = true, version = JsonSchemaVersion.Draft7)
     assert(schemaString).isEqualTo("{\"properties\":{\"childSchema\":{\"properties\":{\"grandchildSchema\":{\"theNestStatus\":\"FULL\"}},\"bobsType\":\"Chainsaw Murderer\"}},\"bobTheBuilder\":true}")
   }
 
   @Test
   fun testToStringNoExtraProperties() {
     val schema = JsonSchema.schema {
-      extraProperties += ("bobTheBuilder" to JsonPrimitive(true))
+      extraProperties += ("bobTheBuilder" to JsrTrue)
 
       properties["childSchema"] = schemaBuilder {
-        extraProperties += ("bobsType" to JsonPrimitive("Chainsaw Murderer"))
+        extraProperties += ("bobsType" to jsrString("Chainsaw Murderer"))
 
         properties["grandchildSchema"] = schemaBuilder {
-          extraProperties += ("theNestStatus" to JsonPrimitive("FULL"))
+          extraProperties += ("theNestStatus" to jsrString("FULL"))
         }
       }
     }
 
-    val schemaString = schema.toString(includeExtraProperties = false, version=JsonSchemaVersion.Draft7)
+    val schemaString = schema.toString(includeExtraProperties = false, version = JsonSchemaVersion.Draft7)
     assert(schemaString).isEqualTo("{\"properties\":{\"childSchema\":{\"properties\":{\"grandchildSchema\":{}}}}}")
   }
 }

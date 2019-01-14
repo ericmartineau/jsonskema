@@ -8,6 +8,7 @@ import io.mverse.jsonschema.validation.SchemaValidator
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.ValidationReport
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
+import lang.json.values
 
 data class ArrayContainsValidator(val keyword: SingleSchemaKeyword,
                                   override val schema: Schema,
@@ -15,10 +16,8 @@ data class ArrayContainsValidator(val keyword: SingleSchemaKeyword,
                                   private val containsValidator: SchemaValidator = factory.createValidator(keyword.value))
   : KeywordValidator<SingleSchemaKeyword>(Keywords.CONTAINS, schema) {
 
-
-
   override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
-    for (i in 0 until subject.jsonArray!!.size) {
+    for (i in 0 until subject.jsonArray!!.values.size) {
       val trap = parentReport.createChildReport()
       val item = subject[i]
       if (containsValidator.validate(item, trap)) {

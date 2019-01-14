@@ -9,10 +9,10 @@ import io.mverse.jsonschema.assertj.asserts.hasViolationAt
 import io.mverse.jsonschema.assertj.asserts.isNotValid
 import io.mverse.jsonschema.assertj.asserts.isValid
 import io.mverse.jsonschema.assertj.asserts.validating
+import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.createSchemaReader
-import kotlinx.serialization.json.json
+import lang.json.jsrObject
 import org.junit.Test
 
 class LogicValidatorTest {
@@ -23,7 +23,7 @@ class LogicValidatorTest {
     val schema = JsonSchema.createSchemaReader().readSchema(jsonObject).asDraft7()
 
     assert(schema)
-        .validating(json { "ifTest" to "quadrilateralus" })
+        .validating(jsrObject { "ifTest" *= "quadrilateralus" })
         .isNotValid {
           hasViolationAt("#/ifTest")
               .hasErrorCode("validation.keyword.maxLength")
@@ -31,7 +31,7 @@ class LogicValidatorTest {
         }
   }
 
-  fun kotlinx.serialization.json.JsonObject.toJsonSchema(): Draft7Schema =
+  fun lang.json.JsrObject.toJsonSchema(): Draft7Schema =
       JsonSchema.createSchemaReader().readSchema(this).asDraft7()
 
   @Test
@@ -40,7 +40,7 @@ class LogicValidatorTest {
         .toJsonSchema()
 
     assert(schema)
-        .validating(json { "ifTest" to "quadruple" })
+        .validating(jsrObject { "ifTest" *= "quadruple" })
         .isValid()
   }
 
@@ -49,7 +49,7 @@ class LogicValidatorTest {
     val schema = loader.readJsonObject("/draft7-keywords.json").toJsonSchema().asDraft7()
 
     assert(schema)
-        .validating(json { "ifTest" to "smasher" })
+        .validating(jsrObject { "ifTest" *= "smasher" })
         .isNotValid {
           hasViolationAt("#/ifTest")
               .hasErrorCode("validation.keyword.maxLength")
@@ -62,7 +62,7 @@ class LogicValidatorTest {
     val schema = loader.readJsonObject("/draft7-keywords.json").toJsonSchema()
 
     assert(schema)
-        .validating(json { "ifTest" to "smash" })
+        .validating(jsrObject { "ifTest" *= "smash" })
         .isValid()
   }
 
@@ -71,7 +71,7 @@ class LogicValidatorTest {
     val schema = loader.readJsonObject("/draft7-keywords.json").toJsonSchema()
 
     assert(schema)
-        .validating(json { "ifTest" to 10.0 })
+        .validating(jsrObject { "ifTest" *= 10.0 })
         .isNotValid {
           hasViolationAt("#/ifTest")
               .hasErrorCode("validation.typeMismatch")
@@ -84,7 +84,7 @@ class LogicValidatorTest {
     val schema = loader.readJsonObject("/draft7-keywords.json").toJsonSchema()
 
     assert(schema)
-        .validating(json { "ifTest" to json {} })
+        .validating(jsrObject { "ifTest" *= jsrObject {} })
         .isValid()
   }
 

@@ -8,6 +8,7 @@ import io.mverse.jsonschema.validation.SchemaValidator
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.ValidationReport
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
+import lang.json.propNames
 
 data class PropertySchemaValidator(val keyword: SchemaMapKeyword,
                                    override val schema: Schema,
@@ -21,7 +22,7 @@ data class PropertySchemaValidator(val keyword: SchemaMapKeyword,
   private val propertyLength: Int = validatedProperties.size
 
   override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
-    val subjectProperties = subject.jsonObject!!.keys
+    val subjectProperties = subject.jsonObject!!.propNames
 
     val a: Set<String>
     val b: Set<String>

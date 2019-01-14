@@ -6,19 +6,18 @@ import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.resourceLoader
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.json
+import lang.json.JsrObject
+import lang.json.jsrObject
 import org.junit.Assert.assertTrue
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.ExpectedException
 
 /**
  * @author erosb
  */
 class JsonObjectTest : BaseLoaderTest("objecttestcases.json") {
 
-  private val testSchemas: JsonObject
+  private val testSchemas: JsrObject
 
   init {
     testSchemas = JsonSchema.resourceLoader().readJsonObject("loading/testschemas.json")
@@ -29,10 +28,10 @@ class JsonObjectTest : BaseLoaderTest("objecttestcases.json") {
     assertTrue(subject().containsKey("a"))
   }
 
-  private fun subject(): JsonObject {
-    return json {
-      "a" to true
-      "b" to json{}
+  private fun subject(): JsrObject {
+    return jsrObject {
+      "a" *= true
+      "b" *= jsrObject {}
     }
   }
 
@@ -47,9 +46,9 @@ class JsonObjectTest : BaseLoaderTest("objecttestcases.json") {
 
   @Test
   fun childForConsidersIdAttr() {
-    val input = testSchemas.getObject("remotePointerResolution")
-    val fc = input.getObject("properties").getObject("folderChange")
-    val sIF  = fc.getObject("properties").getObject("schemaInFolder")
+    val input = testSchemas["remotePointerResolution"] as JsrObject
+    val fc = input["properties"]?.asJsonObject()?.getJsonObject("folderChange")!!
+    val sIF = fc.getJsonObject("properties").getJsonObject("schemaInFolder")
     //Assertion?
   }
 }

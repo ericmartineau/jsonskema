@@ -6,14 +6,14 @@ import assertk.assertions.isEqualTo
 import assertk.fail
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.createSchemaReader
-import kotlinx.serialization.json.JsonObject
+import lang.json.JsrObject
 
 typealias SchemaLoadingAssert = Assert<LoadingReport?>
 typealias SafeSchemaLoadingAssert = Assert<LoadingReport>
 typealias LoadingIssueAssert = Assert<LoadingIssue?>
 typealias SafeLoadingIssueAssert = Assert<LoadingIssue>
 
-fun JsonObject.assertAsSchema(reader: SchemaReader = JsonSchema.createSchemaReader(),
+fun JsrObject.assertAsSchema(reader: SchemaReader = JsonSchema.createSchemaReader(),
                               block:SafeSchemaLoadingAssert.()->Unit = {}): SchemaLoadingAssert {
   return try {
     reader.readSchema(this)

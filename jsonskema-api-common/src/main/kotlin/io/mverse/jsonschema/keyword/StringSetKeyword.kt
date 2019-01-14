@@ -11,5 +11,5 @@ data class StringSetKeyword(override val value: Set<String> = setOf()) : Keyword
     return this + anotherValue
   }
 
-  override fun withValue(value: Set<String>): Keyword<Set<String>> = this.copy(value=value)
+  override fun withValue(value: Set<String>): Keyword<Set<String>> = this.copy(value = value)
 }

@@ -21,6 +21,7 @@ import io.mverse.jsonschema.assertj.asserts.isValid
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.validation.ValidationMocks.mockNullSchema
 import kotlinx.serialization.json.JsonNull
+import lang.json.JsrNull
 import org.junit.Test
 
 class NullSchemaTest {
@@ -35,7 +36,7 @@ class NullSchemaTest {
 
   @Test
   fun success() {
-    val obj = JsonNull
+    val obj = JsrNull
     mockNullSchema.build()
         .validating(obj)
         .isValid()

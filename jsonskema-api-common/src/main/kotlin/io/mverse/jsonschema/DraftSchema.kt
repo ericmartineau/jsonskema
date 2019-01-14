@@ -1,9 +1,9 @@
 package io.mverse.jsonschema
 
 import io.mverse.jsonschema.enums.JsonSchemaType
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
 import lang.collection.SetMultimap
+import lang.json.JsrArray
+import lang.json.JsrValue
 
 /**
  * This interface provides convenience methods for retrieving subschemas in the same version as the
@@ -15,9 +15,9 @@ interface DraftSchema<SELF : DraftSchema<SELF>> : Schema {
 
   val types: Set<JsonSchemaType>
 
-  val enumValues: kotlinx.serialization.json.JsonArray?
+  val enumValues: JsrArray?
 
-  val defaultValue: JsonElement?
+  val defaultValue: JsrValue?
 
   val format: String?
 

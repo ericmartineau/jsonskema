@@ -16,7 +16,6 @@ data class AdditionalPropertiesKeywordDigester(
     override val includedKeywords: List<KeywordInfo<SingleSchemaKeyword>> = listOf(Keywords.ADDITIONAL_PROPERTIES)
 ) : KeywordDigester<SingleSchemaKeyword> {
 
-
   override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder,
                               schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<SingleSchemaKeyword>? {
     val additionalProperties = jsonObject.path(Keywords.ADDITIONAL_PROPERTIES)

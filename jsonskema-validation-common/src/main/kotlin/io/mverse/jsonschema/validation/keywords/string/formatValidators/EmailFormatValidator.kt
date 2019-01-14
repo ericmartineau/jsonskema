@@ -15,8 +15,8 @@
  */
 package io.mverse.jsonschema.validation.keywords.string.formatValidators
 
-import io.mverse.jsonschema.validation.FormatValidator
 import io.mverse.jsonschema.formats.FormatChecks
+import io.mverse.jsonschema.validation.FormatValidator
 import lang.string.format
 
 /**

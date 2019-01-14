@@ -95,8 +95,6 @@ class SchemaValidatorFactoryImpl(private val validatorCache: MutableMap<URI, Sch
 
   override fun getFormatValidator(input: String): FormatValidator? = customFormatValidators[input]
 
-
-
   companion object {
 
     val DEFAULT_VALIDATOR_FACTORY: SchemaValidatorFactory = SchemaValidatorFactoryBuilder().build()
@@ -173,7 +171,7 @@ class SchemaValidatorFactoryBuilder {
    * todo: Find a better way to do this in kotlin.  The main reason for the generics is enforcing that
    * the validator being created works for the keyword it thinks its for
    */
-  inline fun <reified K : Keyword<*>, reified V : KeywordValidator<K>> addValidator(keyword: KeywordInfo<K>, noinline creator:(K, Schema, SchemaValidatorFactory) -> V?): SchemaValidatorFactoryBuilder {
+  inline fun <reified K : Keyword<*>, reified V : KeywordValidator<K>> addValidator(keyword: KeywordInfo<K>, noinline creator: (K, Schema, SchemaValidatorFactory) -> V?): SchemaValidatorFactoryBuilder {
     factories.add(keyword, KeywordValidatorCreator(creator))
     return this
   }
@@ -190,8 +188,8 @@ class SchemaValidatorFactoryBuilder {
     return this
   }
 
-  fun addCustomFormatValidator(format: String, formatValidator: (String)->String?): SchemaValidatorFactoryBuilder {
-    return addCustomFormatValidator(format, object:FormatValidator {
+  fun addCustomFormatValidator(format: String, formatValidator: (String) -> String?): SchemaValidatorFactoryBuilder {
+    return addCustomFormatValidator(format, object : FormatValidator {
       override fun validate(subject: String): String? = formatValidator(subject)
     })
   }

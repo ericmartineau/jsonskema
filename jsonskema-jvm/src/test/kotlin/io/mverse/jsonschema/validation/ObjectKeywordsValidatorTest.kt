@@ -19,11 +19,13 @@ import assertk.assert
 import assertk.assertions.hasSize
 import assertk.assertions.hasToString
 import assertk.assertions.isEqualTo
+import io.mverse.json.jsr353.clean
+import io.mverse.json.jsr353.raw
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.keyword.Keywords
-import io.mverse.jsonschema.loading.parseKtJson
-import io.mverse.jsonschema.loading.parseKtObject
+import io.mverse.jsonschema.loading.parseJsrJson
+import io.mverse.jsonschema.loading.parseJsrObject
 import io.mverse.jsonschema.minus
 import io.mverse.jsonschema.resourceLoader
 import io.mverse.jsonschema.validation.ValidationMocks.createTestValidator
@@ -43,7 +45,9 @@ import io.mverse.jsonschema.validation.ValidationTestSupport.verifyFailure
 import kotlinx.serialization.json.json
 import lang.collection.plus
 import lang.collection.size
-import lang.json.toJsonLiteral
+import lang.json.JsrValue
+import lang.json.jsrObject
+import lang.json.toJsrValue
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -51,7 +55,7 @@ import org.junit.Test
 
 class ObjectKeywordsValidatorTest {
 
-  private lateinit var objectTestCases: kotlinx.serialization.json.JsonObject
+  private lateinit var objectTestCases: lang.json.JsrObject
 
   @Before
   fun before() {
@@ -61,7 +65,7 @@ class ObjectKeywordsValidatorTest {
   @Test
   fun additionalPropertiesOnEmptyObject() {
 
-    val input = objectTestCases.getObject("emptyObject")
+    val input:JsrValue = objectTestCases.raw["emptyObject"]
     val testSchema = mockObjectSchema {
       schemaOfAdditionalProperties = mockBooleanSchema
     }
@@ -73,7 +77,7 @@ class ObjectKeywordsValidatorTest {
   fun maxPropertiesFailure() {
     val subject = buildWithLocation(mockObjectSchema.apply { maxProperties = 2 })
     failureOf(subject)
-        .input(objectTestCases.getObject("maxPropertiesFailure"))
+        .input(objectTestCases.raw.get<JsrValue>("maxPropertiesFailure"))
         .expectedPointer("#")
         .expectedKeyword("maxProperties")
         .expect()
@@ -83,7 +87,7 @@ class ObjectKeywordsValidatorTest {
   fun minPropertiesFailure() {
     val subject = buildWithLocation(mockObjectSchema.apply { minProperties = 2 })
     failureOf(subject)
-        .input(objectTestCases.getObject("minPropertiesFailure"))
+        .input(objectTestCases.raw.get<JsrValue>("minPropertiesFailure"))
         .expectedPointer("#")
         .expectedKeyword("minProperties")
         .expect()
@@ -106,7 +110,7 @@ class ObjectKeywordsValidatorTest {
       }
     }
 
-    val e = verifyFailure { ValidationMocks.createTestValidator(subject).validate(objectTestCases["schemaDepViolation"]) }
+    val e = verifyFailure { ValidationMocks.createTestValidator(subject).validate(objectTestCases["schemaDepViolation"] as JsrValue) }
     var creditCardFailure = e.causes[0]
     var ageFailure = e.causes[1]
     // due to schemaDeps being stored in (unsorted) HashMap, the exceptions may need to be swapped
@@ -135,7 +139,8 @@ class ObjectKeywordsValidatorTest {
       requiredProperties += "boolProp"
     }
 
-    val e = verifyFailure { ValidationMocks.createTestValidator(subject).validate(objectTestCases.get("multipleViolations")) }
+    val e = verifyFailure { ValidationMocks.createTestValidator(subject)
+        .validate(objectTestCases.get("multipleViolations") as JsrValue) }
 
     assertEquals(3, e.causes.size)
     assertEquals(1, countCauseByJsonPointer(e, "#"))
@@ -165,7 +170,7 @@ class ObjectKeywordsValidatorTest {
     val nested1 = newBuilder().apply { properties["nested"] = nested2 }
     val subject = newBuilder().invoke { properties["nested"] = nested1 }
 
-    val subjectException = verifyFailure { ValidationMocks.createTestValidator(subject).validate(objectTestCases.get("multipleViolationsNested")) }
+    val subjectException = verifyFailure { ValidationMocks.createTestValidator(subject).validate(objectTestCases.raw.get<JsrValue>("multipleViolationsNested")) }
 
     assertEquals("#: 9 schema violations found", subjectException.message)
     assertEquals(4, subjectException.causes.size)
@@ -209,14 +214,14 @@ class ObjectKeywordsValidatorTest {
 
   @Test
   fun noProperties() {
-    expectSuccess { ValidationMocks.createTestValidator(mockObjectSchema {}).validate(objectTestCases["noProperties"]) }
+    expectSuccess { ValidationMocks.createTestValidator(mockObjectSchema {}).validate(objectTestCases.raw.get<JsrValue>("noProperties")) }
   }
 
   @Test
   fun notRequireObject() {
     expectSuccess {
       val objectSchema = mockSchema {}
-      ValidationMocks.createTestValidator(objectSchema).validate("foo".toJsonLiteral())
+      ValidationMocks.createTestValidator(objectSchema).validate("foo".toJsrValue())
     }
   }
 
@@ -225,7 +230,7 @@ class ObjectKeywordsValidatorTest {
     val schema = mockObjectSchema {
       patternProperties["b_.*"] = mockBooleanSchema
     }
-    expectSuccess { ValidationMocks.createTestValidator(schema).validate(json {}) }
+    expectSuccess { ValidationMocks.createTestValidator(schema).validate(jsrObject {}) }
   }
 
   @Test
@@ -234,7 +239,7 @@ class ObjectKeywordsValidatorTest {
       schemaOfAdditionalProperties = mockNumberSchema
       patternProperties["aa.*"] = mockBooleanSchema
     }
-    expectSuccess { ValidationMocks.createTestValidator(schema).validate(objectTestCases["patternPropertyOverridesAdditionalPropSchema"]) }
+    expectSuccess { ValidationMocks.createTestValidator(schema).validate(objectTestCases["patternPropertyOverridesAdditionalPropSchema"] as JsrValue) }
   }
 
   @Test
@@ -244,17 +249,17 @@ class ObjectKeywordsValidatorTest {
       patternProperties["^s_.*"] = mockStringSchema
     }
     expectFailure(subject, mockBooleanSchema.build(), "#/b_1",
-        objectTestCases["patternPropertyViolation"])
+        objectTestCases["patternPropertyViolation"] as JsrValue)
   }
 
   @Test
   fun patternPropsOverrideAdditionalProps() {
     val schema = mockObjectSchema.build {
       patternProperties["^v.*"] = mockSchema
-      schemaOfAdditionalProperties = mockBooleanSchema.apply { constValue = false.toJsonLiteral() }
+      schemaOfAdditionalProperties = mockBooleanSchema.apply { constValue = false.toJsrValue() }
 
     }
-    expectSuccess { createTestValidator(schema).validate(objectTestCases["patternPropsOverrideAdditionalProps"]) }
+    expectSuccess { createTestValidator(schema).validate(objectTestCases["patternPropsOverrideAdditionalProps"] as JsrValue) }
   }
 
   @Test
@@ -281,7 +286,7 @@ class ObjectKeywordsValidatorTest {
       propertyNameSchema = testSchema
     }
     failureOf(subject)
-        .input(objectTestCases.getObject("propertyNameSchemaViolation"))
+        .input(objectTestCases["propertyNameSchemaViolation"] as JsrValue)
         .expectedConsumer { error ->
           Assert.assertEquals("#", error.schemaLocation.toString())
           Assert.assertEquals(3, error.violationCount)
@@ -298,12 +303,12 @@ class ObjectKeywordsValidatorTest {
     }
 
     expectFailure(subject, mockBooleanSchema.build(), "#/boolProp",
-        objectTestCases.get("propertySchemaViolation"))
+        objectTestCases.get("propertySchemaViolation") as JsrValue)
   }
 
   @Test
   fun requireObject() {
-    expectFailure(mockObjectSchema.build {}, "#", "foo".toJsonLiteral())
+    expectFailure(mockObjectSchema.build {}, "#", "foo".toJsrValue())
   }
 
   @Test
@@ -338,7 +343,7 @@ class ObjectKeywordsValidatorTest {
     }
 
     expectFailure(subject, billingAddressSchema.build(), "#/billing_address",
-        objectTestCases.get("schemaDepViolation"))
+        objectTestCases.get("schemaDepViolation") as JsrValue)
   }
 
   @Test
@@ -348,7 +353,7 @@ class ObjectKeywordsValidatorTest {
     }
 
     val e = verifyFailure {
-      val testValue = 1.toJsonLiteral()
+      val testValue = 1.toJsrValue()
       ValidationMocks.createTestValidator(subject).validate(testValue)
     }
     assert(e.schemaLocation).hasToString("#/dependencies/a")
@@ -382,28 +387,28 @@ class ObjectKeywordsValidatorTest {
   fun toStringNoAdditionalProperties() {
     val rawSchemaJson = readResourceAsJson("tostring/objectschema.json")
     val actual = JsonSchema.createSchemaReader().readSchema(rawSchemaJson).toString()
-    assertEquals(rawSchemaJson, actual.parseKtObject())
+    assertEquals(rawSchemaJson, actual.parseJsrObject())
   }
 
   @Test
   fun toStringNoExplicitType() {
     val rawSchemaJson = readResourceAsJson("tostring/objectschema.json") - "type"
     val actual = JsonSchema.createSchemaReader().readSchema(rawSchemaJson).toString()
-    assertEquals(rawSchemaJson, actual.parseKtJson())
+    assertEquals(rawSchemaJson, actual.parseJsrJson())
   }
 
   @Test
   fun toStringSchemaDependencies() {
     val rawSchemaJson = readResourceAsJson("tostring/objectschema-schemadep.json")
     val actual = JsonSchema.createSchemaReader().readSchema(rawSchemaJson).toString()
-    assertEquals(rawSchemaJson, actual.parseKtJson())
+    assertEquals(rawSchemaJson, actual.parseJsrJson())
   }
 
   @Test
   fun toStringTest() {
     val rawSchemaJson = readResourceAsJson("tostring/objectschema.json")
     val actual = JsonSchema.createSchemaReader().readSchema(rawSchemaJson).toString()
-    assertEquals(rawSchemaJson, actual.parseKtJson())
+    assertEquals(rawSchemaJson, actual.parseJsrJson())
   }
 
   @Test
@@ -414,7 +419,7 @@ class ObjectKeywordsValidatorTest {
         .expect()
   }
 
-  internal fun readResourceAsJson(url: String): kotlinx.serialization.json.JsonObject {
+  internal fun readResourceAsJson(url: String): lang.json.JsrObject {
     return JsonSchema.resourceLoader().readJsonObject(url)
   }
 }

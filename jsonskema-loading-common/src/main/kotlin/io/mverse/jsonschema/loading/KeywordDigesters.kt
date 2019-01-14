@@ -58,12 +58,7 @@ import io.mverse.jsonschema.loading.keyword.versions.flex.AdditionalPropertiesBo
 import io.mverse.jsonschema.loading.keyword.versions.flex.AdditionalPropertiesKeywordDigester
 import io.mverse.jsonschema.loading.keyword.versions.flex.LimitBooleanKeywordDigester
 import io.mverse.jsonschema.loading.keyword.versions.flex.LimitKeywordDigester
-import kotlinx.serialization.json.ElementType.ARRAY
-import kotlinx.serialization.json.ElementType.BOOLEAN
-import kotlinx.serialization.json.ElementType.NULL
-import kotlinx.serialization.json.ElementType.NUMBER
-import kotlinx.serialization.json.ElementType.OBJECT
-import kotlinx.serialization.json.ElementType.STRING
+import lang.json.JsrType
 
 interface KeywordDigesters {
   companion object {
@@ -76,7 +71,7 @@ interface KeywordDigesters {
           StringKeywordDigester(TITLE),
           StringKeywordDigester(DESCRIPTION),
           MapKeywordDigester(DEFINITIONS),
-          JsonValueKeywordDigester(DEFAULT, ARRAY, OBJECT, STRING, BOOLEAN, NUMBER, NULL),
+          JsonValueKeywordDigester(DEFAULT, JsrType.ARRAY, JsrType.OBJECT, JsrType.STRING, JsrType.BOOLEAN, JsrType.NUMBER, JsrType.NULL),
           MapKeywordDigester(PROPERTIES),
           NumberKeywordDigester(MAX_PROPERTIES),
           StringSetKeywordDigester(REQUIRED),
@@ -105,7 +100,7 @@ interface KeywordDigesters {
           SingleSchemaKeywordDigester(CONTAINS),
           JsonArrayKeywordDigester(ENUM),
           JsonArrayKeywordDigester(EXAMPLES),
-          JsonValueKeywordDigester(CONST, ARRAY, OBJECT, STRING, BOOLEAN, NUMBER, NULL),
+          JsonValueKeywordDigester(CONST, JsrType.ARRAY, JsrType.OBJECT, JsrType.STRING, JsrType.BOOLEAN, JsrType.NUMBER, JsrType.NULL),
           SingleSchemaKeywordDigester(NOT),
           ListKeywordDigester(ALL_OF),
           ListKeywordDigester(ANY_OF),

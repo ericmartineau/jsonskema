@@ -8,7 +8,8 @@ import io.mverse.jsonschema.builder.JsonSchemaBuilder
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.keyword.Keywords.REF
 import io.mverse.jsonschema.utils.JsonUtils
-import kotlinx.serialization.json.JsonObject
+import lang.json.JsrObject
+import lang.json.unbox
 import lang.net.URI
 
 /**
@@ -20,8 +21,7 @@ data class SubSchemaLoader(val extraKeywordLoaders: List<KeywordDigester<*>>,
                            val strict: Boolean,
                            val schemaLoader: SchemaLoader) {
 
-
-  val versions:Set<JsonSchemaVersion> = when {
+  val versions: Set<JsonSchemaVersion> = when {
     defaultVersions == null || defaultVersions.isEmpty() -> JsonSchemaVersion.publicVersions.toSet()
     else -> defaultVersions
   }
@@ -32,7 +32,6 @@ data class SubSchemaLoader(val extraKeywordLoaders: List<KeywordDigester<*>>,
       strict = strict,
       schemaLoader = schemaLoader)
 
-
   /**
    * Extracts all keywords from a json document, reports any issues to the provided LoadingReport.
    *
@@ -41,7 +40,7 @@ data class SubSchemaLoader(val extraKeywordLoaders: List<KeywordDigester<*>>,
    * @param loadingReport The report to write validation into
    * @return A builder loaded up with all the keywords.
    */
-  fun subSchemaBuilder(schemaJson: JsonValueWithPath, rootDocument: JsonObject, loadingReport: LoadingReport): SchemaBuilder {
+  fun subSchemaBuilder(schemaJson: JsonValueWithPath, rootDocument: JsrObject, loadingReport: LoadingReport): SchemaBuilder {
     // #############################################
     // #####  $ref: Overrides everything    ########
     // #############################################
@@ -49,14 +48,14 @@ data class SubSchemaLoader(val extraKeywordLoaders: List<KeywordDigester<*>>,
     if (schemaJson.containsKey(REF.key)) {
       //Ignore all other keywords when encountering a ref
       val ref = schemaJson[REF.key]
-      return refSchemaBuilder(URI(ref.primitive.content), rootDocument, schemaJson.location)
+      return refSchemaBuilder(URI(ref.unbox()), rootDocument, schemaJson.location)
     }
 
     val schemaBuilder = JsonUtils.extractIdFromObject(schemaJson.jsonObject!!)
-        ?.let { schemaBuilder(schemaJson.location, it)}
+        ?.let { schemaBuilder(schemaJson.location, it) }
         ?: schemaBuilder(schemaJson.location)
     schemaBuilder.also {
-      it.currentDocument =rootDocument
+      it.currentDocument = rootDocument
       it.loadingReport = loadingReport
     }
 
@@ -73,7 +72,7 @@ data class SubSchemaLoader(val extraKeywordLoaders: List<KeywordDigester<*>>,
     return JsonSchemaBuilder(location).also { it.schemaLoader = this.schemaLoader }
   }
 
-  internal fun refSchemaBuilder(ref: URI, currentDocument: JsonObject, location: SchemaLocation): SchemaBuilder {
+  internal fun refSchemaBuilder(ref: URI, currentDocument: JsrObject, location: SchemaLocation): SchemaBuilder {
     return JsonSchemaBuilder(location).also {
       it.currentDocument = currentDocument
       it.schemaLoader = this.schemaLoader

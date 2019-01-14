@@ -22,7 +22,7 @@ import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.getValidator
 import io.mverse.jsonschema.keyword.Keywords.EXCLUSIVE_MAXIMUM
-import io.mverse.jsonschema.loading.parseKtObject
+import io.mverse.jsonschema.loading.parseJsrObject
 import io.mverse.jsonschema.minus
 import io.mverse.jsonschema.plus
 import io.mverse.jsonschema.resourceLoader
@@ -31,7 +31,11 @@ import io.mverse.jsonschema.validation.ValidationMocks.mockNumberSchema
 import io.mverse.jsonschema.validation.ValidationMocks.mockSchema
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import kotlinx.serialization.json.JsonNull
-import lang.json.toJsonLiteral
+import lang.json.JsrNull
+import lang.json.JsrObject
+import lang.json.jsrNumber
+import lang.json.toJsrValue
+import lang.json.toJsrValue
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -42,7 +46,7 @@ class NumberSchemaTest {
   @Test
   fun exclusiveMaximum() {
     val schema = mockNumberSchema.build { exclusiveMaximum = (20) }
-    schema.validating(20.toJsonLiteral())
+    schema.validating(jsrNumber(20))
         .isNotValid()
         .hasKeyword(EXCLUSIVE_MAXIMUM)
   }
@@ -59,7 +63,7 @@ class NumberSchemaTest {
   @Test
   fun longNumber() {
     val schema = mockNumberSchema.build()
-    JsonSchema.getValidator(schema).validate(4278190207L.toJsonLiteral())
+    JsonSchema.getValidator(schema).validate(4278190207L.toJsrValue())
   }
 
   @Test
@@ -92,19 +96,19 @@ class NumberSchemaTest {
   @Test
   fun notRequiresNumber() {
     val numberSchema = mockSchema.build()
-    expectSuccess { JsonSchema.getValidator(numberSchema).validate("foo".toJsonLiteral()) }
+    expectSuccess { JsonSchema.getValidator(numberSchema).validate("foo".toJsrValue()) }
   }
 
   @Test
   fun requiresIntegerSuccess() {
     val numberSchema = mockNumberSchema.build()
-    expectSuccess { JsonSchema.getValidator(numberSchema).validate(10.toJsonLiteral()) }
+    expectSuccess { JsonSchema.getValidator(numberSchema).validate(10.toJsrValue()) }
   }
 
   @Test
   fun requiresIntegerFailure() {
     val subject = mockIntegerSchema.build()
-    ValidationTestSupport.expectFailure(subject, 10.2f.toJsonLiteral())
+    ValidationTestSupport.expectFailure(subject, jsrNumber(10.2))
   }
 
   @Test
@@ -113,7 +117,7 @@ class NumberSchemaTest {
       multipleOf = 0.0001
     }
 
-    JsonSchema.getValidator(schema).validate(0.0075.toJsonLiteral())
+    JsonSchema.getValidator(schema).validate(0.0075.toJsrValue())
   }
 
   @Test
@@ -124,7 +128,7 @@ class NumberSchemaTest {
       multipleOf = (10)
     }
 
-    JsonSchema.getValidator(schema).validate(10.0.toJsonLiteral())
+    JsonSchema.getValidator(schema).validate(10.0.toJsrValue())
   }
 
   @Test
@@ -132,28 +136,28 @@ class NumberSchemaTest {
     val rawSchemaJson = loader.readJsonObject("tostring/numberschema.json") - "type"
     val schemaFromJson = JsonSchema.createSchemaReader().readSchema(rawSchemaJson)
     val actual = schemaFromJson.toString()
-    assertEquals(rawSchemaJson, actual.parseKtObject())
+    assertEquals(rawSchemaJson, actual.parseJsrObject())
   }
 
   @Test
   fun toStringReqInteger() {
-    val rawSchemaJson: kotlinx.serialization.json.JsonObject = loader.readJsonObject("tostring/numberschema.json") + ("type" to "number".toJsonLiteral())
+    val rawSchemaJson: JsrObject = loader.readJsonObject("tostring/numberschema.json") + ("type" to "number".toJsrValue())
     val actual = JsonSchema.createSchemaReader().readSchema(rawSchemaJson).toString()
-    assertEquals(rawSchemaJson, actual.parseKtObject())
+    assertEquals(rawSchemaJson, actual.parseJsrObject())
   }
 
   @Test
   fun toStringTest() {
     val rawSchemaJson = loader.readJsonObject("tostring/numberschema.json")
     val actual = JsonSchema.createSchemaReader().readSchema(rawSchemaJson).toString()
-    assertEquals(rawSchemaJson, actual.parseKtObject())
+    assertEquals(rawSchemaJson, actual.parseJsrObject())
   }
 
   @Test
   fun typeFailure() {
     ValidationTestSupport.failureOf(mockNumberSchema)
         .expectedKeyword("type")
-        .input(JsonNull)
+        .input(JsrNull)
         .expect()
   }
 }

@@ -7,7 +7,6 @@ import io.mverse.jsonschema.keyword.Keywords.ADDITIONAL_PROPERTIES
 import io.mverse.jsonschema.keyword.SingleSchemaKeyword
 import io.mverse.jsonschema.validation.SchemaValidator
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
-import io.mverse.jsonschema.validation.ValidationError
 import io.mverse.jsonschema.validation.ValidationReport
 
 class AdditionalPropertiesValidator(keyword: SingleSchemaKeyword, schema: Schema, factory: SchemaValidatorFactory) : KeywordValidator<SingleSchemaKeyword>(Keywords.ADDITIONAL_PROPERTIES, schema) {
@@ -46,7 +45,7 @@ class AdditionalPropertiesValidator(keyword: SingleSchemaKeyword, schema: Schema
         }
       }
     }
-    invalidProps.forEach { (subject, errors)->
+    invalidProps.forEach { (subject, errors) ->
       parentReport += buildKeywordFailure(subject)
           .copy(keyword = ADDITIONAL_PROPERTIES,
               code = "validation.keyword.additionalProperties",

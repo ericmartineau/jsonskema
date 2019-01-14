@@ -8,10 +8,10 @@ import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.KeywordLoader
 import kotlinx.io.InputStream
 import kotlinx.serialization.internal.readToByteBuffer
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonTreeParser
 import lang.Name
+import lang.json.JsrObject
+import lang.json.JsrValue
+import lang.json.parseJsrValue
 import lang.net.URI
 import lang.string.Charsets
 import lang.string.toString
@@ -28,7 +28,7 @@ interface SchemaReader {
   val documentClient: JsonDocumentClient
 
   fun withDocumentClient(documentClient: JsonDocumentClient): SchemaReader
-  fun withPreloadedDocument(schemaObject: kotlinx.serialization.json.JsonObject): SchemaReader = this + schemaObject
+  fun withPreloadedDocument(schemaObject: lang.json.JsrObject): SchemaReader = this + schemaObject
   fun withStrictValidation(vararg versions: JsonSchemaVersion): SchemaReader
 
   fun <K : Keyword<*>> withCustomKeywordLoader(keyword: KeywordInfo<K>,
@@ -39,7 +39,7 @@ interface SchemaReader {
   @Name("readSchemaFromStream")
   fun readSchema(inputStream: InputStream): Schema {
     try {
-      return readSchema(inputStream.parseKtObject())
+      return readSchema(inputStream.parseJsrObject())
     } finally {
       inputStream.close()
     }
@@ -59,26 +59,26 @@ interface SchemaReader {
   }
 
   @Name("readSchemaFromJsonObject")
-  fun readSchema(jsonObject: JsonObject, loadingReport: LoadingReport = LoadingReport()): Schema {
+  fun readSchema(jsonObject: JsrObject, loadingReport: LoadingReport = LoadingReport()): Schema {
     val jsonDocument = fromJsonValue(jsonObject)
     return loader.schemaBuilder(jsonDocument, loadingReport).build()
   }
 
   @Name("readSchemaFromString")
   fun readSchema(inputJson: String): Schema {
-    return readSchema(inputJson.parseKtObject())
+    return readSchema(inputJson.parseJsrObject())
   }
 
-  operator fun plus(document: JsonObject): SchemaReader
-  operator fun plus(document: InputStream): SchemaReader = this + document.parseKtObject()
-  operator fun plus(document: String): SchemaReader = this + document.parseKtObject()
+  operator fun plus(document: JsrObject): SchemaReader
+  operator fun plus(document: InputStream): SchemaReader = this + document.parseJsrObject()
+  operator fun plus(document: String): SchemaReader = this + document.parseJsrObject()
 }
 
-fun String.parseKtObject(): JsonObject = JsonTreeParser(this).readFully().jsonObject
-fun String.parseKtJson(): JsonElement = JsonTreeParser(this).readFully()
+fun String.parseJsrObject(): JsrObject = parseJsrValue(this) as JsrObject
+fun String.parseJsrJson(): JsrValue = parseJsrValue(this)
 
-fun InputStream.parseKtObject(): JsonObject = readFully().parseKtObject()
-fun InputStream.parseKtJson(): JsonElement = readFully().parseKtJson()
+fun InputStream.parseJsrObject(): JsrObject = readFully().parseJsrObject()
+fun InputStream.parseJsrJson(): JsrValue = readFully().parseJsrJson()
 
 fun InputStream.readFully(): String {
   try {

@@ -1,7 +1,7 @@
 package io.mverse.jsonschema.keyword
 
-import kotlinx.serialization.json.JsonElement
+import lang.json.JsrValue
 
-data class JsonValueKeyword(override val value: JsonElement) : KeywordImpl<JsonElement>() {
-  override fun withValue(value: JsonElement): Keyword<JsonElement> = this.copy(value = value)
+data class JsonValueKeyword(override val value: JsrValue) : KeywordImpl<JsrValue>() {
+  override fun withValue(value: JsrValue): Keyword<JsrValue> = this.copy(value = value)
 }

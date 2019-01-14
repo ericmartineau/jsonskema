@@ -8,23 +8,23 @@ import io.mverse.jsonschema.loading.KeywordDigest
 import io.mverse.jsonschema.loading.KeywordDigester
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.ElementType
+import lang.json.JsrType
+import lang.json.JsrValue
 
 abstract class BaseKeywordDigester<T : Keyword<*>>(val keyword: KeywordInfo<T>,
-                                                   vararg expectedTypes: ElementType) : KeywordDigester<T> {
+                                                   vararg expectedTypes: JsrType) : KeywordDigester<T> {
   override val includedKeywords: List<KeywordInfo<T>> = when (expectedTypes.isNotEmpty()) {
     true -> keyword.getTypeVariants(*expectedTypes)
-    false-> listOf(keyword)
+    false -> listOf(keyword)
   }
 
   override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder, schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<T>? {
-    if(!jsonObject.containsKey(keyword.key)) return null
+    if (!jsonObject.containsKey(keyword.key)) return null
 
-    val jsonElement = jsonObject[keyword.key]
-    val keywordValue = extractKeyword(jsonElement)
+    val JsrValue = jsonObject[keyword.key]
+    val keywordValue = extractKeyword(JsrValue)
     return KeywordDigest(keyword, keywordValue)
   }
 
-  protected abstract fun extractKeyword(jsonElement: JsonElement): T
+  protected abstract fun extractKeyword(jsonValue: JsrValue): T
 }

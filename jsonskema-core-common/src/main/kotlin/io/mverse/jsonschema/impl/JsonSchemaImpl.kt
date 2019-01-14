@@ -48,23 +48,22 @@ import io.mverse.jsonschema.keyword.Keywords.TITLE
 import io.mverse.jsonschema.keyword.Keywords.TYPE
 import io.mverse.jsonschema.keyword.Keywords.UNIQUE_ITEMS
 import io.mverse.jsonschema.utils.Schemas.nullSchema
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.json
 import lang.collection.Multimaps
 import lang.collection.SetMultimap
-import lang.net.URI
-import lang.json.JsonSaver
-import lang.json.jsonArrayOf
+import lang.json.JsrArray
+import lang.json.JsrObject
+import lang.json.JsrValue
+import lang.json.jsrArrayOf
+import lang.json.jsrObject
 import lang.logging.Logger
+import lang.net.URI
 
 val log: Logger = Logger("JsonSchemaImpl")
 
 abstract class JsonSchemaImpl<D : DraftSchema<D>>(
     override val location: SchemaLocation,
     override val keywords: Map<KeywordInfo<*>, Keyword<*>> = emptyMap(),
-    override val extraProperties: Map<String, JsonElement> = emptyMap(),
+    override val extraProperties: Map<String, JsrValue> = emptyMap(),
     override val version: JsonSchemaVersion = JsonSchemaVersion.latest)
 
   : DraftSchema<D>, KeywordContainer(keywords) {
@@ -82,8 +81,8 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
   override val title: String? get() = values[TITLE]
   override val description: String? get() = values[DESCRIPTION]
   override val types: Set<JsonSchemaType> get() = values[TYPE] ?: emptySet()
-  override val enumValues: JsonArray? get() = values[ENUM]
-  override val defaultValue: JsonElement? get() = values[DEFAULT]
+  override val enumValues: JsrArray? get() = values[ENUM]
+  override val defaultValue: JsrValue? get() = values[DEFAULT]
   override val format: String? get() = values[FORMAT]
   override val minLength: Int? get() = values[MIN_LENGTH]?.toInt()
   override val maxLength: Int? get() = values[MAX_LENGTH]?.toInt()
@@ -94,7 +93,8 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
   override val minItems: Int? get() = values[MIN_ITEMS]?.toInt()
   override val maxItems: Int? get() = values[MAX_ITEMS]?.toInt()
   override val properties: Map<String, Schema> get() = values[PROPERTIES] ?: emptyMap()
-  override val patternProperties: Map<String, Schema> get() = values[PATTERN_PROPERTIES] ?: emptyMap()
+  override val patternProperties: Map<String, Schema>
+    get() = values[PATTERN_PROPERTIES] ?: emptyMap()
   override val additionalPropertiesSchema: D? get() = values[ADDITIONAL_PROPERTIES]?.toDraftVersion()
   override val requiresUniqueItems: Boolean get() = values[UNIQUE_ITEMS] ?: false
 
@@ -124,11 +124,11 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
   // ###### Base Schema Methods Implemented  ##############
   // ######################################################
 
-  override fun toJson(version: JsonSchemaVersion, includeExtraProperties: Boolean): JsonObject {
-    return json {
+  override fun toJson(version: JsonSchemaVersion, includeExtraProperties: Boolean): JsrObject {
+    return jsrObject {
       if (keywords.containsKey(REF)) {
         // Output as ref
-        REF.key to keyword(REF)?.value?.toString()
+        REF.key *= keyword(REF)?.value?.toString()!!
       } else {
         keywords.forEach { (keyword, keywordValue) ->
           if (keyword.applicableVersions.contains(version)) {
@@ -138,8 +138,8 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
           }
         }
         if (includeExtraProperties) {
-          extraProperties.forEach { (prop,value)->
-            prop to value
+          extraProperties.forEach { (prop, value) ->
+            prop *= value
           }
         }
       }
@@ -170,14 +170,14 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
   override fun toString(): String = toString(version)
 
   override fun toString(version: JsonSchemaVersion, includeExtraProperties: Boolean): String {
-    return JsonSaver().serialize(this.toJson(version, includeExtraProperties))
+    return this.toJson(version, includeExtraProperties).toString()
   }
 
   override fun toBuilder(): SchemaBuilder {
     return JsonSchemaBuilder(fromSchema = this)
   }
 
-  override fun  toBuilder(id: URI): SchemaBuilder {
+  override fun toBuilder(id: URI): SchemaBuilder {
     return JsonSchemaBuilder(fromSchema = this, id = id)
   }
 
@@ -185,10 +185,10 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
   // ###### Helper methods for subclasses (accessing keywords) ########
   // ##################################################################
 
-  protected open val examples: JsonArray get() = values[EXAMPLES] ?: jsonArrayOf()
+  protected open val examples: JsrArray get() = values[EXAMPLES] ?: jsrArrayOf()
   protected open val definitions: Map<String, Schema> get() = values[DEFINITIONS] ?: emptyMap()
-  protected open val notSchema: Schema? get() =  values[Keywords.NOT]
-  protected open val constValue: JsonElement? get() = values[Keywords.CONST]
+  protected open val notSchema: Schema? get() = values[Keywords.NOT]
+  protected open val constValue: JsrValue? get() = values[Keywords.CONST]
   protected open val allOfSchemas: List<Schema> get() = values[Keywords.ALL_OF] ?: emptyList()
   protected open val anyOfSchemas: List<Schema> get() = values[Keywords.ANY_OF] ?: emptyList()
   protected open val oneOfSchemas: List<Schema> get() = values[Keywords.ONE_OF] ?: emptyList()
@@ -204,7 +204,7 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
     get() = this[ADDITIONAL_ITEMS]?.additionalItemSchema != nullSchema
 
   protected open val isAllowAdditionalProperties: Boolean
-  get() = values[ADDITIONAL_PROPERTIES] != nullSchema
+    get() = values[ADDITIONAL_PROPERTIES] != nullSchema
 
   override fun equals(other: Any?): Boolean {
     return when {

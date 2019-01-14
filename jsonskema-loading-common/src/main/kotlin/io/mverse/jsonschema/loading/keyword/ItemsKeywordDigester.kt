@@ -11,21 +11,20 @@ import io.mverse.jsonschema.loading.KeywordDigester
 import io.mverse.jsonschema.loading.LoadingIssues.typeMismatch
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
-import kotlinx.serialization.json.ElementType.ARRAY
-import kotlinx.serialization.json.ElementType.OBJECT
+import lang.json.JsrType
 
 class ItemsKeywordDigester : KeywordDigester<ItemsKeyword> {
 
   override val includedKeywords: List<KeywordInfo<ItemsKeyword>>
-    get() = ITEMS.getTypeVariants(OBJECT, ARRAY)
+    get() = ITEMS.getTypeVariants(JsrType.OBJECT, JsrType.ARRAY)
 
   override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder,
                               schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<ItemsKeyword>? {
     val itemsValue = jsonObject.path(Keywords.ITEMS)
     when (itemsValue.type) {
-      OBJECT -> builder.allItemSchema = schemaLoader.subSchemaBuilder(itemsValue, itemsValue.rootObject, report)
-      ARRAY -> itemsValue.forEachIndex { _, idxValue ->
-        if (idxValue.type !== OBJECT) {
+      JsrType.OBJECT -> builder.allItemSchema = schemaLoader.subSchemaBuilder(itemsValue, itemsValue.rootObject, report)
+      JsrType.ARRAY -> itemsValue.forEachIndex { _, idxValue ->
+        if (idxValue.type !== JsrType.OBJECT) {
           report.error(typeMismatch(Keywords.ITEMS, idxValue))
         } else {
           builder.itemSchemas += schemaLoader.subSchemaBuilder(idxValue, idxValue.rootObject, report)

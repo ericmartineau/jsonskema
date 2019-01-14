@@ -17,7 +17,7 @@ package io.mverse.jsonschema.validation
 
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.createSchemaReader
-import io.mverse.jsonschema.loading.parseKtObject
+import io.mverse.jsonschema.loading.parseJsrObject
 import io.mverse.jsonschema.minus
 import io.mverse.jsonschema.resourceLoader
 import io.mverse.jsonschema.validation.ValidationMocks.mockSchema
@@ -26,7 +26,7 @@ import io.mverse.jsonschema.validation.ValidationTestSupport.buildWithLocation
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import io.mverse.jsonschema.validation.ValidationTestSupport.failureOf
 import io.mverse.jsonschema.validation.ValidationTestSupport.verifyFailure
-import lang.json.toJsonLiteral
+import lang.json.toJsrValue
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -52,13 +52,13 @@ class StringSchemaTest {
   fun formatSuccess() {
     val schemaValidator = validatorFactory
         .createValidator(mockStringSchema.build { format = "test-format-success" })
-    expectSuccess { schemaValidator.validate("string".toJsonLiteral()) }
+    expectSuccess { schemaValidator.validate("string".toJsrValue()) }
   }
 
   fun issue38Pattern() {
     val schema = mockStringSchema.build { pattern = "\\+?\\d+" }
     val validator = ValidationMocks.createTestValidator(schema)
-    verifyFailure { validator.validate("aaa".toJsonLiteral()) }
+    verifyFailure { validator.validate("aaa".toJsrValue()) }
   }
 
   @Test
@@ -122,14 +122,14 @@ class StringSchemaTest {
     val rawSchemaJson = JsonSchema.resourceLoader().readJsonObject("tostring/stringschema.json") - "type"
     val schema = JsonSchema.createSchemaReader().readSchema(rawSchemaJson)
     val actual = JsonSchema.createSchemaReader().readSchema(schema.toString()).toString()
-    assertEquals(rawSchemaJson, actual.parseKtObject())
+    assertEquals(rawSchemaJson, actual.parseJsrObject())
   }
 
   @Test
   fun toStringTest() {
     val rawSchemaJson = JsonSchema.resourceLoader().readJsonObject("tostring/stringschema.json")
     val actual = JsonSchema.createSchemaReader().readSchema(rawSchemaJson).toString()
-    assertEquals(rawSchemaJson, actual.parseKtObject())
+    assertEquals(rawSchemaJson, actual.parseJsrObject())
   }
 
   @Test

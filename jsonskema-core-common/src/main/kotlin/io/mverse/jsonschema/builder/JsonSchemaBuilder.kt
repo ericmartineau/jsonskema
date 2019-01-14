@@ -79,21 +79,23 @@ import io.mverse.jsonschema.loading.SchemaLoadingException
 import io.mverse.jsonschema.utils.SchemaPaths
 import io.mverse.jsonschema.utils.Schemas.nullSchema
 import io.mverse.jsonschema.utils.Schemas.nullSchemaBuilder
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
 import lang.collection.Multimaps
 import lang.collection.SetMultimap
 import lang.exception.illegalState
 import lang.hashKode
-import lang.json.toJsonElement
+import lang.json.JsrArray
+import lang.json.JsrObject
+import lang.json.JsrValue
+import lang.json.toJsrValue
+import lang.json.unboxAsAny
 import lang.net.URI
 import lang.uuid.randomUUID
 
 class JsonSchemaBuilder(
     keywords: MutableMap<KeywordInfo<*>, Keyword<*>> = mutableMapOf(),
-    override var extraProperties: Map<String, JsonElement> = emptyMap(),
+    override var extraProperties: Map<String, JsrValue> = emptyMap(),
     private val location: SchemaLocation = SchemaPaths.fromNonSchemaSource(randomUUID()),
-    override var currentDocument: kotlinx.serialization.json.JsonObject? = null,
+    override var currentDocument: JsrObject? = null,
     override var schemaLoader: SchemaLoader? = null,
     override var loadingReport: LoadingReport = LoadingReport())
   : SchemaBuilder, MutableKeywordContainer(keywords = keywords) {
@@ -158,8 +160,8 @@ class JsonSchemaBuilder(
         is String -> StringKeyword(value)
         is Number -> NumberKeyword(value)
         is Boolean -> BooleanKeyword(value)
-        is JsonArray -> JsonArrayKeyword(value)
-        is JsonElement -> JsonValueKeyword(value)
+        is JsrArray -> JsonArrayKeyword(value)
+        is JsrValue -> JsonValueKeyword(value)
         is Schema -> SingleSchemaKeyword(value)
         is List<*> -> SchemaListKeyword(value as List<Schema>)
         is Map<*, *> -> SchemaMapKeyword(value as Map<String, Schema>)
@@ -197,7 +199,7 @@ class JsonSchemaBuilder(
     get() = values[TITLE]
     set(value) = set(TITLE, value)
 
-  override var defaultValue: JsonElement?
+  override var defaultValue: JsrValue?
     get() = values[DEFAULT]
     set(value) = set(DEFAULT, value)
 
@@ -441,15 +443,15 @@ class JsonSchemaBuilder(
     get() = values[NOT]?.toBuilder()
     set(value) = set(NOT, value)
 
-  override var enumValues: JsonArray?
+  override var enumValues: JsrArray?
     get() = values[ENUM]
     set(value) = set(ENUM, value)
 
   override var const: Any?
-    get() = values[CONST]?.primitive?.literal
-    set(value) = set(CONST, value?.toJsonElement())
+    get() = values[CONST]?.unboxAsAny()
+    set(value) = set(CONST, toJsrValue(value))
 
-  override var constValue: JsonElement?
+  override var constValue: JsrValue?
     get() = values[CONST]
     set(value) = set(CONST, value)
 

@@ -16,13 +16,13 @@ import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.resourceLoader
-import kotlinx.serialization.json.JsonElement
+import lang.json.JsrValue
 
 typealias Draft7Assert = Assert<Draft7Schema>
 typealias SchemaAssert = Assert<Schema>
 
 fun Schema.asserting(): SchemaAssert = assert(this)
-fun Schema.validating(input:JsonElement): SchemaValidationAssert = assert(this).validating(input)
+fun Schema.validating(input:JsrValue?): SchemaValidationAssert = assert(this).validating(input)
 
 fun Assert<Schema>.isDraft7(): Draft7Assert {
   assert(actual.version, "schema.version")
@@ -79,9 +79,9 @@ fun SchemaAssert.hasProperty(property: String): Draft7Assert {
   return assert(propSchema!!)
 }
 
-fun SchemaAssert.validating(toValidate: JsonElement): SchemaValidationAssert {
+fun SchemaAssert.validating(toValidate: JsrValue?): SchemaValidationAssert {
   val validator = ValidationMocks.createTestValidator(actual)
-  val result = validator.validate(toValidate)
+  val result = validator.validate(toValidate!!)
   return assert(result)
 }
 

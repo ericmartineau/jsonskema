@@ -3,8 +3,7 @@ package io.mverse.jsonschema.loading
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.keyword.KeywordInfo
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonNull
+import lang.json.JsrValue
 
 object LoadingIssues {
 
@@ -17,7 +16,7 @@ object LoadingIssues {
         arguments = listOf(foundKeywordName))
   }
 
-  fun typeMismatch(keyword: KeywordInfo<*>, value: JsonElement, location: SchemaLocation): LoadingIssue {
+  fun typeMismatch(keyword: KeywordInfo<*>, value: JsrValue, location: SchemaLocation): LoadingIssue {
     return LoadingIssue(
         code = "keyword.type.mismatch",
         value = value,

@@ -15,7 +15,6 @@
  */
 package io.mverse.jsonschema.validation
 
-
 /**
  * Implementations perform the validation against the "format" keyword (see JSON Schema spec section
  * 7).

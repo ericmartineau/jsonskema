@@ -7,6 +7,7 @@ import io.mverse.jsonschema.keyword.NumberKeyword
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.ValidationReport
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
+import lang.json.values
 
 data class ArrayMaxItemsValidator(val number: NumberKeyword,
                                   override val schema: Schema,
@@ -20,7 +21,7 @@ data class ArrayMaxItemsValidator(val number: NumberKeyword,
   }
 
   override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
-    val actualLength = subject.jsonArray!!.size
+    val actualLength = subject.jsonArray!!.values.size
 
     if (actualLength > maxItems) {
       parentReport += buildKeywordFailure(subject)

@@ -30,8 +30,9 @@ import io.mverse.jsonschema.validation.ValidationMocks.mockNullSchema
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import io.mverse.jsonschema.validation.ValidationTestSupport.verifyFailure
 import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
+import lang.json.JsrObject
 import lang.json.JsonPath
+import lang.json.JsrNull
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -134,7 +135,7 @@ class ValidationErrorTest {
         pointerToViolation = null)
     val actual = subject.toJson()
 
-    actual["pointerToViolation"].assertThat().isEqualTo(JsonNull)
+    actual["pointerToViolation"].assertThat().isEqualTo(JsrNull)
   }
 
   @Test
@@ -220,7 +221,7 @@ class ValidationErrorTest {
   private fun String.toJsonPointer(): JsonPath = JsonPath.fromURI(this)
 }
 
-fun assertk.Assert<JsonObject>.isEqualTo(other: JsonObject, path: String = "") {
+fun assertk.Assert<JsrObject>.isEqualTo(other: JsrObject, path: String = "") {
   val prefix = if (!path.isBlank()) "" else "$path: "
 
   if (actual.keys != other.keys) {
@@ -232,7 +233,7 @@ fun assertk.Assert<JsonObject>.isEqualTo(other: JsonObject, path: String = "") {
     actual.forEach { (k, v) ->
       val otherAtKey = other[k]
       when {
-        v is JsonObject && otherAtKey is JsonObject -> assert(v).isEqualTo(otherAtKey, "$path/$k")
+        v is JsrObject && otherAtKey is JsrObject -> assert(v).isEqualTo(otherAtKey, "$path/$k")
         else -> assert(v, "Value for key '$k'").isEqualTo(otherAtKey)
       }
     }

@@ -8,7 +8,7 @@ import io.mverse.jsonschema.defaultValidatorFactory
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.schema
-import lang.json.toJsonLiteral
+import lang.json.toJsrValue
 import kotlin.test.Test
 
 class KitchenSink {
@@ -22,7 +22,7 @@ class KitchenSink {
     }
 
     val validator = defaultValidatorFactory.createValidator(schema)
-    val results = validator.validate("Bob".toJsonLiteral())
+    val results = validator.validate("Bob".toJsrValue())
     assert(results).isNotNull {
       assert(it.actual.violationCount).isEqualTo(1)
       assert(it.actual.keyword).isEqualTo(Keywords.MIN_LENGTH)

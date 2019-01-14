@@ -18,6 +18,6 @@ expect object FormatChecks {
   fun isValidPhone(str: String): Boolean
   fun isValidUriTemplate(str: String): Boolean
   fun isValidHostname(str: String): Boolean
-  fun isValidIPV4(str: String):Boolean
-  fun isValidIPV6(str: String):Boolean
+  fun isValidIPV4(str: String): Boolean
+  fun isValidIPV6(str: String): Boolean
 }

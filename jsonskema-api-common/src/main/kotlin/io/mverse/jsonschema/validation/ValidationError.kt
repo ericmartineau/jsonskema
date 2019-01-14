@@ -20,14 +20,12 @@ import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.KeywordInfoSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonPrimitive
 import lang.Name
 import lang.SerializableWith
 import lang.json.JsonPath
-import lang.json.toJsonLiteral
-import lang.json.toJsonObject
+import lang.json.JsrObject
+import lang.json.jsrObject
 import lang.json.toKtArray
 import lang.net.URI
 import lang.string.format
@@ -125,41 +123,40 @@ data class ValidationError(
   val violationCount: Int
     get() = causes.violationCount
 
-  fun toJson(withCauses: Boolean = true): kotlinx.serialization.json.JsonObject {
-    val errorJson = mutableMapOf<String, JsonElement>()
+  fun toJson(withCauses: Boolean = true): JsrObject {
+    return jsrObject {
+      if (arguments?.isNotEmpty() == true) {
+        "template" *= messageTemplate ?: JsonNull
+      }
 
-    if (arguments?.isNotEmpty() == true) {
-      errorJson["template"] = this.messageTemplate.toJsonLiteral()
+      if (code != null) {
+        "code" *= code
+      }
+
+      if (violatedSchema != null) {
+        "schemaLocation" *= schemaLocation!!.toString()
+      }
+
+      if (pointerToViolation == null) {
+        "pointerToViolation" *= JsonNull
+      } else {
+        "pointerToViolation" *= pathToViolation ?: JsonNull
+      }
+
+      if (arguments?.isNotEmpty() == true) {
+        "arguments" *= arguments.map { it.toString() }
+      }
+
+      if (keyword != null) {
+        "keyword" *= keyword.key
+      }
+
+      if (withCauses && causes.isNotEmpty()) {
+        "causes" *= causes.map { it.toJson() }
+      }
+
+      "message" *= resolvedMessage
     }
-
-    if (code != null) {
-      errorJson["code"] = JsonPrimitive(code)
-    }
-
-    if (violatedSchema != null) {
-      errorJson["schemaLocation"] = schemaLocation!!.toString().toJsonLiteral()
-    }
-
-    if (pointerToViolation == null) {
-      errorJson["pointerToViolation"] = JsonNull
-    } else {
-      errorJson["pointerToViolation"] = pathToViolation.toJsonLiteral()
-    }
-
-    if (arguments?.isNotEmpty() == true) {
-      errorJson["arguments"] = arguments.map { it.toString() }.toKtArray()
-    }
-
-    if (this.keyword != null) {
-      errorJson["keyword"] = keyword.key.toJsonLiteral()
-    }
-
-    if (withCauses && causes.isNotEmpty()) {
-      errorJson["causes"] = causes.map { it.toJson() }.toKtArray()
-    }
-
-    errorJson["message"] = this.resolvedMessage.toJsonLiteral()
-    return errorJson.toJsonObject()
   }
 
   /**

@@ -5,9 +5,16 @@ import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.validation.factory.KeywordValidatorCreator
 import io.mverse.jsonschema.validation.factory.KeywordValidatorCreators
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
-import kotlinx.serialization.json.ElementType
 import lang.collection.ListMultimap
 import lang.collection.MutableListMultimap
+import lang.json.JsrType
+import lang.json.JsrType.ARRAY
+import lang.json.JsrType.BOOLEAN
+import lang.json.JsrType.NULL
+import lang.json.JsrType.NUMBER
+import lang.json.JsrType.OBJECT
+import lang.json.JsrType.STRING
+import lang.json.JsrType.values
 
 /**
  * Main validation processing controller.  There will be a single instance of this class for each json-schema, but each
@@ -38,19 +45,19 @@ data class JsonSchemaValidator(val factories: KeywordValidatorCreators,
     validatorFactory.cacheValidator(schema.absoluteURI, this)
 
     val validators = mapValidatorsToType(schema, validatorFactory, factories)
-    this.arrayValidators = validators[ElementType.ARRAY]
-    this.objectValidators = validators[ElementType.OBJECT]
-    this.numberValidators = validators[ElementType.NUMBER]
-    this.stringValidators = validators[ElementType.STRING]
-    this.booleanValidators = validators[ElementType.BOOLEAN]
-    this.nullValidators = validators[ElementType.NULL]
+    this.arrayValidators = validators[ARRAY]
+    this.objectValidators = validators[OBJECT]
+    this.numberValidators = validators[NUMBER]
+    this.stringValidators = validators[STRING]
+    this.booleanValidators = validators[BOOLEAN]
+    this.nullValidators = validators[NULL]
 
     this.noop = validators.asMap().isEmpty()
   }
 
   /**
    * Executes this validation for the provided `subject` and appends any validation to the provided `parentReport`
-   * @param subject The JsonElement to be validated against this schema
+   * @param subject The JsrValue to be validated against this schema
    * @param parentReport The report to append any validation to
    * @return true if the `subject` passed validation
    */
@@ -84,16 +91,14 @@ data class JsonSchemaValidator(val factories: KeywordValidatorCreators,
    * @return A list of [KeywordValidator] that apply to the given subject.
    */
   internal fun findValidators(subject: JsonValueWithPath): List<KeywordValidator<*>>? {
-    val validators: List<KeywordValidator<*>>?
-    when (subject.type) {
-      ElementType.ARRAY -> validators = arrayValidators
-      ElementType.OBJECT -> validators = objectValidators
-      ElementType.STRING -> validators = stringValidators
-      ElementType.NUMBER -> validators = numberValidators
-      ElementType.BOOLEAN -> validators = booleanValidators
-      ElementType.NULL -> validators = nullValidators
+    return when (subject.type) {
+      ARRAY -> arrayValidators
+      OBJECT -> objectValidators
+      STRING -> stringValidators
+      NUMBER -> numberValidators
+      BOOLEAN -> booleanValidators
+      NULL -> nullValidators
     }
-    return validators
   }
 
   /**
@@ -108,16 +113,16 @@ data class JsonSchemaValidator(val factories: KeywordValidatorCreators,
    * @return A [ListMultimap] with the keywords sorted by their applicable types.
    */
   private fun mapValidatorsToType(schema: Schema, validatorFactory: SchemaValidatorFactory,
-                                  factories: KeywordValidatorCreators): ListMultimap<ElementType, KeywordValidator<*>> {
+                                  factories: KeywordValidatorCreators): ListMultimap<JsrType, KeywordValidator<*>> {
 
-    val validatorsByType = MutableListMultimap<ElementType, KeywordValidator<*>>()
+    val validatorsByType = MutableListMultimap<JsrType, KeywordValidator<*>>()
     schema.keywords.forEach { (keyword, keywordValue) ->
       factories[keyword].forEach { keywordFactory ->
         val keywordValidator = keywordFactory.invokeUnsafe(keywordValue, schema, validatorFactory)
         if (keywordValidator != null) {
           val applicableTypes = keyword.applicableTypes
           if (applicableTypes.isEmpty()) {
-            for (applicableType in ElementType.values()) {
+            for (applicableType in values()) {
               validatorsByType.add(applicableType, keywordValidator)
             }
           } else {

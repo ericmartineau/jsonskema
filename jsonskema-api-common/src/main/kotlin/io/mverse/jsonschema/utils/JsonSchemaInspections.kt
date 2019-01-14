@@ -4,6 +4,9 @@ import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaType
 import kotlinx.serialization.json.ElementType
 import lang.collection.runLengths
+import lang.json.JsrType
+import lang.json.type
+import lang.json.values
 
 fun Schema.calculateType(): JsonSchemaType? {
   val schema = this.asDraft6()
@@ -12,7 +15,7 @@ fun Schema.calculateType(): JsonSchemaType? {
   }
 
   val fromEnumValue = schema.enumValues?.let { array ->
-    val counts = array
+    val counts = array.values
         .map { it.type.toJsonSchemaType() }
         .distinct()
         .toList()
@@ -56,4 +59,14 @@ internal fun ElementType.toJsonSchemaType(): JsonSchemaType {
     ElementType.BOOLEAN -> JsonSchemaType.BOOLEAN
   }
 }
+
+internal fun JsrType.toJsonSchemaType(): JsonSchemaType =
+    when (this) {
+      JsrType.ARRAY -> JsonSchemaType.ARRAY
+      JsrType.OBJECT -> JsonSchemaType.OBJECT
+      JsrType.STRING -> JsonSchemaType.STRING
+      JsrType.NUMBER -> JsonSchemaType.NUMBER
+      JsrType.BOOLEAN -> JsonSchemaType.BOOLEAN
+      JsrType.NULL -> JsonSchemaType.NULL
+    }
 

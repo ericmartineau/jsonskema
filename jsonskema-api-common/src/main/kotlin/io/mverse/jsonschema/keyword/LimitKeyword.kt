@@ -2,15 +2,15 @@ package io.mverse.jsonschema.keyword
 
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft6
-import kotlinx.serialization.json.JsonBuilder
-import kotlinx.serialization.json.json
 import lang.exception.illegalState
 import lang.isIntegral
+import lang.json.MutableJsrObject
+import lang.json.jsrObject
 
 data class LimitKeyword(val keyword: KeywordInfo<LimitKeyword>,
-                      val exclusiveKeyword: KeywordInfo<LimitKeyword>,
-                      val limit: Number? = null,
-                      val exclusiveLimit: Number? = null) : Keyword<Number?> {
+                        val exclusiveKeyword: KeywordInfo<LimitKeyword>,
+                        val limit: Number? = null,
+                        val exclusiveLimit: Number? = null) : Keyword<Number?> {
 
   override fun withValue(value: Number?): Keyword<Number?> {
     return this.copy(limit = value)
@@ -18,9 +18,9 @@ data class LimitKeyword(val keyword: KeywordInfo<LimitKeyword>,
 
   override val value: Number? = limit
 
-  val isExclusive:Boolean = exclusiveLimit != null
+  val isExclusive: Boolean = exclusiveLimit != null
 
-  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
+  override fun toJson(keyword: KeywordInfo<*>, builder: MutableJsrObject, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
     when {
       version.isBefore(Draft6) -> writeDraft3And4(builder)
       version.isPublic -> writeDraft6AndUp(builder)
@@ -30,36 +30,36 @@ data class LimitKeyword(val keyword: KeywordInfo<LimitKeyword>,
 
   override fun toString(): String {
     val self = this
-    return json {
+    return jsrObject {
       self.toJson(keyword, this, JsonSchemaVersion.latest, false)
     }.toString()
   }
 
-  protected fun writeDraft6AndUp(builder: kotlinx.serialization.json.JsonBuilder) {
+  protected fun writeDraft6AndUp(builder: MutableJsrObject) {
     builder.run {
       if (limit != null) {
-        keyword.key to getWithPrecision(limit)
+        keyword.key *= getWithPrecision(limit)
       }
 
       if (exclusiveLimit != null) {
-        exclusiveKeyword.key to getWithPrecision(exclusiveLimit)
+        exclusiveKeyword.key *= getWithPrecision(exclusiveLimit)
       }
     }
   }
 
-  private fun writeDraft3And4(builder: kotlinx.serialization.json.JsonBuilder) {
+  private fun writeDraft3And4(builder: MutableJsrObject) {
     if (limit != null && exclusiveLimit != null) {
       illegalState("Draft schema version does not support number values for ${keyword.key} " +
           "and ${exclusiveKeyword.key}")
     }
     builder.apply {
       if (exclusiveLimit != null) {
-        keyword.key to getWithPrecision(exclusiveLimit)
-        exclusiveKeyword.key to true
+        keyword.key *= getWithPrecision(exclusiveLimit)
+        exclusiveKeyword.key *= true
       }
 
       if (limit != null) {
-        keyword.key to getWithPrecision(limit)
+        keyword.key *= getWithPrecision(limit)
       }
     }
   }

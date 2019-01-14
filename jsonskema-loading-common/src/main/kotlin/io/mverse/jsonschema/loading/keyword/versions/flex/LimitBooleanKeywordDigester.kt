@@ -19,7 +19,7 @@ import io.mverse.jsonschema.loading.digest
 data class LimitBooleanKeywordDigester(
     val keyword: KeywordInfo<LimitKeyword>,
     val exclusiveKeyword: KeywordInfo<LimitKeyword>,
-    val blankKeywordSupplier: ()->LimitKeyword,
+    val blankKeywordSupplier: () -> LimitKeyword,
     override val includedKeywords: List<KeywordInfo<LimitKeyword>> = listOf(keyword, exclusiveKeyword))
   : KeywordDigester<LimitKeyword> {
 
@@ -30,8 +30,8 @@ data class LimitBooleanKeywordDigester(
     val limitValue = jsonObject.path(keyword.key)
 
     val exclusiveLimit = when {
-      limitValue.number != null && exclusiveValue.boolean ?: false-> limitValue.number
-      else->exclusiveValue.number
+      limitValue.number != null && exclusiveValue.boolean ?: false -> limitValue.number
+      else -> exclusiveValue.number
     }
 
     return keyword.digest(LimitKeyword(keyword, exclusiveKeyword, limitValue.number, exclusiveLimit))

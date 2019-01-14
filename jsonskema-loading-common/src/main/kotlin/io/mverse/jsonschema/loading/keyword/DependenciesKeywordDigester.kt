@@ -11,7 +11,10 @@ import io.mverse.jsonschema.loading.LoadingIssues.typeMismatch
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
 import io.mverse.jsonschema.loading.digest
-import kotlinx.serialization.json.ElementType
+import lang.json.JsrArray
+import lang.json.JsrObject
+import lang.json.unbox
+import lang.json.values
 
 class DependenciesKeywordDigester : KeywordDigester<DependenciesKeyword> {
 
@@ -24,13 +27,14 @@ class DependenciesKeywordDigester : KeywordDigester<DependenciesKeyword> {
     val depsBuilder = DependenciesKeywordBuilder()
 
     dependencies.forEachKey { key, pathValue ->
-      when (pathValue.type) {
-        ElementType.OBJECT -> {
+      val wrapped = pathValue.wrapped
+      when (wrapped) {
+        is JsrObject -> {
           val dependencySchema = schemaLoader.loadSubSchema(pathValue, pathValue.rootObject, report)
           depsBuilder.addDependencySchema(key, dependencySchema)
         }
-        ElementType.ARRAY -> pathValue.jsonArray!!.forEach { arrayItem ->
-          depsBuilder.propertyDependency(key, arrayItem.primitive.content)
+        is JsrArray -> wrapped.values.forEach { arrayItem ->
+          depsBuilder.propertyDependency(key, arrayItem.unbox())
         }
         else -> report.error(typeMismatch(DEPENDENCIES, pathValue.wrapped, pathValue.location))
       }

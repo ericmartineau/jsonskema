@@ -2,14 +2,17 @@ package io.mverse.jsonschema.loading.keyword
 
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.StringSetKeyword
-import kotlinx.serialization.json.JsonElement
+import lang.json.JsrArray
+import lang.json.JsrValue
+import lang.json.unbox
+import lang.json.values
 
 class StringSetKeywordDigester(keyword: KeywordInfo<StringSetKeyword>) : BaseKeywordDigester<StringSetKeyword>(keyword) {
 
-  override fun extractKeyword(jsonElement: JsonElement): StringSetKeyword {
+  override fun extractKeyword(jsonValue: JsrValue): StringSetKeyword {
     val values = linkedSetOf<String>()
-    for (string in jsonElement.jsonArray) {
-      values.add(string.primitive.content)
+    for (string in (jsonValue as JsrArray).values) {
+      values.add(string.unbox())
     }
     return StringSetKeyword(values)
   }

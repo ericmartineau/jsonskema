@@ -6,33 +6,44 @@ import io.mverse.jsonschema.utils.JsonUtils.extractIdFromObject
 import io.mverse.jsonschema.utils.SchemaPaths
 import io.mverse.jsonschema.utils.toJsonSchemaType
 import kotlinx.serialization.Transient
-import kotlinx.serialization.json.ElementType
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
 import lang.Serializable
 import lang.hashKode
 import lang.json.JsonPath
+import lang.json.JsrArray
+import lang.json.JsrNull
+import lang.json.JsrObject
+import lang.json.JsrType
+import lang.json.JsrValue
+import lang.json.get
+import lang.json.jkey
+import lang.json.propNames
+import lang.json.propValues
+import lang.json.properties
+import lang.json.type
+import lang.json.unbox
+import lang.json.unboxAsAny
+import lang.json.unboxOrNull
+import lang.json.values
 import kotlinx.serialization.json.JsonArray as KJsonArray
-import kotlinx.serialization.json.JsonObject as KJsonObject
+import lang.json.JsrObject as KJsonObject
 
 /**
- * This class is used for convenience in accessing data within a JsonObject.
+ * This class is used for convenience in accessing data within a JsrObject.
  *
- * It wraps a kotlin.serialization [JsonElement] and adds some extra methods that allow more fluent usage.
+ * It wraps a kotlin.serialization [JsrValue] and adds some extra methods that allow more fluent usage.
  */
 @Serializable
 data class JsonValueWithPath(
-    val root: JsonElement,
-    val wrapped: JsonElement,
-    val location: SchemaLocation) : Map<String, JsonElement> {
+    val root: JsrValue,
+    val wrapped: JsrValue,
+    val location: SchemaLocation) : Map<String, JsrValue> {
 
-  @Transient val jsonObject: KJsonObject? get() = if (wrapped is JsonObject) wrapped else null
-  @Transient val jsonArray: KJsonArray? get() = if (wrapped is KJsonArray) wrapped else null
+  @Transient val jsonObject: JsrObject? get() = wrapped as? JsrObject
+  @Transient val jsonArray: JsrArray? get() = wrapped as? JsrArray
 
   @Transient
   val rootObject
-    get() = root.jsonObject
+    get() = root as JsrObject
 
   @Transient
   val jsonSchemaType: JsonSchemaType
@@ -40,19 +51,19 @@ data class JsonValueWithPath(
 
   @Transient
   val isBoolean: Boolean
-    get() = wrapped.booleanOrNull ?: false
+    get() = wrapped.type.name == "BOOLEAN"
 
   @Transient val isNull: Boolean
-    get() = wrapped.isNull
+    get() = wrapped.type.name == "NULL"
 
   @Transient val isNotNull: Boolean
-    get() = !wrapped.isNull
+    get() = wrapped.type.name != "NULL"
 
   @Transient val path: JsonPath
     get() = location.jsonPath
 
   override fun isEmpty(): Boolean {
-    return if (jsonObject == null) true else jsonObject!!.isEmpty()
+    return if (jsonObject == null) true else jsonObject!!.properties.isEmpty()
   }
 
   override fun equals(other: Any?): Boolean = other is JsonValueWithPath &&
@@ -64,24 +75,26 @@ data class JsonValueWithPath(
     return containsKey(keywordType.key)
   }
 
-  override val entries: Set<Map.Entry<String, JsonElement>>
-    get() = jsonObject?.entries ?: emptySet()
-  override val keys: Set<String> get() = jsonObject?.keys ?: emptySet()
-  override val values: Collection<JsonElement> get() = jsonObject?.values ?: emptySet()
+  override val entries: Set<Map.Entry<String, JsrValue>>
+    get() = jsonObject?.properties ?: emptySet()
+  override val keys: Set<String>
+    get() = jsonObject?.properties?.map { it.key }?.toSet() ?: emptySet()
+  override val values: Collection<JsrValue>
+    get() = jsonObject?.properties?.map { it.value } ?: emptySet()
 
   override fun containsKey(key: String): Boolean {
-    return jsonObject?.containsKey(key) == true
+    return jsonObject?.propNames?.contains(key) == true
   }
 
-  override fun containsValue(value: JsonElement): Boolean {
-    return jsonObject?.containsValue(value) == true
+  override fun containsValue(value: JsrValue): Boolean {
+    return jsonObject?.propValues?.contains(value) == true
   }
 
-  override operator fun get(key: String): JsonElement {
-    return if (containsKey(key)) jsonObject!![key] else JsonNull
+  override operator fun get(key: String): JsrValue {
+    return if (containsKey(key)) jsonObject!![key.jkey] else JsrNull
   }
 
-  operator fun get(prop: KeywordInfo<*>): JsonElement {
+  operator fun get(prop: KeywordInfo<*>): JsrValue {
     return this[prop.key]
   }
 
@@ -89,31 +102,31 @@ data class JsonValueWithPath(
     return path(keyword.key)
   }
 
-  @Transient override val size: Int get() = jsonObject?.size ?: 0
-  @Transient val type: ElementType get() = wrapped.type
-  @Transient val number: Number? get() = wrapped.primitive.doubleOrNull
-  @Transient val string: String? get() = wrapped.primitive.contentOrNull
-  @Transient val boolean: Boolean? get() = wrapped.primitive.booleanOrNull
-  @Transient val int: Int? get() = wrapped.primitive.intOrNull
-  @Transient val double: Double? get() = wrapped.primitive.doubleOrNull
-  @Transient val arraySize: Int get() = wrapped.jsonArray.size
+  @Transient override val size: Int get() = jsonObject?.propNames?.size ?: 0
+  @Transient val type: JsrType get() = wrapped.type
+  @Transient val number: Number? get() = wrapped.unboxOrNull() as? Number
+  @Transient val string: String? get() = if(wrapped == JsrNull) null else wrapped.unboxAsAny()?.toString()
+  @Transient val boolean: Boolean? get() = wrapped.unboxAsAny() as? Boolean
+  @Transient val int: Int? get() = wrapped.unboxAsAny() as? Int
+  @Transient val double: Double? get() = wrapped.unboxOrNull() as? Double
+  @Transient val arraySize: Int get() = (wrapped as JsrArray).values.size
 
   fun forEachIndex(action: (Int, JsonValueWithPath) -> Unit) {
     var i = 0
-    wrapped.jsonArray.forEach { v ->
+    (wrapped as JsrArray).values.forEach { v ->
       val idx = i++
       action(idx, JsonValueWithPath(root, v, location.child(idx)))
     }
   }
 
   fun forEachKey(action: (String, JsonValueWithPath) -> Unit) {
-    wrapped.jsonObject.forEach { (k, v) ->
+    (wrapped as JsrObject).properties.forEach { (k, v) ->
       action(k, fromJsonValue(root, v, location.child(k)))
     }
   }
 
   operator fun get(idx: Int): JsonValueWithPath {
-    val json: JsonElement = wrapped.jsonArray[idx]
+    val json: JsrValue = (wrapped as JsrArray).values[idx]
     return JsonValueWithPath(root, json, location.child(idx))
   }
 
@@ -132,31 +145,31 @@ data class JsonValueWithPath(
   }
 
   fun numberOfProperties(): Int {
-    return jsonObject?.keys?.size ?: 0
+    return jsonObject?.propNames?.size ?: 0
   }
 
   fun propertyNames(): Set<String> {
-    return jsonObject?.keys ?: emptySet()
+    return jsonObject?.propNames ?: emptySet()
   }
 
   companion object {
 
-    fun fromJsonValue(root: JsonElement, jsonObject: JsonElement, location: SchemaLocation): JsonValueWithPath {
+    fun fromJsonValue(root: JsrValue, jsonObject: JsrValue, location: SchemaLocation): JsonValueWithPath {
       var locationVar = location
-      if (jsonObject is JsonObject) {
-        val asJsonObject = jsonObject.jsonObject
-        locationVar = extractIdFromObject(asJsonObject, "\$id", "id")
+      if (jsonObject is JsrObject) {
+
+        locationVar = extractIdFromObject(jsonObject, "\$id", "id")
             ?.let { locationVar.withId(it) }
             ?: locationVar
       }
       return JsonValueWithPath(root, jsonObject, locationVar)
     }
 
-    fun fromJsonValue(jsonObject: JsonElement): JsonValueWithPath {
+    fun fromJsonValue(jsonObject: JsrValue): JsonValueWithPath {
 
-      if (jsonObject is kotlinx.serialization.json.JsonObject) {
+      if (jsonObject is JsrObject) {
         val schemaLocation = SchemaPaths.fromDocument(jsonObject, "\$id", "id")
-        return JsonValueWithPath(jsonObject.jsonObject, jsonObject, schemaLocation)
+        return JsonValueWithPath(jsonObject, jsonObject, schemaLocation)
       }
 
       return JsonValueWithPath(jsonObject, jsonObject, SchemaPaths.fromNonSchemaSource(jsonObject))

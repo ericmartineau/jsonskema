@@ -6,14 +6,14 @@ import io.mverse.jsonschema.keyword.JsonValueKeyword
 import io.mverse.jsonschema.keyword.Keywords.CONST
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.ValidationReport
-import kotlinx.serialization.json.JsonElement
+import lang.json.JsrValue
 
 data class ConstValidator(val keyword: JsonValueKeyword,
                           val parentSchema: Schema,
                           val factory: SchemaValidatorFactory)
   : KeywordValidator<JsonValueKeyword>(CONST, parentSchema) {
 
-  private val constValue: JsonElement? = keyword.value
+  private val constValue: JsrValue? = keyword.value
 
   override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     if (constValue != subject.wrapped) {

@@ -17,8 +17,8 @@ expect object JsonSchema {
   fun schema(id: String, block: SchemaBuilderDsl.() -> Unit = {}): Schema
   fun schema(block: SchemaBuilderDsl.() -> Unit = {}): Schema
 
-  fun createSchemaBuilder():SchemaBuilder
-  fun createSchemaBuilder(id:URI):SchemaBuilder
+  fun createSchemaBuilder(): SchemaBuilder
+  fun createSchemaBuilder(id: URI): SchemaBuilder
 }
 
 fun JsonSchema.getValidator(schema: Schema): SchemaValidator = JsonSchema.validatorFactory.createValidator(schema)

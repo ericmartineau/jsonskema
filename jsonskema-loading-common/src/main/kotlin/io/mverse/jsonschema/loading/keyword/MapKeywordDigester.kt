@@ -11,7 +11,7 @@ import io.mverse.jsonschema.loading.LoadingIssues
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
 import io.mverse.jsonschema.loading.digest
-import kotlinx.serialization.json.ElementType
+import lang.json.JsrType
 
 data class MapKeywordDigester(val keyword: KeywordInfo<SchemaMapKeyword>) : KeywordDigester<SchemaMapKeyword> {
 
@@ -22,7 +22,7 @@ data class MapKeywordDigester(val keyword: KeywordInfo<SchemaMapKeyword>) : Keyw
     val keyedSchemas = mutableMapOf<String, Schema>()
     val propObject = jsonObject.path(keyword)
     propObject.forEachKey { key, value ->
-      if (value.type !== ElementType.OBJECT) {
+      if (value.type !== JsrType.OBJECT) {
         report.error(LoadingIssues.typeMismatch(keyword, value))
       } else {
         keyedSchemas[key] = schemaLoader.loadSubSchema(value, value.rootObject, report)

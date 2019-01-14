@@ -19,9 +19,11 @@ import assertk.assert
 import assertk.assertions.hasToString
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.RefSchema
-import io.mverse.jsonschema.loading.parseKtObject
 import io.mverse.jsonschema.resourceLoader
 import io.mverse.jsonschema.createSchemaReader
+import io.mverse.jsonschema.loading.parseJsrObject
+import lang.json.JsonKey
+import lang.json.getOrNull
 import lang.net.URI
 import nl.jqno.equalsverifier.EqualsVerifier
 import nl.jqno.equalsverifier.Warning
@@ -36,7 +38,7 @@ class RefSchemaEqualsTest {
     val schema = JsonSchema.createSchemaReader().readSchema(rawSchemaJson)
     val actual = schema.toString()
 
-    assertThat(actual.parseKtObject().getOrNull("properties")).isEqualTo(rawSchemaJson["properties"])
+    assertThat(actual.parseJsrObject().getOrNull(JsonKey("properties"))).isEqualTo(rawSchemaJson["properties"])
   }
 
   @Test

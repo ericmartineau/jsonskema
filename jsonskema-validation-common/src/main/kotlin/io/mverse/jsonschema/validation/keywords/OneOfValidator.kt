@@ -2,7 +2,6 @@ package io.mverse.jsonschema.validation.keywords
 
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.Schema
-import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.ONE_OF
 import io.mverse.jsonschema.keyword.SchemaListKeyword
 import io.mverse.jsonschema.validation.SchemaValidatorFactory

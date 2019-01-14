@@ -9,7 +9,7 @@ plugins {
 }
 
 allprojects  {
-  val msharedVersion by extra { "0.5.75" }
+  val msharedVersion by extra { "0.5.98" }
 
   plugins.apply("kotlinx-serialization")
   mverse {
@@ -22,8 +22,10 @@ allprojects  {
   }
 
   tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-    kotlinOptions.suppressWarnings = true
+    kotlinOptions {
+      jvmTarget = "1.8"
+      suppressWarnings = true
+    }
   }
 
   afterEvaluate {

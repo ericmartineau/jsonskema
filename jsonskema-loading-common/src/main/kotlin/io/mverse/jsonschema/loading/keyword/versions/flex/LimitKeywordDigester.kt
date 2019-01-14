@@ -16,12 +16,11 @@ import io.mverse.jsonschema.loading.digest
  * of the schema.  This class is complicated, but it saved a sort of class explosion for keywords/validators.
  */
 
-
 data class LimitKeywordDigester(
     val keyword: KeywordInfo<LimitKeyword>,
     val exclusiveKeyword: KeywordInfo<LimitKeyword>,
     override val includedKeywords: List<KeywordInfo<LimitKeyword>> = listOf(keyword, exclusiveKeyword),
-    val blankKeywordSupplier: ()->LimitKeyword) : KeywordDigester<LimitKeyword> {
+    val blankKeywordSupplier: () -> LimitKeyword) : KeywordDigester<LimitKeyword> {
 
   override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder,
                               schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<LimitKeyword>? {

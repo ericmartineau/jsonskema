@@ -6,8 +6,8 @@ import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.utils.JsonUtils.tryParseURI
 import io.mverse.jsonschema.utils.recurse
 import io.mverse.jsonschema.utils.trimEmptyFragment
-import kotlinx.serialization.json.JsonObject
 import lang.json.JsonPath
+import lang.json.JsrObject
 import lang.net.URI
 import lang.net.resolveUri
 
@@ -19,7 +19,7 @@ import lang.net.resolveUri
  */
 data class SchemaCache(
     private val documentIdRefs: MutableMap<URI, Map<URI, JsonPath>> = hashMapOf(),
-    private val absoluteDocumentCache: MutableMap<URI, kotlinx.serialization.json.JsonObject> = hashMapOf(),
+    private val absoluteDocumentCache: MutableMap<URI, lang.json.JsrObject> = hashMapOf(),
     private val absoluteSchemaCache: MutableMap<URI, Schema> = hashMapOf()
 ) {
 
@@ -31,14 +31,14 @@ data class SchemaCache(
     absoluteSchemaCache[schemaURI.trimEmptyFragment()] = schema
   }
 
-  fun cacheDocument(documentURI: URI, document: JsonObject) {
+  fun cacheDocument(documentURI: URI, document: JsrObject) {
     val docURI = documentURI.trimEmptyFragment()
     if (docURI.isAbsolute()) {
       absoluteDocumentCache[docURI] = document
     }
   }
 
-  fun lookupDocument(documentURI: URI): kotlinx.serialization.json.JsonObject? {
+  fun lookupDocument(documentURI: URI): lang.json.JsrObject? {
     return absoluteDocumentCache[documentURI.trimEmptyFragment()]
   }
 
@@ -72,7 +72,7 @@ data class SchemaCache(
     return null
   }
 
-  fun resolveURIToDocumentUsingLocalIdentifiers(documentURI: URI, absoluteURI: URI, document: kotlinx.serialization.json.JsonObject): JsonPath? {
+  fun resolveURIToDocumentUsingLocalIdentifiers(documentURI: URI, absoluteURI: URI, document: lang.json.JsrObject): JsonPath? {
 
     val paths = documentIdRefs.getOrPut(documentURI.trimEmptyFragment()) {
       val values = hashMapOf<URI, JsonPath>()

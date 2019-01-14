@@ -2,11 +2,13 @@ package io.mverse.jsonschema.keyword
 
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
-import kotlinx.serialization.json.JsonBuilder
 import kotlinx.serialization.json.json
 import lang.collection.Multimaps
 import lang.collection.SetMultimap
-import lang.json.toKtArray
+import lang.json.MutableJsrObject
+import lang.json.createJsrArray
+import lang.json.jsrObject
+import lang.json.jsrString
 
 data class DependenciesKeyword(val dependencySchemas: SchemaMapKeyword = SchemaMapKeyword(),
                                val propertyDependencies: SetMultimap<String, String> = Multimaps.emptySetMultimap())
@@ -19,15 +21,15 @@ data class DependenciesKeyword(val dependencySchemas: SchemaMapKeyword = SchemaM
     return DependenciesKeywordBuilder(this)
   }
 
-  override fun toJson(keyword: KeywordInfo<*>, builder: JsonBuilder, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
-    builder.run {
-      Keywords.DEPENDENCIES.key to json {
+  override fun toJson(keyword: KeywordInfo<*>, builder: MutableJsrObject, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
+    builder.apply {
+      Keywords.DEPENDENCIES.key *= jsrObject {
         propertyDependencies.asMap().forEach { (prop: String, setOfDependentProps: Collection<String>) ->
-          prop to setOfDependentProps.toKtArray()
+          prop *= createJsrArray(setOfDependentProps.map { jsrString(it) })
         }
 
         dependencySchemas.value.forEach { (key, schema) ->
-          key to schema.asVersion(version).toJson()
+          key *= schema.asVersion(version).toJson()
         }
       }
     }

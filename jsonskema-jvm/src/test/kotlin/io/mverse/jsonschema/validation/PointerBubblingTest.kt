@@ -21,17 +21,20 @@ import io.mverse.jsonschema.getValidator
 import io.mverse.jsonschema.resourceLoader
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.validation.ValidationTestSupport.verifyFailure
+import lang.json.JsonKey
+import lang.json.get
 import org.junit.Assert
 import org.junit.Test
+import javax.json.JsonObject
 
 class PointerBubblingTest {
   private val allSchemas = loader.readJsonObject("testschemas.json")
-  private val rectangleSchema = JsonSchema.createSchemaReader().readSchema(allSchemas.getObject("pointerResolution"))
+  private val rectangleSchema = JsonSchema.createSchemaReader().readSchema(allSchemas[JsonKey("pointerResolution")].asJsonObject())
   private val testInputs = loader.readJsonObject("objecttestcases.json")
 
   @Test
   fun rectangleMultipleFailures() {
-    val input = testInputs.getObject("rectangleMultipleFailures")
+    val input = testInputs.get("rectangleMultipleFailures") as JsonObject
     val e = verifyFailure { JsonSchema.getValidator(rectangleSchema).validate(input) }
     Assert.assertEquals("#/rectangle", e.pathToViolation)
     Assert.assertEquals(2, e.causes.size)
@@ -41,7 +44,7 @@ class PointerBubblingTest {
 
   @Test
   fun rectangleSingleFailure() {
-    val input = testInputs.getObject("rectangleSingleFailure")
+    val input = testInputs["rectangleSingleFailure"] as JsonObject
     ValidationTestSupport.expectFailure(rectangleSchema, RefSchema::class.java, "#/rectangle/a", input)
   }
 

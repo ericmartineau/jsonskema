@@ -6,7 +6,7 @@ import assertk.assertions.isNull
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.resourceLoader
-import kotlinx.serialization.json.JsonObject
+import lang.json.JsrObject
 import lang.net.URI
 import lang.net.resolveUri
 import org.junit.Before
@@ -15,7 +15,7 @@ import org.junit.Test
 class RefSchemaLoaderImplTest {
 
   private lateinit var refSchemaLoader: RefSchemaLoader
-  private lateinit var accountProfileJson: JsonObject
+  private lateinit var accountProfileJson: JsrObject
   private lateinit var documentURI: URI
 
   @Before
@@ -76,7 +76,7 @@ class RefSchemaLoaderImplTest {
     assert(schema).isNull()
   }
 
-  private fun readResource(relativePath: String): JsonObject {
+  private fun readResource(relativePath: String): JsrObject {
     return JsonSchema.resourceLoader(this::class).readJsonObject(relativePath)
   }
 }

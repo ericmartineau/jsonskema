@@ -22,7 +22,7 @@ import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.validation.ValidationMocks.mockBooleanSchema
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import io.mverse.jsonschema.validation.ValidationTestSupport.failureOf
-import lang.json.toJsonLiteral
+import lang.json.toJsrValue
 
 import org.junit.Assert
 import org.junit.Test
@@ -32,7 +32,7 @@ class BooleanSchemaTest {
   @Test
   fun whenStringFalse_SchemaFailsValidation() {
     mockBooleanSchema.build()
-        .validating("false".toJsonLiteral())
+        .validating("false".toJsrValue())
         .isNotValid()
         .hasKeyword(Keywords.TYPE)
   }

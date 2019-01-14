@@ -10,6 +10,9 @@ mverse  {
     compile("kotlinx-serialization-runtime")
     compile("mverse-json")
     compile("mverse-lang-jvm")
+
+    // Default provider for JSR 353:Java API for Processing JSON
+    testCompile("org.glassfish:javax.json:1.1.4")
   }
 }
 

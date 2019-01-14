@@ -16,15 +16,25 @@
 package io.mverse.jsonschema.integration
 
 import com.google.common.base.Preconditions
+import io.mverse.json.jsr353.clean
+import io.mverse.json.jsr353.nullable
+import io.mverse.json.jsr353.untyped
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.SchemaException
 import io.mverse.jsonschema.validation.ValidationMocks.createTestValidator
-import io.mverse.jsonschema.loading.parseKtJson
+import io.mverse.jsonschema.loading.parseJsrJson
 import io.mverse.jsonschema.createSchemaReader
 import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
+import lang.json.JsrValue
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.content
+import lang.json.JsonKey
+import lang.json.JsrArray
+import lang.json.JsrObject
+import lang.json.get
+import lang.json.unbox
+import lang.json.unboxAsAny
+import lang.json.unboxOrNull
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletHandler
 import org.eclipse.jetty.servlet.ServletHolder
@@ -43,8 +53,8 @@ import java.util.*
 import java.util.regex.Pattern
 
 @RunWith(Parameterized::class)
-class SchemaValidationTestSuite(private val schemaDescription: String, private val schemaJson: kotlinx.serialization.json.JsonObject,
-                                private val inputDescription: String, private val input: JsonElement,
+class SchemaValidationTestSuite(private val schemaDescription: String, private val schemaJson: lang.json.JsrObject,
+                                private val inputDescription: String, private val input: JsrValue,
                                 private val expectedToBeValid: Boolean) {
 
   @Test
@@ -84,15 +94,15 @@ class SchemaValidationTestSuite(private val schemaDescription: String, private v
         }
         val fileName = path.substring(path.lastIndexOf('/') + 1)
         val arr = loadTests(SchemaValidationTestSuite::class.java.getResourceAsStream("/$path"))
-        arr.map { it.jsonObject }.forEach { schemaTest ->
-          val testInputs = schemaTest["tests"].jsonArray
-          testInputs.map { it.jsonObject }.forEach { input ->
+        arr.map { it as JsrObject }.forEach { schemaTest ->
+          val testInputs = schemaTest["tests"] as JsrArray
+          testInputs.map { it as JsrObject }.forEach { input ->
             val params = mutableListOf<Any>()
-            params += "[" + fileName + "]/" + schemaTest["description"].content
-            params += schemaTest["schema"].jsonObject
-            params += "[" + fileName + "]/" + input["description"].content
-            params += input.get("data")
-            params += input["valid"].boolean
+            params += "[" + fileName + "]/" + schemaTest[JsonKey("description")].unbox()
+            params += schemaTest["schema"] as JsrObject
+            params += "[" + fileName + "]/" + input[JsonKey("description")].unbox()
+            params += input["data"]!!
+            params += input["valid"]!!.unbox<Boolean>()
             rval.add(params.toTypedArray())
           }
         }
@@ -124,6 +134,6 @@ class SchemaValidationTestSuite(private val schemaDescription: String, private v
       }
     }
 
-    private fun loadTests(input: InputStream): JsonArray = input.parseKtJson().jsonArray
+    private fun loadTests(input: InputStream): JsrArray = input.parseJsrJson() as JsrArray
   }
 }

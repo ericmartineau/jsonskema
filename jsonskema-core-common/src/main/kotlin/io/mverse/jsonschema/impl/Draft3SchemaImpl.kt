@@ -17,8 +17,8 @@ import io.mverse.jsonschema.keyword.Keywords.ID
 import io.mverse.jsonschema.keyword.Keywords.MAXIMUM
 import io.mverse.jsonschema.keyword.Keywords.MINIMUM
 import io.mverse.jsonschema.utils.Schemas.nullSchema
-import kotlinx.serialization.json.JsonElement
 import lang.collection.freezeMap
+import lang.json.JsrValue
 import lang.net.URI
 
 class Draft3SchemaImpl : JsonSchemaImpl<Draft3Schema>, Draft3Schema {
@@ -58,7 +58,7 @@ class Draft3SchemaImpl : JsonSchemaImpl<Draft3Schema>, Draft3Schema {
 
   constructor(location: SchemaLocation,
               keywords: Map<KeywordInfo<*>, Keyword<*>>,
-              extraProperties: Map<String, JsonElement>) : super(location, keywords, extraProperties, Draft3)
+              extraProperties: Map<String, JsrValue>) : super(location, keywords, extraProperties, Draft3)
 
   override fun asDraft3(): Draft3Schema = this
   override fun convertVersion(source: Schema): Draft3Schema = source.asDraft3()

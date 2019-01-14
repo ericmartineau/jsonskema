@@ -13,6 +13,7 @@ import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.json.json
 import kotlinx.serialization.stringify
 import lang.json.JSON
+import lang.json.jsrObject
 import org.junit.Test
 
 class ValidationReportTest {
@@ -20,7 +21,7 @@ class ValidationReportTest {
   @Test
   fun toStringTest() {
     val report = ValidationReport()
-    val testSubject = JsonValueWithPath.fromJsonValue(json {})
+    val testSubject = JsonValueWithPath.fromJsonValue(jsrObject {})
     val stringSchema = JsonSchema.schema {
       pattern = "[a-z]+"
       minLength = 12
@@ -36,8 +37,8 @@ class ValidationReportTest {
   fun testSerialization() {
     val report = ValidationReport()
 
-    val testSubject = JsonValueWithPath.fromJsonValue(json {
-      "name" to "George Jones"
+    val testSubject = JsonValueWithPath.fromJsonValue(jsrObject {
+      "name" *= "George Jones"
     })
     val stringSchema = JsonSchema.schema {
       properties["name"] = {

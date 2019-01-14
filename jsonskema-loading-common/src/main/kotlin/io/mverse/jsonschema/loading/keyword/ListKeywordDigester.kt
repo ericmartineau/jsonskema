@@ -11,7 +11,7 @@ import io.mverse.jsonschema.loading.LoadingIssues.typeMismatch
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
 import io.mverse.jsonschema.loading.digest
-import kotlinx.serialization.json.ElementType
+import lang.json.JsrType
 
 data class ListKeywordDigester(val keyword: KeywordInfo<SchemaListKeyword>) : KeywordDigester<SchemaListKeyword> {
 
@@ -22,7 +22,7 @@ data class ListKeywordDigester(val keyword: KeywordInfo<SchemaListKeyword>) : Ke
     val schemas = mutableListOf<Schema>()
     val jsonArray = jsonObject.path(keyword)
     jsonArray.forEachIndex { _, item ->
-      if (item.type !== ElementType.OBJECT) {
+      if (item.type !== JsrType.OBJECT) {
         report.error(typeMismatch(keyword, item))
       } else {
         schemas.add(schemaLoader.loadSubSchema(item, item.rootObject, report))

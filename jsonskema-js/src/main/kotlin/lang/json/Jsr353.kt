@@ -36,10 +36,10 @@ actual fun createJsrArray(values:Iterable<JsrValue>):JsrArray {
   return JsrArrayImpl(values.toList())
 }
 
-actual fun createJsrString(string:String):JsrString = JsrStringImpl(string)
-actual fun createJsrNumber(int:Int):JsrNumber = JsrNumberImpl(int)
-actual fun createJsrNumber(double:Double):JsrNumber = JsrNumberImpl(double)
-actual fun createJsrNumber(long:Long):JsrNumber = JsrNumberImpl(long)
+actual fun jsrString(string:String):JsrString = JsrStringImpl(string)
+actual fun jsrNumber(int:Int):JsrNumber = JsrNumberImpl(int)
+actual fun jsrNumber(double:Double):JsrNumber = JsrNumberImpl(double)
+actual fun jsrNumber(long:Long):JsrNumber = JsrNumberImpl(long)
 
 data class JsrObjectImpl(override val map:Map<String, JsrValue>):JsrObject
 data class JsrArrayImpl(override val list:List<JsrValue>):JsrArray
