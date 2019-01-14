@@ -44,6 +44,7 @@ import io.mverse.jsonschema.keyword.Keywords.PROPERTIES
 import io.mverse.jsonschema.keyword.Keywords.PROPERTY_NAMES
 import io.mverse.jsonschema.keyword.Keywords.REF
 import io.mverse.jsonschema.keyword.Keywords.REQUIRED
+import io.mverse.jsonschema.keyword.Keywords.SCHEMA
 import io.mverse.jsonschema.keyword.Keywords.TITLE
 import io.mverse.jsonschema.keyword.Keywords.TYPE
 import io.mverse.jsonschema.keyword.Keywords.UNIQUE_ITEMS
@@ -144,6 +145,11 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
         }
       }
     }
+  }
+
+  fun forEachSortedKeyword(block: (KeywordInfo<*>, Keyword<*>)->Unit) {
+    keywords.map{it.key to it.value}
+        .sortedBy { it.first.sortOrder }
   }
 
   // ######################################################

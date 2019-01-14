@@ -27,6 +27,7 @@ import lang.json.JsrType
 </K> */
 @SerializableWith(KeywordInfoSerializer::class)
 data class KeywordInfo<K : Keyword<*>>(
+    val sortOrder: Int,
     val key: String,
 
     /**
@@ -56,10 +57,10 @@ data class KeywordInfo<K : Keyword<*>>(
      */
     val expects: JsrType,
 
-    val variants: Map<JsrType, KeywordInfo<K>> = emptyMap()) {
+    val variants: Map<JsrType, KeywordInfo<K>> = emptyMap()):Comparable<KeywordInfo<K>> {
 
   internal constructor(mainInfo: KeywordInfo<K>, allVersions: List<KeywordVersionInfoBuilder<K>>)
-      : this(key = mainInfo.key,
+      : this(sortOrder = mainInfo.sortOrder, key = mainInfo.key,
       forSchemas = mainInfo.forSchemas,
       applicableTypes = mainInfo.applicableTypes,
       expects = mainInfo.expects,
@@ -75,11 +76,12 @@ data class KeywordInfo<K : Keyword<*>>(
   internal constructor(mainInfo: KeywordVersionInfoBuilder<K>, allVersions: List<KeywordVersionInfoBuilder<K>>)
       : this(mainInfo = mainInfo.build(), allVersions = allVersions)
 
-  internal constructor(key: String,
+  internal constructor(sortOrder:Int, key: String,
                        forSchemas: Collection<JsonSchemaType> = JsonSchemaType.values().toHashSet(),
                        expects: JsrType,
                        since: JsonSchemaVersion?,
                        until: JsonSchemaVersion?) : this(
+      sortOrder = sortOrder,
       key = key,
       expects = expects,
       mostRecentVersion = until ?: JsonSchemaVersion.latest,
@@ -90,6 +92,10 @@ data class KeywordInfo<K : Keyword<*>>(
       applicableVersions = JsonSchemaVersion.values().range(since ?: JsonSchemaVersion.Draft3, until
           ?: JsonSchemaVersion.latest)
   )
+
+  override fun compareTo(other: KeywordInfo<K>): Int {
+    return this.sortOrder.compareTo(other.sortOrder)
+  }
 
   fun getTypeVariant(valueType: JsrType): KeywordInfo<K>? {
     return variants[valueType]
@@ -134,7 +140,7 @@ data class KeywordInfo<K : Keyword<*>>(
     return hashKode(key, expects)
   }
 
-  class KeywordInfoBuilder<K : Keyword<*>> {
+  class KeywordInfoBuilder<K : Keyword<*>>(var sortOrder: Int) {
 
     private lateinit var key: String
     private var main: KeywordVersionInfoBuilder<K>
@@ -146,7 +152,7 @@ data class KeywordInfo<K : Keyword<*>>(
     private val forSchemas: MutableSet<JsonSchemaType> = mutableSetOf()
 
     init {
-      this.current = KeywordVersionInfoBuilder()
+      this.current = KeywordVersionInfoBuilder(sortOrder)
       this.main = current
     }
 
@@ -162,7 +168,7 @@ data class KeywordInfo<K : Keyword<*>>(
 
     fun additionalDefinition(): KeywordInfoBuilder<K> {
       this.versions.add(current)
-      current = KeywordVersionInfoBuilder()
+      current = KeywordVersionInfoBuilder(sortOrder)
       return this
     }
 
@@ -198,12 +204,13 @@ data class KeywordInfo<K : Keyword<*>>(
   }
 
   companion object {
+    var sortOrder = 0
     inline fun <reified X : Keyword<*>> builder(): KeywordInfoBuilder<X> {
-      return KeywordInfoBuilder()
+      return KeywordInfoBuilder(sortOrder++)
     }
   }
 
-  class KeywordVersionInfoBuilder<K : Keyword<*>> {
+  class KeywordVersionInfoBuilder<K : Keyword<*>>(var sortOrder: Int) {
     private var since: JsonSchemaVersion? = null
     private var until: JsonSchemaVersion? = null
     private var key: String? = null
@@ -214,7 +221,7 @@ data class KeywordInfo<K : Keyword<*>>(
       if (forSchemas.isEmpty()) {
         forSchemas.addAll(JsonSchemaType.values())
       }
-      return KeywordInfo(key!!, forSchemas, expects!!, since, until)
+      return KeywordInfo(sortOrder, key!!, forSchemas, expects!!, since, until)
     }
 
     fun until(version: JsonSchemaVersion): KeywordVersionInfoBuilder<K> {
