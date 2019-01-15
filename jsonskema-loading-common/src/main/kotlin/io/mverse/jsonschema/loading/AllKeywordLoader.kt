@@ -63,7 +63,7 @@ data class AllKeywordLoader(val allExtractors: List<KeywordDigester<*>>,
         nonMatches.forEach { report.log(it) }
       } else if (!strict) {
         report.warn(keywordNotFoundIssue(prop, jsrValue))
-        builder.extraProperties += prop to jsrValue.wrapped
+        builder.extraProperties[prop] = jsrValue.wrapped
       } else {
         report.error(keywordNotFoundIssue(prop, jsrValue))
       }

@@ -1,7 +1,6 @@
 package io.mverse.jsonschema.impl
 
 import assertk.Assert
-import assertk.all
 import assertk.assert
 import assertk.assertAll
 import assertk.assertions.hasToString
@@ -16,10 +15,8 @@ import io.mverse.jsonschema.MergeActionType
 import io.mverse.jsonschema.MergeReport
 import io.mverse.jsonschema.assertj.asserts.isEqualIgnoringWhitespace
 import io.mverse.jsonschema.createSchemaReader
-import io.mverse.jsonschema.enums.JsonSchemaType
-import io.mverse.jsonschema.enums.JsonSchemaType.*
-import io.mverse.jsonschema.enums.JsonSchemaVersion
-import io.mverse.jsonschema.enums.JsonSchemaVersion.*
+import io.mverse.jsonschema.enums.JsonSchemaType.STRING
+import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
 import io.mverse.jsonschema.keyword.DollarSchemaKeyword.Companion.emptyUri
 import io.mverse.jsonschema.keyword.Keywords.SCHEMA
 import lang.json.JsonPath
@@ -69,13 +66,13 @@ class JsonSchemaImplTest {
   @Test
   fun testToStringExtraProperties() {
     val schema = JsonSchema.schema {
-      extraProperties += ("bobTheBuilder" to JsrTrue)
+      extraProperties["bobTheBuilder"] = JsrTrue
 
       properties["childSchema"] = schemaBuilder {
-        extraProperties += ("bobsType" to jsrString("Chainsaw Murderer"))
+        extraProperties["bobsType"] = jsrString("Chainsaw Murderer")
 
         properties["grandchildSchema"] = schemaBuilder {
-          extraProperties += ("theNestStatus" to jsrString("FULL"))
+          extraProperties["theNestStatus"] = jsrString("FULL")
         }
       }
     }
@@ -87,13 +84,13 @@ class JsonSchemaImplTest {
   @Test
   fun testToStringNoExtraProperties() {
     val schema = JsonSchema.schema {
-      extraProperties += ("bobTheBuilder" to JsrTrue)
+      extraProperties["bobTheBuilder"] = JsrTrue
 
       properties["childSchema"] = schemaBuilder {
-        extraProperties += ("bobsType" to jsrString("Chainsaw Murderer"))
+        extraProperties["bobsType"] = jsrString("Chainsaw Murderer")
 
         properties["grandchildSchema"] = schemaBuilder {
-          extraProperties += ("theNestStatus" to jsrString("FULL"))
+          extraProperties["theNestStatus"] = jsrString("FULL")
         }
       }
     }
@@ -105,13 +102,13 @@ class JsonSchemaImplTest {
   @Test
   fun testToStringFieldOrder() {
     val schema = JsonSchema.schema("https://something.com") {
-      extraProperties += ("bobTheBuilder" to JsrTrue)
+      extraProperties["bobTheBuilder"] = JsrTrue
 
       properties["childSchema"] = schemaBuilder {
-        extraProperties += ("bobsType" to jsrString("Chainsaw Murderer"))
+        extraProperties["bobsType"] = jsrString("Chainsaw Murderer")
 
         properties["grandchildSchema"] = schemaBuilder {
-          extraProperties += ("theNestStatus" to jsrString("FULL"))
+          extraProperties["theNestStatus"] = jsrString("FULL")
         }
       }
 
@@ -138,12 +135,12 @@ class JsonSchemaImplTest {
     val schema = JsonSchema.schema("https://something.com") {
       metaSchema = URI("http://custom-meta-schema.com")
 
-      extraProperties += ("bobTheBuilder" to JsrTrue)
+      extraProperties["bobTheBuilder"] = JsrTrue
       properties["childSchema"] = schemaBuilder {
-        extraProperties += ("bobsType" to jsrString("Chainsaw Murderer"))
+        extraProperties["bobsType"] = jsrString("Chainsaw Murderer")
 
         properties["grandchildSchema"] = schemaBuilder {
-          extraProperties += ("theNestStatus" to jsrString("FULL"))
+          extraProperties["theNestStatus"] to jsrString("FULL")
         }
       }
       isUseSchemaKeyword = true
@@ -288,7 +285,6 @@ class JsonSchemaImplTest {
     }
 
     val mergedSchemaString = mergedSchema.toString(Draft7, includeExtraProperties = true, indent = true)
-
   }
 
   fun Assert<MergeReport>.contains(type: MergeActionType, path: String): Assert<MergeReport> {
