@@ -6,6 +6,7 @@ import io.mverse.jsonschema.Draft6Schema
 import io.mverse.jsonschema.Draft7Schema
 import io.mverse.jsonschema.DraftSchema
 import io.mverse.jsonschema.KeywordContainer
+import io.mverse.jsonschema.MergeReport
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.SchemaLocation
@@ -50,10 +51,12 @@ import io.mverse.jsonschema.keyword.Keywords.UNIQUE_ITEMS
 import io.mverse.jsonschema.utils.Schemas.nullSchema
 import lang.collection.Multimaps
 import lang.collection.SetMultimap
+import lang.json.JsonPath
 import lang.json.JsrArray
 import lang.json.JsrObject
 import lang.json.JsrValue
 import lang.json.jsrArrayOf
+import lang.json.jsrJson
 import lang.json.jsrObject
 import lang.json.writeJson
 import lang.logging.Logger
@@ -64,10 +67,14 @@ val log: Logger = Logger("JsonSchemaImpl")
 abstract class JsonSchemaImpl<D : DraftSchema<D>>(
     override val location: SchemaLocation,
     override val keywords: Map<KeywordInfo<*>, Keyword<*>> = emptyMap(),
-    override val extraProperties: Map<String, JsrValue> = emptyMap(),
+    override val extraProperties: Map<String, JsrValue> = mutableMapOf(),
     override val version: JsonSchemaVersion = JsonSchemaVersion.latest)
 
   : DraftSchema<D>, KeywordContainer(keywords) {
+
+  init {
+    initialize()
+  }
 
   // ######################################################
   // ###### Getters for common keywords (draft3-6) ########
@@ -178,7 +185,7 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
 
   override fun toString(): String = toString(version)
 
-  override fun toString(version: JsonSchemaVersion, includeExtraProperties: Boolean, indent:Boolean): String {
+  override fun toString(version: JsonSchemaVersion, includeExtraProperties: Boolean, indent: Boolean): String {
     return toJson(version, includeExtraProperties).writeJson(indent)
   }
 
@@ -223,8 +230,27 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
     }
   }
 
+  override fun merge(path: JsonPath, override: Schema, report: MergeReport): Schema {
+    val toBuilder = this.toBuilder()
+    toBuilder.merge(path, override, report)
+    return toBuilder.build()
+  }
+
   override fun hashCode(): Int {
     return keywords.hashCode()
+  }
+
+  companion object {
+    /**
+     * This function just ensures that the companion object is loaded and the init block is run.
+     */
+    fun initialize() {}
+
+    init {
+      jsrJson.registerConversion<Schema> {
+        it.toJson(JsonSchemaVersion.Draft7, true)
+      }
+    }
   }
 }
 

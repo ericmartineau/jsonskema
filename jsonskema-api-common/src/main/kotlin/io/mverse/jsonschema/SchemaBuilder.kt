@@ -7,6 +7,7 @@ import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
 import lang.Name
 import lang.collection.SetMultimap
+import lang.json.JsonPath
 import lang.json.JsrArray
 import lang.json.JsrObject
 import lang.json.JsrValue
@@ -120,7 +121,7 @@ interface SchemaBuilder {
   // ########           INNER KEYWORDS                   ##############
   // ##################################################################
 
-  var extraProperties: Map<String, JsrValue>
+  var extraProperties: MutableMap<String, JsrValue>
 
   @Name("buildWithLocation")
   fun build(itemsLocation: SchemaLocation? = null, report: LoadingReport): Schema
@@ -137,4 +138,8 @@ interface SchemaBuilder {
 
   @Name("build")
   fun build(): Schema
+
+  operator fun contains(keyword:KeywordInfo<*>):Boolean
+  fun merge(path: JsonPath, other: Schema, report: MergeReport)
+  operator fun plusAssign(other:Schema) = merge(JsonPath.rootPath, other, MergeReport())
 }

@@ -1,9 +1,12 @@
 package io.mverse.jsonschema.keyword
 
+import io.mverse.jsonschema.MergeReport
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft6
+import io.mverse.jsonschema.mergeConflict
 import lang.exception.illegalState
 import lang.isIntegral
+import lang.json.JsonPath
 import lang.json.MutableJsrObject
 import lang.json.jsrObject
 
@@ -45,6 +48,15 @@ data class LimitKeyword(val keyword: KeywordInfo<LimitKeyword>,
         exclusiveKeyword.key *= getWithPrecision(exclusiveLimit)
       }
     }
+  }
+
+  override fun merge(path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<Number?>, report: MergeReport): Keyword<Number?> {
+    other as LimitKeyword
+    if(this.isExclusive != other.isExclusive) report += mergeConflict(path.child("exclusive"), keyword, this.isExclusive, other.isExclusive)
+    if(this.exclusiveLimit != null && this.exclusiveLimit != other.exclusiveLimit) report += mergeConflict(path.child("exclusive"), keyword, this.exclusiveLimit, other.exclusiveLimit)
+    if(this.limit != null && this.limit != other.limit) report += mergeConflict(path.child("limit"), keyword, this.limit, other.limit)
+
+    return copy(limit = other.limit ?: this.limit, exclusiveLimit = other.exclusiveLimit ?: this.exclusiveLimit)
   }
 
   private fun writeDraft3And4(builder: MutableJsrObject) {

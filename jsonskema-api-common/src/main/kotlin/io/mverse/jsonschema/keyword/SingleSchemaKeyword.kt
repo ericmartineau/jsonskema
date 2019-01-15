@@ -1,7 +1,9 @@
 package io.mverse.jsonschema.keyword
 
+import io.mverse.jsonschema.MergeReport
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
+import lang.json.JsonPath
 import lang.json.MutableJsrObject
 
 data class SingleSchemaKeyword(override val value: Schema) : KeywordImpl<Schema>() {
@@ -9,6 +11,10 @@ data class SingleSchemaKeyword(override val value: Schema) : KeywordImpl<Schema>
     builder.apply {
       keyword.key *= value.asVersion(version).toJson(includeExtraProperties = includeExtraProperties)
     }
+  }
+
+  override fun merge(path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<Schema>, report: MergeReport): Keyword<Schema> {
+    return SingleSchemaKeyword(this.value.merge(path, other.value, report))
   }
 
   override fun withValue(value: Schema): Keyword<Schema> = this.copy(value = value)

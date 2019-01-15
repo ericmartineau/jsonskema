@@ -1,5 +1,7 @@
 package io.mverse.jsonschema.builder
 
+import io.mverse.jsonschema.MergeException
+import io.mverse.jsonschema.MergeReport
 import io.mverse.jsonschema.MutableKeywordContainer
 import io.mverse.jsonschema.MutableSchemaMap
 import io.mverse.jsonschema.RefSchema
@@ -77,6 +79,8 @@ import io.mverse.jsonschema.keyword.URIKeyword
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
 import io.mverse.jsonschema.loading.SchemaLoadingException
+import io.mverse.jsonschema.mergeAdd
+import io.mverse.jsonschema.mergeError
 import io.mverse.jsonschema.utils.SchemaPaths
 import io.mverse.jsonschema.utils.Schemas.nullSchema
 import io.mverse.jsonschema.utils.Schemas.nullSchemaBuilder
@@ -84,6 +88,7 @@ import lang.collection.Multimaps
 import lang.collection.SetMultimap
 import lang.exception.illegalState
 import lang.hashKode
+import lang.json.JsonPath
 import lang.json.JsrArray
 import lang.json.JsrObject
 import lang.json.JsrValue
@@ -94,7 +99,7 @@ import lang.uuid.randomUUID
 
 class JsonSchemaBuilder(
     keywords: MutableMap<KeywordInfo<*>, Keyword<*>> = mutableMapOf(),
-    override var extraProperties: Map<String, JsrValue> = emptyMap(),
+    override var extraProperties: MutableMap<String, JsrValue> = mutableMapOf(),
     private val location: SchemaLocation = SchemaPaths.fromNonSchemaSource(randomUUID()),
     override var currentDocument: JsrObject? = null,
     override var schemaLoader: SchemaLoader? = null,
@@ -200,6 +205,29 @@ class JsonSchemaBuilder(
         else -> set(SCHEMA, value)
       }
     }
+
+  override fun merge(path: JsonPath, other: Schema, report: MergeReport) {
+    other.extraProperties.forEach { (k, v) ->
+      extraProperties[k] = v
+    }
+
+    other.keywords.forEach { (keyword, value) ->
+      val kwPath = path.child(keyword.key)
+      if (keyword !in this) {
+        keywords[keyword] = value
+        report += mergeAdd(kwPath, keyword)
+      } else {
+        val thisValue = keywords[keyword] as Keyword<Any>
+        val otherValue = value as Keyword<Any>
+        try {
+          val mergeKeyword = thisValue.merge(kwPath, keyword, otherValue, report)
+          keywords[keyword] = mergeKeyword
+        } catch (e: MergeException) {
+          report += mergeError(kwPath, keyword, e)
+        }
+      }
+    }
+  }
 
   override var refSchema: Schema? = null
 
@@ -338,6 +366,10 @@ class JsonSchemaBuilder(
   override var properties: MutableSchemaMap = MutableSchemaMap(PROPERTIES, this)
   override var patternProperties = MutableSchemaMap(PATTERN_PROPERTIES, this)
   override var definitions = MutableSchemaMap(DEFINITIONS, this)
+
+  override fun contains(keyword: KeywordInfo<*>): Boolean {
+    return keywords.containsKey(keyword)
+  }
 
   override var propertyNameSchema: SchemaBuilder?
     get() = values[PROPERTY_NAMES]?.toBuilder()

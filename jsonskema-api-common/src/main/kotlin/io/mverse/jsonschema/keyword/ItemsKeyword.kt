@@ -1,8 +1,11 @@
 package io.mverse.jsonschema.keyword
 
+import io.mverse.jsonschema.MergeReport
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
+import io.mverse.jsonschema.mergeConflict
 import io.mverse.jsonschema.utils.isFalseSchema
+import lang.json.JsonPath
 import lang.json.MutableJsrObject
 import lang.json.createJsrArray
 
@@ -55,6 +58,11 @@ data class ItemsKeyword(val indexedSchemas: List<Schema> = emptyList(),
       result.append("additionalItems=").append(additionalItemSchema)
     }
     return result.toString()
+  }
+
+  override fun merge(path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<List<Schema>>, report: MergeReport): Keyword<List<Schema>> {
+    report += mergeConflict(path, keyword, this, other)
+    return SchemaListKeyword(other.value)
   }
 
   override fun withValue(value: List<Schema>): ItemsKeyword = this.copy(indexedSchemas = value)

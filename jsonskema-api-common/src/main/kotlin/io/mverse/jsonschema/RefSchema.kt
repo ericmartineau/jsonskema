@@ -5,6 +5,7 @@ import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
 import lang.exception.illegalState
 import lang.hashKode
+import lang.json.JsonPath
 import lang.json.JsrObject
 import lang.net.URI
 
@@ -88,6 +89,8 @@ abstract class RefSchema(
   override fun toString(): String {
     return toJson(version ?: JsonSchemaVersion.latest).toString()
   }
+
+  override fun merge(path: JsonPath, override: Schema, report: MergeReport): Schema = refSchema.merge(path, override, report)
 
   abstract override fun toJson(version: JsonSchemaVersion, includeExtraProperties: Boolean): JsrObject
   abstract override fun asDraft6(): Draft6Schema

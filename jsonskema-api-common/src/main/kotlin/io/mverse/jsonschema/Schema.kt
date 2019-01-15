@@ -4,8 +4,10 @@ import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import lang.Name
+import lang.json.JsonPath
 import lang.json.JsrObject
 import lang.json.JsrValue
+import lang.json.jsrJson
 import lang.net.URI
 
 interface Schema {
@@ -52,6 +54,10 @@ interface Schema {
     }
   }
 
+  operator fun plus(override: Schema):Schema = merge(JsonPath.rootPath, override, MergeReport())
+
+  fun merge(path: JsonPath, override:Schema, report:MergeReport): Schema
+
   fun toBuilder(): SchemaBuilder
 
   fun toBuilder(id: URI): SchemaBuilder
@@ -69,4 +75,5 @@ interface Schema {
   fun asDraft7(): Draft7Schema
 
   fun toString(version: JsonSchemaVersion, includeExtraProperties: Boolean = false, indent:Boolean = false): String
+  operator fun contains(keyword:KeywordInfo<*>):Boolean = keywords.contains(keyword)
 }

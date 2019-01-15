@@ -1,6 +1,9 @@
 package io.mverse.jsonschema.keyword
 
+import io.mverse.jsonschema.MergeReport
 import io.mverse.jsonschema.enums.JsonSchemaVersion
+import io.mverse.jsonschema.mergeConflict
+import lang.json.JsonPath
 import lang.json.MutableJsrObject
 import lang.net.URI
 
@@ -21,6 +24,11 @@ open class DollarSchemaKeyword(override val value: URI) : Keyword<URI> {
         SCHEMA_KEYWORD *= value.toString()
       }
     }
+  }
+
+  override fun merge(path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<URI>, report: MergeReport): Keyword<URI> {
+    report += mergeConflict(path, keyword, this, other)
+    return DollarSchemaKeyword((other as DollarSchemaKeyword).value)
   }
 
   override fun hashCode(): Int {

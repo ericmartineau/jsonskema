@@ -35,6 +35,10 @@ open class RefSchemaImpl : RefSchema {
 
   internal constructor(location: SchemaLocation, refURI: URI, refSchemaLoader: (Schema) -> Schema?) : super(location, refURI, refSchemaLoader)
 
+  init {
+    JsonSchemaImpl.initialize()
+  }
+
   override fun asDraft6(): Draft6Schema {
     val draft6 = refSchemaOrNull?.asDraft6()
         ?: Draft6SchemaImpl(

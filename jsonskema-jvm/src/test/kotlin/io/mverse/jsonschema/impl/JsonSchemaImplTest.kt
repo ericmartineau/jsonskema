@@ -1,18 +1,28 @@
 package io.mverse.jsonschema.impl
 
+import assertk.Assert
+import assertk.all
 import assertk.assert
+import assertk.assertAll
 import assertk.assertions.hasToString
 import assertk.assertions.isEqualTo
+import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import io.mverse.jsonschema.Draft3Schema
 import io.mverse.jsonschema.Draft4Schema
 import io.mverse.jsonschema.Draft6Schema
 import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.MergeActionType
+import io.mverse.jsonschema.MergeReport
 import io.mverse.jsonschema.assertj.asserts.isEqualIgnoringWhitespace
 import io.mverse.jsonschema.createSchemaReader
+import io.mverse.jsonschema.enums.JsonSchemaType
+import io.mverse.jsonschema.enums.JsonSchemaType.*
 import io.mverse.jsonschema.enums.JsonSchemaVersion
+import io.mverse.jsonschema.enums.JsonSchemaVersion.*
 import io.mverse.jsonschema.keyword.DollarSchemaKeyword.Companion.emptyUri
 import io.mverse.jsonschema.keyword.Keywords.SCHEMA
+import lang.json.JsonPath
 import lang.json.JsrTrue
 import lang.json.jsrString
 import lang.net.URI
@@ -70,7 +80,7 @@ class JsonSchemaImplTest {
       }
     }
 
-    val schemaString = schema.toString(includeExtraProperties = true, version = JsonSchemaVersion.Draft7)
+    val schemaString = schema.toString(includeExtraProperties = true, version = Draft7)
     assert(schemaString).isEqualTo("{\"properties\":{\"childSchema\":{\"properties\":{\"grandchildSchema\":{\"theNestStatus\":\"FULL\"}},\"bobsType\":\"Chainsaw Murderer\"}},\"bobTheBuilder\":true}")
   }
 
@@ -88,7 +98,7 @@ class JsonSchemaImplTest {
       }
     }
 
-    val schemaString = schema.toString(includeExtraProperties = false, version = JsonSchemaVersion.Draft7)
+    val schemaString = schema.toString(includeExtraProperties = false, version = Draft7)
     assert(schemaString).isEqualTo("{\"properties\":{\"childSchema\":{\"properties\":{\"grandchildSchema\":{}}}}}")
   }
 
@@ -108,7 +118,7 @@ class JsonSchemaImplTest {
       isUseSchemaKeyword = true
     }
 
-    val schemaString = schema.toString(includeExtraProperties = false, version = JsonSchemaVersion.Draft7, indent = true)
+    val schemaString = schema.toString(includeExtraProperties = false, version = Draft7, indent = true)
     assert(schemaString.trim()).isEqualIgnoringWhitespace("{\n" +
         "    \"\$schema\": \"http://json-schema.org/draft-07/schema#\",\n" +
         "    \"\$id\": \"https://something.com\",\n" +
@@ -139,7 +149,7 @@ class JsonSchemaImplTest {
       isUseSchemaKeyword = true
     }
 
-    val schemaString = schema.toString(includeExtraProperties = false, version = JsonSchemaVersion.Draft7, indent = true)
+    val schemaString = schema.toString(includeExtraProperties = false, version = Draft7, indent = true)
     assert(schemaString.trim()).isEqualIgnoringWhitespace("{\n" +
         "    \"\$schema\": \"http://custom-meta-schema.com\",\n" +
         "    \"\$id\": \"https://something.com\",\n" +
@@ -152,7 +162,6 @@ class JsonSchemaImplTest {
         "        }\n" +
         "    }\n" +
         "}")
-
   }
 
   @Test fun testLoadCustomMetaSchema() {
@@ -208,4 +217,85 @@ class JsonSchemaImplTest {
     assert(readSchema.keywords.containsKey(SCHEMA)).isTrue()
     assert(readSchema.keywords.get(SCHEMA)!!.value).isEqualTo(emptyUri)
   }
+
+  @Test fun testMergeSchemas() {
+    val schemaA = JsonSchema.schema {
+
+      "name" required schemaBuilder {
+        minLength = 1
+        oneOfSchemas += schemaBuilder {
+          type = STRING
+          pattern = "^[A-Z]*$"
+        }
+
+        oneOfSchemas += schemaBuilder {
+          type = STRING
+          pattern = "^[a-z]*$"
+        }
+      }
+      "age" required string
+      "address" required schemaBuilder {
+        "street1" required string {
+          minLength = 10
+        }
+        "number" required number {
+          exclusiveMaximum = 10
+        }
+        "const" required string {
+          const = "10"
+        }
+      }
+    }
+
+    val schemaB = JsonSchema.schema {
+      "name" optional string {
+        minLength = 3
+
+        oneOfSchemas += schemaBuilder {
+          type = STRING
+          const = "R2D2"
+        }
+        oneOfSchemas += schemaBuilder {
+          type = STRING
+          pattern = "^[A-Za-z]$"
+        }
+      }
+      "age" optional number {
+        minimum = 1
+      }
+      "address" required schemaBuilder {
+        "street1" required string
+        "street2" optional string
+        "state" optional string {
+          maxLength = 2
+        }
+      }
+    }
+
+    val mergeReport = MergeReport()
+    val mergedSchema = schemaA.merge(JsonPath.rootPath, schemaB, mergeReport)
+
+    assertAll {
+      assert(mergeReport.isConflict).isTrue()
+      assert(mergeReport)
+          .contains(MergeActionType.CONFLICT, "/properties/name/minLength")
+          .contains(MergeActionType.MERGE, "/required")
+          .contains(MergeActionType.MERGE, "/properties/name/oneOf")
+          .contains(MergeActionType.ADD, "/properties/address/properties/street2")
+          .contains(MergeActionType.ADD, "/properties/age/minimum")
+          .contains(MergeActionType.MERGE, "/properties/address/required")
+          .contains(MergeActionType.MERGE, "/properties/age/type")
+    }
+
+    val mergedSchemaString = mergedSchema.toString(Draft7, includeExtraProperties = true, indent = true)
+
+  }
+
+  fun Assert<MergeReport>.contains(type: MergeActionType, path: String): Assert<MergeReport> {
+    val partialMatch = this.actual.filter { it.path == JsonPath(path) }
+    assert(partialMatch, "merge at $path").isNotEmpty()
+    assert(partialMatch.first().type, "Type for merge at $path").isEqualTo(type)
+    return this
+  }
 }
+
