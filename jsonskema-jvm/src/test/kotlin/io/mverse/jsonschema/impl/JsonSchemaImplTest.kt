@@ -6,6 +6,7 @@ import assertk.assertAll
 import assertk.assertions.hasToString
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
+import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import io.mverse.jsonschema.Draft3Schema
 import io.mverse.jsonschema.Draft4Schema
@@ -18,6 +19,7 @@ import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.enums.JsonSchemaType.STRING
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
 import io.mverse.jsonschema.keyword.DollarSchemaKeyword.Companion.emptyUri
+import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
 import io.mverse.jsonschema.keyword.Keywords.SCHEMA
 import lang.json.JsonPath
 import lang.json.JsrTrue
@@ -216,8 +218,8 @@ class JsonSchemaImplTest {
   }
 
   @Test fun testMergeSchemas() {
-    val schemaA = JsonSchema.schema {
-
+    val schemaA = JsonSchema.schema(URI("https://nba.com")) {
+      isUseSchemaKeyword = true
       "name" required schemaBuilder {
         minLength = 1
         oneOfSchemas += schemaBuilder {
@@ -242,9 +244,9 @@ class JsonSchemaImplTest {
           const = "10"
         }
       }
-    }
+    }.asDraft6()
 
-    val schemaB = JsonSchema.schema {
+    val schemaB = JsonSchema.schema("https://foo.com") {
       "name" optional string {
         minLength = 3
 
@@ -273,6 +275,10 @@ class JsonSchemaImplTest {
     val mergedSchema = schemaA.merge(JsonPath.rootPath, schemaB, mergeReport)
 
     assertAll {
+      val restricted = mergeReport.actions.firstOrNull {
+        it.keyword == SCHEMA || it.keyword== DOLLAR_ID
+      }
+      assert(restricted, "restricted keyword").isNull()
       assert(mergeReport.isConflict).isTrue()
       assert(mergeReport)
           .contains(MergeActionType.CONFLICT, "/properties/name/minLength")

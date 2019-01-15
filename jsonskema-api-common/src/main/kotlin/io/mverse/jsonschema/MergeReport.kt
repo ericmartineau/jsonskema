@@ -1,17 +1,25 @@
 package io.mverse.jsonschema
 
 import io.mverse.jsonschema.keyword.KeywordInfo
+import io.mverse.jsonschema.keyword.Keywords
 import lang.json.JsonPath
 
 data class MergeReport(val actions: MutableList<MergeReportAction> = mutableListOf()) : Iterable<MergeReportAction> by actions {
   var isConflict: Boolean = false
   var isMerge: Boolean = false
+  var isError: Boolean = false
   operator fun plusAssign(issue: MergeReportAction) {
+    if(issue.keyword in ignoredKeywords) return
     when (issue.type) {
       MergeActionType.CONFLICT-> isConflict = true
       MergeActionType.MERGE-> isMerge = true
+      MergeActionType.ERROR-> isError = true
     }
     this.actions += issue
+  }
+
+  companion object {
+    val ignoredKeywords = setOf(Keywords.DOLLAR_ID, Keywords.SCHEMA)
   }
 }
 
