@@ -160,6 +160,13 @@ open class SchemaBuilderDsl(val schemaBuilder: SchemaBuilder = createSchemaBuild
       }
     }
 
+  val array: () -> SchemaBuilderDsl
+    get() = {
+      SchemaBuilderDsl().apply {
+        type = JsonSchemaType.ARRAY
+      }
+    }
+
   operator fun Pair<String, String>.invoke(propBlock: SchemaBuilderDsl.() -> Unit) {
     val key = this.first
     val title = this.second
@@ -198,6 +205,13 @@ open class SchemaBuilderDsl(val schemaBuilder: SchemaBuilder = createSchemaBuild
     return SchemaBuilderDsl().apply {
       this.type = JsonSchemaType.BOOLEAN
       this.title = title
+      this.block()
+    }
+  }
+
+  fun array(block: SchemaBuilderDsl.() -> Unit = {}): SchemaBuilderDsl {
+    return SchemaBuilderDsl().apply {
+      this.type = JsonSchemaType.ARRAY
       this.block()
     }
   }
