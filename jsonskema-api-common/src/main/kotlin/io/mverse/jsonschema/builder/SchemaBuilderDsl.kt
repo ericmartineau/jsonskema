@@ -260,22 +260,23 @@ open class SchemaBuilderDsl(val schemaBuilder: SchemaBuilder = createSchemaBuild
     else -> SchemaBuilderDsl(createSchemaBuilder(id), this).apply(block)
   }
 
-  fun allItemsSchema(block: SchemaBuilderDsl.() -> Unit){
+  fun allItemsSchema(block: SchemaBuilderDsl.() -> Unit) {
     this.allItemSchema = SchemaBuilderDsl(createSchemaBuilder(), this).apply(block)
   }
 
-  fun ifSchema(block: SchemaBuilderDsl.() -> Unit){
+  fun ifSchema(block: SchemaBuilderDsl.() -> Unit) {
     ifSchema = SchemaBuilderDsl(createSchemaBuilder(), this).apply(block)
   }
-  fun thenSchema(block: SchemaBuilderDsl.() -> Unit){
+
+  fun thenSchema(block: SchemaBuilderDsl.() -> Unit) {
     thenSchema = SchemaBuilderDsl(createSchemaBuilder(), this).apply(block)
   }
 
-  fun elseSchema(block: SchemaBuilderDsl.() -> Unit){
+  fun elseSchema(block: SchemaBuilderDsl.() -> Unit) {
     elseSchema = SchemaBuilderDsl(createSchemaBuilder(), this).apply(block)
   }
 
-  fun schemaOfAdditionalProperties(block: SchemaBuilderDsl.() -> Unit){
+  fun schemaOfAdditionalProperties(block: SchemaBuilderDsl.() -> Unit) {
     schemaOfAdditionalProperties = SchemaBuilderDsl(createSchemaBuilder(), this).apply(block)
   }
 }
