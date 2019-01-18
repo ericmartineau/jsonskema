@@ -4,26 +4,18 @@ import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaType
 import kotlinx.serialization.json.ElementType
 import lang.collection.runLengths
+import lang.json.JsrArray
 import lang.json.JsrType
 import lang.json.type
 import lang.json.values
 
-fun Schema.calculateType(): JsonSchemaType? {
-  val schema = this.asDraft6()
+fun Schema.calculateJsonSchemaType(): JsonSchemaType? {
+  val schema = this.asDraft7()
   if (schema.types.isNotEmpty()) {
     return schema.types.first()
   }
 
-  val fromEnumValue = schema.enumValues?.let { array ->
-    val counts = array.values
-        .map { it.type.toJsonSchemaType() }
-        .distinct()
-        .toList()
-    return@let when (counts.size) {
-      1 -> counts.first()
-      else -> null
-    }
-  }
+  val fromEnumValue = schema.enumValues?.jsonSchemaType
 
   return when (fromEnumValue) {
     null -> {
@@ -48,6 +40,18 @@ fun Schema.calculateType(): JsonSchemaType? {
     else -> fromEnumValue
   }
 }
+
+val JsrArray.jsonSchemaType: JsonSchemaType?
+  get() {
+    val counts = this.values
+        .map { it.type.toJsonSchemaType() }
+        .distinct()
+        .toList()
+    return when (counts.size) {
+      1 -> counts.first()
+      else -> null
+    }
+  }
 
 internal fun ElementType.toJsonSchemaType(): JsonSchemaType {
   return when (this) {

@@ -1,7 +1,7 @@
 package io.mverse.jsonschema
 
 import io.mverse.jsonschema.enums.JsonSchemaType
-import io.mverse.jsonschema.utils.calculateType
+import io.mverse.jsonschema.utils.calculateJsonSchemaType
 
 /**
  * Walks the schema and finds all recursive leaf properties.
@@ -24,7 +24,7 @@ fun recurseProperties(schema: Draft7Schema, currentPath: String, isRequired: Boo
 //    processed += currentPath
 
     // If this property is a deterministic primitive, add it
-    val calculateType = schema.calculateType()
+    val calculateType = schema.calculateJsonSchemaType()
     if (calculateType != null && calculateType != JsonSchemaType.OBJECT && calculateType != JsonSchemaType.ARRAY &&
         calculateType != JsonSchemaType.NULL) {
       holder[currentPath] = schema with isRequired

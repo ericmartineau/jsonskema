@@ -5,11 +5,14 @@ import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.enums.FormatType
 import io.mverse.jsonschema.enums.JsonSchemaType
+import io.mverse.jsonschema.utils.jsonSchemaType
+import lang.collection.asList
 import lang.json.JsrArray
 import lang.json.KtArray
 import lang.json.createJsrArray
 import lang.json.jsrString
 import lang.json.toJsrArray
+import lang.json.toJsrValue
 import lang.net.URI
 
 open class SchemaBuilderDsl(val schemaBuilder: SchemaBuilder = createSchemaBuilder(),
@@ -216,10 +219,12 @@ open class SchemaBuilderDsl(val schemaBuilder: SchemaBuilder = createSchemaBuild
     }
   }
 
-  fun enum(vararg enumValues: String): SchemaBuilderDsl {
+  fun enum(vararg values: String): SchemaBuilderDsl = enum(values.toList())
+
+  fun enum(enumValues: Iterable<Any?>): SchemaBuilderDsl {
     return SchemaBuilderDsl().apply {
-      this.type = JsonSchemaType.STRING
-      this.enumValues = createJsrArray(enumValues.map { jsrString(it) })
+      this.enumValues = createJsrArray(enumValues.map { toJsrValue(it) })
+      this.type = this.enumValues?.jsonSchemaType
     }
   }
 

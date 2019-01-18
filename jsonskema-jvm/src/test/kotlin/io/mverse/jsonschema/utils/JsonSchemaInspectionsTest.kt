@@ -20,7 +20,7 @@ class JsonSchemaInspectionsTest {
     val draft6Schema = JsonSchema.schema {
       enumValues = jsrArrayOf(1, true)
     }.asDraft6()
-    assert(draft6Schema.calculateType()).isEqualTo(NULL)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(NULL)
   }
 
   @Test
@@ -28,7 +28,7 @@ class JsonSchemaInspectionsTest {
     val draft6Schema = JsonSchema.schema {
       maxItems = 23
     }
-    assert(draft6Schema.calculateType()).isEqualTo(ARRAY)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(ARRAY)
   }
 
   @Test
@@ -36,7 +36,7 @@ class JsonSchemaInspectionsTest {
     val draft6Schema = JsonSchema.schema {
       type = BOOLEAN
     }.asDraft6()
-    assert(draft6Schema.calculateType()).isEqualTo(BOOLEAN)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(BOOLEAN)
   }
 
   @Test
@@ -44,7 +44,7 @@ class JsonSchemaInspectionsTest {
     val draft6Schema = JsonSchema.schema {
       enumValues = jsrArrayOf(true, false)
     }.asDraft6()
-    assert(draft6Schema.calculateType()).isEqualTo(BOOLEAN)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(BOOLEAN)
   }
 
   @Test
@@ -52,7 +52,7 @@ class JsonSchemaInspectionsTest {
     val draft6Schema = JsonSchema.schema {
       type = NULL
     }
-    assert(draft6Schema.calculateType()).isEqualTo(NULL)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(NULL)
   }
 
   @Test
@@ -60,7 +60,7 @@ class JsonSchemaInspectionsTest {
     val draft6Schema = JsonSchema.schema {
       enumValues = jsrArrayOf(JsonNull)
     }.asDraft6()
-    assert(draft6Schema.calculateType()).isEqualTo(NULL)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(NULL)
   }
 
   @Test
@@ -68,7 +68,7 @@ class JsonSchemaInspectionsTest {
     val draft6Schema = JsonSchema.schema {
       maximum = 23
     }.asDraft6()
-    assert(draft6Schema.calculateType()).isEqualTo(NUMBER)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(NUMBER)
   }
 
   @Test
@@ -76,7 +76,7 @@ class JsonSchemaInspectionsTest {
     val draft6Schema = JsonSchema.schema {
       enumValues = jsrArrayOf(1, 4)
     }.asDraft6()
-    assert(draft6Schema.calculateType()).isEqualTo(NUMBER)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(NUMBER)
   }
 
   @Test
@@ -84,7 +84,7 @@ class JsonSchemaInspectionsTest {
     val draft6Schema = JsonSchema.schema {
       maxProperties = 23
     }.asDraft6()
-    assert(draft6Schema.calculateType()).isEqualTo(OBJECT)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(OBJECT)
   }
 
   @Test
@@ -92,6 +92,6 @@ class JsonSchemaInspectionsTest {
     val draft6Schema = JsonSchema.schema {
       format = FormatType.DATE.toString()
     }.asDraft6()
-    assert(draft6Schema.calculateType()).isEqualTo(STRING)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(STRING)
   }
 }
