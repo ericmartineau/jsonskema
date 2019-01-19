@@ -46,7 +46,7 @@ data class ValidationError(
      * A pointer to the violation within the input document we validated.
      */
     @Name("pointerToViolation")
-    private val pointerToViolation: JsonPath? = null,
+    val pointerToViolation: JsonPath? = null,
 
     @Name("code")
     val code: String? = null,
