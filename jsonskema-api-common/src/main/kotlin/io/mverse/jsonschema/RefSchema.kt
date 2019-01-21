@@ -8,6 +8,7 @@ import lang.hashKode
 import lang.json.JsonPath
 import lang.json.JsrObject
 import lang.net.URI
+import lang.suppress.Suppressions.Companion.NAME_SHADOWING
 
 /**
  * This class is used to resolve JSON pointers. during the construction of the schema. This class has been made mutable
@@ -90,7 +91,10 @@ abstract class RefSchema(
     return toJson(version ?: JsonSchemaVersion.latest).toString()
   }
 
-  override fun merge(path: JsonPath, override: Schema, report: MergeReport): Schema = refSchema.merge(path, override, report)
+  @Suppress(NAME_SHADOWING)
+  override fun merge(path: JsonPath, override: Schema?, report: MergeReport): Schema {
+    return override ?: this
+  }
 
   abstract override fun toJson(version: JsonSchemaVersion, includeExtraProperties: Boolean): JsrObject
   abstract override fun asDraft6(): Draft6Schema

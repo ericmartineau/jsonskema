@@ -3,7 +3,6 @@ package io.mverse.jsonschema.keyword
 import io.mverse.jsonschema.MergeReport
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
-import io.mverse.jsonschema.mergeConflict
 import io.mverse.jsonschema.utils.isFalseSchema
 import lang.json.JsonPath
 import lang.json.MutableJsrObject
@@ -60,10 +59,18 @@ data class ItemsKeyword(val indexedSchemas: List<Schema> = emptyList(),
     return result.toString()
   }
 
-  override fun merge(path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<List<Schema>>, report: MergeReport): Keyword<List<Schema>> {
-    report += mergeConflict(path, keyword, this, other)
-    return SchemaListKeyword(other.value)
+  override fun merge(path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<List<Schema>>, report: MergeReport): ItemsKeyword {
+    other as ItemsKeyword
+    val allItemSchema = allItemSchema?.merge(path, other.allItemSchema, report)
+        ?: other.allItemSchema
+    val addtlItemSchema = additionalItemSchema?.merge(path.sibling(additionItemsKey), other.additionalItemSchema, report)
+    val indexedSchemas = if (other.hasIndexedSchemas) other.indexedSchemas else indexedSchemas
+    return ItemsKeyword(indexedSchemas, allItemSchema, addtlItemSchema)
   }
 
   override fun withValue(value: List<Schema>): ItemsKeyword = this.copy(indexedSchemas = value)
+
+  companion object {
+    val additionItemsKey = Keywords.ADDITIONAL_ITEMS.key
+  }
 }

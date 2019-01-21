@@ -56,7 +56,7 @@ interface Schema {
 
   operator fun plus(override: Schema):Schema = merge(JsonPath.rootPath, override, MergeReport())
 
-  fun merge(path: JsonPath, override:Schema, report:MergeReport): Schema
+  fun merge(path: JsonPath, override:Schema?, report:MergeReport): Schema
 
   fun toBuilder(): SchemaBuilder
 

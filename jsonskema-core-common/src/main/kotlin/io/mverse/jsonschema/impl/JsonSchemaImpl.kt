@@ -230,9 +230,10 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
     }
   }
 
-  override fun merge(path: JsonPath, override: Schema, report: MergeReport): Schema {
+  override fun merge(path: JsonPath, override: Schema?, report: MergeReport): Schema {
+    val overrides = override ?: return this
     val toBuilder = this.toBuilder()
-    toBuilder.merge(path, override, report)
+    toBuilder.merge(path, overrides, report)
     return toBuilder.build()
   }
 
