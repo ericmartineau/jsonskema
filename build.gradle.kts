@@ -9,7 +9,7 @@ plugins {
 }
 
 allprojects  {
-  val msharedVersion by extra { "0.6.0-dev.1.uncommitted+73c7a69" }
+  val msharedVersion by extra { "0.5.110" }
 
   plugins.apply("kotlinx-serialization")
   mverse {
