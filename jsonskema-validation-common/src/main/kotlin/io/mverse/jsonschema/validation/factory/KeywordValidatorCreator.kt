@@ -4,6 +4,7 @@ import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
+import lang.suppress.Suppressions.Companion.UNCHECKED_CAST
 
 /**
  * Extracts any necessary validation keywords from a [Schema] instance.
@@ -15,7 +16,7 @@ class KeywordValidatorCreator<K : Keyword<*>, V : KeywordValidator<K>>(val block
   }
 
   fun invokeUnsafe(keyword: Keyword<*>, schema: Schema, factory: SchemaValidatorFactory): KeywordValidator<*>? {
-    @Suppress("UNCHECKED_CAST")
+    @Suppress(UNCHECKED_CAST)
     return block(keyword as K, schema, factory)
   }
 }

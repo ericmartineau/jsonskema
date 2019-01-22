@@ -21,7 +21,7 @@ data class LoadingReport(
   }
 
   fun log(issue: LoadingIssue): LoadingReport {
-    return apply {
+    apply {
       issues.add(issue)
       if (issue.level == LoadingIssueLevel.ERROR) {
         hasError = true

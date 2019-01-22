@@ -16,23 +16,53 @@
 package io.mverse.jsonschema.loading.reference
 
 import io.mverse.jsonschema.loading.JsonDocumentClient
-import io.mverse.jsonschema.loading.parseJsrObject
+import io.mverse.jsonschema.resolver.ClasspathDocumentFetcher
+import io.mverse.jsonschema.resolver.FetchedDocument
+import io.mverse.jsonschema.resolver.FetchedDocumentResults
+import io.mverse.jsonschema.resolver.HttpDocumentFetcher
+import io.mverse.jsonschema.resolver.JsonDocumentFetcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.supervisorScope
+import lang.coroutine.TimeoutException
+import lang.coroutine.awaitFirstOrNull
+import lang.coroutine.blocking
+import lang.exception.illegalArgument
 import lang.json.JsonPath
 import lang.json.JsrObject
-import lang.json.KtObject
 import lang.net.URI
-import lang.net.readFully
+import kotlin.reflect.KClass
 
 /**
- * A [JsonDocumentClient] implementation which uses [URL] for reading the remote content.
+ * A [JsonDocumentClient] implementation which uses a collection of [JsonDocumentFetcher] to find
+ * schemas from various places (classpath, URL, memory, etc).  Uses coroutines to simultaneous
+ * check all fetcher instances, and the first one to return a valid result wins, while the others
+ * are cancelled.
  */
-open class DefaultJsonDocumentClient(val schemaCache: SchemaCache = SchemaCache()) : JsonDocumentClient {
+open class DefaultJsonDocumentClient(val fetchers: MutableList<JsonDocumentFetcher> = defaultFetchers.toMutableList(),
+                                     val schemaCache: SchemaCache,
+                                     val fetchTimeout: Long = 10000L) : JsonDocumentClient {
+
+  constructor(fetchers: List<JsonDocumentFetcher> = defaultFetchers, fetchTimeout: Long = 10000L) : this(fetchers.toMutableList(), SchemaCache(), fetchTimeout)
+
+  init {
+    if (fetchers.isEmpty()) {
+      illegalArgument("Must provide at least one fetcher implementation")
+    }
+  }
 
   override fun findLoadedDocument(documentLocation: URI): JsrObject? {
     return schemaCache.lookupDocument(documentLocation)
   }
 
-  override fun registerLoadedDocument(documentLocation: URI, document: JsrObject) {
+  override fun registerFetchedDocument(document: FetchedDocument) {
+    schemaCache.cacheDocument(document.originalUri, document.jsrObject)
+    if (document.isDifferentURI) {
+      schemaCache.cacheDocument(document.uri, document.jsrObject)
+    }
+  }
+
+  override fun registerFetchedDocument(documentLocation: URI, document: JsrObject) {
     schemaCache.cacheDocument(documentLocation, document)
   }
 
@@ -40,5 +70,43 @@ open class DefaultJsonDocumentClient(val schemaCache: SchemaCache = SchemaCache(
     return schemaCache.resolveURIToDocumentUsingLocalIdentifiers(documentURI, schemaURI, document)
   }
 
-  override fun fetchDocument(uri: URI): JsrObject = uri.readFully().parseJsrObject()
+  override fun fetchDocument(uri: URI): FetchedDocumentResults {
+    val errors: MutableMap<KClass<out JsonDocumentFetcher>, Throwable> = mutableMapOf()
+    return blocking fetch@{
+      supervisorScope {
+        val deferreds = fetchers.map { fetcher ->
+          async(Dispatchers.Default) {
+            try {
+              val fetched = fetcher.fetchDocument(uri)
+              return@async fetched
+            } catch (e: Exception) {
+              errors[fetcher.key] = e
+              return@async null
+            }
+          }
+        }
+
+        try {
+          deferreds.awaitFirstOrNull(fetchTimeout)
+        } catch (e: TimeoutException) {
+          null
+        }.let { fetched ->
+          val unaccounted = fetchers.map { it::class }.filter {
+            it !in errors && fetched?.fetcherKey != it
+          }.toSet()
+
+          FetchedDocumentResults(errors, unaccounted, fetched).orThrow()
+        }
+      }
+    }
+  }
+
+  override fun plusAssign(fetcher: JsonDocumentFetcher) {
+    fetchers += fetcher
+  }
+
+  companion object {
+    val defaultFetchers = listOf(ClasspathDocumentFetcher(), HttpDocumentFetcher())
+  }
 }
+

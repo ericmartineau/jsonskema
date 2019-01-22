@@ -14,6 +14,7 @@ data class MergeReport(val actions: MutableList<MergeReportAction> = mutableList
       MergeActionType.CONFLICT-> isConflict = true
       MergeActionType.MERGE-> isMerge = true
       MergeActionType.ERROR-> isError = true
+      else->{}
     }
     this.actions += issue
   }

@@ -11,6 +11,7 @@ mverse  {
     compile("mverse-json")
     compile("mverse-lang-jvm")
 
+    testCompile("mverse-junit")
     // Default provider for JSR 353:Java API for Processing JSON
     testCompile("org.glassfish:javax.json:1.1.4")
   }

@@ -74,7 +74,7 @@ interface SchemaLoader {
    * @param client The new [JsonDocumentClient] to use for loading schemas
    * @return A new copy of this loader.
    */
-  fun withDocumentClient(client: JsonDocumentClient): SchemaLoader
+  fun withDocumentClient(documentClient: JsonDocumentClient): SchemaLoader
 
   operator fun plusAssign(preloadedSchema: JsrObject)
 }

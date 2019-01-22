@@ -14,6 +14,8 @@ import lang.enums.range
 import lang.exception.illegalState
 import lang.hashKode
 import lang.json.JsrType
+import lang.suppress.Suppressions
+import lang.suppress.Suppressions.Companion.UNUSED_PARAMETER
 
 /**
  * Represents a single keyword and its applicable versions, and acceptable input types.
@@ -275,6 +277,8 @@ data class KeywordInfo<K : Keyword<*>>(
 }
 
 class KeywordInfoSerializer() : KSerializer<KeywordInfo<out Keyword<*>>> {
+
+  @Suppress(UNUSED_PARAMETER)
   constructor(ser: KSerializer<Any>) : this()
 
   override val descriptor: SerialDescriptor = StringDescriptor.withName("KeywordInfo")

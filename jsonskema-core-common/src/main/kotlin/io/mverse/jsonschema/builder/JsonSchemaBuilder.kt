@@ -95,6 +95,8 @@ import lang.json.JsrValue
 import lang.json.toJsrValue
 import lang.json.unboxAsAny
 import lang.net.URI
+import lang.suppress.Suppressions
+import lang.suppress.Suppressions.Companion.UNCHECKED_CAST
 import lang.uuid.randomUUID
 
 class JsonSchemaBuilder(
@@ -217,7 +219,9 @@ class JsonSchemaBuilder(
         keywords[keyword] = value
         report += mergeAdd(kwPath, keyword)
       } else {
+        @Suppress(UNCHECKED_CAST)
         val thisValue = keywords[keyword] as Keyword<Any>
+        @Suppress(UNCHECKED_CAST)
         val otherValue = value as Keyword<Any>
         try {
           val mergeKeyword = thisValue.merge(kwPath, keyword, otherValue, report)
@@ -558,7 +562,8 @@ class JsonSchemaBuilder(
 
   override fun build(block: SchemaBuilder.() -> Unit): Schema {
     this.block()
-    val location: SchemaLocation = @Suppress("USELESS_ELVIS")
+    val location: SchemaLocation = @Suppress("USELESS_ELVIS", "SENSELESS_COMPARISON")
+
     when {
       this.id == null -> this.location ?: SchemaPaths.fromBuilder(this)
       this.location != null -> this.location.withId(this.id!!)

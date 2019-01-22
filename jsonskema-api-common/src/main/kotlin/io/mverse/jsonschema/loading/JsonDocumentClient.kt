@@ -15,6 +15,9 @@
  */
 package io.mverse.jsonschema.loading
 
+import io.mverse.jsonschema.resolver.FetchedDocument
+import io.mverse.jsonschema.resolver.FetchedDocumentResults
+import io.mverse.jsonschema.resolver.JsonDocumentFetcher
 import lang.json.JsonPath
 import lang.json.JsrObject
 import lang.net.URI
@@ -30,9 +33,16 @@ interface JsonDocumentClient {
 
   fun findLoadedDocument(documentLocation: URI): JsrObject?
 
-  fun registerLoadedDocument(documentLocation: URI, document: JsrObject)
+  fun registerFetchedDocument(documentLocation: URI, document: JsrObject)
+  fun registerFetchedDocument(document: FetchedDocument)
 
   fun resolveSchemaWithinDocument(documentURI: URI, schemaURI: URI, document: JsrObject): JsonPath?
+
+  fun withDocumentFetcher(fetcher: JsonDocumentFetcher) {
+    this += fetcher
+  }
+
+  operator fun plusAssign(fetcher: JsonDocumentFetcher)
 
   /**
    * Returns a stream to be used for reading the remote content (response body) of the URL. In the
@@ -43,9 +53,9 @@ interface JsonDocumentClient {
    * @return the input stream of the response
    * @throws java.io.UncheckedIOException if an IO error occurs.
    */
-  fun fetchDocument(uri: URI): JsrObject
+  fun fetchDocument(uri: URI): FetchedDocumentResults
 
-  fun fetchDocument(url: String): JsrObject {
+  fun fetchDocument(url: String): FetchedDocumentResults {
     return fetchDocument(URI(url))
   }
 }

@@ -65,8 +65,8 @@ data class SchemaLoaderImpl(
     return this
   }
 
-  override fun withDocumentClient(client: JsonDocumentClient): SchemaLoaderImpl {
-    return this.copy(documentClient = client)
+  override fun withDocumentClient(documentClient: JsonDocumentClient): SchemaLoaderImpl {
+    return this.copy(documentClient = documentClient)
   }
 
   // #############################################################
@@ -75,21 +75,21 @@ data class SchemaLoaderImpl(
 
   override fun withPreloadedDocument(schemaObject: JsrObject): SchemaReader {
     JsonUtils.extractIdFromObject(schemaObject)?.also { id ->
-      documentClient.registerLoadedDocument(id, schemaObject)
+      documentClient.registerFetchedDocument(id, schemaObject)
     }
     return this
   }
 
   override operator fun plus(document: JsrObject): SchemaReader {
     JsonUtils.extractIdFromObject(document)?.also { id ->
-      documentClient.registerLoadedDocument(id, document)
+      documentClient.registerFetchedDocument(id, document)
     }
     return this
   }
 
   override operator fun plusAssign(preloadedSchema: JsrObject) {
     JsonUtils.extractIdFromObject(preloadedSchema)?.also { id ->
-      documentClient.registerLoadedDocument(id, preloadedSchema)
+      documentClient.registerFetchedDocument(id, preloadedSchema)
     }
   }
 

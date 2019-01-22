@@ -6,12 +6,12 @@ import io.mverse.jsonschema.validation.keywords.KeywordValidator
 
 object NumberLimitValidators {
 
+  @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
   fun getMaxValidator(keyword: LimitKeyword, schema: Schema): KeywordValidator<LimitKeyword>? {
     return when {
       keyword.isExclusive -> NumberExclusiveMaximumValidator(
           schema = schema,
           exclusiveMaximum = keyword.exclusiveLimit!!.toDouble())
-      @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
       keyword.limit != null -> NumberMaximumValidator(
           schema = schema,
           maximum = keyword.limit!!.toDouble()

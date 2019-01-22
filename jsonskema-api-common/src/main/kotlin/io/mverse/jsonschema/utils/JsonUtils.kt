@@ -49,8 +49,6 @@ object JsonUtils {
   }
 
   fun prettyPrintArgs(vararg args: Any): Array<Any> = prettyPrintArgs(args.asIterable())
-
-
 }
 
 /**

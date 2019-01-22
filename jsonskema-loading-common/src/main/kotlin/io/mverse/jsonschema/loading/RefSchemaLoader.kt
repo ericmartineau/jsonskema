@@ -10,20 +10,15 @@ import io.mverse.jsonschema.SchemaLocation.Companion.ROOT_URI
 import io.mverse.jsonschema.utils.JsonUtils
 import io.mverse.jsonschema.utils.isJsonPointer
 import io.mverse.jsonschema.utils.withoutFragment
-import kotlinx.serialization.json.JsonNull
-import lang.json.JsonKey
 import lang.json.JsonPath
 import lang.json.JsrNull
 import lang.json.JsrObject
 import lang.json.JsrValue
-import lang.json.KtObject
-import lang.json.get
 import lang.json.getOrNull
 import lang.json.type
 import lang.net.URI
 import lang.net.fragment
 import lang.net.resolveUri
-import lang.net.scheme
 
 data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoader: SchemaLoader) {
 
@@ -54,17 +49,11 @@ data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoa
 
     val foundDoc = documentClient.findLoadedDocument(remoteDocumentURI)
     return foundDoc
-        ?: {
-          val scheme = referenceURI.scheme?.toLowerCase() ?: ""
-          if (!scheme.startsWith("http")) {
-            throw SchemaException(referenceURI, "Couldn't resolve ref within document, but can't readSchema non-http scheme: %s", scheme)
-          }
+        ?: documentClient.fetchDocument(remoteDocumentURI).let cache@{results->
+          documentClient.registerFetchedDocument(results.fetchedDocument)
+          return@cache results.fetchedJson
+        }
 
-          // Load document remotely
-          val document = documentClient.fetchDocument(remoteDocumentURI)
-          documentClient.registerLoadedDocument(remoteDocumentURI, document)
-          document
-        }()
   }
 
   internal fun findRefInRemoteDocument(referenceURI: URI, report: LoadingReport): SchemaBuilder {

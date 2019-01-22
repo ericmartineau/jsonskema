@@ -51,7 +51,7 @@ interface SchemaReader {
     return when (existing) {
       null -> {
         val fetchedDocument = documentClient.findLoadedDocument(schemaURI)
-            ?: documentClient.fetchDocument(schemaURI)
+            ?: documentClient.fetchDocument(schemaURI).fetchedJson
         readSchema(fetchedDocument)
       }
       else -> existing

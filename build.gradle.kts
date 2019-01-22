@@ -9,7 +9,8 @@ plugins {
 }
 
 allprojects  {
-  val msharedVersion by extra { "0.5.110" }
+  val msharedVersion by extra { "0.5.111" }
+  val kotlinCoroutinesVersion by extra { "1.1.0" }
 
   plugins.apply("kotlinx-serialization")
   mverse {
@@ -53,10 +54,25 @@ allprojects  {
         entry("kotlin-test-junit")
       }
 
+      dependencySet("org.jetbrains.kotlinx:0.1.3-native-1.3.20-eap-52") {
+        entry("kotlinx-coroutines-io")
+        entry("kotlinx-coroutines-io-jvm")
+        entry("kotlinx-io")
+        entry("kotlinx-io-jvm")
+      }
+
+      dependencySet("org.jetbrains.kotlinx:$kotlinCoroutinesVersion") {
+        entry("kotlinx-coroutines-core")
+        entry("kotlinx-coroutines-core-common")
+        entry("kotlinx-coroutines-jdk8")
+      }
+
+
       dependencySet("io.mverse:$msharedVersion") {
         entry("mverse-json")
         entry("mverse-lang-jvm")
         entry("mverse-lang-common")
+        entry("mverse-junit")
       }
 
       /**
@@ -67,11 +83,6 @@ allprojects  {
         entry("kotlinx-serialization-runtime-common")
         entry("kotlinx-serialization-runtime-jsonparser")
       }
-
-
-      dependency("org.jetbrains.kotlinx:kotlinx-io:0.1.2-dev-6")
-      dependency("org.jetbrains.kotlinx:kotlinx-io-common:0.1.2-dev-6")
-      dependency("org.jetbrains.kotlinx:kotlinx-io-js:0.1.2-dev-6")
 
 
       // Immutable Collections Library for Kotlin
