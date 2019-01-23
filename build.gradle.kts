@@ -9,7 +9,7 @@ plugins {
 }
 
 allprojects  {
-  val msharedVersion by extra { "0.5.111" }
+  val msharedVersion by extra { "0.6.0-dev.0.uncommitted+296888e" }
   val kotlinCoroutinesVersion by extra { "1.1.0" }
 
   plugins.apply("kotlinx-serialization")
@@ -54,6 +54,8 @@ allprojects  {
         entry("kotlin-test-junit")
       }
 
+      dependency("io.github.microutils:kotlin-logging:1.6.22")
+
       dependencySet("org.jetbrains.kotlinx:0.1.3-native-1.3.20-eap-52") {
         entry("kotlinx-coroutines-io")
         entry("kotlinx-coroutines-io-jvm")
@@ -72,6 +74,8 @@ allprojects  {
         entry("mverse-json")
         entry("mverse-lang-jvm")
         entry("mverse-lang-common")
+        entry("mverse-log-common")
+        entry("mverse-log-jvm")
         entry("mverse-junit")
       }
 
@@ -87,6 +91,17 @@ allprojects  {
 
       // Immutable Collections Library for Kotlin
       dependency("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.1")
+
+
+      dependencySet("org.slf4j:1.7.+") {
+        entry("slf4j-api")
+        entry("jul-to-slf4j")
+      }
+
+      dependencySet("ch.qos.logback:1.2.+") {
+        entry("logback-classic")
+        entry("logback-core")
+      }
     }
   }
 }

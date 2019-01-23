@@ -21,9 +21,13 @@ import io.mverse.jsonschema.resolver.FetchedDocument
 import io.mverse.jsonschema.resolver.FetchedDocumentResults
 import io.mverse.jsonschema.resolver.HttpDocumentFetcher
 import io.mverse.jsonschema.resolver.JsonDocumentFetcher
+import io.mverse.logging.Logged
+import io.mverse.logging.MLog
+import io.mverse.logging.duration
+import io.mverse.logging.mlogger
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.supervisorScope
 import lang.coroutine.TimeoutException
 import lang.coroutine.awaitFirstOrNull
 import lang.coroutine.blocking
@@ -43,7 +47,8 @@ open class DefaultJsonDocumentClient(val fetchers: MutableList<JsonDocumentFetch
                                      val schemaCache: SchemaCache,
                                      val fetchTimeout: Long = 10000L) : JsonDocumentClient {
 
-  constructor(fetchers: List<JsonDocumentFetcher> = defaultFetchers, fetchTimeout: Long = 10000L) : this(fetchers.toMutableList(), SchemaCache(), fetchTimeout)
+  constructor(fetchers: List<JsonDocumentFetcher> = defaultFetchers, fetchTimeout: Long = 10000L)
+      : this(fetchers.toMutableList(), SchemaCache(), fetchTimeout)
 
   init {
     if (fetchers.isEmpty()) {
@@ -71,41 +76,59 @@ open class DefaultJsonDocumentClient(val fetchers: MutableList<JsonDocumentFetch
   }
 
   override fun fetchDocument(uri: URI): FetchedDocumentResults {
+//    return debug.timed("fetch: $uri") { mlog ->
+      return blocking fetch@{
+        if (fetchers.size == 1) {
+          fetchSingle(uri)
+        } else {
+          fetchAll(uri)
+        }
+      }.orThrow()
+//    }
+  }
+
+  private suspend fun CoroutineScope.fetchSingle(uri: URI): FetchedDocumentResults {
+//    mlog.duration("single") {
+      return try {
+        FetchedDocumentResults(result = fetchers.first().fetchDocument(uri))
+      } catch (e: Exception) {
+        FetchedDocumentResults(errors = mapOf(fetchers.first().key to e))
+      }
+//    }
+  }
+
+  private suspend inline fun CoroutineScope.fetchAll(uri: URI): FetchedDocumentResults {
     val errors: MutableMap<KClass<out JsonDocumentFetcher>, Throwable> = mutableMapOf()
-    return blocking fetch@{
-      supervisorScope {
-        val deferreds = fetchers.map { fetcher ->
-          async(Dispatchers.Default) {
-            try {
-              val fetched = fetcher.fetchDocument(uri)
-              return@async fetched
-            } catch (e: Exception) {
-              errors[fetcher.key] = e
-              return@async null
-            }
+
+    val deferreds = fetchers.map { fetcher ->
+      async(Dispatchers.Default) {
+//        mlog.duration(fetcher.key.simpleName!!) fetcher@{
+          return@async try {
+            val fetched = fetcher.fetchDocument(uri)
+            fetched
+          } catch (e: Exception) {
+            errors[fetcher.key] = e
+            null
           }
         }
-
-        try {
-          deferreds.awaitFirstOrNull(fetchTimeout)
-        } catch (e: TimeoutException) {
-          null
-        }.let { fetched ->
-          val unaccounted = fetchers.map { it::class }.filter {
-            it !in errors && fetched?.fetcherKey != it
-          }.toSet()
-
-          FetchedDocumentResults(errors, unaccounted, fetched).orThrow()
-        }
-      }
+//      }
     }
+    val fetched = try {
+//      mlog.duration("await") {
+        deferreds.awaitFirstOrNull(fetchTimeout)
+//      }
+    } catch (e: TimeoutException) {
+      null
+    }
+
+    return FetchedDocumentResults(errors, result = fetched)
   }
 
   override fun plusAssign(fetcher: JsonDocumentFetcher) {
     fetchers += fetcher
   }
 
-  companion object {
+  companion object : Logged(mlogger {}) {
     val defaultFetchers = listOf(ClasspathDocumentFetcher(), HttpDocumentFetcher())
   }
 }

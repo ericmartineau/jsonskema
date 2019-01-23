@@ -12,9 +12,7 @@ import io.mverse.jsonschema.validation.ValidationReport
 class AdditionalPropertiesValidator(keyword: SingleSchemaKeyword, schema: Schema, factory: SchemaValidatorFactory) : KeywordValidator<SingleSchemaKeyword>(Keywords.ADDITIONAL_PROPERTIES, schema) {
 
   private val additionalPropertiesValidator: SchemaValidator
-
   private val propertySchemaKeys: Set<String>
-
   private val patternProperties: Set<Regex>
 
   init {

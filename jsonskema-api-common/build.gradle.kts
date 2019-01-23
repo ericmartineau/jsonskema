@@ -10,6 +10,8 @@ mverse  {
     compile(kotlinTest())
     compile(kotlinImmutable())
     compile("mverse-lang-common")
+    compile("kotlin-logging")
+    compile("mverse-log-common")
     compile(kotlinSerialization())
   }
 }

@@ -4,6 +4,7 @@ import assertk.assert
 import assertk.assertions.contains
 import assertk.assertions.hasSize
 import assertk.assertions.isBetween
+import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isLessThan
 import assertk.assertions.isNotNull
@@ -20,6 +21,7 @@ import io.mverse.jsonschema.resolver.HttpDocumentFetcher
 import io.mverse.jsonschema.resolver.JsonDocumentFetcher
 import kotlinx.coroutines.delay
 import lang.net.URI
+import lang.time.currentTime
 import org.junit.Test
 import java.io.FileNotFoundException
 import java.util.concurrent.TimeoutException
@@ -98,6 +100,34 @@ class DefaultJsonDocumentClientTest {
         }
       }
       duration().isBetween(500, 6000)
+    }
+  }
+
+  @Test fun testDefaultLoading() {
+    val client = DefaultJsonDocumentClient()
+    val time = currentTime()
+    val result = client.fetchDocument("https://storage.googleapis.com/mverse-test/schemas/schema.json")
+    println("Delay ${currentTime() - time}ms")
+  }
+
+  @Test fun testLoadingClasspath() {
+    val client = DefaultJsonDocumentClient(listOf(ClasspathDocumentFetcher()))
+    assertTimed {
+      val time = currentTime()
+      val r = client.fetchDocument("https://storage.googleapis.com/mverse-test/schemas/schema.json")
+      println("Delay ${currentTime() - time}ms")
+      r
+    }.apply {
+      verify {
+        doesNotThrowAnyException()
+        returnedValue {
+          isNotNull {
+            val doc = it.actual
+            assert(doc.result!!.schemaData).isEqualTo("{}")
+          }
+        }
+      }
+      duration().isLessThan(200)
     }
   }
 
