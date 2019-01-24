@@ -25,14 +25,16 @@ import assertk.assertions.isTrue
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaBuilder
-import io.mverse.jsonschema.ValidationMocks
+import io.mverse.jsonschema.validation.ValidationMocks
 import io.mverse.jsonschema.assertj.subject.ValidationErrorPredicate
 import io.mverse.jsonschema.keyword.KeywordInfo
-import io.mverse.jsonschema.createValidatorFactory
 import io.mverse.jsonschema.getValidator
-import kotlinx.serialization.json.JsonElement
+import lang.json.JsrValue
 import kotlinx.serialization.json.JsonNull
-import lang.json.toJsonLiteral
+import lang.json.JsrNull
+import lang.json.jsrNumber
+import lang.json.toJsrValue
+import lang.json.toJsrValue
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import java.util.*
@@ -42,16 +44,20 @@ typealias ValidationErrorPredicater= (ValidationError)->Boolean
 
 object ValidationTestSupport {
 
-  fun buildWithLocation(builder: SchemaBuilder<*>): Schema {
+  fun buildWithLocation(builder: SchemaBuilder): Schema {
     return builder.build()
+  }
+
+  fun buildWithLocation(builder: Schema): Schema {
+    return builder.toBuilder().build()
   }
 
   fun countCauseByJsonPointer(root: ValidationError, pointer: String): Long {
     return root.causes
-        ?.map { it.pathToViolation }
-        ?.filter { ptr -> ptr.equals(pointer) }
-        ?.count()
-        ?.toLong() ?: 0
+        .map { it.pathToViolation }
+        .filter { ptr -> ptr.equals(pointer) }
+        .count()
+        .toLong()
   }
 
   fun countMatchingMessage(messages: List<ValidationError>, expectedSubstring: String): Long {
@@ -62,7 +68,7 @@ object ValidationTestSupport {
 
   fun expectFailure(failingSchema: Schema,
                     expectedViolatedSchemaClass: Class<out Schema>,
-                    expectedPointer: String, input: JsonElement) {
+                    expectedPointer: String, input: JsrValue) {
 
     val errors = test(failingSchema, expectedPointer, input)
     assert(errors).isNotNull()
@@ -72,16 +78,16 @@ object ValidationTestSupport {
   }
 
   fun expectFailure(failingSchema: Schema, num: Double) {
-    expectFailure(failingSchema, null, num.toJsonLiteral())
+    expectFailure(failingSchema, null, toJsrValue(num))
   }
 
-  fun expectFailure(failingSchema: Schema, input: JsonElement) {
+  fun expectFailure(failingSchema: Schema, input: JsrValue) {
     expectFailure(failingSchema, null, input)
   }
 
   fun expectFailure(failingSchema: Schema,
                     expectedViolatedSchema: Schema,
-                    expectedPointer: String?, input: JsonElement) {
+                    expectedPointer: String?, input: JsrValue) {
 
     val errors = test(failingSchema, expectedPointer, input)
     assert(errors).isNotNull()
@@ -90,7 +96,7 @@ object ValidationTestSupport {
   }
 
   fun expectFailure(failingSchema: Schema, expectedPointer: String?,
-                    input: JsonElement) {
+                    input: JsrValue) {
     expectFailure(failingSchema, failingSchema, expectedPointer, input)
   }
 
@@ -134,12 +140,12 @@ object ValidationTestSupport {
     return Failure().schema(schema)
   }
 
-  fun failureOf(subjectBuilder: SchemaBuilder<*>): Failure {
+  fun failureOf(subjectBuilder: SchemaBuilder): Failure {
     return failureOf(buildWithLocation(subjectBuilder))
   }
 
   private fun test(failingSchema: Schema, expectedPointer: String?,
-                   input: JsonElement): ValidationError? {
+                   input: JsrValue): ValidationError? {
 
     val error = JsonSchema.getValidator(failingSchema).validate(input)
     assert(error, failingSchema.toString() + " did not fail for " + input).isNotNull()
@@ -157,7 +163,7 @@ object ValidationTestSupport {
     private var expectedPointer = "#"
     private var expectedSchemaLocation = "#"
     private var expectedKeyword: String? = null
-    private var input: JsonElement? = null
+    private var input: JsrValue? = null
     private var expectedMessageFragment: String? = null
     private var expectedPredicate: ValidationErrorPredicate? = null
     private var expectedConsumer: ValidationErrorConsumer? = null
@@ -237,31 +243,31 @@ object ValidationTestSupport {
     }
 
     fun nullInput(): Failure {
-      this.input = JsonNull
+      this.input = JsrNull
       return this
     }
 
     fun input(input: String): Failure {
-      this.input = input.toJsonLiteral()
+      this.input = toJsrValue(input)
       return this
     }
 
     fun input(input: Boolean): Failure {
-      this.input = input.toJsonLiteral()
+      this.input = toJsrValue(input)
       return this
     }
 
     fun input(i: Int): Failure {
-      this.input = i.toJsonLiteral()
+      this.input = jsrNumber(i)
       return this
     }
 
-    fun input(input: JsonElement): Failure {
-      this.input = input
+    fun input(input: JsrValue?): Failure {
+      this.input = input!!
       return this
     }
 
-    fun input(): JsonElement? {
+    fun input(): JsrValue? {
       return input
     }
 
@@ -296,22 +302,22 @@ object ValidationTestSupport {
   }
 
   fun expectSuccess(schema: Schema, input: Long) {
-    expectSuccess(schema, input.toJsonLiteral())
+    expectSuccess(schema, toJsrValue(input))
   }
 
   fun expectSuccess(schema: Schema, input: Double) {
-    expectSuccess(schema, input.toJsonLiteral())
+    expectSuccess(schema, toJsrValue(input))
   }
 
   fun expectSuccess(schema: Schema, input: String) {
-    expectSuccess(schema, input.toJsonLiteral())
+    expectSuccess(schema, toJsrValue(input))
   }
 
   fun expectSuccess(schema: Schema, input: Boolean) {
-    expectSuccess(schema, input.toJsonLiteral())
+    expectSuccess(schema, toJsrValue(input))
   }
 
-  fun expectSuccess(schema: Schema, input: JsonElement) {
+  fun expectSuccess(schema: Schema, input: JsrValue) {
     val error = JsonSchema.createValidatorFactory().createValidator(schema).validate(input)
     assert(error, "Found validation: " + error.toString()).isNull()
   }

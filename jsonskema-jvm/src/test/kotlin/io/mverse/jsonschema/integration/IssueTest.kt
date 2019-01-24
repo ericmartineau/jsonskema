@@ -37,7 +37,7 @@
 //import java.util.Arrays
 //import java.util.Optional
 //import javax.json.JsonArray
-//import kotlin.io.json.JsonObject
+//import kotlin.io.json.JsrObject
 //import javax.json.JsonStructure
 //import javax.json.JsonValue
 //import javax.json.spi.JsonProvider
@@ -83,7 +83,7 @@
 //  private fun loadSchema(): Schema {
 //    val schemaFile = fileByName("schema.json")
 //    if (schemaFile.isPresent()) {
-//      FileInputStream(schemaFile.get()).use({ schemaStream -> return JsonSchema.schemaReader().readSchema(schemaStream) })
+//      FileInputStream(schemaFile.get()).use({ schemaStream -> return JsonSchema.createSchemaReader().readSchema(schemaStream) })
 //    }
 //    throw RuntimeException(issueDir.getCanonicalPath() + "/schema.json is not found")
 //  }
@@ -183,11 +183,11 @@
 //  }
 //
 //  // Recursively process the expected values, which can contain nested arrays
-//  private fun readExpectedValues(expected: JsonObject) {
+//  private fun readExpectedValues(expected: JsrObject) {
 //    expectedFailureList!!.add(expected.getString("message"))
 //    if (expected.containsKey("causingExceptions")) {
 //      val causingEx = expected.getJsonArray("causingExceptions")
-//      for (subJson in causingEx.getValuesAs(JsonObject::class.java)) {
+//      for (subJson in causingEx.getValuesAs(JsrObject::class.java)) {
 //        readExpectedValues(subJson)
 //      }
 //    }

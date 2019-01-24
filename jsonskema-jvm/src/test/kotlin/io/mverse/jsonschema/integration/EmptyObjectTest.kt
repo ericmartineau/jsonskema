@@ -18,23 +18,24 @@ package io.mverse.jsonschema.integration
 import assertk.assert
 import assertk.assertions.isNull
 import io.mverse.jsonschema.JsonSchema
-import io.mverse.jsonschema.ValidationMocks
+import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.schemaReader
-import kotlinx.serialization.json.json
+import io.mverse.jsonschema.validation.ValidationMocks
+import lang.json.JsrObject
+import lang.json.jsrObject
 import kotlin.test.Test
 
 class EmptyObjectTest {
 
   @Test
   fun validateEmptyObject() {
-    val jsonSubject = json {
-      "type" to "object"
-      "properties" to json {}
+    val jsonSubject = jsrObject {
+      "type" *= "object"
+      "properties" *= jsrObject {}
     }
     val schemaJson = JsonSchema.resourceLoader().readJson("json-schema-draft-06.json")
 
-    val schema = JsonSchema.schemaReader().readSchema(schemaJson.jsonObject)
+    val schema = JsonSchema.createSchemaReader().readSchema(schemaJson as JsrObject)
     val validator = ValidationMocks.createTestValidator(schema)
     val errors = validator.validate(jsonSubject)
     assert(errors).isNull()

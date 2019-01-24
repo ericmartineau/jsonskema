@@ -20,7 +20,7 @@ import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.assertj.asserts.isValid
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.schemaReader
+import io.mverse.jsonschema.createSchemaReader
 import org.junit.Test
 
 class MetaSchemaTest {
@@ -28,7 +28,7 @@ class MetaSchemaTest {
   @Test
   fun validateMetaSchema() {
     val jsonSchema = JsonSchema.resourceLoader().readJsonObject("json-schema-draft-06.json")
-    val schema = JsonSchema.schemaReader().readSchema(jsonSchema)
+    val schema = JsonSchema.createSchemaReader().readSchema(jsonSchema)
     assert(schema)
         .validating(jsonSchema)
         .isValid()

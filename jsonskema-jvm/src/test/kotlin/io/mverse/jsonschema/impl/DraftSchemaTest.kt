@@ -11,11 +11,12 @@ import io.mverse.jsonschema.DraftSchema
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.createSchemaReader
-import io.mverse.jsonschema.loading.parseJsonObject
+import io.mverse.jsonschema.loading.parseJsrObject
 import io.mverse.unit.junit.TestParam
 import junitparams.JUnitParamsRunner
 import junitparams.Parameters
-import lang.URI
+import kotlinx.io.streams.asInput
+import lang.net.URI
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -421,11 +422,11 @@ class DraftSchemaTest {
   companion object {
 
     private val schemaReader = JsonSchema.createSchemaReader()
-    private lateinit var kitchenSinkSchema: Schema
+    private var kitchenSinkSchema: Schema
 
     init {
       val resourceAsStream = DraftSchemaTest::class.java.getResourceAsStream("/kitchen-sink-schema.json")
-      val schemaJson = resourceAsStream.parseJsonObject()
+      val schemaJson = resourceAsStream.asInput().parseJsrObject()
       schemaReader.withPreloadedDocument(schemaJson)
       kitchenSinkSchema = schemaReader.readSchema(schemaJson)
     }

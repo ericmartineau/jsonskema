@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.loading
 
 import assertk.assert
+import assertk.assertAll
 import assertk.assertions.containsAll
 import assertk.assertions.hasSize
 import assertk.assertions.hasToString
@@ -19,16 +20,17 @@ import io.mverse.jsonschema.assertj.asserts.isSchemaEqual
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
-import io.mverse.jsonschema.jsonschema
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.StringKeyword
 import io.mverse.jsonschema.loading.reference.DefaultJsonDocumentClient
+import io.mverse.jsonschema.resolver.FetchedDocument
+import io.mverse.jsonschema.resolver.FetchedDocumentResults
+import io.mverse.jsonschema.resolver.HttpDocumentFetcher
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.schemaReader
 import kotlinx.serialization.json.json
-import lang.URI
-import org.assertj.core.api.SoftAssertions.assertSoftly
+import lang.json.jsrObject
+import lang.net.URI
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -53,18 +55,17 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   @Test
   fun emptySchema() {
     val emptySchema = getSchemaForKey("emptySchema")
-    assertSoftly { a ->
-      assert(emptySchema).isNotNull {
-        it.hasToString("{}")
-      }
+
+    assert(emptySchema).isNotNull {
+      it.hasToString("{}")
     }
   }
 
   @Test
   fun emptySchemaWithDefault() {
     val emptySchema = getSchemaForKey("emptySchemaWithDefault")
-    val actual = json {
-      "default" to 0
+    val actual = jsrObject {
+      "default" *= 0
     }
 
     assert(emptySchema.toString()).isEqualIgnoringWhitespace(actual.toString())
@@ -101,7 +102,7 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   @Test(expected = SchemaException::class)
   fun invalidNumberSchema() {
     val input = getJsonObjectForKey("invalidNumberSchema")
-    JsonSchema.schemaReader().readSchema(input)
+    JsonSchema.createSchemaReader().readSchema(input)
   }
 
   @Test(expected = SchemaException::class)
@@ -181,7 +182,7 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
 
   @Test(expected = SchemaException::class)
   fun pointerResolutionFailure() {
-    val pointerResolutionFailure = getSchemaForKey("pointerResolutionFailure")
+    getSchemaForKey("pointerResolutionFailure")
   }
 
   @Test(expected = SchemaException::class)
@@ -207,9 +208,10 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   fun remotePointerResulion() {
     val documentClient = Mockito.spy(DefaultJsonDocumentClient())
 
-    doReturn(json {}).`when`(documentClient).fetchDocument(URI("http://example.org/asd"))
-    doReturn(json {}).`when`(documentClient).fetchDocument(URI("http://example.org/otherschema.json"))
-    doReturn(json {}).`when`(documentClient).fetchDocument(URI("http://example.org/folder/subschemaInFolder.json"))
+    val fetchedDoc = FetchedDocumentResults(result = FetchedDocument(HttpDocumentFetcher::class, URI(""), URI(""), "{}"))
+    doReturn(fetchedDoc).`when`(documentClient).fetchDocument(URI("http://example.org/asd"))
+    doReturn(fetchedDoc).`when`(documentClient).fetchDocument(URI("http://example.org/otherschema.json"))
+    doReturn(fetchedDoc).`when`(documentClient).fetchDocument(URI("http://example.org/folder/subschemaInFolder.json"))
 
     val factory = SchemaLoaderImpl().withDocumentClient(documentClient)
     factory.readSchema(getJsonObjectForKey("remotePointerResolution"))
@@ -225,7 +227,7 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   @Test
   fun schemaJsonIdIsRecognized() {
     val client = spy(DefaultJsonDocumentClient())
-    val retval = json {}
+    val retval = FetchedDocumentResults(result = FetchedDocument(HttpDocumentFetcher::class, URI(""), URI(""), "{}"))
     doReturn(retval).`when`(client).fetchDocument("http://example.org/schema/schema.json")
     doReturn(retval).`when`(client).fetchDocument(URI("http://example.org/schema/schema.json"))
     val schemaWithId = getJsonObjectForKey("schemaWithId")
@@ -236,11 +238,12 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   @Test
   fun schemaPointerIsPopulated() {
     val rawSchema = JsonSchema.resourceLoader(this::class).readJsonObject("objecttestschemas.json")
-        .getObject("objectWithSchemaDep")
-    val actual = JsonSchema.schemaReader().readSchema(rawSchema).asDraft6()
+        .getJsonObject("objectWithSchemaDep")
+    val actual = JsonSchema.createSchemaReader().readSchema(rawSchema).asDraft6()
 
-    assert(actual).isNotNull()
-    assertSoftly { a ->
+    assertAll {
+      assert(actual).isNotNull()
+
       assert(actual.propertySchemaDependencies)
           .isNotEmpty()
       val actualSchemaPointer = actual.propertySchemaDependencies["a"]
@@ -258,8 +261,8 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
 
   @Test
   fun sniffByFormat() {
-    val schemaJson = json { "format" to "hostname" }
-    val actual = JsonSchema.schemaReader().readSchema(schemaJson).asDraft6()
+    val schemaJson = jsrObject { "format" *= "hostname" }
+    val actual = JsonSchema.createSchemaReader().readSchema(schemaJson).asDraft6()
     assert(actual.format).isEqualTo("hostname")
   }
 
@@ -281,8 +284,8 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
     val loader = JsonSchema.schemaReader + customKeyword(keyword) { jsonValue ->
       StringKeyword(jsonValue.string!!)
     }
-    val inputJson = json {
-      "customKeyword" to "boomIsThePassword"
+    val inputJson = jsrObject {
+      "customKeyword" *= "boomIsThePassword"
     }
     val schema = loader.readSchema(inputJson)
     assert(schema.keywords.get(keyword)).isEqualTo(StringKeyword("boomIsThePassword"))
@@ -303,9 +306,9 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
 
   @Test
   fun unsupportedFormat() {
-    val schema = json {
-      "type" to "string"
-      "format" to "unknown"
+    val schema = jsrObject {
+      "type" *= "string"
+      "format" *= "unknown"
     }
     JsonSchema.schemaReader.readSchema(schema)
   }
@@ -326,12 +329,12 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
    */
   @Test
   fun testEqualsWithNumberPrecision() {
-    val schemaOne = jsonschema("https://storage.googleapis.com/mverse-test/mverse/petStore/0.0.1/schema/dog/jsonschema-draft6.json") {
-          withSchema()
-          propertySchema("maxNumber") {
-            minItems(32)
-          }
-        }.asDraft7()
+    val schemaOne = JsonSchema.schema("https://storage.googleapis.com/mverse-test/mverse/petStore/0.0.1/schema/dog/jsonschema-draft6.json") {
+      isUseSchemaKeyword = true
+      properties["maxNumber"] = {
+        minItems = 32
+      }
+    }.asDraft7()
 
     val asString = schemaOne.toString(Draft7)
 

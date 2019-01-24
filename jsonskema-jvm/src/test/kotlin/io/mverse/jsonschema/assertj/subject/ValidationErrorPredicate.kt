@@ -1,15 +1,14 @@
 package io.mverse.jsonschema.assertj.subject
 
+import com.google.common.base.Joiner
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.validation.ValidationError
-import lang.Joiner
-import lang.URI
-import lang.format
+import lang.net.URI
 
 interface ValidationErrorPredicate : (ValidationError) -> Boolean {
   companion object {
 
-    val AND = Joiner(" && ", true)
+    val AND = Joiner.on(" && ").skipNulls()
     val EXPRESSION_FORMAT = "%s.%s(%s)"
 
     fun of(field: String, operator: String, rhs: Any?, predicate: (ValidationError) -> Boolean): ValidationErrorPredicate {
@@ -38,7 +37,7 @@ interface ValidationErrorPredicate : (ValidationError) -> Boolean {
 
     fun messageContains(message: String): ValidationErrorPredicate {
       return of("message", "contains", message) { e ->
-        e.message != null && e.message.contains(message)
+        e.message.contains(message)
       }
     }
 
@@ -67,7 +66,7 @@ interface ValidationErrorPredicate : (ValidationError) -> Boolean {
     }
 
     fun toString(vararg predicates: ValidationErrorPredicate): String {
-      return AND.join(*predicates)
+      return AND.join(predicates.iterator())
     }
   }
 }

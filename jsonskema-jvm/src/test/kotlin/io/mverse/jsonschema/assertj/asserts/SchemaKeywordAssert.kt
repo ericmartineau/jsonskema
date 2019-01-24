@@ -2,9 +2,9 @@ package io.mverse.jsonschema.assertj.asserts
 
 import assertk.Assert
 import assertk.assertions.isEqualTo
-import io.mverse.jsonschema.keyword.JsonSchemaKeyword
+import io.mverse.jsonschema.keyword.Keyword
 
-typealias SchemaKeywordAssert<K> = Assert<JsonSchemaKeyword<K>>
+typealias SchemaKeywordAssert<K> = Assert<Keyword<K>>
 
 fun <K> SchemaKeywordAssert<K>.withAssertion(assertion: (K?) -> Unit): SchemaKeywordAssert<K> {
   assertion(actual.value)

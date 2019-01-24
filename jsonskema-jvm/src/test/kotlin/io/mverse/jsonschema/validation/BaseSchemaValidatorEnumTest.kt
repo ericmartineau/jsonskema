@@ -1,38 +1,46 @@
 package io.mverse.jsonschema.validation
 
 import assertk.assert
+import assertk.assertAll
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
-import assertk.assertions.isNull
 import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchema.schemaBuilder
 import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.assertj.asserts.isValid
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.keyword.Keywords
-import io.mverse.jsonschema.loading.parseJson
-import io.mverse.jsonschema.loading.parseJsonObject
-import io.mverse.jsonschema.schemaBuilder
-import io.mverse.jsonschema.validation.ValidationMocks.createTestValidator
+import io.mverse.jsonschema.loading.parseJsrJson
+import io.mverse.jsonschema.loading.parseJsrObject
 import io.mverse.jsonschema.validation.ValidationMocks.mockSchema
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import io.mverse.jsonschema.validation.ValidationTestSupport.failureOf
 import io.mverse.jsonschema.validation.ValidationTestSupport.verifyFailure
 import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.json
-import lang.json.jsonArrayOf
-import lang.json.toJsonLiteral
-import lang.json.toJsonArray
+import lang.json.JsrArray
+import lang.json.JsrObject
+import lang.json.createJsrArray
+import lang.json.get
+import lang.json.jkey
+import lang.json.jsrArrayOf
+import lang.json.jsrObject
+import lang.json.mutate
+import lang.json.toJsrValue
+import lang.json.toJsrValue
+import lang.json.toKtArray
+import lang.json.toMutableJsonArray
+import lang.json.values
 import org.junit.Before
 import org.junit.Test
 
 class BaseSchemaValidatorEnumTest {
-  private lateinit var possibleValues: kotlinx.serialization.json.JsonArray
+  private lateinit var possibleValues: JsrArray
 
   @Before
   fun before() {
-    possibleValues = listOf(true, "foo").toJsonArray()
+    possibleValues = jsrArrayOf(true, "foo")
   }
 
   @Test
@@ -40,50 +48,55 @@ class BaseSchemaValidatorEnumTest {
     failureOf(subjectBuilder())
         .expectedPointer("#")
         .expectedKeyword(Keywords.ENUM)
-        .input(jsonArrayOf(1))
+        .input(jsrArrayOf(1))
         .expect()
   }
 
   @Test
   fun objectInArrayMatches() {
-    val possibleValues = (this.possibleValues + json { "a" to true }).toJsonArray()
-    val subject = subjectBuilder().enumValues(possibleValues).build()
+    val possibleValues = createJsrArray(this.possibleValues + jsrObject { "a" to true })
+    val subject = subjectBuilder().build { enumValues = possibleValues }
 
-    val testValues = json { "a" to true }
+    val testValues = jsrObject { "a" to true }
     subject.validating(testValues)
         .isValid()
   }
 
   @Test
   fun success() {
-    val validJsonObject = json {
-      "a" to 0
+    val validJsonObject = jsrObject {
+      "a" *= 0
     }
-    possibleValues += jsonArrayOf(listOf<Any>(), validJsonObject)
+    possibleValues = possibleValues.mutate {
+      plus(jsrArrayOf())
+      plus(validJsonObject)
+    }
     val schema = subjectBuilder().build()
     val subject = ValidationMocks.createTestValidator(schema)
 
-    expectSuccess { subject.validate(true.toJsonLiteral()) }
-    expectSuccess { subject.validate("foo".toJsonLiteral()) }
-    expectSuccess { subject.validate(jsonArrayOf()) }
-    expectSuccess { subject.validate(validJsonObject) }
+    assertAll {
+      expectSuccess { subject.validate(true.toJsrValue()) }
+      expectSuccess { subject.validate("foo".toJsrValue()) }
+      expectSuccess { subject.validate(jsrArrayOf()) }
+      expectSuccess { subject.validate(validJsonObject) }
+    }
   }
 
   @Test
   fun toStringTest() {
     val toString = subjectBuilder().build().toString()
-    val actual = toString.parseJsonObject()
+    val actual = toString.parseJsrObject()
     assert(actual).hasSize(1)
-    val pv = jsonArrayOf(true, "foo")
-    assert(actual["enum"]).isEqualTo(pv)
+    val pv = jsrArrayOf(true, "foo")
+    assert(actual["enum".jkey]).isEqualTo(pv)
   }
 
   @Test
   fun validate_WhenNumbersHaveDifferentLexicalValues_EnumDoesntMatch() {
-    val testEnum = "[1, 1.0, 1.00]".parseJson().jsonArray
-    val testValNotSame = "1.000".toJsonLiteral()
+    val testEnum = "[1, 1.0, 1.00]".parseJsrJson().asJsonArray()
+    val testValNotSame = toJsrValue("1.000")
 
-    val schema = JsonSchema.schemaBuilder().enumValues(testEnum).build()
+    val schema = JsonSchema.schema { enumValues = testEnum }
 
     val validate = ValidationMocks.createTestValidator(schema).validate(testValNotSame)
 
@@ -93,10 +106,10 @@ class BaseSchemaValidatorEnumTest {
 
   @Test
   fun validate_WhenNumbersHaveSameLexicalValues_EnumMatches() {
-    val testEnum = "[1, 1.0, 1.00]".parseJson().jsonArray
-    val testValNotSame = "1.00".parseJson()
+    val testEnum = "[1, 1.0, 1.00]".parseJsrJson().asJsonArray()
+    val testValNotSame = "1.00".parseJsrJson()
 
-    val schema = mockSchema().enumValues(testEnum).build()
+    val schema = mockSchema.build { enumValues = testEnum }
     schema.validating(testValNotSame)
         .isValid()
   }
@@ -106,12 +119,9 @@ class BaseSchemaValidatorEnumTest {
     // To validate you either need to be:
     // An array with items [true, "foo", {"a": true}], OR
     // The number literal 42
-    val possibleValuesContainer = jsonArrayOf(
-        possibleValues + json { "a" to true },
-        42)
-
-    val subject = subjectBuilder().enumValues(possibleValuesContainer).build()
-    val testValues = jsonArrayOf(true, "foo", json { "a" to true })
+    val possibleValuesContainer = jsrArrayOf(possibleValues.plus(jsrObject { "a" to true }), 42)
+    val subject = subjectBuilder().build { enumValues = possibleValuesContainer }
+    val testValues = jsrArrayOf(true, "foo", jsrObject { "a" to true })
 
     expectSuccess {
       val error = ValidationMocks.createTestValidator(subject).validate(testValues)
@@ -121,21 +131,21 @@ class BaseSchemaValidatorEnumTest {
 
   @Test
   fun validate_WhenSubjectIsArray_AndEnumIsAppliedToTheArray_ThenTheArrayFailsToValidate() {
-    val possibleValues = this.possibleValues + json { "a" to true }
+    val possibleValues = possibleValues.toMutableJsonArray() + jsrObject { "a" *= true }
 
-    val subject = subjectBuilder().enumValues(possibleValues).build()
+    val subject = subjectBuilder().build { enumValues = possibleValues.build() }
 
-    val testValues = jsonArrayOf(json { "a" to true })
+    val testValues = jsrArrayOf(jsrObject { "a" to true })
 
     verifyFailure {
       ValidationMocks.createTestValidator(subject).validate(testValues)
     }
   }
 
-  private fun subjectBuilder(): SchemaBuilder<*> {
-    return JsonSchema.schemaBuilder().enumValues(possibleValues)
+  private fun subjectBuilder(): SchemaBuilder {
+    return schemaBuilder { enumValues = possibleValues }
   }
 
-  operator fun kotlinx.serialization.json.JsonArray.plus(iterable: Iterable<Any?>): kotlinx.serialization.json.JsonArray = (this.content + iterable).toJsonArray()
-  operator fun kotlinx.serialization.json.JsonArray.plus(element: kotlinx.serialization.json.JsonObject): kotlinx.serialization.json.JsonArray = (this.content + element).toJsonArray()
+  operator fun JsonArray.plus(iterable: Iterable<Any?>): JsonArray = (this.content + iterable).toKtArray()
+  operator fun JsonArray.plus(element: JsrObject): JsonArray = (this.content + element).toKtArray()
 }

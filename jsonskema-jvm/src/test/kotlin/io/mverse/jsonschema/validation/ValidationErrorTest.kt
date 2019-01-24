@@ -21,20 +21,18 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.fail
 import com.google.common.collect.Lists.newArrayList
-import io.mverse.jsonschema.JsonPath
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.assertThat
 import io.mverse.jsonschema.keyword.Keywords
-import io.mverse.jsonschema.loading.readFully
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.ValidationMocks.mockBooleanSchema
 import io.mverse.jsonschema.validation.ValidationMocks.mockNullSchema
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import io.mverse.jsonschema.validation.ValidationTestSupport.verifyFailure
-import kotlinx.serialization.json.JSON
 import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
+import lang.json.JsrObject
+import lang.json.JsonPath
+import lang.json.JsrNull
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -55,8 +53,8 @@ class ValidationErrorTest {
   @Test
   fun testToJson() {
     val subject = ValidationError(
-        violatedSchema = mockBooleanSchema().build(),
-        pointerToViolation = JsonPath.parseFromURIFragment("#/a/b"),
+        violatedSchema = mockBooleanSchema.build(),
+        pointerToViolation = JsonPath.fromURI("#/a/b"),
         errorMessage = "exception message",
         keyword = Keywords.TYPE)
 
@@ -73,7 +71,7 @@ class ValidationErrorTest {
         code = "code",
         errorMessage = "exception message",
         keyword = Keywords.TYPE,
-        pointerToViolation = JsonPath.parseFromURIFragment("#/a/b"))
+        pointerToViolation = JsonPath.fromURI("#/a/b"))
 
     val expected = loader.readJsonObject("exception-to-json-with-schema-location.json")
     val actual = subject.toJson()
@@ -82,7 +80,7 @@ class ValidationErrorTest {
 
   @Test
   fun throwForMultipleFailures() {
-    val failedSchema = mockNullSchema().build()
+    val failedSchema = mockNullSchema.build {}
     val input1 = ValidationError(
         violatedSchema = failedSchema,
         code = "code",
@@ -97,7 +95,7 @@ class ValidationErrorTest {
         keyword = Keywords.TYPE,
         pointerToViolation = "#".toJsonPointer())
 
-    val e = ValidationError.collectErrors(rootSchema, JsonPath.rootPath(), Arrays.asList(input1, input2))
+    val e = ValidationError.collectErrors(rootSchema, JsonPath.rootPath, Arrays.asList(input1, input2))
     assert(e).isNotNull()
 
     Assert.assertSame(rootSchema, e!!.violatedSchema)
@@ -110,12 +108,12 @@ class ValidationErrorTest {
 
   @Test
   fun throwForNoFailure() {
-    expectSuccess { ValidationError.collectErrors(rootSchema, JsonPath.rootPath(), emptyList()) }
+    expectSuccess { ValidationError.collectErrors(rootSchema, JsonPath.rootPath, emptyList()) }
   }
 
   @Test
   fun collectError_WhenSingleFailure_ThenFailureIsReturned() {
-    val failedSchema = mockNullSchema().build()
+    val failedSchema = mockNullSchema.build()
     val input = ValidationError(
         violatedSchema = failedSchema,
         code = "code",
@@ -123,27 +121,27 @@ class ValidationErrorTest {
         keyword = Keywords.TYPE,
         pointerToViolation = "#".toJsonPointer())
 
-    val actual = verifyFailure { ValidationError.collectErrors(rootSchema, JsonPath.rootPath(), newArrayList(input)) }
+    val actual = verifyFailure { ValidationError.collectErrors(rootSchema, JsonPath.rootPath, newArrayList(input)) }
     Assert.assertSame(input, actual)
   }
 
   @Test
   fun toJsonNullPointerToViolation() {
     val subject = ValidationError(
-        violatedSchema = mockBooleanSchema().build(),
+        violatedSchema = mockBooleanSchema.build(),
         code = "exception message",
         errorMessage = "msg",
         keyword = null,
         pointerToViolation = null)
     val actual = subject.toJson()
 
-    actual["pointerToViolation"].assertThat().isEqualTo(JsonNull)
+    actual["pointerToViolation"].assertThat().isEqualTo(JsrNull)
   }
 
   @Test
   fun toJsonWithCauses() {
     val cause = ValidationError(
-        violatedSchema = mockNullSchema().build(),
+        violatedSchema = mockNullSchema.build(),
         code = "code",
         messageTemplate = "cause msg %s",
         keyword = Keywords.TYPE,
@@ -151,7 +149,7 @@ class ValidationErrorTest {
         arguments = listOf("foo", "bar"))
 
     val subject = ValidationError(
-        violatedSchema = mockNullSchema().build(),
+        violatedSchema = mockNullSchema.build(),
         errorMessage = "exception message",
         keyword = null,
         causes = listOf(cause),
@@ -186,14 +184,14 @@ class ValidationErrorTest {
 
   @Test
   fun violationCountWithoutCauses() {
-    val subject = subjectWithCauses()
+    subjectWithCauses()
         .assertThat { violationCount }
         .isEqualTo(1)
   }
 
   private fun createTestValidationError(): ValidationError {
     return ValidationError(
-        violatedSchema = mockBooleanSchema().build(),
+        violatedSchema = mockBooleanSchema.build(),
         code = "code",
         errorMessage = "Failed Validation",
         keyword = Keywords.TYPE,
@@ -202,7 +200,7 @@ class ValidationErrorTest {
 
   private fun createDummyException(pointer: String): ValidationError {
     return ValidationError(
-        violatedSchema = mockBooleanSchema().build(),
+        violatedSchema = mockBooleanSchema.build(),
         code = "code",
         errorMessage = "stuff went wrong",
         keyword = Keywords.TYPE,
@@ -212,19 +210,19 @@ class ValidationErrorTest {
   private fun subjectWithCauses(vararg causes: ValidationError?): ValidationError? {
     return if (causes.isEmpty()) {
       ValidationError(
-          violatedSchema = mockBooleanSchema().build(),
+          violatedSchema = mockBooleanSchema.build(),
           code = "code",
           errorMessage = "Failure",
           keyword = Keywords.TYPE,
           pointerToViolation = "#".toJsonPointer())
-    } else ValidationError.collectErrors(rootSchema, JsonPath.rootPath(), causes.filterNotNull().toList())
+    } else ValidationError.collectErrors(rootSchema, JsonPath.rootPath, causes.filterNotNull().toList())
   }
 
-  private fun String.toJsonPointer(): JsonPath = JsonPath.parseFromURIFragment(this)
+  private fun String.toJsonPointer(): JsonPath = JsonPath.fromURI(this)
 }
 
-fun assertk.Assert<JsonObject>.isEqualTo(other: JsonObject, path: String = "") {
-  val prefix = if(!path.isBlank()) "" else "$path: "
+fun assertk.Assert<JsrObject>.isEqualTo(other: JsrObject, path: String = "") {
+  val prefix = if (!path.isBlank()) "" else "$path: "
 
   if (actual.keys != other.keys) {
     fail("${prefix}Key mismatch: Extra:${actual.keys.minus(other.keys)}, Missing:${other.keys.minus(actual.keys)}")
@@ -235,7 +233,7 @@ fun assertk.Assert<JsonObject>.isEqualTo(other: JsonObject, path: String = "") {
     actual.forEach { (k, v) ->
       val otherAtKey = other[k]
       when {
-        v is JsonObject && otherAtKey is JsonObject -> assert(v).isEqualTo(otherAtKey, "$path/$k")
+        v is JsrObject && otherAtKey is JsrObject -> assert(v).isEqualTo(otherAtKey, "$path/$k")
         else -> assert(v, "Value for key '$k'").isEqualTo(otherAtKey)
       }
     }

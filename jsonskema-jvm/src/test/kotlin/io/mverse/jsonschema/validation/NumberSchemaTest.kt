@@ -19,20 +19,23 @@ import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.assertj.asserts.hasKeyword
 import io.mverse.jsonschema.assertj.asserts.isNotValid
 import io.mverse.jsonschema.assertj.asserts.validating
+import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.getValidator
-import io.mverse.jsonschema.keyword.Keywords
-import io.mverse.jsonschema.keyword.Keywords.Companion.EXCLUSIVE_MAXIMUM
-import io.mverse.jsonschema.loading.parseJsonObject
+import io.mverse.jsonschema.keyword.Keywords.EXCLUSIVE_MAXIMUM
+import io.mverse.jsonschema.loading.parseJsrObject
 import io.mverse.jsonschema.minus
 import io.mverse.jsonschema.plus
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.schemaReader
 import io.mverse.jsonschema.validation.ValidationMocks.mockIntegerSchema
 import io.mverse.jsonschema.validation.ValidationMocks.mockNumberSchema
 import io.mverse.jsonschema.validation.ValidationMocks.mockSchema
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import kotlinx.serialization.json.JsonNull
-import lang.json.toJsonLiteral
+import lang.json.JsrNull
+import lang.json.JsrObject
+import lang.json.jsrNumber
+import lang.json.toJsrValue
+import lang.json.toJsrValue
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -42,15 +45,15 @@ class NumberSchemaTest {
 
   @Test
   fun exclusiveMaximum() {
-    val schema = mockNumberSchema().exclusiveMaximum(20).build()
-    schema.validating(20.toJsonLiteral())
+    val schema = mockNumberSchema.build { exclusiveMaximum = (20) }
+    schema.validating(jsrNumber(20))
         .isNotValid()
         .hasKeyword(EXCLUSIVE_MAXIMUM)
   }
 
   @Test
   fun exclusiveMinimum() {
-    val subject = ValidationTestSupport.buildWithLocation(mockNumberSchema().exclusiveMinimum(10.0))
+    val subject = ValidationTestSupport.buildWithLocation(mockNumberSchema.apply { exclusiveMinimum = (10.0) })
     ValidationTestSupport.failureOf(subject)
         .expectedKeyword("exclusiveMinimum")
         .input(10)
@@ -59,13 +62,13 @@ class NumberSchemaTest {
 
   @Test
   fun longNumber() {
-    val schema = mockNumberSchema().build()
-    JsonSchema.getValidator(schema).validate(4278190207L.toJsonLiteral())
+    val schema = mockNumberSchema.build()
+    JsonSchema.getValidator(schema).validate(4278190207L.toJsrValue())
   }
 
   @Test
   fun maximum() {
-    val subject = ValidationTestSupport.buildWithLocation(mockNumberSchema().maximum(20.0))
+    val subject = ValidationTestSupport.buildWithLocation(mockNumberSchema { maximum = (20.0) })
     ValidationTestSupport.failureOf(subject)
         .expectedKeyword("maximum")
         .input(21)
@@ -74,7 +77,7 @@ class NumberSchemaTest {
 
   @Test
   fun minimumFailure() {
-    val subject = ValidationTestSupport.buildWithLocation(mockNumberSchema().minimum(10.0))
+    val subject = ValidationTestSupport.buildWithLocation(mockNumberSchema { minimum = 10.0 })
     ValidationTestSupport.failureOf(subject)
         .expectedKeyword("minimum")
         .input(9)
@@ -83,7 +86,7 @@ class NumberSchemaTest {
 
   @Test
   fun multipleOfFailure() {
-    val subject = ValidationTestSupport.buildWithLocation(mockNumberSchema().multipleOf(10))
+    val subject = ValidationTestSupport.buildWithLocation(mockNumberSchema { multipleOf = 10 })
     ValidationTestSupport.failureOf(subject)
         .expectedKeyword("multipleOf")
         .input(15)
@@ -92,68 +95,69 @@ class NumberSchemaTest {
 
   @Test
   fun notRequiresNumber() {
-    val numberSchema = mockSchema()
-        .build()
-    expectSuccess { JsonSchema.getValidator(numberSchema).validate("foo".toJsonLiteral()) }
+    val numberSchema = mockSchema.build()
+    expectSuccess { JsonSchema.getValidator(numberSchema).validate("foo".toJsrValue()) }
   }
 
   @Test
   fun requiresIntegerSuccess() {
-    val numberSchema = mockNumberSchema().build()
-    expectSuccess { JsonSchema.getValidator(numberSchema).validate(10.toJsonLiteral()) }
+    val numberSchema = mockNumberSchema.build()
+    expectSuccess { JsonSchema.getValidator(numberSchema).validate(10.toJsrValue()) }
   }
 
   @Test
   fun requiresIntegerFailure() {
-    val subject = mockIntegerSchema().build()
-    ValidationTestSupport.expectFailure(subject, 10.2f.toJsonLiteral())
+    val subject = mockIntegerSchema.build()
+    ValidationTestSupport.expectFailure(subject, jsrNumber(10.2))
   }
 
   @Test
   fun smallMultipleOf() {
-    val schema = mockNumberSchema()
-        .multipleOf(0.0001)
-        .build()
-    JsonSchema.getValidator(schema).validate(0.0075.toJsonLiteral())
+    val schema = mockNumberSchema.build {
+      multipleOf = 0.0001
+    }
+
+    JsonSchema.getValidator(schema).validate(0.0075.toJsrValue())
   }
 
   @Test
   fun success() {
-    val schema = mockNumberSchema()
-        .minimum(10.0)
-        .exclusiveMaximum(11.0)
-        .multipleOf(10)
-        .build()
-    JsonSchema.getValidator(schema).validate(10.0.toJsonLiteral())
+    val schema = mockNumberSchema.build {
+      minimum = 10.0
+      exclusiveMaximum = 11.0
+      multipleOf = (10)
+    }
+
+    JsonSchema.getValidator(schema).validate(10.0.toJsrValue())
   }
 
   @Test
   fun toStringNoExplicitType() {
     val rawSchemaJson = loader.readJsonObject("tostring/numberschema.json") - "type"
-    val schemaFromJson = JsonSchema.schemaReader().readSchema(rawSchemaJson)
+    val schemaFromJson = JsonSchema.createSchemaReader().readSchema(rawSchemaJson)
     val actual = schemaFromJson.toString()
-    assertEquals(rawSchemaJson, actual.parseJsonObject())
+    assertEquals(rawSchemaJson, actual.parseJsrObject())
   }
 
   @Test
   fun toStringReqInteger() {
-    val rawSchemaJson: kotlinx.serialization.json.JsonObject = loader.readJsonObject("tostring/numberschema.json") + ("type" to "number".toJsonLiteral())
-    val actual = JsonSchema.schemaReader().readSchema(rawSchemaJson).toString()
-    assertEquals(rawSchemaJson, actual.parseJsonObject())
+    val rawSchemaJson: JsrObject = loader.readJsonObject("tostring/numberschema.json") + ("type" to "number".toJsrValue())
+    val actual = JsonSchema.createSchemaReader().readSchema(rawSchemaJson).toString()
+    assertEquals(rawSchemaJson, actual.parseJsrObject())
   }
 
   @Test
   fun toStringTest() {
     val rawSchemaJson = loader.readJsonObject("tostring/numberschema.json")
-    val actual = JsonSchema.schemaReader().readSchema(rawSchemaJson).toString()
-    assertEquals(rawSchemaJson, actual.parseJsonObject())
+    val actual = JsonSchema.createSchemaReader().readSchema(rawSchemaJson).toString()
+    assertEquals(rawSchemaJson, actual.parseJsrObject())
   }
 
   @Test
   fun typeFailure() {
-    ValidationTestSupport.failureOf(mockNumberSchema())
+    ValidationTestSupport.failureOf(mockNumberSchema)
         .expectedKeyword("type")
-        .input(JsonNull)
+        .input(JsrNull)
         .expect()
   }
 }

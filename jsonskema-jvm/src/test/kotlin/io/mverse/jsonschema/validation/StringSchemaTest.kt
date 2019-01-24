@@ -16,22 +16,20 @@
 package io.mverse.jsonschema.validation
 
 import io.mverse.jsonschema.JsonSchema
-import io.mverse.jsonschema.loading.parseJsonObject
+import io.mverse.jsonschema.createSchemaReader
+import io.mverse.jsonschema.loading.parseJsrObject
 import io.mverse.jsonschema.minus
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.schemaReader
-import io.mverse.jsonschema.validation.ValidationMocks.createTestValidator
 import io.mverse.jsonschema.validation.ValidationMocks.mockSchema
 import io.mverse.jsonschema.validation.ValidationMocks.mockStringSchema
 import io.mverse.jsonschema.validation.ValidationTestSupport.buildWithLocation
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import io.mverse.jsonschema.validation.ValidationTestSupport.failureOf
 import io.mverse.jsonschema.validation.ValidationTestSupport.verifyFailure
-import lang.json.toJsonLiteral
+import lang.json.toJsrValue
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.util.*
 
 class StringSchemaTest {
 
@@ -43,29 +41,29 @@ class StringSchemaTest {
   @Test
   fun formatFailure() {
     val schemaValidator = validatorFactory.createValidator(
-        buildWithLocation(mockStringSchema().format("test-format-failure"))
+        buildWithLocation(mockStringSchema { format = ("test-format-failure") })
     )
     failureOf(schemaValidator)
-        .expectedKeyword("format")
         .input("string")
         .expect()
   }
 
   @Test
   fun formatSuccess() {
-    val schemaValidator = validatorFactory.createValidator(mockStringSchema().format("test-format-success").build())
-    expectSuccess { schemaValidator.validate("string".toJsonLiteral()) }
+    val schemaValidator = validatorFactory
+        .createValidator(mockStringSchema.build { format = "test-format-success" })
+    expectSuccess { schemaValidator.validate("string".toJsrValue()) }
   }
 
   fun issue38Pattern() {
-    val schema = mockStringSchema().pattern("\\+?\\d+").build()
+    val schema = mockStringSchema.build { pattern = "\\+?\\d+" }
     val validator = ValidationMocks.createTestValidator(schema)
-    verifyFailure { validator.validate("aaa".toJsonLiteral()) }
+    verifyFailure { validator.validate("aaa".toJsrValue()) }
   }
 
   @Test
   fun maxLength() {
-    val subject = buildWithLocation(mockStringSchema().maxLength(3))
+    val subject = buildWithLocation(mockStringSchema { maxLength = 3 })
     failureOf(subject)
         .expectedKeyword("maxLength")
         .input("foobar")
@@ -74,7 +72,7 @@ class StringSchemaTest {
 
   @Test
   fun minLength() {
-    val subject = buildWithLocation(mockStringSchema().minLength(2))
+    val subject = buildWithLocation(mockStringSchema { minLength = 2 })
     failureOf(subject)
         .expectedKeyword("minLength")
         .input("a")
@@ -83,7 +81,11 @@ class StringSchemaTest {
 
   @Test
   fun multipleViolations() {
-    val schema = mockStringSchema().minLength(3).maxLength(1).pattern("^b.*").build()
+    val schema = mockStringSchema {
+      minLength = (3)
+      maxLength = (1)
+      pattern = ("^b.*")
+    }
     failureOf(schema)
         .input("ab")
         .expectedConsumer { e -> Assert.assertEquals(3, e.causes.size) }
@@ -92,47 +94,47 @@ class StringSchemaTest {
 
   @Test
   fun notRequiresString() {
-    val schema = mockSchema().build()
+    val schema = mockSchema.build {}
     expectSuccess(schema, 2)
   }
 
   @Test
   fun patternFailure() {
-    val subject = buildWithLocation(mockStringSchema().pattern("^a*$"))
+    val subject = buildWithLocation(mockStringSchema { pattern = ("^a*$") })
     failureOf(subject).expectedKeyword("pattern").input("abc").expect()
   }
 
   @Test
   fun patternSuccess() {
 
-    val schema = mockStringSchema().pattern("^a*$").build()
+    val schema = mockStringSchema.build { pattern = ("^a*$") }
     expectSuccess(schema, "aaaa")
   }
 
   @Test
   fun success() {
 
-    expectSuccess(mockStringSchema().build(), "foo")
+    expectSuccess(mockStringSchema.build {}, "foo")
   }
 
   @Test
   fun toStringNoExplicitType() {
     val rawSchemaJson = JsonSchema.resourceLoader().readJsonObject("tostring/stringschema.json") - "type"
-    val schema = JsonSchema.schemaReader().readSchema(rawSchemaJson)
-    val actual = JsonSchema.schemaReader().readSchema(schema.toString()).toString()
-    assertEquals(rawSchemaJson, actual.parseJsonObject())
+    val schema = JsonSchema.createSchemaReader().readSchema(rawSchemaJson)
+    val actual = JsonSchema.createSchemaReader().readSchema(schema.toString()).toString()
+    assertEquals(rawSchemaJson, actual.parseJsrObject())
   }
 
   @Test
   fun toStringTest() {
     val rawSchemaJson = JsonSchema.resourceLoader().readJsonObject("tostring/stringschema.json")
-    val actual = JsonSchema.schemaReader().readSchema(rawSchemaJson).toString()
-    assertEquals(rawSchemaJson, actual.parseJsonObject())
+    val actual = JsonSchema.createSchemaReader().readSchema(rawSchemaJson).toString()
+    assertEquals(rawSchemaJson, actual.parseJsrObject())
   }
 
   @Test
   fun typeFailure() {
-    failureOf(mockStringSchema())
+    failureOf(mockStringSchema)
         .expectedKeyword("type")
         .nullInput()
         .expect()

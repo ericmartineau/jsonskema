@@ -176,6 +176,7 @@
     },
     "definitions": {}
   },
+
   "pointerResolutionQueryFailure": {
     "type": "object",
     "properties": {

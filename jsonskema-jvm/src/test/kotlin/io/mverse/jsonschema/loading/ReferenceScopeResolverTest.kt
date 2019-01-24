@@ -18,7 +18,7 @@ package io.mverse.jsonschema.loading
 import assertk.assertions.isEqualTo
 import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.assertThat
-import lang.URI
+import lang.net.URI
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -26,21 +26,15 @@ import org.junit.runners.Parameterized.Parameters
 import java.util.*
 
 @RunWith(Parameterized::class)
-class ReferenceScopeResolverTest(testcaseName: String, expectedOutput: String,
+@Suppress("UNUSED_PARAMETER")
+class ReferenceScopeResolverTest(name: String,
+                                 expectedOutput: String,
                                  parentScope: String,
                                  encounteredSegment: String) {
 
-  private val expectedOutput: URI
-
-  private val parentScope: URI
-
-  private val encounteredSegment: URI
-
-  init {
-    this.expectedOutput = URI(expectedOutput)
-    this.parentScope = URI(parentScope)
-    this.encounteredSegment = URI(encounteredSegment)
-  }
+  private val expectedOutput: URI = URI(expectedOutput)
+  private val parentScope: URI = URI(parentScope)
+  private val encounteredSegment: URI = URI(encounteredSegment)
 
   @Test
   fun test() {
@@ -54,20 +48,13 @@ class ReferenceScopeResolverTest(testcaseName: String, expectedOutput: String,
     @Parameters(name = "{0}")
     @JvmStatic
     fun params(): List<Array<out Any>> {
-      return Arrays.asList(
-          parList("fragment id", "http://x.y.z/root.json#foo", "http://x.y.z/root.json", "#foo"),
-          parList("rel path", "http://example.org/foo", "http://example.org/bar", "foo"),
-          parList("file name change", "http://x.y.z/schema/child.json",
-              "http://x.y.z/schema/parent.json",
-              "child.json"),
-          parList("file name after folder path", "http://x.y.z/schema/child.json",
-              "http://x.y.z/schema/", "child.json"),
-          parList("new root", "http://bserver.com", "http://aserver.com/",
-              "http://bserver.com"))
+      return listOf(
+          arrayOf("fragment id", "http://x.y.z/root.json#foo", "http://x.y.z/root.json", "#foo"),
+          arrayOf("rel path", "http://example.org/foo", "http://example.org/bar", "foo"),
+          arrayOf("file name change", "http://x.y.z/schema/child.json", "http://x.y.z/schema/parent.json", "child.json"),
+          arrayOf("file name after folder path", "http://x.y.z/schema/child.json", "http://x.y.z/schema/", "child.json"),
+          arrayOf("new root", "http://bserver.com", "http://aserver.com/", "http://bserver.com"))
     }
 
-    private fun parList(vararg params: String): Array<out Any> {
-      return params
-    }
   }
 }

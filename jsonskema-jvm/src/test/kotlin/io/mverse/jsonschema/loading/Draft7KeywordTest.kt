@@ -17,12 +17,12 @@ import io.mverse.jsonschema.assertj.asserts.withAssertion
 import io.mverse.jsonschema.enums.JsonSchemaType.STRING
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
 import io.mverse.jsonschema.keyword.Keywords
-import io.mverse.jsonschema.keyword.Keywords.Companion.COMMENT
-import io.mverse.jsonschema.keyword.Keywords.Companion.CONTENT_ENCODING
-import io.mverse.jsonschema.keyword.Keywords.Companion.CONTENT_MEDIA_TYPE
-import io.mverse.jsonschema.keyword.Keywords.Companion.PATTERN
+import io.mverse.jsonschema.keyword.Keywords.COMMENT
+import io.mverse.jsonschema.keyword.Keywords.CONTENT_ENCODING
+import io.mverse.jsonschema.keyword.Keywords.CONTENT_MEDIA_TYPE
+import io.mverse.jsonschema.keyword.Keywords.PATTERN
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.schemaReader
+import io.mverse.jsonschema.createSchemaReader
 import org.junit.Before
 import org.junit.Test
 
@@ -35,7 +35,7 @@ class Draft7KeywordTest {
 
   @Before
   fun readSchema() {
-    val schemaReader = JsonSchema.schemaReader().withStrictValidation(Draft7)
+    val schemaReader = JsonSchema.createSchemaReader().withStrictValidation(Draft7)
     val loader = JsonSchema.resourceLoader(this::class)
     val schemaObject = loader.readJsonObject("/draft7-keywords.json")
     this.schema = schemaReader.readSchema(schemaObject)

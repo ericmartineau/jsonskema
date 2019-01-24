@@ -4,15 +4,12 @@ import assertk.assert
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaException
 import io.mverse.jsonschema.enums.JsonSchemaType
-import io.mverse.jsonschema.jsonschema
-import io.mverse.jsonschema.jsonschemaBuilder
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.ExpectedException
 
 /**
  * @author erosb
@@ -80,8 +77,8 @@ class ObjectKeywordsLoaderTest : BaseLoaderTest("objecttestschemas.json") {
   }
 
   companion object {
-    val BOOLEAN_SCHEMA = jsonschema {
-      type(JsonSchemaType.BOOLEAN)
+    val BOOLEAN_SCHEMA = JsonSchema.schema {
+      type = JsonSchemaType.BOOLEAN
     }
   }
 }

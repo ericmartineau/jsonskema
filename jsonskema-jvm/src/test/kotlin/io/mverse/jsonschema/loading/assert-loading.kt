@@ -5,15 +5,15 @@ import assertk.assert
 import assertk.assertions.isEqualTo
 import assertk.fail
 import io.mverse.jsonschema.JsonSchema
-import io.mverse.jsonschema.schemaReader
-import kotlinx.serialization.json.JsonObject
+import io.mverse.jsonschema.createSchemaReader
+import lang.json.JsrObject
 
 typealias SchemaLoadingAssert = Assert<LoadingReport?>
 typealias SafeSchemaLoadingAssert = Assert<LoadingReport>
 typealias LoadingIssueAssert = Assert<LoadingIssue?>
 typealias SafeLoadingIssueAssert = Assert<LoadingIssue>
 
-fun JsonObject.assertAsSchema(reader: SchemaReader = JsonSchema.schemaReader(),
+fun JsrObject.assertAsSchema(reader: SchemaReader = JsonSchema.createSchemaReader(),
                               block:SafeSchemaLoadingAssert.()->Unit = {}): SchemaLoadingAssert {
   return try {
     reader.readSchema(this)
@@ -41,6 +41,7 @@ fun SchemaLoadingAssert.isFailed(errorCount:Int? = null, block: SafeSchemaLoadin
   if (actual?.hasErrors() != true) {
     fail("Unexpected success! Try harder to fail.")
   } else {
+    assert(actual!!.issues.size, "error count").isEqualTo(errorCount)
     assert(actual!!).block()
   }
 }

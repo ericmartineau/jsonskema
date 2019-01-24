@@ -1,30 +1,30 @@
 package io.mverse.jsonschema.validation
 
 import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchema.schema
+import io.mverse.jsonschema.JsonSchema.schemaBuilder
+import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.ValidationMocks.createTestValidator
 import io.mverse.jsonschema.validation.ValidationMocks.mockBooleanSchema
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
-
-import io.mverse.jsonschema.ValidationMocks.createTestValidator
-import io.mverse.jsonschema.schemaBuilder
-import lang.json.toJsonLiteral
+import lang.json.JsrTrue
+import lang.json.toJsrValue
 import org.junit.Test
-
 
 class BaseSchemaValidatorNotSchemaTest {
   @Test
   fun failure() {
-    val subject = JsonSchema.schemaBuilder().notSchema(mockBooleanSchema()).build()
+    val subject = schema { notSchema = mockBooleanSchema }
     ValidationTestSupport.failureOf(subject)
         .validator(createTestValidator(subject))
-        .input(true.toJsonLiteral())
+        .input(JsrTrue)
         .expectedKeyword("not")
         .expect()
   }
 
   @Test
   fun success() {
-    val schemaWithNot =JsonSchema.schemaBuilder().notSchema(mockBooleanSchema()).build()
-    expectSuccess { ValidationMocks.createTestValidator(schemaWithNot).validate("foo".toJsonLiteral()) }
+    val schemaWithNot = JsonSchema.schemaBuilder { notSchema = mockBooleanSchema }
+    expectSuccess { ValidationMocks.createTestValidator(schemaWithNot).validate("foo".toJsrValue()) }
   }
 }

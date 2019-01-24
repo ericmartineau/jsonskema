@@ -2,6 +2,7 @@ package io.mverse.jsonschema.utils
 
 import assertk.assert
 import assertk.assertions.isEqualTo
+import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.enums.FormatType
 import io.mverse.jsonschema.enums.JsonSchemaType.ARRAY
 import io.mverse.jsonschema.enums.JsonSchemaType.BOOLEAN
@@ -9,89 +10,88 @@ import io.mverse.jsonschema.enums.JsonSchemaType.NULL
 import io.mverse.jsonschema.enums.JsonSchemaType.NUMBER
 import io.mverse.jsonschema.enums.JsonSchemaType.OBJECT
 import io.mverse.jsonschema.enums.JsonSchemaType.STRING
-import io.mverse.jsonschema.jsonschema
 import kotlinx.serialization.json.JsonNull
-import lang.json.jsonArrayOf
+import lang.json.jsrArrayOf
 import org.junit.Test
 
 class JsonSchemaInspectionsTest {
   @Test
   fun testAmbiguous_EnumValues() {
-    val draft6Schema = jsonschema {
-      enumValues(jsonArrayOf(1, true))
+    val draft6Schema = JsonSchema.schema {
+      enumValues = jsrArrayOf(1, true)
     }.asDraft6()
-    assert(draft6Schema.calculateType()).isEqualTo(NULL)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(NULL)
   }
 
   @Test
   fun testArraySchema() {
-    val draft6Schema = jsonschema {
-      maxItems(23)
+    val draft6Schema = JsonSchema.schema {
+      maxItems = 23
     }
-    assert(draft6Schema.calculateType()).isEqualTo(ARRAY)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(ARRAY)
   }
 
   @Test
   fun testBooleanSchema() {
-    val draft6Schema = jsonschema {
-      type(BOOLEAN)
+    val draft6Schema = JsonSchema.schema {
+      type = BOOLEAN
     }.asDraft6()
-    assert(draft6Schema.calculateType()).isEqualTo(BOOLEAN)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(BOOLEAN)
   }
 
   @Test
   fun testBooleanSchema_EnumValues() {
-    val draft6Schema = jsonschema {
-      enumValues(jsonArrayOf(true, false))
+    val draft6Schema = JsonSchema.schema {
+      enumValues = jsrArrayOf(true, false)
     }.asDraft6()
-    assert(draft6Schema.calculateType()).isEqualTo(BOOLEAN)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(BOOLEAN)
   }
 
   @Test
   fun testNullSchema() {
-    val draft6Schema = jsonschema {
-      type(NULL)
+    val draft6Schema = JsonSchema.schema {
+      type = NULL
     }
-    assert(draft6Schema.calculateType()).isEqualTo(NULL)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(NULL)
   }
 
   @Test
   fun testNullSchema_EnumValues() {
-    val draft6Schema = jsonschema {
-      enumValues(jsonArrayOf(JsonNull))
+    val draft6Schema = JsonSchema.schema {
+      enumValues = jsrArrayOf(JsonNull)
     }.asDraft6()
-    assert(draft6Schema.calculateType()).isEqualTo(NULL)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(NULL)
   }
 
   @Test
   fun testNumberSchema() {
-    val draft6Schema = jsonschema {
-      maximum(23)
+    val draft6Schema = JsonSchema.schema {
+      maximum = 23
     }.asDraft6()
-    assert(draft6Schema.calculateType()).isEqualTo(NUMBER)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(NUMBER)
   }
 
   @Test
   fun testNumberSchema_EnumValues() {
-    val draft6Schema = jsonschema {
-      enumValues(jsonArrayOf(1, 4))
+    val draft6Schema = JsonSchema.schema {
+      enumValues = jsrArrayOf(1, 4)
     }.asDraft6()
-    assert(draft6Schema.calculateType()).isEqualTo(NUMBER)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(NUMBER)
   }
 
   @Test
   fun testObjectSchema() {
-    val draft6Schema = jsonschema {
-      maxProperties(23)
+    val draft6Schema = JsonSchema.schema {
+      maxProperties = 23
     }.asDraft6()
-    assert(draft6Schema.calculateType()).isEqualTo(OBJECT)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(OBJECT)
   }
 
   @Test
   fun testStringSchema() {
-    val draft6Schema = jsonschema {
-      format(FormatType.DATE.toString())
+    val draft6Schema = JsonSchema.schema {
+      format = FormatType.DATE.toString()
     }.asDraft6()
-    assert(draft6Schema.calculateType()).isEqualTo(STRING)
+    assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(STRING)
   }
 }

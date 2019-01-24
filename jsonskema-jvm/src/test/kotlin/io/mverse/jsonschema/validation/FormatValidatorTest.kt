@@ -16,7 +16,7 @@
 package io.mverse.jsonschema.validation
 
 import io.mverse.jsonschema.enums.FormatType
-import lang.illegalState
+import lang.exception.illegalState
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized

@@ -3,7 +3,8 @@ package io.mverse.jsonschema.validation
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import io.mverse.jsonschema.assertThat
-import io.mverse.jsonschema.loading.parseJson
+import io.mverse.jsonschema.loading.parseJsrJson
+import io.mverse.jsonschema.utils.equalsLexically
 import kotlinx.serialization.json.JsonLiteral
 import org.junit.Test
 
@@ -11,10 +12,10 @@ class ObjectComparatorTest {
 
   @Test
   fun testLexicalEquivalentForNumbers() {
-    val testNumA = "1.00".parseJson() as JsonLiteral
-    val testNumB = "1.0".parseJson() as JsonLiteral
-    val testNumC = "1".parseJson() as JsonLiteral
-    val testNumD = "1".parseJson() as JsonLiteral
+    val testNumA = "1.00".parseJsrJson()
+    val testNumB = "1.0".parseJsrJson()
+    val testNumC = "1".parseJsrJson()
+    val testNumD = "1".parseJsrJson()
 
     assertk.assert {
       testNumA.equalsLexically(testNumB).assertThat("1.00 lexical equivalent to 1.0").isFalse()

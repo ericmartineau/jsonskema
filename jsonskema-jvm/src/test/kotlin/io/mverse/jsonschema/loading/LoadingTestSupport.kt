@@ -21,9 +21,9 @@
 //import io.mverse.jsonschema.Schema
 //import io.mverse.jsonschema.SchemaException
 //import io.mverse.jsonschema.resourceLoader
-//import io.mverse.jsonschema.schemaReader
-//import kotlinx.serialization.json.JsonElement
-//import kotlinx.serialization.json.JsonObject
+//import io.mverse.jsonschema.createSchemaReader
+//import lang.json.JsrValue
+//import lang.json.JsrObject
 //import java.util.Optional
 //import java.util.function.Consumer
 //import java.util.function.Predicate
@@ -42,7 +42,7 @@
 //
 //  fun <S : Schema, E : Exception> expectFailure(failure: Failure<S, E>): E? {
 //    try {
-//      val schemaFactory = failure.schemaFactory() ?: (JsonSchema.schemaReader())
+//      val schemaFactory = failure.schemaFactory() ?: (JsonSchema.createSchemaReader())
 //      schemaFactory.readSchema(failure.input()!!)
 //    } catch (e: Throwable) {
 //      failure.expectedException()
@@ -84,7 +84,7 @@
 //
 //  class Failure<S : Schema, E : Exception> {
 //
-//    private var input: JsonObject? = null
+//    private var input: JsrObject? = null
 //
 //    private var expectedSchemaLocation = "#"
 //
@@ -137,17 +137,17 @@
 //      return this
 //    }
 //
-//    fun input(input: JsonObject): Failure<S, E> {
+//    fun input(input: JsrObject): Failure<S, E> {
 //      this.input = input
 //      return this
 //    }
 //
-//    fun input(input: JsonElement): Failure<S, E> {
+//    fun input(input: JsrValue): Failure<S, E> {
 //      this.input = input.jsonObject
 //      return this
 //    }
 //
-//    fun input(): JsonObject? {
+//    fun input(): JsrObject? {
 //      return input
 //    }
 //

@@ -19,6 +19,7 @@ bintray {
     key = System.getProperty('BINTRAY_PASSWORD')
     publications = ['mavenProject']
     pkg {
+        publish = true
         repo = 'mverse-public'
         name = 'jsonskema'
         userOrg = 'mverse-io'

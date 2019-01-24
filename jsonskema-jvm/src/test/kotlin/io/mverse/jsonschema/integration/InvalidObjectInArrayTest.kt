@@ -23,8 +23,9 @@ import io.mverse.jsonschema.assertj.asserts.hasViolationAt
 import io.mverse.jsonschema.assertj.asserts.hasViolationsAt
 import io.mverse.jsonschema.assertj.asserts.isDraft7
 import io.mverse.jsonschema.assertj.asserts.validating
+import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.schemaReader
+import io.mverse.jsonschema.createSchemaReader
 import org.junit.Test
 
 class InvalidObjectInArrayTest {
@@ -34,7 +35,7 @@ class InvalidObjectInArrayTest {
 
     val schemaJson = JsonSchema.resourceLoader().readJsonObject("/io/mverse/jsonschema/invalidobjectinarray/schema.json")
     val valueJson = JsonSchema.resourceLoader().readJsonObject("/io/mverse/jsonschema/invalidobjectinarray/subject.json")
-    val schema = JsonSchema.schemaReader().readSchema(schemaJson)
+    val schema = JsonSchema.createSchemaReader().readSchema(schemaJson)
 
     assert(schema)
         .isDraft7()
