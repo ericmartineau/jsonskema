@@ -23,12 +23,12 @@ enum class JsonSchemaType {
   companion object : KSerializer<JsonSchemaType> {
     override val descriptor: SerialDescriptor = SerialClassDescImpl("JsonSchemaType")
 
-    override fun deserialize(input: Decoder): JsonSchemaType {
-      return JsonSchemaTypes.fromString(input.decodeString())
+    override fun deserialize(decoder: Decoder): JsonSchemaType {
+      return JsonSchemaTypes.fromString(decoder.decodeString())
     }
 
-    override fun serialize(output: Encoder, obj: JsonSchemaType) {
-      output.encodeString(obj.name.toLowerCase())
+    override fun serialize(encoder: Encoder, obj: JsonSchemaType) {
+      encoder.encodeString(obj.name.toLowerCase())
     }
   }
 }

@@ -14,6 +14,7 @@ import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.loading.parseJsrObject
 import io.mverse.jsonschema.resourceLoader
+import kotlinx.io.streams.asInput
 import lang.json.JsrObject
 import org.junit.Test
 
@@ -21,7 +22,7 @@ class EndToEndTest {
 
   @Test
   fun testParseAndValidate() {
-    val primitives = JsonSchema.resourceLoader().getStream("primitives.json")
+    val primitives = JsonSchema.resourceLoader().getStream("primitives.json").asInput()
     val jsonSchema = JsonSchema.resourceLoader().getStream("mverse-account-profile.json")
     val jsonData = JsonSchema.resourceLoader().readJson("account-data.json") as JsrObject
     val preloadedSchema = primitives.parseJsrObject()

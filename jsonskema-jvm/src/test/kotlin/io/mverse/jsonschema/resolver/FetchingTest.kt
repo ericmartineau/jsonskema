@@ -1,10 +1,10 @@
-package io.mverse.jsonschema
+package io.mverse.jsonschema.resolver
 
 import assertk.assertions.isTrue
 import io.mverse.assertk.hasStringValue
 import io.mverse.assertk.hasValueAtPointer
 import io.mverse.jsonschema.resolver.ClasspathDocumentFetcher
-import lang.coroutine.blocking
+import lang.coroutines.blocking
 import lang.net.toURI
 import org.junit.Test
 

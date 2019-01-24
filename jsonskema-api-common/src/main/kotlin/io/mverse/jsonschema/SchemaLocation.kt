@@ -4,10 +4,13 @@ import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.utils.isGeneratedURI
 import io.mverse.jsonschema.utils.isJsonPointer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import lang.hashKode
 import lang.json.JsonPath
 import lang.net.URI
 import lang.net.resolveUri
+import lang.serializer.JsrValueSerializer
+import lang.serializer.URISerializer
 
 /**
  * Provides location information for any given schema or validation context, including:
@@ -21,41 +24,46 @@ import lang.net.resolveUri
  */
 @Serializable
 class SchemaLocation(
+    @Serializable(URISerializer::class)
     val documentURI: URI,
 
     /**
      * Resolution scope for this location
      */
+    @Serializable(URISerializer::class)
     val resolutionScope: URI,
 
     /**
      * Path within the containing document
      */
+    @Serializable(JsonPath.Companion::class)
     val jsonPath: JsonPath,
 
     /**
      * Private val to support serialization
      */
+    @Serializable(URISerializer::class)
     private val _canonicalURI: URI? = null,
 
     /**
      * Private val to support serialization
      */
+    @Serializable(URISerializer::class)
     private val _uniqueURI: URI? = null) {
 
   /**
    * @return The absolute json-pointer for this location, resolved against the documentURI
    */
-  val absoluteJsonPointerURI: URI by lazy {
+  @Transient val absoluteJsonPointerURI: URI by lazy {
     documentURI.resolveUri(jsonPointerFragment)
   }
 
-  val jsonPointerFragment: URI get() = jsonPath.uriFragment
+  @Transient val jsonPointerFragment: URI get() = jsonPath.uriFragment
 
   /**
    * @return Whether this location has an auto-generated root URI.
    */
-  private val isGenerated: Boolean
+  @Transient private val isGenerated: Boolean
     get() = this.documentURI.isGeneratedURI()
 
   init {
@@ -66,7 +74,7 @@ class SchemaLocation(
   /**
    * @see .canonicalURI
    */
-  val canonicalURI: URI by lazy {
+  @Transient val canonicalURI: URI by lazy {
     _canonicalURI ?: when (isGenerated) {
       true -> jsonPath.uriFragment
       false -> _uniqueURI ?: this.absoluteJsonPointerURI
@@ -76,7 +84,7 @@ class SchemaLocation(
   /**
    * @see .uniqueURI
    */
-  val uniqueURI: URI by lazy {
+  @Transient val uniqueURI: URI by lazy {
     when {
       _uniqueURI != null -> _uniqueURI
       !isGenerated -> this.canonicalURI

@@ -15,6 +15,7 @@ import io.mverse.jsonschema.loading.parseJsrObject
 import io.mverse.unit.junit.TestParam
 import junitparams.JUnitParamsRunner
 import junitparams.Parameters
+import kotlinx.io.streams.asInput
 import lang.net.URI
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -425,7 +426,7 @@ class DraftSchemaTest {
 
     init {
       val resourceAsStream = DraftSchemaTest::class.java.getResourceAsStream("/kitchen-sink-schema.json")
-      val schemaJson = resourceAsStream.parseJsrObject()
+      val schemaJson = resourceAsStream.asInput().parseJsrObject()
       schemaReader.withPreloadedDocument(schemaJson)
       kitchenSinkSchema = schemaReader.readSchema(schemaJson)
     }

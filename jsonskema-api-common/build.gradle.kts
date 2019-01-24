@@ -13,6 +13,8 @@ mverse  {
     compile("kotlin-logging")
     compile("mverse-log-common")
     compile(kotlinSerialization())
+    compile("kotlinx-io")
+    compile("kotlinx-coroutines-io")
   }
 }
 

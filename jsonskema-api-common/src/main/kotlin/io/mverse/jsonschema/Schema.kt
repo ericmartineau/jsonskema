@@ -3,6 +3,7 @@ package io.mverse.jsonschema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
+import kotlinx.serialization.Serializable
 import lang.Name
 import lang.json.JsonPath
 import lang.json.JsrObject

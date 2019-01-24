@@ -2,7 +2,6 @@ package io.mverse.jsonschema.utils
 
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaType
-import kotlinx.serialization.json.ElementType
 import lang.collection.runLengths
 import lang.json.JsrArray
 import lang.json.JsrType
@@ -53,16 +52,16 @@ val JsrArray.jsonSchemaType: JsonSchemaType?
     }
   }
 
-internal fun ElementType.toJsonSchemaType(): JsonSchemaType {
-  return when (this) {
-    ElementType.NULL -> JsonSchemaType.NULL
-    ElementType.STRING -> JsonSchemaType.STRING
-    ElementType.NUMBER -> JsonSchemaType.NUMBER
-    ElementType.OBJECT -> JsonSchemaType.OBJECT
-    ElementType.ARRAY -> JsonSchemaType.ARRAY
-    ElementType.BOOLEAN -> JsonSchemaType.BOOLEAN
-  }
-}
+//internal fun ElementType.toJsonSchemaType(): JsonSchemaType {
+//  return when (this) {
+//    ElementType.NULL -> JsonSchemaType.NULL
+//    ElementType.STRING -> JsonSchemaType.STRING
+//    ElementType.NUMBER -> JsonSchemaType.NUMBER
+//    ElementType.OBJECT -> JsonSchemaType.OBJECT
+//    ElementType.ARRAY -> JsonSchemaType.ARRAY
+//    ElementType.BOOLEAN -> JsonSchemaType.BOOLEAN
+//  }
+//}
 
 internal fun JsrType.toJsonSchemaType(): JsonSchemaType =
     when (this) {

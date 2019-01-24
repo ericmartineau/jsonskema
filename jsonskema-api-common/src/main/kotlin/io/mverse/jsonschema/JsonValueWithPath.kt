@@ -5,8 +5,8 @@ import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.utils.JsonUtils.extractIdFromObject
 import io.mverse.jsonschema.utils.SchemaPaths
 import io.mverse.jsonschema.utils.toJsonSchemaType
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import lang.Serializable
 import lang.hashKode
 import lang.json.JsonPath
 import lang.json.JsrArray
@@ -20,10 +20,10 @@ import lang.json.propNames
 import lang.json.propValues
 import lang.json.properties
 import lang.json.type
-import lang.json.unbox
 import lang.json.unboxAsAny
 import lang.json.unboxOrNull
 import lang.json.values
+import lang.serializer.JsrValueSerializer
 import kotlinx.serialization.json.JsonArray as KJsonArray
 import lang.json.JsrObject as KJsonObject
 
@@ -32,7 +32,6 @@ import lang.json.JsrObject as KJsonObject
  *
  * It wraps a kotlin.serialization [JsrValue] and adds some extra methods that allow more fluent usage.
  */
-@Serializable
 data class JsonValueWithPath(
     val root: JsrValue,
     val wrapped: JsrValue,
@@ -105,7 +104,9 @@ data class JsonValueWithPath(
   @Transient override val size: Int get() = jsonObject?.propNames?.size ?: 0
   @Transient val type: JsrType get() = wrapped.type
   @Transient val number: Number? get() = wrapped.unboxOrNull() as? Number
-  @Transient val string: String? get() = if(wrapped == JsrNull) null else wrapped.unboxAsAny()?.toString()
+  @Transient
+  val string: String?
+    get() = if (wrapped == JsrNull) null else wrapped.unboxAsAny()?.toString()
   @Transient val boolean: Boolean? get() = wrapped.unboxAsAny() as? Boolean
   @Transient val int: Int? get() = wrapped.unboxAsAny() as? Int
   @Transient val double: Double? get() = wrapped.unboxOrNull() as? Double

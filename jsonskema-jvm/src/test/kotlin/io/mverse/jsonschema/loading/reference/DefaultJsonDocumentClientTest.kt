@@ -10,7 +10,6 @@ import assertk.assertions.isLessThan
 import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
 import assertk.assertions.message
-import io.mverse.assertk.assertTimed
 import io.mverse.assertk.hasStringValue
 import io.mverse.assertk.hasValueAtPointer
 import io.mverse.jsonschema.assertj.asserts.isEqualIgnoringWhitespace
@@ -19,30 +18,36 @@ import io.mverse.jsonschema.resolver.DocumentFetchException
 import io.mverse.jsonschema.resolver.FetchedDocument
 import io.mverse.jsonschema.resolver.HttpDocumentFetcher
 import io.mverse.jsonschema.resolver.JsonDocumentFetcher
-import kotlinx.coroutines.delay
+import io.mverse.logging.NoopMLog.start
+import io.mverse.logging.mlogger
+import io.mverse.test.assertTimed
+import lang.exception.illegalState
 import lang.net.URI
 import lang.time.currentTime
 import org.junit.Test
 import java.io.FileNotFoundException
-import java.util.concurrent.TimeoutException
+
+val slowpoke = 2000L
+val expectedSlowpoke = 2000L
 
 class DefaultJsonDocumentClientTest {
   @Test fun testFetchingNoProvidersFound() {
     assert {
-      DefaultJsonDocumentClient(listOf())
+      DefaultJsonDocumentClient(mutableListOf())
     }.thrownError { }
   }
 
   @Test fun testFetchingAllProvidersFailed() {
-    val defaultClient = DefaultJsonDocumentClient()
+    val defaultClient = DefaultJsonDocumentClient(2000)
     assertTimed {
       defaultClient.fetchDocument("https://nba.com/no/document/here")
-    }.run {
-      duration().isLessThan(5000)
-      verify {
-
-        thrownError {
-          isInstanceOf(DocumentFetchException::class) {
+    }
+        .duration { isLessThan(2000) }
+        .thrownError {
+          if (it.actual !is DocumentFetchException) {
+            it.actual.printStackTrace()
+          }
+          it.isInstanceOf(DocumentFetchException::class) {
             assert(it.actual.failures).hasSize(2)
             assert(it.actual.failures[ClasspathDocumentFetcher::class]).isNotNull {
               it.message().isNotNull {
@@ -59,8 +64,6 @@ class DefaultJsonDocumentClientTest {
             }
           }
         }
-      }
-    }
   }
 
   @Test fun testFetchingOneProviderSucceeded() {
@@ -84,57 +87,78 @@ class DefaultJsonDocumentClientTest {
       assert(fetched.jsrObject).hasValueAtPointer("/\$id") {
         hasStringValue("https://nba.com/schemas/by/eric/hats.json")
       }
-    }.duration().isLessThan(9000)
+    }.duration { isLessThan(expectedSlowpoke) }
   }
 
-  @Test fun testFetchingSlowpokeTimeout() {
-    val defaultClient = DefaultJsonDocumentClient(listOf(SlowpokeFetcher()), fetchTimeout = 500)
+  @Test fun testFetchingSlowpokeTimeout_Single() {
+    val defaultClient = DefaultJsonDocumentClient(SlowpokeFetcher(), fetchTimeout = 500)
     assertTimed {
       defaultClient.fetchDocument("https://unknown.com/path/is/bogus")
-    }.apply {
-      verify {
-        thrownError {
-          isInstanceOf(DocumentFetchException::class) {
-            assert(it.actual.failures).hasSize(1)
+    }
+        .thrownError {
+          if (it.actual !is DocumentFetchException) {
+            it.actual.printStackTrace()
+          }
+
+          it.isInstanceOf(DocumentFetchException::class) {
+            assert(it.actual.failures).hasSize(0)
           }
         }
-      }
-      duration().isBetween(500, 6000)
-    }
+        .duration { isBetween(500, expectedSlowpoke) }
   }
 
-  @Test fun testDefaultLoading() {
-    val client = DefaultJsonDocumentClient()
-    val time = currentTime()
-    val result = client.fetchDocument("https://storage.googleapis.com/mverse-test/schemas/schema.json")
-    println("Delay ${currentTime() - time}ms")
+  @Test fun testFetchingSlowpokeTimeout_Multi() {
+    val defaultClient = DefaultJsonDocumentClient(SlowpokeFetcher(), SlowpokeFetcher(), fetchTimeout = 500)
+    assertTimed {
+      defaultClient.fetchDocument("https://unknown.com/path/is/bogus")
+    }
+        .thrownError {
+          if (it.actual !is DocumentFetchException) {
+            it.actual.printStackTrace()
+          }
+
+          it.isInstanceOf(DocumentFetchException::class) {
+            assert(it.actual.failures).hasSize(0)
+          }
+        }
+        .duration { isBetween(500, expectedSlowpoke) }
   }
 
   @Test fun testLoadingClasspath() {
-    val client = DefaultJsonDocumentClient(listOf(ClasspathDocumentFetcher()))
+    val client = DefaultJsonDocumentClient(ClasspathDocumentFetcher())
+    client.fetchDocument("https://storage.googleapis.com/mverse-test/schemas/schema.json")
     assertTimed {
       val time = currentTime()
       val r = client.fetchDocument("https://storage.googleapis.com/mverse-test/schemas/schema.json")
       println("Delay ${currentTime() - time}ms")
       r
-    }.apply {
-      verify {
-        doesNotThrowAnyException()
-        returnedValue {
-          isNotNull {
+    }
+        .doesNotThrowAnyException()
+        .returnedValue {
+          it.isNotNull {
             val doc = it.actual
             assert(doc.result!!.schemaData).isEqualTo("{}")
           }
         }
-      }
-      duration().isLessThan(200)
-    }
+        .duration { isLessThan(200) }
   }
 
   class SlowpokeFetcher : JsonDocumentFetcher {
     override suspend fun fetchDocument(uri: URI): FetchedDocument {
-      delay(10000)
-      throw TimeoutException("Died after 10 seconds")
+      val start = currentTime()
+      try {
+        Thread.sleep(slowpoke)
+        throw IllegalStateException("Slowpoke puked after ${slowpoke / 1000} seconds")
+      } catch (e: InterruptedException) {
+        illegalState("Slowpoke was too slow ${currentTime() - start}ms")
+      }
+    }
+
+    override val isInterruptable = true
+
+    companion object {
+      val log = mlogger {}
     }
   }
 }
+

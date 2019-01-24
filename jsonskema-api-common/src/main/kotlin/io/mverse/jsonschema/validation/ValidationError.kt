@@ -1,3 +1,4 @@
+@file:ContextualSerialization(URI::class,  OffsetDateTime::class, ZonedDateTime::class, LocalDateTime::class)
 /*
  * Copyright (C) 2017 MVerse (http://mverse.io)
  *
@@ -18,17 +19,21 @@ package io.mverse.jsonschema.validation
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.KeywordInfoSerializer
+import kotlinx.serialization.ContextualSerialization
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.JsonNull
 import lang.Name
-import lang.SerializableWith
 import lang.json.JsonPath
 import lang.json.JsrObject
 import lang.json.jsrObject
 import lang.json.toKtArray
 import lang.net.URI
+import lang.serializer.URISerializer
 import lang.string.format
+import lang.time.LocalDateTime
+import lang.time.OffsetDateTime
+import lang.time.ZonedDateTime
 
 /**
  * Thrown by [Schema] subclasses on validation failure.
@@ -46,6 +51,7 @@ data class ValidationError(
      * A pointer to the violation within the input document we validated.
      */
     @Name("pointerToViolation")
+    @Serializable(JsonPath.Companion::class)
     val pointerToViolation: JsonPath? = null,
 
     @Name("code")
@@ -68,7 +74,7 @@ data class ValidationError(
     val causes: List<ValidationError> = emptyList(),
 
     @Name("keyword")
-    @SerializableWith(KeywordInfoSerializer::class)
+    @Serializable(KeywordInfoSerializer::class)
     val keyword: KeywordInfo<*>? = null,
 
     @Name("arguments")
@@ -117,6 +123,7 @@ data class ValidationError(
   val pathToViolation: String?
     get() = pointerToViolation?.uriFragment?.toString()
 
+  @Serializable(URISerializer::class)
   val schemaLocation: URI?
     get() = violatedSchema!!.pointerFragmentURI
 

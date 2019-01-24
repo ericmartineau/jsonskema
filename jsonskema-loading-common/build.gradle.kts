@@ -7,6 +7,7 @@ mverse  {
     compile(kotlinStdlib())
     compile("kotlinx-serialization-runtime-common")
     compile("mverse-lang-common")
+    compile("mverse-coroutines-common")
     compile("kotlinx-coroutines-core-common")
   }
 }

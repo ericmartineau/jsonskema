@@ -9,12 +9,11 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.internal.StringDescriptor
 import kotlinx.serialization.withName
-import lang.SerializableWith
+import kotlinx.serialization.Serializable
 import lang.enums.range
 import lang.exception.illegalState
 import lang.hashKode
 import lang.json.JsrType
-import lang.suppress.Suppressions
 import lang.suppress.Suppressions.Companion.UNUSED_PARAMETER
 
 /**
@@ -27,7 +26,7 @@ import lang.suppress.Suppressions.Companion.UNUSED_PARAMETER
  *
  * @param <K> The type of value this keyword produces (a schema, a string, an array, etc)
 </K> */
-@SerializableWith(KeywordInfoSerializer::class)
+@Serializable(KeywordInfoSerializer::class)
 data class KeywordInfo<K : Keyword<*>>(
     val sortOrder: Int,
     val key: String,
@@ -283,11 +282,11 @@ class KeywordInfoSerializer() : KSerializer<KeywordInfo<out Keyword<*>>> {
 
   override val descriptor: SerialDescriptor = StringDescriptor.withName("KeywordInfo")
 
-  override fun deserialize(input: Decoder): KeywordInfo<Keyword<*>> {
+  override fun deserialize(decoder: Decoder): KeywordInfo<Keyword<*>> {
     illegalState("Unable to deserialize keyword info")
   }
 
-  override fun serialize(output: Encoder, obj: KeywordInfo<out Keyword<*>>) {
-    output.encodeString(obj.key)
+  override fun serialize(encoder: Encoder, obj: KeywordInfo<out Keyword<*>>) {
+    encoder.encodeString(obj.key)
   }
 }

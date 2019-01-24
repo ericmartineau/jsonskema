@@ -21,20 +21,25 @@ import io.mverse.jsonschema.resolver.FetchedDocument
 import io.mverse.jsonschema.resolver.FetchedDocumentResults
 import io.mverse.jsonschema.resolver.HttpDocumentFetcher
 import io.mverse.jsonschema.resolver.JsonDocumentFetcher
-import io.mverse.logging.Logged
+import io.mverse.jsonschema.utils.createDispatcher
 import io.mverse.logging.MLog
+import io.mverse.logging.MLogged
 import io.mverse.logging.duration
 import io.mverse.logging.mlogger
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import io.mverse.logging.timed
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
-import lang.coroutine.TimeoutException
-import lang.coroutine.awaitFirstOrNull
-import lang.coroutine.blocking
+import kotlinx.coroutines.supervisorScope
+import lang.collection.asList
+import lang.coroutines.TimeoutException
+import lang.coroutines.awaitFirstOrNull
+import lang.coroutines.blocking
 import lang.exception.illegalArgument
 import lang.json.JsonPath
 import lang.json.JsrObject
 import lang.net.URI
+import lang.net.path
 import kotlin.reflect.KClass
 
 /**
@@ -44,17 +49,22 @@ import kotlin.reflect.KClass
  * are cancelled.
  */
 open class DefaultJsonDocumentClient(val fetchers: MutableList<JsonDocumentFetcher> = defaultFetchers.toMutableList(),
-                                     val schemaCache: SchemaCache,
+                                     val schemaCache: SchemaCache = SchemaCache(),
                                      val fetchTimeout: Long = 10000L) : JsonDocumentClient {
 
-  constructor(fetchers: List<JsonDocumentFetcher> = defaultFetchers, fetchTimeout: Long = 10000L)
-      : this(fetchers.toMutableList(), SchemaCache(), fetchTimeout)
+  constructor(fetcher: JsonDocumentFetcher, vararg moreFetchers: JsonDocumentFetcher, fetchTimeout: Long = 10000L)
+      : this((fetcher.asList() + moreFetchers).toMutableList(), SchemaCache(), fetchTimeout)
+
+  constructor(fetchTimeout: Long = 10000L)
+      : this(schemaCache = SchemaCache(), fetchTimeout = fetchTimeout)
 
   init {
     if (fetchers.isEmpty()) {
       illegalArgument("Must provide at least one fetcher implementation")
     }
   }
+
+  val dispatcher: CoroutineDispatcher = createDispatcher("json-document-fetch-%d")
 
   override fun findLoadedDocument(documentLocation: URI): JsrObject? {
     return schemaCache.lookupDocument(documentLocation)
@@ -76,49 +86,43 @@ open class DefaultJsonDocumentClient(val fetchers: MutableList<JsonDocumentFetch
   }
 
   override fun fetchDocument(uri: URI): FetchedDocumentResults {
-//    return debug.timed("fetch: $uri") { mlog ->
-      return blocking fetch@{
-        if (fetchers.size == 1) {
-          fetchSingle(uri)
-        } else {
-          fetchAll(uri)
-        }
-      }.orThrow()
-//    }
+    debug.timed("fetchall: ${uri.path}") {
+      return fetchAll(uri, it).orThrow()
+    }
   }
 
-  private suspend fun CoroutineScope.fetchSingle(uri: URI): FetchedDocumentResults {
-//    mlog.duration("single") {
-      return try {
-        FetchedDocumentResults(result = fetchers.first().fetchDocument(uri))
-      } catch (e: Exception) {
-        FetchedDocumentResults(errors = mapOf(fetchers.first().key to e))
-      }
-//    }
-  }
-
-  private suspend inline fun CoroutineScope.fetchAll(uri: URI): FetchedDocumentResults {
+  fun fetchAll(uri: URI, mlog: MLog): FetchedDocumentResults {
     val errors: MutableMap<KClass<out JsonDocumentFetcher>, Throwable> = mutableMapOf()
-
-    val deferreds = fetchers.map { fetcher ->
-      async(Dispatchers.Default) {
-//        mlog.duration(fetcher.key.simpleName!!) fetcher@{
+    val deferreds = fetchers.mapIndexed { idx, fetcher ->
+      GlobalScope.async(dispatcher) {
+        mlog.duration("${fetcher.key.simpleName}-$idx") fetcher@{
           return@async try {
             val fetched = fetcher.fetchDocument(uri)
             fetched
           } catch (e: Exception) {
+            mlog["${fetcher.key.simpleName}.error"] = "$e"
             errors[fetcher.key] = e
             null
           }
         }
-//      }
+      }
     }
-    val fetched = try {
-//      mlog.duration("await") {
-        deferreds.awaitFirstOrNull(fetchTimeout)
-//      }
-    } catch (e: TimeoutException) {
-      null
+
+    val fetched = blocking {
+      supervisorScope {
+        try {
+          mlog.duration("await") {
+            val awaited = deferreds.awaitFirstOrNull(fetchTimeout)
+            awaited
+          }
+        } catch (e: TimeoutException) {
+          mlog["timeout"] = true
+          null
+        } catch (e: Exception) {
+          mlog["error"] = e.message
+          null
+        }
+      }
     }
 
     return FetchedDocumentResults(errors, result = fetched)
@@ -128,7 +132,7 @@ open class DefaultJsonDocumentClient(val fetchers: MutableList<JsonDocumentFetch
     fetchers += fetcher
   }
 
-  companion object : Logged(mlogger {}) {
+  companion object : MLogged(mlogger {}) {
     val defaultFetchers = listOf(ClasspathDocumentFetcher(), HttpDocumentFetcher())
   }
 }

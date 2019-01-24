@@ -1,17 +1,15 @@
 import io.mverse.gradle.kotlinx
+import io.spring.gradle.dependencymanagement.dsl.DependenciesHandler
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("io.mverse.project") version "0.5.32"
-  id("io.mverse.multi-platform") version "0.5.32"
-  kotlin("jvm").version("1.3.10")
-  id("kotlinx-serialization").version("1.3.10")
+  id("kotlin-multiplatform")
+  id("io.mverse.project")
+  id("io.mverse.multi-platform")
+  id("kotlinx-serialization")
 }
 
 allprojects  {
-  val msharedVersion by extra { "0.6.0-dev.0.uncommitted+296888e" }
-  val kotlinCoroutinesVersion by extra { "1.1.0" }
-
   plugins.apply("kotlinx-serialization")
   mverse {
     isDefaultDependencies = false
@@ -40,54 +38,11 @@ allprojects  {
 
   dependencyManagement {
     dependencies {
-      // None
 
-      dependencySet("org.jetbrains.kotlin:1.3.10") {
-        entry("kotlin-stdlib")
-        entry("kotlin-runtime")
-        entry("kotlin-stdlib-common")
-        entry("kotlin-stdlib-jdk7")
-        entry("kotlin-stdlib-jdk8")
-        entry("kotlin-reflect")
-        entry("kotlin-test-annotations-common")
-        entry("kotlin-test")
-        entry("kotlin-test-junit")
-      }
+      installKotlinDeps()
+      installMverseShared()
 
       dependency("io.github.microutils:kotlin-logging:1.6.22")
-
-      dependencySet("org.jetbrains.kotlinx:0.1.3-native-1.3.20-eap-52") {
-        entry("kotlinx-coroutines-io")
-        entry("kotlinx-coroutines-io-jvm")
-        entry("kotlinx-io")
-        entry("kotlinx-io-jvm")
-      }
-
-      dependencySet("org.jetbrains.kotlinx:$kotlinCoroutinesVersion") {
-        entry("kotlinx-coroutines-core")
-        entry("kotlinx-coroutines-core-common")
-        entry("kotlinx-coroutines-jdk8")
-      }
-
-
-      dependencySet("io.mverse:$msharedVersion") {
-        entry("mverse-json")
-        entry("mverse-lang-jvm")
-        entry("mverse-lang-common")
-        entry("mverse-log-common")
-        entry("mverse-log-jvm")
-        entry("mverse-junit")
-      }
-
-      /**
-       * 0.90.3 is a custom version that preserves order of keys
-       */
-      dependencySet("org.jetbrains.kotlinx:0.90.3") {
-        entry("kotlinx-serialization-runtime")
-        entry("kotlinx-serialization-runtime-common")
-        entry("kotlinx-serialization-runtime-jsonparser")
-      }
-
 
       // Immutable Collections Library for Kotlin
       dependency("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.1")
@@ -106,6 +61,59 @@ allprojects  {
   }
 }
 
+fun DependenciesHandler.installKotlinDeps() {
+  val kotlinCoroutines:String by project
+  val kotlin:String by project
+  val kotlinSerialization:String by project
+  val kotlinIO:String by project
 
+  // None
+  dependencySet("org.jetbrains.kotlin:$kotlin") {
+    entry("kotlin-stdlib")
+    entry("kotlin-runtime")
+    entry("kotlin-stdlib-common")
+    entry("kotlin-stdlib-jdk7")
+    entry("kotlin-stdlib-jdk8")
+    entry("kotlin-reflect")
+    entry("kotlin-test-annotations-common")
+    entry("kotlin-test")
+    entry("kotlin-test-junit")
+  }
+
+  dependencySet("org.jetbrains.kotlinx:$kotlinCoroutines") {
+    entry("kotlinx-coroutines-core")
+    entry("kotlinx-coroutines-core-common")
+    entry("kotlinx-coroutines-jdk8")
+  }
+
+  dependencySet("org.jetbrains.kotlinx:$kotlinIO") {
+    entry("kotlinx-io")
+    entry("kotlinx-io-jvm")
+    entry("kotlinx-coroutines-io")
+    entry("kotlinx-coroutines-io-jvm")
+  }
+
+  dependencySet("org.jetbrains.kotlinx:$kotlinSerialization") {
+    entry("kotlinx-serialization-runtime")
+    entry("kotlinx-serialization-runtime-common")
+    entry("kotlinx-serialization-runtime-jsonparser")
+  }
+}
+
+fun DependenciesHandler.installMverseShared() {
+  val mverseShared:String by project
+
+  dependencySet("io.mverse:$mverseShared") {
+    entry("mverse-json")
+    entry("mverse-lang-jvm")
+    entry("mverse-lang-common")
+    entry("mverse-log-common")
+    entry("mverse-log-jvm")
+    entry("mverse-test-common")
+    entry("mverse-test-jvm")
+    entry("mverse-coroutines-common")
+    entry("mverse-coroutines-jvm")
+  }
+}
 
 
