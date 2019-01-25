@@ -2,23 +2,20 @@ package io.mverse.jsonschema.builder
 
 import io.mverse.jsonschema.JsonSchema.createSchemaBuilder
 import io.mverse.jsonschema.Schema
-import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.enums.FormatType
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.utils.jsonSchemaType
-import lang.collection.asList
 import lang.json.JsrArray
 import lang.json.KtArray
 import lang.json.createJsrArray
-import lang.json.jsrString
 import lang.json.toJsrArray
 import lang.json.toJsrValue
 import lang.net.URI
 
-open class SchemaBuilderDsl(val schemaBuilder: SchemaBuilder = createSchemaBuilder(),
-                            val parent: SchemaBuilder? = null,
+open class SchemaBuilderDsl(val schemaBuilder: MutableSchema = createSchemaBuilder(),
+                            val parent: MutableSchema? = null,
                             var name: String? = null) :
-    SchemaBuilder by schemaBuilder {
+    MutableSchema by schemaBuilder {
 
   /**
    * Section

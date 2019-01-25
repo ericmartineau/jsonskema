@@ -3,7 +3,9 @@ package io.mverse.jsonschema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
+import io.mverse.logging.mlogger
 import lang.exception.illegalState
+import lang.exception.nullPointer
 import lang.hashKode
 import lang.json.JsonPath
 import lang.json.JsrObject
@@ -26,20 +28,46 @@ abstract class RefSchema(
     val refURI: URI,
 
     /**
-     * This class can be used as either a resolved schema, or as a reference.  This callback function
-     * allows for lazy loading the schema, while still leveraging the "this" value
+     * Contains a reference to the actual loaded schema, or null if it hasn't been resolved.
      */
-    refSchemaLoader: ((RefSchema) -> Schema?)?) : Schema {
+    refSchema: Schema? = null,
+    val factory:SchemaLoader? = null) : Schema {
 
-  /**
-   * Contains a reference to the actual loaded schema, or null if it hasn't been resolved
-   */
-  val refSchemaOrNull by lazy { refSchemaLoader?.invoke(this) }
+  constructor(factory: SchemaLoader,
+              location: SchemaLocation,
+              refURI: URI,
+              currentDocument: JsrObject?,
+              report: LoadingReport) : this(location, refURI, factory = factory) {
+    asyncLoad(factory, currentDocument, report)
+  }
+
+  private fun asyncLoad(loader: SchemaLoader, doc: JsrObject?, report: LoadingReport) {
+    val found = loader.loadRefSchema(this, refURI, doc, report) {
+      if (it is RefSchema) {
+        if (loadCounter++ > 10) illegalState("Stack overflow while loading schema $refURI")
+        asyncLoad(loader, doc, report)
+      } else {
+        internalRefSchema = it
+      }
+    }
+    if (found != null) {
+      internalRefSchema = found
+    }
+  }
+
+  private var loadCounter = 0
+  private var internalRefSchema: Schema? = refSchema
+    set(value) {
+      field = value ?: nullPointer("The internal refSchema should never be set to null")
+    }
+
+  val refSchemaOrNull: Schema? get() = internalRefSchema
 
   /**
    * Reference to the loaded schema
    */
-  val refSchema: Schema get() = refSchemaOrNull ?: illegalState("Ref schema hasn't been resolved")
+  val refSchema: Schema
+    get() = refSchemaOrNull ?: factory?.findLoadedSchema(refURI) ?: illegalState("Ref schema hasn't been resolved yet")
 
   /**
    * A non-resolved schema that contains just the ref keyword
@@ -50,42 +78,8 @@ abstract class RefSchema(
   override val schemaURI: URI? get() = refSchema.schemaURI
   override val title: String? get() = refSchema.title
   override val description: String? get() = refSchema.description
-
   override val extraProperties get() = refSchema.extraProperties
-
   override val keywords get() = refSchema.keywords
-
-  constructor(factory: SchemaLoader?,
-              location: SchemaLocation,
-              refURI: URI,
-              currentDocument: JsrObject?,
-              report: LoadingReport) : this(location, refURI, loader@{ thisSchema ->
-    var infiniteLoopPrevention = 0
-
-    when (factory) {
-      null -> return@loader null
-      else -> {
-        var schema: Schema = thisSchema
-        var thisRefURI = refURI
-        while (schema is RefSchema) {
-          schema = factory.loadRefSchema(schema, thisRefURI, currentDocument, report)
-          if (schema is RefSchema) {
-            thisRefURI = schema.refURI
-          }
-          if (infiniteLoopPrevention++ > 10) {
-            throw IllegalStateException("Too many nested references")
-          }
-        }
-        return@loader schema
-      }
-    }
-  }) {
-    // Force resolution of the schema
-    this.refSchemaOrNull != null
-  }
-
-  protected constructor(location: SchemaLocation, refURI: URI, refSchema: Schema) :
-      this(location, refURI, { refSchema })
 
   override fun toString(): String {
     return toJson(version ?: JsonSchemaVersion.latest).toString()
@@ -107,5 +101,9 @@ abstract class RefSchema(
 
   override fun hashCode(): Int {
     return hashKode(refURI)
+  }
+
+  companion object {
+    val log = mlogger {}
   }
 }

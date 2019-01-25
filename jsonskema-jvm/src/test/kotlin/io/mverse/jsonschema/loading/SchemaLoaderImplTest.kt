@@ -28,7 +28,6 @@ import io.mverse.jsonschema.resolver.FetchedDocumentResults
 import io.mverse.jsonschema.resolver.HttpDocumentFetcher
 import io.mverse.jsonschema.resourceLoader
 import io.mverse.jsonschema.schemaReader
-import kotlinx.serialization.json.json
 import lang.json.jsrObject
 import lang.net.URI
 import org.junit.Assert
@@ -208,7 +207,7 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   fun remotePointerResulion() {
     val documentClient = Mockito.spy(DefaultJsonDocumentClient())
 
-    val fetchedDoc = FetchedDocumentResults(result = FetchedDocument(HttpDocumentFetcher::class, URI(""), URI(""), "{}"))
+    val fetchedDoc = FetchedDocumentResults(fetchedOrNull = FetchedDocument(HttpDocumentFetcher::class, URI(""), URI(""), "{}"))
     doReturn(fetchedDoc).`when`(documentClient).fetchDocument(URI("http://example.org/asd"))
     doReturn(fetchedDoc).`when`(documentClient).fetchDocument(URI("http://example.org/otherschema.json"))
     doReturn(fetchedDoc).`when`(documentClient).fetchDocument(URI("http://example.org/folder/subschemaInFolder.json"))
@@ -227,7 +226,7 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   @Test
   fun schemaJsonIdIsRecognized() {
     val client = spy(DefaultJsonDocumentClient())
-    val retval = FetchedDocumentResults(result = FetchedDocument(HttpDocumentFetcher::class, URI(""), URI(""), "{}"))
+    val retval = FetchedDocumentResults(fetchedOrNull = FetchedDocument(HttpDocumentFetcher::class, URI(""), URI(""), "{}"))
     doReturn(retval).`when`(client).fetchDocument("http://example.org/schema/schema.json")
     doReturn(retval).`when`(client).fetchDocument(URI("http://example.org/schema/schema.json"))
     val schemaWithId = getJsonObjectForKey("schemaWithId")

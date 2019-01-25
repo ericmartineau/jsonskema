@@ -2,9 +2,9 @@ package io.mverse.jsonschema.loading
 
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.Schema
-import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.SchemaLocation
-import io.mverse.jsonschema.builder.JsonSchemaBuilder
+import io.mverse.jsonschema.builder.MutableJsonSchema
+import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.keyword.Keywords.REF
 import io.mverse.jsonschema.utils.JsonUtils
@@ -40,7 +40,7 @@ data class SubSchemaLoader(val extraKeywordLoaders: List<KeywordDigester<*>>,
    * @param loadingReport The report to write validation into
    * @return A builder loaded up with all the keywords.
    */
-  fun subSchemaBuilder(schemaJson: JsonValueWithPath, rootDocument: JsrObject, loadingReport: LoadingReport): SchemaBuilder {
+  fun subSchemaBuilder(schemaJson: JsonValueWithPath, rootDocument: JsrObject, loadingReport: LoadingReport): MutableSchema {
     // #############################################
     // #####  $ref: Overrides everything    ########
     // #############################################
@@ -63,17 +63,17 @@ data class SubSchemaLoader(val extraKeywordLoaders: List<KeywordDigester<*>>,
     return schemaBuilder
   }
 
-  internal fun schemaBuilder(location: SchemaLocation, `$id`: URI): SchemaBuilder {
+  internal fun schemaBuilder(location: SchemaLocation, `$id`: URI): MutableSchema {
     val loader = this.schemaLoader
-    return JsonSchemaBuilder(location, `$id`).also { it.schemaLoader = loader }
+    return MutableJsonSchema(location, `$id`).also { it.schemaLoader = loader }
   }
 
-  internal fun schemaBuilder(location: SchemaLocation): SchemaBuilder {
-    return JsonSchemaBuilder(location).also { it.schemaLoader = this.schemaLoader }
+  internal fun schemaBuilder(location: SchemaLocation): MutableSchema {
+    return MutableJsonSchema(location).also { it.schemaLoader = this.schemaLoader }
   }
 
-  internal fun refSchemaBuilder(ref: URI, currentDocument: JsrObject, location: SchemaLocation): SchemaBuilder {
-    return JsonSchemaBuilder(location).also {
+  internal fun refSchemaBuilder(ref: URI, currentDocument: JsrObject, location: SchemaLocation): MutableSchema {
+    return MutableJsonSchema(location).also {
       it.currentDocument = currentDocument
       it.schemaLoader = this.schemaLoader
       it.ref = ref

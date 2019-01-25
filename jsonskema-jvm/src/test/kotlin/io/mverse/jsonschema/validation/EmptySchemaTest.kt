@@ -20,13 +20,11 @@ import assertk.assertions.containsAll
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import io.mverse.jsonschema.JsonSchema
-import io.mverse.jsonschema.SchemaBuilder
+import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.loading.parseJsrObject
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
-import kotlinx.serialization.json.content
 import lang.json.toJsrValue
-import lang.json.unbox
 import lang.json.unboxAsAny
 import org.junit.Assert
 import org.junit.Test
@@ -78,13 +76,13 @@ class EmptySchemaTest {
   private fun roundTripSchema(title: String? = null,
                               description: String? = null,
                               id: String? = null): lang.json.JsrObject {
-    val builder: SchemaBuilder = if (id?.isNotBlank() == true) {
+    val builder: MutableSchema = if (id?.isNotBlank() == true) {
       JsonSchema.schemaBuilder(id)
     } else {
       JsonSchema.schemaBuilder()
     }
-    if (title != null) builder.title= title
-    if (description != null) builder.description= description
+    if (title != null) builder.title = title
+    if (description != null) builder.description = description
     return builder.build().toString().parseJsrObject()
   }
 }

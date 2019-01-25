@@ -1,5 +1,6 @@
 package io.mverse.jsonschema
 
+import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.builder.SchemaBuilderDsl
 import io.mverse.jsonschema.validation.SchemaValidator
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
@@ -17,8 +18,8 @@ expect object JsonSchema {
   fun schema(id: String, block: SchemaBuilderDsl.() -> Unit = {}): Schema
   fun schema(block: SchemaBuilderDsl.() -> Unit = {}): Schema
 
-  fun createSchemaBuilder(): SchemaBuilder
-  fun createSchemaBuilder(id: URI): SchemaBuilder
+  fun createSchemaBuilder(): MutableSchema
+  fun createSchemaBuilder(id: URI): MutableSchema
 }
 
 fun JsonSchema.getValidator(schema: Schema): SchemaValidator = JsonSchema.validatorFactory.createValidator(schema)

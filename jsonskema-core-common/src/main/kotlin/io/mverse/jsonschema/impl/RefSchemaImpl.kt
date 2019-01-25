@@ -7,9 +7,9 @@ import io.mverse.jsonschema.Draft7Schema
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.Schema
-import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.SchemaLocation
-import io.mverse.jsonschema.builder.JsonSchemaBuilder
+import io.mverse.jsonschema.builder.MutableJsonSchema
+import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
 import io.mverse.jsonschema.keyword.Keywords
@@ -25,15 +25,14 @@ open class RefSchemaImpl : RefSchema {
 
   override val version: JsonSchemaVersion = Draft7
 
-  constructor(factory: SchemaLoader?,
+  constructor(factory: SchemaLoader,
               location: SchemaLocation,
               refURI: URI,
               currentDocument: JsrObject?,
               report: LoadingReport) : super(factory, location, refURI, currentDocument, report)
 
   constructor(location: SchemaLocation, refURI: URI, refSchema: Schema) : super(location, refURI, refSchema)
-
-  internal constructor(location: SchemaLocation, refURI: URI, refSchemaLoader: (Schema) -> Schema?) : super(location, refURI, refSchemaLoader)
+  constructor(location: SchemaLocation, refURI: URI) : super(location, refURI)
 
   init {
     JsonSchemaImpl.initialize()
@@ -86,14 +85,14 @@ open class RefSchemaImpl : RefSchema {
       }
     }
 
-  override fun toBuilder(): SchemaBuilder {
+  override fun toMutableSchema(): MutableSchema {
     @Suppress("unchecked_cast")
-    return JsonSchemaBuilder(fromSchema = this)
+    return MutableJsonSchema(fromSchema = this)
   }
 
-  override fun toBuilder(id: URI): SchemaBuilder {
+  override fun toMutableSchema(id: URI): MutableSchema {
     @Suppress("unchecked_cast")
-    return JsonSchemaBuilder(fromSchema = this, id = id)
+    return MutableJsonSchema(fromSchema = this, id = id)
   }
 
   override fun toJson(version: JsonSchemaVersion, includeExtraProperties: Boolean): JsrObject {

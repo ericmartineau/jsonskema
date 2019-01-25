@@ -3,8 +3,8 @@ package io.mverse.jsonschema.validation
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.JsonSchema.schemaBuilder
 import io.mverse.jsonschema.Schema
-import io.mverse.jsonschema.SchemaBuilder
-import io.mverse.jsonschema.builder.JsonSchemaBuilder
+import io.mverse.jsonschema.builder.MutableJsonSchema
+import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.enums.JsonSchemaType.ARRAY
 import io.mverse.jsonschema.enums.JsonSchemaType.BOOLEAN
 import io.mverse.jsonschema.enums.JsonSchemaType.INTEGER
@@ -16,7 +16,7 @@ import lang.net.URI
 
 object ValidationMocks {
 
-  fun ValidationMocks.createTestValidator(schema: SchemaBuilder): SchemaValidator {
+  fun ValidationMocks.createTestValidator(schema: MutableSchema): SchemaValidator {
     return ValidationMocks.createTestValidator(schema.build())
   }
 
@@ -24,58 +24,58 @@ object ValidationMocks {
     return SchemaValidatorFactoryImpl.builder().build().createValidator(schema)
   }
 
-  val mockArraySchema: SchemaBuilder
+  val mockArraySchema: MutableSchema
     get() {
       return schemaBuilder { type = ARRAY }
     }
 
-  val mockBooleanSchema: SchemaBuilder
+  val mockBooleanSchema: MutableSchema
     get() {
       return schemaBuilder { type = BOOLEAN }
     }
 
-  fun mockBooleanSchema(id: URI): SchemaBuilder {
+  fun mockBooleanSchema(id: URI): MutableSchema {
     return schemaBuilder(id) { type = BOOLEAN }
   }
 
-  fun mockBooleanSchema(id: String): SchemaBuilder {
+  fun mockBooleanSchema(id: String): MutableSchema {
     return schemaBuilder(id) { type = BOOLEAN }
   }
 
-  val mockIntegerSchema: SchemaBuilder
+  val mockIntegerSchema: MutableSchema
     get() {
       return schemaBuilder { type = INTEGER }
     }
 
-  val mockNullSchema: SchemaBuilder
+  val mockNullSchema: MutableSchema
     get() {
       return schemaBuilder { type = NULL }
     }
 
-  val mockNumberSchema: SchemaBuilder
+  val mockNumberSchema: MutableSchema
     get() {
       return schemaBuilder { type = NUMBER }
     }
 
-  val mockObjectSchema: SchemaBuilder
+  val mockObjectSchema: MutableSchema
     get() {
       return schemaBuilder { type = OBJECT }
     }
 
-  val mockSchema:SchemaBuilder get() = JsonSchemaBuilder()
+  val mockSchema: MutableSchema get() = MutableJsonSchema()
 
-  fun mockObjectSchema(id: String): SchemaBuilder {
+  fun mockObjectSchema(id: String): MutableSchema {
     return schemaBuilder(id) { type = OBJECT }
   }
 
-  fun mockObjectSchema(id: URI): SchemaBuilder {
+  fun mockObjectSchema(id: URI): MutableSchema {
     return schemaBuilder(id) { type = OBJECT }
   }
 
   fun createTestValidator(schema: Schema): SchemaValidator =
       JsonSchema.createValidatorFactory().createValidator(schema)
 
-  val mockStringSchema: SchemaBuilder
+  val mockStringSchema: MutableSchema
     get() {
       return schemaBuilder { type = STRING }
     }

@@ -8,9 +8,9 @@ import io.mverse.jsonschema.DraftSchema
 import io.mverse.jsonschema.KeywordContainer
 import io.mverse.jsonschema.MergeReport
 import io.mverse.jsonschema.Schema
-import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.SchemaLocation
-import io.mverse.jsonschema.builder.JsonSchemaBuilder
+import io.mverse.jsonschema.builder.MutableJsonSchema
+import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.keyword.IdKeyword
@@ -189,12 +189,12 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
     return toJson(version, includeExtraProperties).writeJson(indent)
   }
 
-  override fun toBuilder(): SchemaBuilder {
-    return JsonSchemaBuilder(fromSchema = this)
+  override fun toMutableSchema(): MutableSchema {
+    return MutableJsonSchema(fromSchema = this)
   }
 
-  override fun toBuilder(id: URI): SchemaBuilder {
-    return JsonSchemaBuilder(fromSchema = this, id = id)
+  override fun toMutableSchema(id: URI): MutableSchema {
+    return MutableJsonSchema(fromSchema = this, id = id)
   }
 
   // ##################################################################
@@ -232,7 +232,7 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
 
   override fun merge(path: JsonPath, override: Schema?, report: MergeReport): Schema {
     val overrides = override ?: return this
-    val toBuilder = this.toBuilder()
+    val toBuilder = this.toMutableSchema()
     toBuilder.merge(path, overrides, report)
     return toBuilder.build()
   }

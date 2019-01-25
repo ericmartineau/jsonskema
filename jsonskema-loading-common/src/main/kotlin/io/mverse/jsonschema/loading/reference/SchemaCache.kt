@@ -6,6 +6,7 @@ import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.utils.JsonUtils.tryParseURI
 import io.mverse.jsonschema.utils.recurse
 import io.mverse.jsonschema.utils.trimEmptyFragment
+import lang.collection.MutableListMultimap
 import lang.json.JsonPath
 import lang.json.JsrObject
 import lang.net.URI
@@ -20,7 +21,8 @@ import lang.net.resolveUri
 data class SchemaCache(
     private val documentIdRefs: MutableMap<URI, Map<URI, JsonPath>> = hashMapOf(),
     private val absoluteDocumentCache: MutableMap<URI, lang.json.JsrObject> = hashMapOf(),
-    private val absoluteSchemaCache: MutableMap<URI, Schema> = hashMapOf()
+    private val absoluteSchemaCache: MutableMap<URI, Schema> = hashMapOf(),
+    private var schemaCallbacks: MutableListMultimap<URI, (Schema) -> Unit> = MutableListMultimap()
 ) {
 
   operator fun plusAssign(pair: Pair<URI, Schema>) = cacheSchema(pair.first, pair.second)
@@ -28,7 +30,10 @@ data class SchemaCache(
 
   fun cacheSchema(schemaURI: URI, schema: Schema) {
     check(schemaURI.isAbsolute()) { "Must be an absolute URI" }
-    absoluteSchemaCache[schemaURI.trimEmptyFragment()] = schema
+    val normalized = schemaURI.trimEmptyFragment()
+    absoluteSchemaCache[normalized] = schema
+    schemaCallbacks[normalized].forEach { it(schema) }
+    schemaCallbacks -= normalized
   }
 
   fun cacheDocument(documentURI: URI, document: JsrObject) {
@@ -58,18 +63,20 @@ data class SchemaCache(
     return getSchema(schemaLocation.uniqueURI, schemaLocation.canonicalURI)
   }
 
+  fun onSchemaCache(ref: URI, callback: (Schema) -> Unit) {
+    when (val cached = this[ref]) {
+      null -> schemaCallbacks[ref.trimEmptyFragment()] += callback
+      else -> callback(cached)
+    }
+  }
+
   operator fun get(schemaUri: URI): Schema? = this.getSchema(schemaUri)
 
   fun getSchema(vararg schemaURI: URI): Schema? {
-    for (uri in schemaURI) {
-      if (uri.isAbsolute()) {
-        val hit = absoluteSchemaCache[uri.trimEmptyFragment()]
-        if (hit != null) {
-          return hit
-        }
-      }
-    }
-    return null
+    return schemaURI.asSequence()
+        .filter { it.isAbsolute() }
+        .mapNotNull { absoluteSchemaCache[it.trimEmptyFragment()] }
+        .firstOrNull()
   }
 
   fun resolveURIToDocumentUsingLocalIdentifiers(documentURI: URI, absoluteURI: URI, document: lang.json.JsrObject): JsonPath? {

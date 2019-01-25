@@ -18,7 +18,6 @@ import io.mverse.jsonschema.resolver.DocumentFetchException
 import io.mverse.jsonschema.resolver.FetchedDocument
 import io.mverse.jsonschema.resolver.HttpDocumentFetcher
 import io.mverse.jsonschema.resolver.JsonDocumentFetcher
-import io.mverse.logging.NoopMLog.start
 import io.mverse.logging.mlogger
 import io.mverse.test.assertTimed
 import lang.exception.illegalState
@@ -68,7 +67,7 @@ class DefaultJsonDocumentClientTest {
 
   @Test fun testFetchingOneProviderSucceeded() {
     val defaultClient = DefaultJsonDocumentClient()
-    val fetched = defaultClient.fetchDocument("https://nba.com/schemas/by/eric/hats.json").fetchedDocument
+    val fetched = defaultClient.fetchDocument("https://nba.com/schemas/by/eric/hats.json").fetched
     assert(fetched.isDifferentURI).isTrue()
     assert(fetched.schemaData).isEqualIgnoringWhitespace("{}")
     assert(fetched.jsrObject).hasValueAtPointer("/\$id") {
@@ -81,7 +80,7 @@ class DefaultJsonDocumentClientTest {
     defaultClient += SlowpokeFetcher()
 
     assertTimed {
-      val fetched = defaultClient.fetchDocument("https://nba.com/schemas/by/eric/hats.json").fetchedDocument
+      val fetched = defaultClient.fetchDocument("https://nba.com/schemas/by/eric/hats.json").fetched
       assert(fetched.isDifferentURI).isTrue()
       assert(fetched.schemaData).isEqualIgnoringWhitespace("{}")
       assert(fetched.jsrObject).hasValueAtPointer("/\$id") {
@@ -137,7 +136,7 @@ class DefaultJsonDocumentClientTest {
         .returnedValue {
           it.isNotNull {
             val doc = it.actual
-            assert(doc.result!!.schemaData).isEqualTo("{}")
+            assert(doc.fetchedOrNull!!.schemaData).isEqualTo("{}")
           }
         }
         .duration { isLessThan(200) }

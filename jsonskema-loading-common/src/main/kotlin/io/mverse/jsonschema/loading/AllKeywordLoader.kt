@@ -1,7 +1,7 @@
 package io.mverse.jsonschema.loading
 
 import io.mverse.jsonschema.JsonValueWithPath
-import io.mverse.jsonschema.SchemaBuilder
+import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
@@ -34,7 +34,7 @@ data class AllKeywordLoader(val allExtractors: List<KeywordDigester<*>>,
     this.filteredExtractors = filtered.freeze()
   }
 
-  fun loadKeywordsForSchema(jsonObject: JsonValueWithPath, builder: SchemaBuilder, report: LoadingReport) {
+  fun loadKeywordsForSchema(jsonObject: JsonValueWithPath, builder: MutableSchema, report: LoadingReport) {
     //Process keywords we know:
     jsonObject.forEachKey { prop, jsrValue ->
       val matches = mutableMapOf<JsonSchemaVersion, KeywordDigester<*>>()
@@ -52,7 +52,7 @@ data class AllKeywordLoader(val allExtractors: List<KeywordDigester<*>>,
       }
       if (matches.isNotEmpty()) {
         for (draftVersion in JsonSchemaVersion.publicVersions) {
-          val foundMatch = matches.get(draftVersion)
+          val foundMatch = matches[draftVersion]
           if (foundMatch != null) {
             if (processKeyword(foundMatch, jsonObject, builder, schemaLoader, report)) {
               break
@@ -71,7 +71,7 @@ data class AllKeywordLoader(val allExtractors: List<KeywordDigester<*>>,
   }
 
   private fun <K : Keyword<*>> processKeyword(digester: KeywordDigester<K>, JsrValue: JsonValueWithPath,
-                                              builder: SchemaBuilder, factory: SchemaLoader,
+                                              builder: MutableSchema, factory: SchemaLoader,
                                               report: LoadingReport): Boolean {
     val digest = digester.extractKeyword(JsrValue, builder, factory, report)
     return when (digest) {

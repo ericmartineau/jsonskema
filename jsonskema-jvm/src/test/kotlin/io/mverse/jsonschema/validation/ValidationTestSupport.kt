@@ -24,32 +24,29 @@ import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.Schema
-import io.mverse.jsonschema.SchemaBuilder
-import io.mverse.jsonschema.validation.ValidationMocks
 import io.mverse.jsonschema.assertj.subject.ValidationErrorPredicate
-import io.mverse.jsonschema.keyword.KeywordInfo
+import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.getValidator
-import lang.json.JsrValue
-import kotlinx.serialization.json.JsonNull
+import io.mverse.jsonschema.keyword.KeywordInfo
 import lang.json.JsrNull
+import lang.json.JsrValue
 import lang.json.jsrNumber
-import lang.json.toJsrValue
 import lang.json.toJsrValue
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import java.util.*
 
-typealias ValidationErrorConsumer= (ValidationError)->Unit
-typealias ValidationErrorPredicater= (ValidationError)->Boolean
+typealias ValidationErrorConsumer = (ValidationError) -> Unit
+typealias ValidationErrorPredicater = (ValidationError) -> Boolean
 
 object ValidationTestSupport {
 
-  fun buildWithLocation(builder: SchemaBuilder): Schema {
+  fun buildWithLocation(builder: MutableSchema): Schema {
     return builder.build()
   }
 
   fun buildWithLocation(builder: Schema): Schema {
-    return builder.toBuilder().build()
+    return builder.toMutableSchema().build()
   }
 
   fun countCauseByJsonPointer(root: ValidationError, pointer: String): Long {
@@ -140,7 +137,7 @@ object ValidationTestSupport {
     return Failure().schema(schema)
   }
 
-  fun failureOf(subjectBuilder: SchemaBuilder): Failure {
+  fun failureOf(subjectBuilder: MutableSchema): Failure {
     return failureOf(buildWithLocation(subjectBuilder))
   }
 
@@ -290,13 +287,13 @@ object ValidationTestSupport {
     }
   }
 
-  fun verifyFailure(validationFn: ()->ValidationError?): ValidationError {
+  fun verifyFailure(validationFn: () -> ValidationError?): ValidationError {
     val error = validationFn()
     assert(error, "Should have failed").isNotNull()
     return error!!
   }
 
-  fun expectSuccess(validationFn: ()->ValidationError?) {
+  fun expectSuccess(validationFn: () -> ValidationError?) {
     val error = validationFn()
     assert(error, "Should have succeeded: $error").isNull()
   }

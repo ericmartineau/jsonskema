@@ -1,7 +1,7 @@
 package io.mverse.jsonschema.loading.keyword.versions.flex
 
 import io.mverse.jsonschema.JsonValueWithPath
-import io.mverse.jsonschema.SchemaBuilder
+import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.ADDITIONAL_PROPERTIES
@@ -18,7 +18,7 @@ data class AdditionalPropertiesBooleanKeywordDigester(
     override val includedKeywords: List<KeywordInfo<SingleSchemaKeyword>> = ADDITIONAL_PROPERTIES.getTypeVariants(JsrType.BOOLEAN)
 ) : KeywordDigester<SingleSchemaKeyword> {
 
-  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder,
+  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: MutableSchema,
                               schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<SingleSchemaKeyword>? {
     val additionalProperties = jsonObject.path(Keywords.ADDITIONAL_PROPERTIES)
     return if (additionalProperties.isBoolean && additionalProperties.boolean == false) {

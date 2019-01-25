@@ -1,9 +1,9 @@
 package io.mverse.jsonschema.loading.keyword
 
 import io.mverse.jsonschema.JsonValueWithPath
-import io.mverse.jsonschema.SchemaBuilder
+import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.keyword.DependenciesKeyword
-import io.mverse.jsonschema.keyword.DependenciesKeywordBuilder
+import io.mverse.jsonschema.keyword.MutableDependenciesKeyword
 import io.mverse.jsonschema.keyword.Keywords.DEPENDENCIES
 import io.mverse.jsonschema.loading.KeywordDigest
 import io.mverse.jsonschema.loading.KeywordDigester
@@ -20,11 +20,11 @@ class DependenciesKeywordDigester : KeywordDigester<DependenciesKeyword> {
 
   override val includedKeywords = listOf(DEPENDENCIES)
 
-  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder,
+  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: MutableSchema,
                               schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<DependenciesKeyword>? {
 
     val dependencies = jsonObject.path(DEPENDENCIES)
-    val depsBuilder = DependenciesKeywordBuilder()
+    val depsBuilder = MutableDependenciesKeyword()
 
     dependencies.forEachKey { key, pathValue ->
       val wrapped = pathValue.wrapped

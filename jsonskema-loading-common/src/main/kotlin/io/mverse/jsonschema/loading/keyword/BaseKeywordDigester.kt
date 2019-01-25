@@ -1,7 +1,7 @@
 package io.mverse.jsonschema.loading.keyword
 
 import io.mverse.jsonschema.JsonValueWithPath
-import io.mverse.jsonschema.SchemaBuilder
+import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.loading.KeywordDigest
@@ -18,7 +18,7 @@ abstract class BaseKeywordDigester<T : Keyword<*>>(val keyword: KeywordInfo<T>,
     false -> listOf(keyword)
   }
 
-  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder, schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<T>? {
+  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: MutableSchema, schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<T>? {
     if (!jsonObject.containsKey(keyword.key)) return null
 
     val JsrValue = jsonObject[keyword.key]

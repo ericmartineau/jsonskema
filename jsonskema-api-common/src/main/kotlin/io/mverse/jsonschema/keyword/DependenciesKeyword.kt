@@ -3,7 +3,6 @@ package io.mverse.jsonschema.keyword
 import io.mverse.jsonschema.MergeReport
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
-import io.mverse.jsonschema.keyword.Keywords.DEPENDENCIES
 import lang.collection.Multimaps
 import lang.collection.MutableSetMultimap
 import lang.collection.SetMultimap
@@ -20,8 +19,8 @@ data class DependenciesKeyword(val dependencySchemas: SchemaMapKeyword = SchemaM
   override val value: Map<String, Schema> = dependencySchemas.value
   override val subschemas: List<Schema> get() = dependencySchemas.subschemas
 
-  fun toBuilder(): DependenciesKeywordBuilder {
-    return DependenciesKeywordBuilder(this)
+  fun toBuilder(): MutableDependenciesKeyword {
+    return MutableDependenciesKeyword(this)
   }
 
   override fun toJson(keyword: KeywordInfo<*>, builder: MutableJsrObject, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
@@ -49,13 +48,13 @@ data class DependenciesKeyword(val dependencySchemas: SchemaMapKeyword = SchemaM
 
     thisProps.forEach {
       it.value.forEach { value->
-        multimap += it.key to value
+        multimap[it.key] += value
       }
     }
 
     deps.propertyDependencies.asMap().forEach {
       it.value.forEach { value->
-        multimap += it.key to value
+        multimap[it.key] += value
       }
     }
     return DependenciesKeyword(dependencySchemas = dependencySchemas.merge(path, keyword, deps.dependencySchemas, report) as SchemaMapKeyword,
@@ -63,8 +62,8 @@ data class DependenciesKeyword(val dependencySchemas: SchemaMapKeyword = SchemaM
   }
 
   companion object {
-    fun builder(): DependenciesKeywordBuilder {
-      return DependenciesKeywordBuilder()
+    fun builder(): MutableDependenciesKeyword {
+      return MutableDependenciesKeyword()
     }
   }
 }

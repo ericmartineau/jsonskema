@@ -1,14 +1,13 @@
 package io.mverse.jsonschema
 
+import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
-import kotlinx.serialization.Serializable
 import lang.Name
 import lang.json.JsonPath
 import lang.json.JsrObject
 import lang.json.JsrValue
-import lang.json.jsrJson
 import lang.net.URI
 
 interface Schema {
@@ -59,9 +58,9 @@ interface Schema {
 
   fun merge(path: JsonPath, override:Schema?, report:MergeReport): Schema
 
-  fun toBuilder(): SchemaBuilder
+  fun toMutableSchema(): MutableSchema
 
-  fun toBuilder(id: URI): SchemaBuilder
+  fun toMutableSchema(id: URI): MutableSchema
 
   @Name("asDraft3")
   fun asDraft3(): Draft3Schema

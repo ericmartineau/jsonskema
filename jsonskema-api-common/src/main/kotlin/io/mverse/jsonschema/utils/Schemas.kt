@@ -2,7 +2,7 @@ package io.mverse.jsonschema.utils
 
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.Schema
-import io.mverse.jsonschema.SchemaBuilder
+import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.enums.JsonSchemaType
 
 object Schemas {
@@ -13,12 +13,12 @@ object Schemas {
     notSchema = JsonSchema.schemaBuilder()
   }
 
-  fun nullSchemaBuilder(): SchemaBuilder {
-    return nullSchema.toBuilder()
+  fun nullSchemaBuilder(): MutableSchema {
+    return nullSchema.toMutableSchema()
   }
 
-  fun falseSchemaBuilder(): SchemaBuilder {
-    return falseSchema.toBuilder()
+  fun falseSchemaBuilder(): MutableSchema {
+    return falseSchema.toMutableSchema()
   }
 }
 

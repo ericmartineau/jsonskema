@@ -7,9 +7,9 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.JsonSchema.schemaBuilder
-import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.assertj.asserts.isValid
 import io.mverse.jsonschema.assertj.asserts.validating
+import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.loading.parseJsrJson
 import io.mverse.jsonschema.loading.parseJsrObject
@@ -18,7 +18,6 @@ import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import io.mverse.jsonschema.validation.ValidationTestSupport.failureOf
 import io.mverse.jsonschema.validation.ValidationTestSupport.verifyFailure
 import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.json
 import lang.json.JsrArray
 import lang.json.JsrObject
 import lang.json.createJsrArray
@@ -28,10 +27,8 @@ import lang.json.jsrArrayOf
 import lang.json.jsrObject
 import lang.json.mutate
 import lang.json.toJsrValue
-import lang.json.toJsrValue
 import lang.json.toKtArray
 import lang.json.toMutableJsonArray
-import lang.json.values
 import org.junit.Before
 import org.junit.Test
 
@@ -142,7 +139,7 @@ class BaseSchemaValidatorEnumTest {
     }
   }
 
-  private fun subjectBuilder(): SchemaBuilder {
+  private fun subjectBuilder(): MutableSchema {
     return schemaBuilder { enumValues = possibleValues }
   }
 

@@ -1,7 +1,7 @@
 package io.mverse.jsonschema.utils
 
-import io.mverse.jsonschema.SchemaBuilder
 import io.mverse.jsonschema.SchemaLocation
+import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.utils.JsonUtils.extractIdFromObject
 import lang.json.JsonPath
 import lang.json.JsrObject
@@ -51,7 +51,7 @@ object SchemaPaths {
    * This builds an instance from the schema values loaded into a builder.  Another builder with
    * the exact same keyword configuration woudl have the same location.
    */
-  fun fromBuilder(builder: SchemaBuilder): SchemaLocation {
+  fun fromBuilder(builder: MutableSchema): SchemaLocation {
     val uniqueURIFromBuilder = generateUniqueURI(builder)
     return SchemaLocation.builderFromId(uniqueURIFromBuilder).build()
   }

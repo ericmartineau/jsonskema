@@ -87,22 +87,26 @@ open class DefaultJsonDocumentClient(val fetchers: MutableList<JsonDocumentFetch
 
   override fun fetchDocument(uri: URI): FetchedDocumentResults {
     debug.timed("fetchall: ${uri.path}") {
-      return fetchAll(uri, it).orThrow()
+      return fetchAll(uri, it)
     }
   }
 
   fun fetchAll(uri: URI, mlog: MLog): FetchedDocumentResults {
     val errors: MutableMap<KClass<out JsonDocumentFetcher>, Throwable> = mutableMapOf()
-    val deferreds = fetchers.mapIndexed { idx, fetcher ->
-      GlobalScope.async(dispatcher) {
-        mlog.duration("${fetcher.key.simpleName}-$idx") fetcher@{
-          return@async try {
-            val fetched = fetcher.fetchDocument(uri)
-            fetched
-          } catch (e: Exception) {
-            mlog["${fetcher.key.simpleName}.error"] = "$e"
-            errors[fetcher.key] = e
-            null
+    val deferreds = fetchers.mapIndexedNotNull { idx, fetcher ->
+      if (!fetcher.handles(uri)) {
+        null
+      } else {
+        GlobalScope.async(dispatcher) {
+          mlog.duration("${fetcher.key.simpleName}-$idx") fetcher@{
+            return@async try {
+              val fetched = fetcher.fetchDocument(uri)
+              fetched
+            } catch (e: Exception) {
+              mlog["${fetcher.key.simpleName}.error"] = "$e"
+              errors[fetcher.key] = e
+              null
+            }
           }
         }
       }
@@ -125,7 +129,7 @@ open class DefaultJsonDocumentClient(val fetchers: MutableList<JsonDocumentFetch
       }
     }
 
-    return FetchedDocumentResults(errors, result = fetched)
+    return FetchedDocumentResults(errors, fetchedOrNull = fetched)
   }
 
   override fun plusAssign(fetcher: JsonDocumentFetcher) {

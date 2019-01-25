@@ -19,7 +19,6 @@ import assertk.assert
 import assertk.assertions.hasSize
 import assertk.assertions.hasToString
 import assertk.assertions.isEqualTo
-import io.mverse.json.jsr353.clean
 import io.mverse.json.jsr353.raw
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.createSchemaReader
@@ -42,7 +41,9 @@ import io.mverse.jsonschema.validation.ValidationTestSupport.expectFailure
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import io.mverse.jsonschema.validation.ValidationTestSupport.failureOf
 import io.mverse.jsonschema.validation.ValidationTestSupport.verifyFailure
-import kotlinx.serialization.json.json
+import lang.collection.Multimaps
+import lang.collection.MutableSetMultimap
+import lang.collection.SetMultimap
 import lang.collection.plus
 import lang.collection.size
 import lang.json.JsrValue
@@ -65,7 +66,7 @@ class ObjectKeywordsValidatorTest {
   @Test
   fun additionalPropertiesOnEmptyObject() {
 
-    val input:JsrValue = objectTestCases.raw["emptyObject"]
+    val input: JsrValue = objectTestCases.raw["emptyObject"]
     val testSchema = mockObjectSchema {
       schemaOfAdditionalProperties = mockBooleanSchema
     }
@@ -100,7 +101,7 @@ class ObjectKeywordsValidatorTest {
     val subject = mockObjectSchema {
       properties["name"] = mockStringSchema
       properties["credit_card"] = mockNumberSchema
-      schemaDependencies += "credit_card" to mockObjectSchema.apply {
+      schemaDependencies += "credit_card" to  mockObjectSchema.apply {
         properties["billing_address"] = billingAddressSchema
         properties["billing_name"] = billingNameSchema
         requiredProperties += "billing_address"
@@ -139,8 +140,10 @@ class ObjectKeywordsValidatorTest {
       requiredProperties += "boolProp"
     }
 
-    val e = verifyFailure { ValidationMocks.createTestValidator(subject)
-        .validate(objectTestCases.get("multipleViolations") as JsrValue) }
+    val e = verifyFailure {
+      ValidationMocks.createTestValidator(subject)
+          .validate(objectTestCases.get("multipleViolations") as JsrValue)
+    }
 
     assertEquals(3, e.causes.size)
     assertEquals(1, countCauseByJsonPointer(e, "#"))
@@ -270,7 +273,10 @@ class ObjectKeywordsValidatorTest {
     }
     val subject = mockObjectSchema {
       properties["ifPresent"] = mockNullSchema
-      propertyDependencies += "ifPresent" to "mustBePresent"
+      propertyDependencies += MutableSetMultimap<String, String>()
+          .apply {
+            add("ifPresent", "mustBePresent")
+          }
     }
 
     failureOf(subject)
@@ -343,7 +349,7 @@ class ObjectKeywordsValidatorTest {
     }
 
     expectFailure(subject, billingAddressSchema.build(), "#/billing_address",
-        objectTestCases.get("schemaDepViolation") as JsrValue)
+        objectTestCases["schemaDepViolation"] as JsrValue)
   }
 
   @Test

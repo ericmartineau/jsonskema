@@ -1,6 +1,7 @@
 plugins {
   kotlin("jvm")
   id("kotlinx-serialization")
+  kotlin("kapt")
 }
 
 mverse  {
@@ -27,7 +28,8 @@ mverse  {
 dependencies {
   // Default provider for JSR 353:Java API for Processing JSON
 //  compile("org.glassfish:javax.json:1.1.2")
-
+  kapt("io.github.jffiorillo:jvmbuilder:0.0.4")
+  compile("io.github.jffiorillo:jvmbuilder-annotations:0.0.4")
 
   compile("io.mverse:hashkode:1.0.1")
 

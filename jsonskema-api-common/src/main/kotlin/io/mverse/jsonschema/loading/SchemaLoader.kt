@@ -2,7 +2,7 @@ package io.mverse.jsonschema.loading
 
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.Schema
-import io.mverse.jsonschema.SchemaBuilder
+import io.mverse.jsonschema.builder.MutableSchema
 import lang.json.JsrObject
 import lang.net.URI
 
@@ -22,7 +22,7 @@ interface SchemaLoader {
    * @param loadingReport A place to log loading validation
    * @return A schema builder instance.
    */
-  fun schemaBuilder(forSchema: JsonValueWithPath, loadingReport: LoadingReport): SchemaBuilder {
+  fun schemaBuilder(forSchema: JsonValueWithPath, loadingReport: LoadingReport): MutableSchema {
     return subSchemaBuilder(forSchema, forSchema.jsonObject!!, loadingReport)
   }
 
@@ -34,7 +34,8 @@ interface SchemaLoader {
    * @param report A place to log loading validation
    * @return A loaded ref schema
    */
-  fun loadRefSchema(referencedFrom: Schema, refURI: URI, currentDocument: JsrObject?, report: LoadingReport): Schema
+  fun loadRefSchema(referencedFrom: Schema, refURI: URI, currentDocument: JsrObject?, report: LoadingReport,
+                    callback: (Schema) -> Unit): Schema?
 
   /**
    * Loads a subschema within a document
@@ -52,7 +53,7 @@ interface SchemaLoader {
    * @param loadingReport A place to log loading validation
    * @return A schema builder instance.
    */
-  fun subSchemaBuilder(schemaJson: JsonValueWithPath, inDocument: JsrObject, loadingReport: LoadingReport): SchemaBuilder
+  fun subSchemaBuilder(schemaJson: JsonValueWithPath, inDocument: JsrObject, loadingReport: LoadingReport): MutableSchema
 
   /**
    * Looks for a schema that's already been loaded by this loader.
@@ -77,4 +78,5 @@ interface SchemaLoader {
   fun withDocumentClient(documentClient: JsonDocumentClient): SchemaLoader
 
   operator fun plusAssign(preloadedSchema: JsrObject)
+  operator fun plusAssign(preloadedSchema: Schema)
 }

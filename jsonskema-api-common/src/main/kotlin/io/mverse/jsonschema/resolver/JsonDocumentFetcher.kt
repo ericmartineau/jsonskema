@@ -4,18 +4,24 @@ import lang.exception.nullPointer
 import lang.net.URI
 import lang.net.path
 import lang.net.readFully
+import lang.net.scheme
 import lang.resources.readStringAsResource
 
 interface JsonDocumentFetcher {
   suspend fun fetchDocument(uri: URI): FetchedDocument
   val key: FetcherKey get() = this::class
   val isInterruptable: Boolean get() = false
+  fun handles(refURI:URI):Boolean = true
 }
 
 class HttpDocumentFetcher : JsonDocumentFetcher {
   override suspend fun fetchDocument(uri: URI): FetchedDocument {
     val fetched = uri.readFully()
     return FetchedDocument(key, uri, uri, fetched)
+  }
+
+  override fun handles(refURI: URI): Boolean {
+    return refURI.scheme?.startsWith("http")==true
   }
 
   override val isInterruptable = true

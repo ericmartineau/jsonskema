@@ -9,7 +9,7 @@ plugins {
   id("kotlinx-serialization")
 }
 
-allprojects  {
+allprojects {
   plugins.apply("kotlinx-serialization")
   mverse {
     isDefaultDependencies = false
@@ -23,7 +23,6 @@ allprojects  {
   tasks.withType<KotlinCompile> {
     kotlinOptions {
       jvmTarget = "1.8"
-      suppressWarnings = true
     }
   }
 
@@ -61,11 +60,13 @@ allprojects  {
   }
 }
 
+
+
 fun DependenciesHandler.installKotlinDeps() {
-  val kotlinCoroutines:String by project
-  val kotlin:String by project
-  val kotlinSerialization:String by project
-  val kotlinIO:String by project
+  val kotlinCoroutines: String by project
+  val kotlin: String by project
+  val kotlinSerialization: String by project
+  val kotlinIO: String by project
 
   // None
   dependencySet("org.jetbrains.kotlin:$kotlin") {
@@ -101,7 +102,7 @@ fun DependenciesHandler.installKotlinDeps() {
 }
 
 fun DependenciesHandler.installMverseShared() {
-  val mverseShared:String by project
+  val mverseShared: String by project
 
   dependencySet("io.mverse:$mverseShared") {
     entry("mverse-json")

@@ -1,7 +1,7 @@
 package io.mverse.jsonschema.loading.keyword
 
 import io.mverse.jsonschema.JsonValueWithPath
-import io.mverse.jsonschema.SchemaBuilder
+import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.enums.JsonSchemaTypes
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.TYPE
@@ -20,7 +20,7 @@ class TypeKeywordDigester : KeywordDigester<TypeKeyword> {
 
   override val includedKeywords = TYPE.getTypeVariants(JsrType.STRING, JsrType.ARRAY)
 
-  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder,
+  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: MutableSchema,
                               schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<TypeKeyword>? {
     val type = jsonObject.path(Keywords.TYPE)
     val wrapped = type.wrapped

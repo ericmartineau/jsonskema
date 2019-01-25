@@ -19,5 +19,6 @@ mverse  {
 }
 
 dependencies {
+  compile("io.github.jffiorillo:jvmbuilder-annotations:0.0.4")
   compile("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.1")
 }

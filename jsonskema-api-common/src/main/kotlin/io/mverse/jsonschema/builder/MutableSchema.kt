@@ -1,5 +1,8 @@
-package io.mverse.jsonschema
+package io.mverse.jsonschema.builder
 
+import io.mverse.jsonschema.MergeReport
+import io.mverse.jsonschema.Schema
+import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
@@ -13,7 +16,9 @@ import lang.json.JsrObject
 import lang.json.JsrValue
 import lang.net.URI
 
-interface SchemaBuilder {
+typealias SchemaBuilder = MutableSchema
+
+interface MutableSchema {
 
   // ##################################################################
   // ########           COUPLE OF GETTERS                ##############
@@ -63,12 +68,12 @@ interface SchemaBuilder {
   // ########           OBJECT KEYWORDS                  ##############
   // ##################################################################
 
-  var schemaOfAdditionalProperties: SchemaBuilder?
+  var schemaOfAdditionalProperties: MutableSchema?
   var schemaDependencies: Map<String, SchemaBuilder>
   var propertyDependencies: SetMultimap<String, String>
   var properties: MutableSchemaMap
 
-  var propertyNameSchema: SchemaBuilder?
+  var propertyNameSchema: MutableSchema?
   var patternProperties: MutableSchemaMap
   var definitions: MutableSchemaMap
 
@@ -93,29 +98,29 @@ interface SchemaBuilder {
   var maxItems: Int?
   var minItems: Int?
 
-  var schemaOfAdditionalItems: SchemaBuilder?
-  var containsSchema: SchemaBuilder?
+  var schemaOfAdditionalItems: MutableSchema?
+  var containsSchema: MutableSchema?
 
-  var itemSchemas: List<SchemaBuilder>
-  var allItemSchema: SchemaBuilder?
+  var itemSchemas: List<MutableSchema>
+  var allItemSchema: MutableSchema?
 
   // ##################################################################
   // ########           COMMON KEYWORDS                  ##############
   // ##################################################################
 
-  var notSchema: SchemaBuilder?
+  var notSchema: MutableSchema?
   var enumValues: JsrArray?
   var const: Any?
   var constValue: JsrValue?
 
-  var oneOfSchemas: List<SchemaBuilder>
-  var anyOfSchemas: List<SchemaBuilder>
-  var allOfSchemas: List<SchemaBuilder>
-  var ifSchema: SchemaBuilder?
-  var thenSchema: SchemaBuilder?
-  var elseSchema: SchemaBuilder?
+  var oneOfSchemas: List<MutableSchema>
+  var anyOfSchemas: List<MutableSchema>
+  var allOfSchemas: List<MutableSchema>
+  var ifSchema: MutableSchema?
+  var thenSchema: MutableSchema?
+  var elseSchema: MutableSchema?
 
-  operator fun invoke(block: SchemaBuilder.() -> Unit): SchemaBuilder
+  operator fun invoke(block: MutableSchema.() -> Unit): MutableSchema
 
   // ##################################################################
   // ########           INNER KEYWORDS                   ##############
@@ -126,7 +131,7 @@ interface SchemaBuilder {
   @Name("buildWithLocation")
   fun build(itemsLocation: SchemaLocation? = null, report: LoadingReport): Schema
 
-  fun build(block: SchemaBuilder.() -> Unit): Schema
+  fun build(block: MutableSchema.() -> Unit): Schema
 
   var loadingReport: LoadingReport
   var schemaLoader: SchemaLoader?
@@ -134,12 +139,12 @@ interface SchemaBuilder {
 
   operator fun <K : Keyword<*>> set(keyword: KeywordInfo<K>, value: K)
   operator fun <X, K : Keyword<X>> get(keyword: KeywordInfo<K>): K?
-  fun buildSubSchema(toBuild: SchemaBuilder, keyword: KeywordInfo<*>, path: String, vararg paths: String): Schema
+  fun buildSubSchema(toBuild: MutableSchema, keyword: KeywordInfo<*>, path: String, vararg paths: String): Schema
 
   @Name("build")
   fun build(): Schema
 
-  operator fun contains(keyword:KeywordInfo<*>):Boolean
+  operator fun contains(keyword: KeywordInfo<*>): Boolean
   fun merge(path: JsonPath, other: Schema, report: MergeReport)
-  operator fun plusAssign(other:Schema) = merge(JsonPath.rootPath, other, MergeReport())
+  operator fun plusAssign(other: Schema) = merge(JsonPath.rootPath, other, MergeReport())
 }

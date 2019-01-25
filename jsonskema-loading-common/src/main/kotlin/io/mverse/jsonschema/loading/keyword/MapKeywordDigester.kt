@@ -2,7 +2,7 @@ package io.mverse.jsonschema.loading.keyword
 
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.Schema
-import io.mverse.jsonschema.SchemaBuilder
+import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.SchemaMapKeyword
 import io.mverse.jsonschema.loading.KeywordDigest
@@ -17,7 +17,7 @@ data class MapKeywordDigester(val keyword: KeywordInfo<SchemaMapKeyword>) : Keyw
 
   override val includedKeywords get() = listOf(keyword)
 
-  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: SchemaBuilder,
+  override fun extractKeyword(jsonObject: JsonValueWithPath, builder: MutableSchema,
                               schemaLoader: SchemaLoader, report: LoadingReport): KeywordDigest<SchemaMapKeyword>? {
     val keyedSchemas = mutableMapOf<String, Schema>()
     val propObject = jsonObject.path(keyword)
