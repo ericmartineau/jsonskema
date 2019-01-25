@@ -23,6 +23,7 @@ import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.loading.parseJsrObject
+import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import lang.json.toJsrValue
 import lang.json.unboxAsAny

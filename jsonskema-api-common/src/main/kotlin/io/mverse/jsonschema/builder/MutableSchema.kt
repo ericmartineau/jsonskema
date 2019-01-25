@@ -134,7 +134,7 @@ interface MutableSchema {
   fun build(block: MutableSchema.() -> Unit): Schema
 
   var loadingReport: LoadingReport
-  var schemaLoader: SchemaLoader?
+  val schemaLoader: SchemaLoader
   var currentDocument: JsrObject?
 
   operator fun <K : Keyword<*>> set(keyword: KeywordInfo<K>, value: K)

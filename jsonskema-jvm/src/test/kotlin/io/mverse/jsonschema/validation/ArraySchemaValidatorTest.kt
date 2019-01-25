@@ -39,7 +39,7 @@ import io.mverse.jsonschema.keyword.Keywords.UNIQUE_ITEMS
 import io.mverse.jsonschema.loading.parseJsrJson
 import io.mverse.jsonschema.loading.parseJsrObject
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.schemaReader
+import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.ValidationMocks.mockArraySchema
 import io.mverse.jsonschema.validation.ValidationMocks.mockBooleanSchema
 import io.mverse.jsonschema.validation.ValidationMocks.mockNullSchema
@@ -84,7 +84,7 @@ class ArraySchemaValidatorTest {
 
   @Test
   fun additionalItemsSchemaFailure() {
-    val nullSchema = schemaBuilder("nulls") {
+    val nullSchema = JsonSchema.schemaBuilder("nulls") {
       type = NULL
     }
 

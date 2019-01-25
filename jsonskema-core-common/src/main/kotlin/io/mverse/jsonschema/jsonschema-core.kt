@@ -1,18 +1,12 @@
 package io.mverse.jsonschema
 
-import io.mverse.jsonschema.builder.MutableJsonSchema
 import lang.json.JsrObject
 import lang.json.JsrValue
 import lang.json.toMutableJsonObject
-import lang.json.unbox
-import lang.net.URI
 
-fun JsonSchema.schemaBuilder(): MutableJsonSchema = MutableJsonSchema()
-fun JsonSchema.schemaBuilder(id: URI): MutableJsonSchema = MutableJsonSchema(id)
-fun JsonSchema.schemaBuilder(id: String): MutableJsonSchema = MutableJsonSchema(URI(id))
-
-val JsrValue.int get() = this.unbox<Int>()
-val JsrValue.double get() = this.unbox<Double>()
+//fun JsonSchema.schemaBuilder(loader: SchemaLoader = JsonSchema.schemaReader.loader): MutableJsonSchema = MutableJsonSchema(loader)
+//fun JsonSchema.schemaBuilder(id: URI): MutableJsonSchema = MutableJsonSchema(id)
+//fun JsonSchema.schemaBuilder(id: String): MutableJsonSchema = MutableJsonSchema(URI(id))
 
 operator fun JsrObject.minus(key: String): JsrObject = this.toMutableJsonObject().run {
   this - key

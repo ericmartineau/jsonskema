@@ -4,6 +4,7 @@ import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.enums.JsonSchemaType.NULL
 import io.mverse.jsonschema.enums.JsonSchemaType.NUMBER
 import io.mverse.jsonschema.enums.JsonSchemaType.STRING
+import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.TestErrorHelper.failure
 import org.junit.Assert.assertEquals
 import org.junit.Rule

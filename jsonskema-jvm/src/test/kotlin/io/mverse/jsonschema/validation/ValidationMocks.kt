@@ -12,6 +12,7 @@ import io.mverse.jsonschema.enums.JsonSchemaType.NULL
 import io.mverse.jsonschema.enums.JsonSchemaType.NUMBER
 import io.mverse.jsonschema.enums.JsonSchemaType.OBJECT
 import io.mverse.jsonschema.enums.JsonSchemaType.STRING
+import io.mverse.jsonschema.schemaBuilder
 import lang.net.URI
 
 object ValidationMocks {
@@ -39,7 +40,7 @@ object ValidationMocks {
   }
 
   fun mockBooleanSchema(id: String): MutableSchema {
-    return schemaBuilder(id) { type = BOOLEAN }
+    return JsonSchema.schemaBuilder(id) { type = BOOLEAN }
   }
 
   val mockIntegerSchema: MutableSchema
@@ -62,10 +63,10 @@ object ValidationMocks {
       return schemaBuilder { type = OBJECT }
     }
 
-  val mockSchema: MutableSchema get() = MutableJsonSchema()
+  val mockSchema: MutableSchema get() = MutableJsonSchema(JsonSchema.schemaLoader)
 
   fun mockObjectSchema(id: String): MutableSchema {
-    return schemaBuilder(id) { type = OBJECT }
+    return JsonSchema.schemaBuilder(id) { type = OBJECT }
   }
 
   fun mockObjectSchema(id: URI): MutableSchema {

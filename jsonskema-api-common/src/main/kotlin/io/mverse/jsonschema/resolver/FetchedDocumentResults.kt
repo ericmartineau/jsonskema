@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
 
 typealias FetcherKey = KClass<out JsonDocumentFetcher>
 
-data class FetchedDocumentResults(val errors: Map<FetcherKey, Throwable> = emptyMap(),
+data class FetchedDocumentResults(val failures: Map<FetcherKey, Throwable> = emptyMap(),
                                   val cancelled: Set<FetcherKey> = emptySet(),
                                   val fetchedOrNull: FetchedDocument? = null) {
   val fetched: FetchedDocument
@@ -20,11 +20,11 @@ data class FetchedDocumentResults(val errors: Map<FetcherKey, Throwable> = empty
 }
 
 class DocumentFetchException(result: FetchedDocumentResults) : Exception(result.toErrorString()) {
-  val failures = result.errors
+  val failures = result.failures
 
   companion object {
     fun FetchedDocumentResults.toErrorString(): String {
-      errors.run {
+      failures.run {
         val builder = StringBuilder("Error fetching document with $size failures: \n")
         builder += toList().join { "${it.first.simpleName}: ${it.second}".indent() }.wrap()
         return builder.toString()

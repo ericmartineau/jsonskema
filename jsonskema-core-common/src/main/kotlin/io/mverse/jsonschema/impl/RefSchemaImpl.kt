@@ -31,8 +31,8 @@ open class RefSchemaImpl : RefSchema {
               currentDocument: JsrObject?,
               report: LoadingReport) : super(factory, location, refURI, currentDocument, report)
 
-  constructor(location: SchemaLocation, refURI: URI, refSchema: Schema) : super(location, refURI, refSchema)
-  constructor(location: SchemaLocation, refURI: URI) : super(location, refURI)
+  constructor(factory: SchemaLoader, location: SchemaLocation, refURI: URI, refSchema: Schema) : super(factory, location, refURI, refSchema)
+  constructor(factory: SchemaLoader, location: SchemaLocation, refURI: URI) : super(factory, location, refURI)
 
   init {
     JsonSchemaImpl.initialize()
@@ -41,40 +41,41 @@ open class RefSchemaImpl : RefSchema {
   override fun asDraft6(): Draft6Schema {
     val draft6 = refSchemaOrNull?.asDraft6()
         ?: Draft6SchemaImpl(
+            schemaLoader,
             location = location,
             keywords = mapOf(Keywords.REF to URIKeyword(refURI)))
-    return Draft6RefSchemaImpl(location, refURI, draft6)
+    return Draft6RefSchemaImpl(schemaLoader, location, refURI, draft6)
   }
 
   override fun asDraft7(): Draft7Schema {
     val draft7 = refSchemaOrNull?.asDraft7()
-        ?: Draft7SchemaImpl(
+        ?: Draft7SchemaImpl(schemaLoader,
             location = location,
             keywords = mapOf(Keywords.REF to URIKeyword(refURI)),
             extraProperties = emptyMap())
-    return Draft7RefSchemaImpl(location, refURI, draft7)
+    return Draft7RefSchemaImpl(schemaLoader,location, refURI, draft7)
   }
 
   override fun asDraft4(): Draft4Schema {
     val draft4 = refSchemaOrNull?.asDraft4()
-        ?: Draft4SchemaImpl(
+        ?: Draft4SchemaImpl(schemaLoader,
             location = location,
             keywords = mapOf(Keywords.REF to URIKeyword(refURI)),
             extraProperties = emptyMap())
-    return Draft4RefSchemaImpl(location, refURI, draft4)
+    return Draft4RefSchemaImpl(schemaLoader,location, refURI, draft4)
   }
 
   override fun asDraft3(): Draft3Schema {
     val draft3 = refSchemaOrNull?.asDraft3()
-        ?: Draft3SchemaImpl(
+        ?: Draft3SchemaImpl(schemaLoader,
             location = location,
             keywords = mapOf(Keywords.REF to URIKeyword(refURI)),
             extraProperties = emptyMap())
-    return Draft3RefSchemaImpl(location, refURI, draft3)
+    return Draft3RefSchemaImpl(schemaLoader,location, refURI, draft3)
   }
 
   override fun withId(id: URI): Schema {
-    return RefSchemaImpl(location.withId(id), refURI, this)
+    return RefSchemaImpl(schemaLoader, location.withId(id), refURI, this)
   }
 
   override val refOnlySchema: Schema
@@ -87,12 +88,12 @@ open class RefSchemaImpl : RefSchema {
 
   override fun toMutableSchema(): MutableSchema {
     @Suppress("unchecked_cast")
-    return MutableJsonSchema(fromSchema = this)
+    return MutableJsonSchema(schemaLoader, fromSchema = this)
   }
 
   override fun toMutableSchema(id: URI): MutableSchema {
     @Suppress("unchecked_cast")
-    return MutableJsonSchema(fromSchema = this, id = id)
+    return MutableJsonSchema(schemaLoader, fromSchema = this, id = id)
   }
 
   override fun toJson(version: JsonSchemaVersion, includeExtraProperties: Boolean): JsrObject {

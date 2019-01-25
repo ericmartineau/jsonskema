@@ -64,18 +64,16 @@ data class SubSchemaLoader(val extraKeywordLoaders: List<KeywordDigester<*>>,
   }
 
   internal fun schemaBuilder(location: SchemaLocation, `$id`: URI): MutableSchema {
-    val loader = this.schemaLoader
-    return MutableJsonSchema(location, `$id`).also { it.schemaLoader = loader }
+    return MutableJsonSchema(schemaLoader, location, `$id`)
   }
 
   internal fun schemaBuilder(location: SchemaLocation): MutableSchema {
-    return MutableJsonSchema(location).also { it.schemaLoader = this.schemaLoader }
+    return MutableJsonSchema(schemaLoader, location)
   }
 
   internal fun refSchemaBuilder(ref: URI, currentDocument: JsrObject, location: SchemaLocation): MutableSchema {
-    return MutableJsonSchema(location).also {
+    return MutableJsonSchema(schemaLoader, location).also {
       it.currentDocument = currentDocument
-      it.schemaLoader = this.schemaLoader
       it.ref = ref
     }
   }

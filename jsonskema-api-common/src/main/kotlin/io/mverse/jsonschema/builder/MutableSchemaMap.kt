@@ -15,10 +15,7 @@ class MutableSchemaMap(val keyword: KeywordInfo<SchemaMapKeyword>,
 
   operator fun set(key: String, block: MutableSchema.() -> Unit) {
     val existing = builder[keyword] ?: SchemaMapKeyword()
-    builder[keyword] = existing + (key to builder.buildSubSchema(JsonSchema.schemaBuilder {
-      schemaLoader = builder.schemaLoader
-      block()
-    }, keyword, key))
+    builder[keyword] = existing + (key to builder.buildSubSchema(JsonSchema.schemaBuilder(builder.schemaLoader, block), keyword, key))
   }
 
   fun toSchemaMap(): Map<String, Schema> = builder[keyword]?.value ?: emptyMap()

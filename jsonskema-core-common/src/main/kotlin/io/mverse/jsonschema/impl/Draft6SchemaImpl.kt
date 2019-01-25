@@ -9,6 +9,7 @@ import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
+import io.mverse.jsonschema.loading.SchemaLoader
 import lang.collection.freezeMap
 import lang.json.JsrArray
 import lang.json.JsrValue
@@ -46,15 +47,15 @@ class Draft6SchemaImpl : JsonSchemaImpl<Draft6Schema>, Draft6Schema {
   override val keywords: Map<KeywordInfo<*>, Keyword<*>>
     get() = super.keywords
 
-  constructor(from: Schema) : super(from, JsonSchemaVersion.Draft6)
+  constructor(schemaLoader: SchemaLoader, from: Schema) : super(schemaLoader, from, JsonSchemaVersion.Draft6)
 
-  constructor(location: SchemaLocation,
+  constructor(schemaLoader: SchemaLoader, location: SchemaLocation,
               keywords: Map<KeywordInfo<*>, Keyword<*>>,
-              extraProperties: Map<String, JsrValue> = emptyMap()) : super(location, keywords.freezeMap(), extraProperties.freezeMap(), JsonSchemaVersion.Draft6)
+              extraProperties: Map<String, JsrValue> = emptyMap()) : super(schemaLoader, location, keywords.freezeMap(), extraProperties.freezeMap(), JsonSchemaVersion.Draft6)
 
   override fun asDraft6(): Draft6Schema = this
   override fun convertVersion(source: Schema): Draft6Schema = source.asDraft6()
-  override fun withId(id: URI): Schema = Draft6SchemaImpl(location = location.withId(id),
+  override fun withId(id: URI): Schema = Draft6SchemaImpl(schemaLoader, location = location.withId(id),
       keywords = keywords.toMutableMap().also {
         it.remove(Keywords.ID)
         it[DOLLAR_ID] = IdKeyword(id)

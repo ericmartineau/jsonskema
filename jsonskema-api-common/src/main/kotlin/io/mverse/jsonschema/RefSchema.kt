@@ -5,7 +5,6 @@ import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
 import io.mverse.logging.mlogger
 import lang.exception.illegalState
-import lang.exception.nullPointer
 import lang.hashKode
 import lang.json.JsonPath
 import lang.json.JsrObject
@@ -17,6 +16,7 @@ import lang.suppress.Suppressions.Companion.NAME_SHADOWING
  * to permit the loading of recursive schemas.
  */
 abstract class RefSchema(
+    val schemaLoader: SchemaLoader,
     /**
      * The location this schema is referenced from
      */
@@ -31,34 +31,30 @@ abstract class RefSchema(
      * Contains a reference to the actual loaded schema, or null if it hasn't been resolved.
      */
     refSchema: Schema? = null,
-    val factory:SchemaLoader? = null) : Schema {
+    val refResolver: (RefSchema) -> Schema? = { null }) : Schema {
 
-  constructor(factory: SchemaLoader,
+
+  constructor(loader: SchemaLoader,
               location: SchemaLocation,
               refURI: URI,
               currentDocument: JsrObject?,
-              report: LoadingReport) : this(location, refURI, factory = factory) {
-    asyncLoad(factory, currentDocument, report)
-  }
-
-  private fun asyncLoad(loader: SchemaLoader, doc: JsrObject?, report: LoadingReport) {
-    val found = loader.loadRefSchema(this, refURI, doc, report) {
-      if (it is RefSchema) {
-        if (loadCounter++ > 10) illegalState("Stack overflow while loading schema $refURI")
-        asyncLoad(loader, doc, report)
-      } else {
-        internalRefSchema = it
-      }
-    }
-    if (found != null) {
-      internalRefSchema = found
-    }
-  }
+              report: LoadingReport) : this(loader, location, refURI, refResolver = { refSchema ->
+    refSchema.resolve(loader, currentDocument, report)
+  })
 
   private var loadCounter = 0
   private var internalRefSchema: Schema? = refSchema
+    get() {
+      if (field == null) {
+        when (val resolved = refResolver(this)) {
+          is RefSchema -> field = resolved.refSchemaOrNull
+          is Schema -> field = resolved
+        }
+      }
+      return field
+    }
     set(value) {
-      field = value ?: nullPointer("The internal refSchema should never be set to null")
+      field = field ?: value
     }
 
   val refSchemaOrNull: Schema? get() = internalRefSchema
@@ -67,7 +63,7 @@ abstract class RefSchema(
    * Reference to the loaded schema
    */
   val refSchema: Schema
-    get() = refSchemaOrNull ?: factory?.findLoadedSchema(refURI) ?: illegalState("Ref schema hasn't been resolved yet")
+    get() = internalRefSchema ?: illegalState("Ref schema hasn't been resolved yet")
 
   /**
    * A non-resolved schema that contains just the ref keyword
@@ -105,5 +101,13 @@ abstract class RefSchema(
 
   companion object {
     val log = mlogger {}
+
+    fun RefSchema.resolve(loader: SchemaLoader, doc: JsrObject?, report: LoadingReport): Schema? {
+      return loader.loadRefSchema(this, this.refURI, doc, report)
+    }
+  }
+
+  init {
+    schemaLoader += this
   }
 }

@@ -18,6 +18,7 @@ import io.mverse.jsonschema.keyword.Keywords.IF
 import io.mverse.jsonschema.keyword.Keywords.READ_ONLY
 import io.mverse.jsonschema.keyword.Keywords.THEN
 import io.mverse.jsonschema.keyword.Keywords.WRITE_ONLY
+import io.mverse.jsonschema.loading.SchemaLoader
 import lang.collection.freezeMap
 import lang.json.JsrArray
 import lang.json.JsrValue
@@ -66,17 +67,19 @@ class Draft7SchemaImpl : JsonSchemaImpl<Draft7Schema>, Draft7Schema {
   override val minProperties: Int? get() = super.minProperties
   override val requiredProperties: Set<String> get() = super.requiredProperties
 
-  constructor(from: Schema) : super(from, Draft7) {}
+  constructor(schemaLoader: SchemaLoader, from: Schema) : super(schemaLoader, from, Draft7)
 
-  constructor(location: SchemaLocation,
+  constructor(schemaLoader: SchemaLoader,
+              location: SchemaLocation,
               keywords: Map<KeywordInfo<*>, Keyword<*>>,
-              extraProperties: Map<String, JsrValue>) : super(location, keywords.freezeMap(), extraProperties.freezeMap(), Draft7)
+              extraProperties: Map<String, JsrValue>) : super(schemaLoader, location, keywords.freezeMap(), extraProperties.freezeMap(), Draft7)
 
   override val version: JsonSchemaVersion = Draft7
   override fun asDraft7(): Draft7Schema = this
   override fun convertVersion(source: Schema): Draft7Schema = source.asDraft7()
   override fun withId(id: URI): Schema {
     return Draft7SchemaImpl(
+        schemaLoader = schemaLoader,
         location = location.withId(id),
         keywords = keywords.toMutableMap().also {
           it.remove(Keywords.ID)

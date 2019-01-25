@@ -48,6 +48,7 @@ import io.mverse.jsonschema.keyword.Keywords.REQUIRED
 import io.mverse.jsonschema.keyword.Keywords.TITLE
 import io.mverse.jsonschema.keyword.Keywords.TYPE
 import io.mverse.jsonschema.keyword.Keywords.UNIQUE_ITEMS
+import io.mverse.jsonschema.loading.SchemaLoader
 import io.mverse.jsonschema.utils.Schemas.nullSchema
 import lang.collection.Multimaps
 import lang.collection.SetMultimap
@@ -65,6 +66,7 @@ import lang.net.URI
 val log: Logger = Logger("JsonSchemaImpl")
 
 abstract class JsonSchemaImpl<D : DraftSchema<D>>(
+    val schemaLoader: SchemaLoader,
     override val location: SchemaLocation,
     override val keywords: Map<KeywordInfo<*>, Keyword<*>> = emptyMap(),
     override val extraProperties: Map<String, JsrValue> = mutableMapOf(),
@@ -122,8 +124,9 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
     return convertVersion(this)
   }
 
-  protected constructor(from: Schema, version: JsonSchemaVersion) :
-      this(location = from.location,
+  protected constructor(schemaLoader:SchemaLoader, from: Schema, version: JsonSchemaVersion) :
+      this(schemaLoader = schemaLoader,
+          location = from.location,
           keywords = from.keywords,
           extraProperties = from.extraProperties,
           version = version)
@@ -168,19 +171,19 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
 
   override fun asDraft6(): Draft6Schema {
     return if (this is Draft6Schema) this
-    else Draft6SchemaImpl(this)
+    else Draft6SchemaImpl(schemaLoader,this)
   }
 
   override fun asDraft3(): Draft3Schema {
-    return this as? Draft3Schema ?: Draft3SchemaImpl(this)
+    return this as? Draft3Schema ?: Draft3SchemaImpl(schemaLoader,this)
   }
 
   override fun asDraft7(): Draft7Schema {
-    return this as? Draft7Schema ?: Draft7SchemaImpl(this)
+    return this as? Draft7Schema ?: Draft7SchemaImpl(schemaLoader,this)
   }
 
   override fun asDraft4(): Draft4Schema {
-    return this as? Draft4Schema ?: Draft4SchemaImpl(this)
+    return this as? Draft4Schema ?: Draft4SchemaImpl(schemaLoader,this)
   }
 
   override fun toString(): String = toString(version)
@@ -190,11 +193,11 @@ abstract class JsonSchemaImpl<D : DraftSchema<D>>(
   }
 
   override fun toMutableSchema(): MutableSchema {
-    return MutableJsonSchema(fromSchema = this)
+    return MutableJsonSchema(schemaLoader, fromSchema = this)
   }
 
   override fun toMutableSchema(id: URI): MutableSchema {
-    return MutableJsonSchema(fromSchema = this, id = id)
+    return MutableJsonSchema(schemaLoader, fromSchema = this, id = id)
   }
 
   // ##################################################################

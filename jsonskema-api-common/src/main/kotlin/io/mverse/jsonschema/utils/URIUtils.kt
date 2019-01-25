@@ -52,8 +52,4 @@ fun URI.isGeneratedURI(): Boolean {
   return SCHEME_AUTOASSIGN.equals(uri.scheme)
 }
 
-fun URI.withNewFragment(newFragment: URI): URI {
-  check(newFragment.isFragmentOnly) { "Must only be a fragment" }
-  return this.withFragment(newFragment.fragment)
-}
 

@@ -17,6 +17,7 @@ import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.SchemaException
 import io.mverse.jsonschema.assertj.asserts.isEqualIgnoringWhitespace
 import io.mverse.jsonschema.assertj.asserts.isSchemaEqual
+import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
@@ -27,7 +28,8 @@ import io.mverse.jsonschema.resolver.FetchedDocument
 import io.mverse.jsonschema.resolver.FetchedDocumentResults
 import io.mverse.jsonschema.resolver.HttpDocumentFetcher
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.schemaReader
+import io.mverse.jsonschema.schema
+import io.mverse.logging.mlogger
 import lang.json.jsrObject
 import lang.net.URI
 import org.junit.Assert
@@ -179,14 +181,25 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
     }
   }
 
-  @Test(expected = SchemaException::class)
+  @Test
   fun pointerResolutionFailure() {
-    getSchemaForKey("pointerResolutionFailure")
+    val schema = getSchemaForKey("pointerResolutionFailure")
+    assert {
+      schema.validating(jsrObject{}) // This should trigger failure
+    }.thrownError {
+      isInstanceOf(SchemaException::class)
+    }
   }
 
-  @Test(expected = SchemaException::class)
+  @Test
   fun pointerResolutionQueryFailure() {
-    getSchemaForKey("pointerResolutionQueryFailure")
+    val schema = getSchemaForKey("pointerResolutionQueryFailure")
+    assert(schema).isNotNull()
+    assert {
+      schema.validating(jsrObject{}) // This should trigger failure
+    }.thrownError {
+      isInstanceOf(SchemaException::class)
+    }
   }
 
   @Test
@@ -339,5 +352,9 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
 
     val deserialized = JsonSchema.createSchemaReader().readSchema(asString)
     assert(schemaOne).isSchemaEqual(deserialized)
+  }
+
+  companion object {
+    val log = mlogger{}
   }
 }

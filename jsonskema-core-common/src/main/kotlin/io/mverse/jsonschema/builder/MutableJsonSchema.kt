@@ -97,43 +97,46 @@ import lang.net.URI
 import lang.suppress.Suppressions.Companion.UNCHECKED_CAST
 import lang.uuid.randomUUID
 
-typealias JsonSchemeaBuilder = MutableJsonSchema
+@Deprecated("Use MutableJsonSchema", replaceWith = ReplaceWith("MutableJsonSchema"))
+typealias JsonSchemaBuilder = MutableJsonSchema
 
 class MutableJsonSchema(
+    override val schemaLoader: SchemaLoader,
     keywords: MutableMap<KeywordInfo<*>, Keyword<*>> = mutableMapOf(),
     override var extraProperties: MutableMap<String, JsrValue> = mutableMapOf(),
     private val location: SchemaLocation = SchemaPaths.fromNonSchemaSource(randomUUID()),
     override var currentDocument: JsrObject? = null,
-    override var schemaLoader: SchemaLoader? = null,
     override var loadingReport: LoadingReport = LoadingReport())
   : SchemaBuilder, MutableKeywordContainer(keywords = keywords) {
 
-  constructor(fromSchema: Schema, id: URI) : this(fromSchema, SchemaLocation.builderFromId(id).build()) {
+  constructor(schemaLoader: SchemaLoader, fromSchema: Schema, id: URI) : this(schemaLoader = schemaLoader, fromSchema = fromSchema,
+      location = SchemaLocation.builderFromId(id).build()) {
     keywords[DOLLAR_ID] = IdKeyword(id)
   }
 
-  constructor(fromSchema: Schema, location: SchemaLocation) : this(location = location,
+  constructor(schemaLoader: SchemaLoader, fromSchema: Schema, location: SchemaLocation) : this(schemaLoader = schemaLoader, location = location,
       keywords = fromSchema.keywords.toMutableMap(),
       extraProperties = fromSchema.extraProperties.toMutableMap())
 
-  constructor(fromSchema: Schema) : this(fromSchema, fromSchema.location)
+  constructor(schemaLoader: SchemaLoader, fromSchema: Schema) : this(schemaLoader = schemaLoader, fromSchema = fromSchema,
+      location = fromSchema.location)
 
-  constructor(fromSchema: RefSchema) : this(location = fromSchema.location) {
+  constructor(schemaLoader: SchemaLoader, fromSchema: RefSchema) : this(schemaLoader = schemaLoader, location = fromSchema.location) {
     if (fromSchema.refSchemaOrNull != null) {
       this.refSchema = fromSchema.refSchemaOrNull!!
     }
     this.ref = fromSchema.refURI
   }
 
-  constructor(id: URI) : this(location = SchemaPaths.fromIdNonAbsolute(id)) {
+  constructor(schemaLoader: SchemaLoader, id: URI) : this(schemaLoader = schemaLoader, location = SchemaPaths.fromIdNonAbsolute(id)) {
     keywords[DOLLAR_ID] = IdKeyword(id)
   }
 
-  constructor(location: SchemaLocation, id: URI) : this(location = location) {
+  constructor(schemaLoader: SchemaLoader, location: SchemaLocation, id: URI) : this(schemaLoader = schemaLoader, location = location) {
     keywords[DOLLAR_ID] = IdKeyword(id)
   }
 
-  constructor(location: SchemaLocation) : this(keywords = mutableMapOf(), location = location)
+  constructor(schemaLoader: SchemaLoader, location: SchemaLocation) : this(schemaLoader = schemaLoader, keywords = mutableMapOf(), location = location)
 
   operator fun <X, K : Keyword<X>> set(keyword: KeywordInfo<K>, value: X?, block: (X) -> K) {
     when (value) {
@@ -538,34 +541,24 @@ class MutableJsonSchema(
 
     val thisSchemaURI = finalLocation.uniqueURI
 
-    if (schemaLoader != null) {
-      val cachedSchema = schemaLoader!!.findLoadedSchema(thisSchemaURI)
-      if (cachedSchema != null) {
-        return cachedSchema
-      }
+    val cachedSchema = schemaLoader.findLoadedSchema(thisSchemaURI)
+    if (cachedSchema != null) {
+      return cachedSchema
     }
 
     val refSchema = this.refSchema
     val ref = this.ref
-    val schemaLoader = this.schemaLoader
     return when {
-      refSchema != null -> RefSchemaImpl(refURI = this.refSchema!!.absoluteURI,
+      refSchema != null -> RefSchemaImpl(schemaLoader, refURI = this.refSchema!!.absoluteURI,
           location = finalLocation,
           refSchema = this.refSchema!!)
-      ref != null -> when (schemaLoader) {
-        null -> {
-          log.info { "Warning: Creating a ref schema that cannot be resolved: location=$finalLocation, ref=$refURI" }
-          RefSchemaImpl(finalLocation, refURI!!)
-        }
-        else -> RefSchemaImpl(refURI = this.refURI!!,
-            factory = schemaLoader,
-            currentDocument = currentDocument,
-            location = finalLocation,
-            report = report)
-      }
-
-      else -> Draft7SchemaImpl(finalLocation, this.keywords, this.extraProperties)
-          .apply { schemaLoader?.plusAssign(this) }
+      ref != null -> RefSchemaImpl(refURI = this.refURI!!,
+          factory = schemaLoader,
+          currentDocument = currentDocument,
+          location = finalLocation,
+          report = report)
+      else -> Draft7SchemaImpl(schemaLoader, finalLocation, this.keywords, this.extraProperties)
+          .apply { schemaLoader += this }
     }
   }
 
@@ -573,13 +566,13 @@ class MutableJsonSchema(
 
   override fun build(block: MutableSchema.() -> Unit): Schema {
     this.block()
-    val location: SchemaLocation = @Suppress("USELESS_ELVIS", "SENSELESS_COMPARISON")
-
-    when {
-      this.id == null -> this.location ?: SchemaPaths.fromBuilder(this)
-      this.location != null -> this.location.withId(this.id!!)
-      else -> SchemaPaths.fromId(this.id!!)
-    }
+    val location: SchemaLocation =
+        @Suppress("USELESS_ELVIS", "SENSELESS_COMPARISON")
+        when {
+          this.id == null -> this.location ?: SchemaPaths.fromBuilder(this)
+          this.location != null -> this.location.withId(this.id!!)
+          else -> SchemaPaths.fromId(this.id!!)
+        }
 
     val built = build(location, loadingReport)
     if (loadingReport.hasErrors()) {

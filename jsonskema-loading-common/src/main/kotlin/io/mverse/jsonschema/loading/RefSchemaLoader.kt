@@ -25,6 +25,28 @@ import lang.suppress.Suppressions.Companion.NAME_SHADOWING
 data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoader: SchemaLoader) {
 
   fun loadRefSchema(referencedFrom: Schema, refURI: URI, currentDocument: JsrObject?, report: LoadingReport): Schema? {
+    // Cache ahead to deal with any stack overflows
+    val currentLocation = referencedFrom.location
+    schemaLoader += referencedFrom
+
+    // Make sure we're dealing with an absolute URI
+    val absoluteReferenceURI = currentLocation.resolutionScope.resolveUri(refURI)
+    val documentURI = currentLocation.documentURI
+
+    return when (val existing = findRefSchema(referencedFrom, refURI, currentDocument, report)) {
+      null -> {
+        val schemaBuilder = findRefInDocument(documentURI, absoluteReferenceURI, currentDocument, report)
+            ?: findRefInRemoteDocument(absoluteReferenceURI, report)
+            ?: return null
+        val refSchema = schemaBuilder.build()
+        schemaLoader += refSchema
+        refSchema
+      }
+      else -> existing
+    }
+  }
+
+  fun findRefSchema(referencedFrom: Schema, refURI: URI, currentDocument: JsrObject?, report: LoadingReport): Schema? {
     // Cache ahead to deal with any infinite recursion.
     val currentLocation = referencedFrom.location
     schemaLoader += referencedFrom
@@ -40,7 +62,6 @@ data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoa
     }
 
     val schemaBuilder = findRefInDocument(documentURI, absoluteReferenceURI, currentDocument, report)
-        ?: findRefInRemoteDocument(absoluteReferenceURI, report)
         ?: return null //Couldn't be resolved yet
     val refSchema = schemaBuilder.build()
     schemaLoader += refSchema

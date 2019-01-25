@@ -13,6 +13,10 @@ fun JsonSchema.resourceLoader(klass:KClass<*>):JsonResourceLoader = JsonResource
 
 class JsonResourceLoader(private val loadFrom: KClass<*>) {
 
+  fun getPath(rel: String):String {
+    val testPackage = loadFrom.java.`package`
+    return testPackage.name.replace('.', '/') + "/$rel"
+  }
   fun getStream(relPath: String): InputStream {
     return loadFrom.java.getResourceAsStream(relPath)
   }

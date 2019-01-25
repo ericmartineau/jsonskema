@@ -6,6 +6,7 @@ import assertk.assertions.isNull
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.resourceLoader
+import io.mverse.jsonschema.schema
 import lang.json.JsrObject
 import lang.net.URI
 import lang.net.resolveUri

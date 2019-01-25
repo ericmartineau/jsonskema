@@ -40,4 +40,5 @@
   </root>
 
   <logger name="io.mverse.jsonschema" level="DEBUG"/>
+  <logger name="io.mverse.jsonschema.loading" level="DEBUG"/>
 </configuration>

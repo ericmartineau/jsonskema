@@ -1,5 +1,6 @@
 package io.mverse.jsonschema.loading.reference
 
+import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.keyword.Keywords
@@ -21,9 +22,7 @@ import lang.net.resolveUri
 data class SchemaCache(
     private val documentIdRefs: MutableMap<URI, Map<URI, JsonPath>> = hashMapOf(),
     private val absoluteDocumentCache: MutableMap<URI, lang.json.JsrObject> = hashMapOf(),
-    private val absoluteSchemaCache: MutableMap<URI, Schema> = hashMapOf(),
-    private var schemaCallbacks: MutableListMultimap<URI, (Schema) -> Unit> = MutableListMultimap()
-) {
+    private val absoluteSchemaCache: MutableMap<URI, Schema> = hashMapOf()) {
 
   operator fun plusAssign(pair: Pair<URI, Schema>) = cacheSchema(pair.first, pair.second)
   operator fun plus(pair: Pair<URI, Schema>): SchemaCache = apply { cacheSchema(pair.first, pair.second) }
@@ -32,8 +31,6 @@ data class SchemaCache(
     check(schemaURI.isAbsolute()) { "Must be an absolute URI" }
     val normalized = schemaURI.trimEmptyFragment()
     absoluteSchemaCache[normalized] = schema
-    schemaCallbacks[normalized].forEach { it(schema) }
-    schemaCallbacks -= normalized
   }
 
   fun cacheDocument(documentURI: URI, document: JsrObject) {
@@ -61,13 +58,6 @@ data class SchemaCache(
   fun getSchema(schemaLocation: SchemaLocation): Schema? {
     //A schema can be cached in two places
     return getSchema(schemaLocation.uniqueURI, schemaLocation.canonicalURI)
-  }
-
-  fun onSchemaCache(ref: URI, callback: (Schema) -> Unit) {
-    when (val cached = this[ref]) {
-      null -> schemaCallbacks[ref.trimEmptyFragment()] += callback
-      else -> callback(cached)
-    }
   }
 
   operator fun get(schemaUri: URI): Schema? = this.getSchema(schemaUri)

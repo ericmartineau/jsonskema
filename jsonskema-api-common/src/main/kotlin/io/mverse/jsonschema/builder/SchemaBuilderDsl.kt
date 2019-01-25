@@ -1,6 +1,6 @@
 package io.mverse.jsonschema.builder
 
-import io.mverse.jsonschema.JsonSchema.createSchemaBuilder
+import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.FormatType
 import io.mverse.jsonschema.enums.JsonSchemaType
@@ -12,7 +12,7 @@ import lang.json.toJsrArray
 import lang.json.toJsrValue
 import lang.net.URI
 
-open class SchemaBuilderDsl(val schemaBuilder: MutableSchema = createSchemaBuilder(),
+open class SchemaBuilderDsl(val schemaBuilder: MutableSchema,
                             val parent: MutableSchema? = null,
                             var name: String? = null) :
     MutableSchema by schemaBuilder {
@@ -22,7 +22,7 @@ open class SchemaBuilderDsl(val schemaBuilder: MutableSchema = createSchemaBuild
    */
   operator fun String.invoke(title: String? = null, propBlock: SchemaBuilderDsl.() -> Unit) {
     val key = this
-    val propSchema = SchemaBuilderDsl()
+    val propSchema = newChildDsl()
     if (title != null) {
       propSchema.title = title
     }
@@ -50,7 +50,7 @@ open class SchemaBuilderDsl(val schemaBuilder: MutableSchema = createSchemaBuild
     this@SchemaBuilderDsl.properties[this] = propertySchema@{
       type = JsonSchemaType.ARRAY
 
-      val allItemsSchema = SchemaBuilderDsl()
+      val allItemsSchema = newChildDsl()
       allItemsSchema.block()
       this@propertySchema.allItemSchema = allItemsSchema
     }
@@ -134,35 +134,35 @@ open class SchemaBuilderDsl(val schemaBuilder: MutableSchema = createSchemaBuild
 
   val string: () -> SchemaBuilderDsl
     get() = {
-      SchemaBuilderDsl().apply {
+      newChildDsl().apply {
         type = JsonSchemaType.STRING
       }
     }
 
   val number: () -> SchemaBuilderDsl
     get() = {
-      SchemaBuilderDsl().apply {
+      newChildDsl().apply {
         type = JsonSchemaType.NUMBER
       }
     }
 
   val integer: () -> SchemaBuilderDsl
     get() = {
-      SchemaBuilderDsl().apply {
+      newChildDsl().apply {
         type = JsonSchemaType.INTEGER
       }
     }
 
   val boolean: () -> SchemaBuilderDsl
     get() = {
-      SchemaBuilderDsl().apply {
+      newChildDsl().apply {
         type = JsonSchemaType.BOOLEAN
       }
     }
 
   val array: () -> SchemaBuilderDsl
     get() = {
-      SchemaBuilderDsl().apply {
+      newChildDsl().apply {
         type = JsonSchemaType.ARRAY
       }
     }
@@ -170,7 +170,7 @@ open class SchemaBuilderDsl(val schemaBuilder: MutableSchema = createSchemaBuild
   operator fun Pair<String, String>.invoke(propBlock: SchemaBuilderDsl.() -> Unit) {
     val key = this.first
     val title = this.second
-    val propSchema = SchemaBuilderDsl().apply {
+    val propSchema = newChildDsl().apply {
       this.title = title
       propBlock()
     }
@@ -178,7 +178,7 @@ open class SchemaBuilderDsl(val schemaBuilder: MutableSchema = createSchemaBuild
   }
 
   fun number(title: String? = null, block: SchemaBuilderDsl.() -> Unit = {}): SchemaBuilderDsl {
-    return SchemaBuilderDsl().apply {
+    return newChildDsl().apply {
       this.type = JsonSchemaType.NUMBER
       this.title = title
       this.block()
@@ -186,7 +186,7 @@ open class SchemaBuilderDsl(val schemaBuilder: MutableSchema = createSchemaBuild
   }
 
   fun integer(title: String? = null, block: SchemaBuilderDsl.() -> Unit = {}): SchemaBuilderDsl {
-    return SchemaBuilderDsl().apply {
+    return newChildDsl().apply {
       this.type = JsonSchemaType.INTEGER
       this.title = title
       this.block()
@@ -194,7 +194,7 @@ open class SchemaBuilderDsl(val schemaBuilder: MutableSchema = createSchemaBuild
   }
 
   fun string(title: String? = null, block: SchemaBuilderDsl.() -> Unit = {}): SchemaBuilderDsl {
-    return SchemaBuilderDsl().apply {
+    return newChildDsl().apply {
       this.type = JsonSchemaType.STRING
       this.title = title
       this.block()
@@ -202,7 +202,7 @@ open class SchemaBuilderDsl(val schemaBuilder: MutableSchema = createSchemaBuild
   }
 
   fun boolean(title: String? = null, block: SchemaBuilderDsl.() -> Unit = {}): SchemaBuilderDsl {
-    return SchemaBuilderDsl().apply {
+    return newChildDsl().apply {
       this.type = JsonSchemaType.BOOLEAN
       this.title = title
       this.block()
@@ -210,7 +210,7 @@ open class SchemaBuilderDsl(val schemaBuilder: MutableSchema = createSchemaBuild
   }
 
   fun array(block: SchemaBuilderDsl.() -> Unit = {}): SchemaBuilderDsl {
-    return SchemaBuilderDsl().apply {
+    return newChildDsl().apply {
       this.type = JsonSchemaType.ARRAY
       this.block()
     }
@@ -219,28 +219,28 @@ open class SchemaBuilderDsl(val schemaBuilder: MutableSchema = createSchemaBuild
   fun enum(vararg values: String): SchemaBuilderDsl = enum(values.toList())
 
   fun enum(enumValues: Iterable<Any?>): SchemaBuilderDsl {
-    return SchemaBuilderDsl().apply {
+    return newChildDsl().apply {
       this.enumValues = createJsrArray(enumValues.map { toJsrValue(it) })
       this.type = this.enumValues?.jsonSchemaType
     }
   }
 
   fun enum(values: JsrArray, block: SchemaBuilderDsl.() -> Unit = {}): SchemaBuilderDsl {
-    return SchemaBuilderDsl().apply {
+    return newChildDsl().apply {
       enumValues = values
       block()
     }
   }
 
   fun enum(values: KtArray, block: SchemaBuilderDsl.() -> Unit = {}): SchemaBuilderDsl {
-    return SchemaBuilderDsl().apply {
+    return newChildDsl().apply {
       enumValues = values.toJsrArray()
       block()
     }
   }
 
   fun datetime(title: String? = null, block: SchemaBuilderDsl.() -> Unit = {}): SchemaBuilderDsl {
-    return SchemaBuilderDsl().apply {
+    return newChildDsl().apply {
       this.type = JsonSchemaType.STRING
       this.title = title
       this.format = FormatType.DATE_TIME.toString()
@@ -258,27 +258,39 @@ open class SchemaBuilderDsl(val schemaBuilder: MutableSchema = createSchemaBuild
   }
 
   fun schemaBuilder(id: URI? = null, block: SchemaBuilderDsl.() -> Unit): SchemaBuilderDsl = when (id) {
-    null -> SchemaBuilderDsl(createSchemaBuilder(), this).apply(block)
-    else -> SchemaBuilderDsl(createSchemaBuilder(id), this).apply(block)
+    null -> SchemaBuilderDsl(newChildSchema(), this).apply(block)
+    else -> SchemaBuilderDsl(newChildSchema(id), this).apply(block)
   }
 
   fun allItemsSchema(block: SchemaBuilderDsl.() -> Unit) {
-    this.allItemSchema = SchemaBuilderDsl(createSchemaBuilder(), this).apply(block)
+    this.allItemSchema = SchemaBuilderDsl(newChildSchema(), this).apply(block)
   }
 
   fun ifSchema(block: SchemaBuilderDsl.() -> Unit) {
-    ifSchema = SchemaBuilderDsl(createSchemaBuilder(), this).apply(block)
+    ifSchema = SchemaBuilderDsl(newChildSchema(), this).apply(block)
   }
 
   fun thenSchema(block: SchemaBuilderDsl.() -> Unit) {
-    thenSchema = SchemaBuilderDsl(createSchemaBuilder(), this).apply(block)
+    thenSchema = SchemaBuilderDsl(newChildSchema(), this).apply(block)
   }
 
   fun elseSchema(block: SchemaBuilderDsl.() -> Unit) {
-    elseSchema = SchemaBuilderDsl(createSchemaBuilder(), this).apply(block)
+    elseSchema = SchemaBuilderDsl(newChildSchema(), this).apply(block)
   }
 
   fun schemaOfAdditionalProperties(block: SchemaBuilderDsl.() -> Unit) {
-    schemaOfAdditionalProperties = SchemaBuilderDsl(createSchemaBuilder(), this).apply(block)
+    schemaOfAdditionalProperties = SchemaBuilderDsl(newChildSchema(), this).apply(block)
+  }
+
+  private fun newChildSchema(): MutableSchema {
+    return JsonSchema.createSchemaBuilder(schemaLoader)
+  }
+
+  private fun newChildDsl(): SchemaBuilderDsl {
+    return SchemaBuilderDsl(JsonSchema.createSchemaBuilder(schemaLoader))
+  }
+
+  private fun newChildSchema(id: URI): MutableSchema {
+    return SchemaBuilderDsl(JsonSchema.createSchemaBuilder(id, schemaLoader))
   }
 }

@@ -18,7 +18,7 @@ class RefSchemaTest {
   @Test
   fun testRefSchemaToVersion() {
     jsrJson {
-      val withRef = RefSchemaImpl(location = SchemaLocation.documentRoot("https://nonexistant.com/#/foo"),
+      val withRef = RefSchemaImpl(JsonSchema.schemaReader.loader, location = SchemaLocation.documentRoot("https://nonexistant.com/#/foo"),
           refURI = URI("https://nonexistant.com"),
           refSchema = JsonSchema.schema {
             constValue = 42.0.toJsrJson()
@@ -36,7 +36,7 @@ class RefSchemaTest {
    */
   @Test
   fun testRefSchemaNullToVersion() {
-    val withRef = RefSchemaImpl(location = SchemaLocation.documentRoot("https://nonexistant.com/#/foo"),
+    val withRef = RefSchemaImpl(JsonSchema.schemaReader.loader, location = SchemaLocation.documentRoot("https://nonexistant.com/#/foo"),
         refURI = URI("https://nonexistant.com"))
 
     withRef.asDraft4()
@@ -51,12 +51,10 @@ class RefSchemaTest {
   fun testRefResolutionWithBuilders() {
     val loader = JsonSchema.schemaReader.loader
     val  childSchema = JsonSchema.schema("http://schemas/child") {
-      schemaLoader = loader
       "parent" required URI("http://schemas/parent")
     }.asDraft7()
 
     val  parentSchema = JsonSchema.schema("http://schemas/parent") {
-      schemaLoader = loader
       "name" required string
     }.asDraft7()
 

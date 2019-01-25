@@ -34,8 +34,17 @@ interface SchemaLoader {
    * @param report A place to log loading validation
    * @return A loaded ref schema
    */
-  fun loadRefSchema(referencedFrom: Schema, refURI: URI, currentDocument: JsrObject?, report: LoadingReport,
-                    callback: (Schema) -> Unit): Schema?
+  fun loadRefSchema(referencedFrom: Schema, refURI: URI, currentDocument: JsrObject?, report: LoadingReport):Schema?
+
+  /**
+   * Loads a $ref schema
+   * @param referencedFrom The schema where the $ref resides
+   * @param refURI The URI to the $ref
+   * @param currentDocument The current document being processed (from which `#referencedFrom` was loaded)
+   * @param report A place to log loading validation
+   * @return A loaded ref schema
+   */
+  fun findRefSchema(referencedFrom: Schema, refURI: URI, currentDocument: JsrObject?, report: LoadingReport): Schema?
 
   /**
    * Loads a subschema within a document

@@ -34,9 +34,12 @@ data class SchemaLoaderImpl(
   // ########  LOADING SCHEMAS/SUBSCHEMAS FROM JSON    ###########
   // #############################################################
 
-  override fun loadRefSchema(referencedFrom: Schema, refURI: URI, currentDocument: JsrObject?, report: LoadingReport, callback: (Schema) -> Unit):Schema? {
-    schemaCache.onSchemaCache(refURI, callback)
+  override fun loadRefSchema(referencedFrom: Schema, refURI: URI, currentDocument: JsrObject?, report: LoadingReport): Schema? {
     return refSchemaLoader.loadRefSchema(referencedFrom, refURI, currentDocument, report)
+  }
+
+  override fun findRefSchema(referencedFrom: Schema, refURI: URI, currentDocument: JsrObject?, report: LoadingReport): Schema? {
+    return refSchemaLoader.findRefSchema(referencedFrom, refURI, currentDocument, report)
   }
 
   override fun loadSubSchema(schemaJson: JsonValueWithPath, inDocument: lang.json.JsrObject, loadingReport: LoadingReport): Schema {

@@ -8,13 +8,13 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isLessThan
 import assertk.assertions.isNotNull
+import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import assertk.assertions.message
 import io.mverse.assertk.hasStringValue
 import io.mverse.assertk.hasValueAtPointer
 import io.mverse.jsonschema.assertj.asserts.isEqualIgnoringWhitespace
 import io.mverse.jsonschema.resolver.ClasspathDocumentFetcher
-import io.mverse.jsonschema.resolver.DocumentFetchException
 import io.mverse.jsonschema.resolver.FetchedDocument
 import io.mverse.jsonschema.resolver.HttpDocumentFetcher
 import io.mverse.jsonschema.resolver.JsonDocumentFetcher
@@ -42,26 +42,24 @@ class DefaultJsonDocumentClientTest {
       defaultClient.fetchDocument("https://nba.com/no/document/here")
     }
         .duration { isLessThan(2000) }
-        .thrownError {
-          if (it.actual !is DocumentFetchException) {
-            it.actual.printStackTrace()
-          }
-          it.isInstanceOf(DocumentFetchException::class) {
-            assert(it.actual.failures).hasSize(2)
-            assert(it.actual.failures[ClasspathDocumentFetcher::class]).isNotNull {
-              it.message().isNotNull {
-                it.contains("No resource on classpath")
-              }
-            }
+        .returnedValue {
 
-            assert(it.actual.failures[HttpDocumentFetcher::class]).isNotNull {
-              it.isInstanceOf(FileNotFoundException::class) {
-                it.message().isNotNull {
-                  it.contains("https://www.nba.com/no/document/here")
-                }
+          assert(it.actual.fetchedOrNull).isNull()
+          assert(it.actual.failures).hasSize(2)
+          assert(it.actual.failures[ClasspathDocumentFetcher::class]).isNotNull {
+            it.message().isNotNull {
+              it.contains("No resource on classpath")
+            }
+          }
+
+          assert(it.actual.failures[HttpDocumentFetcher::class]).isNotNull {
+            it.isInstanceOf(FileNotFoundException::class) {
+              it.message().isNotNull {
+                it.contains("https://www.nba.com/no/document/here")
               }
             }
           }
+
         }
   }
 
@@ -94,14 +92,9 @@ class DefaultJsonDocumentClientTest {
     assertTimed {
       defaultClient.fetchDocument("https://unknown.com/path/is/bogus")
     }
-        .thrownError {
-          if (it.actual !is DocumentFetchException) {
-            it.actual.printStackTrace()
-          }
-
-          it.isInstanceOf(DocumentFetchException::class) {
-            assert(it.actual.failures).hasSize(0)
-          }
+        .returnedValue {
+          assert(it.actual.failures).hasSize(0)
+          assert(it.actual.fetchedOrNull).isNull()
         }
         .duration { isBetween(500, expectedSlowpoke) }
   }
@@ -111,14 +104,9 @@ class DefaultJsonDocumentClientTest {
     assertTimed {
       defaultClient.fetchDocument("https://unknown.com/path/is/bogus")
     }
-        .thrownError {
-          if (it.actual !is DocumentFetchException) {
-            it.actual.printStackTrace()
-          }
-
-          it.isInstanceOf(DocumentFetchException::class) {
-            assert(it.actual.failures).hasSize(0)
-          }
+        .returnedValue {
+          assert(it.actual.failures).hasSize(0)
+          assert(it.actual.fetchedOrNull).isNull()
         }
         .duration { isBetween(500, expectedSlowpoke) }
   }

@@ -21,6 +21,7 @@ import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
 import io.mverse.jsonschema.keyword.DollarSchemaKeyword.Companion.emptyUri
 import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
 import io.mverse.jsonschema.keyword.Keywords.SCHEMA
+import io.mverse.jsonschema.schema
 import lang.json.JsonPath
 import lang.json.JsrTrue
 import lang.json.jsrString
@@ -103,7 +104,7 @@ class JsonSchemaImplTest {
 
   @Test
   fun testToStringFieldOrder() {
-    val schema = JsonSchema.schema("https://something.com") {
+    val schema = JsonSchema.schema("https://something.com/field-order") {
       extraProperties["bobTheBuilder"] = JsrTrue
 
       properties["childSchema"] = schemaBuilder {
@@ -120,7 +121,7 @@ class JsonSchemaImplTest {
     val schemaString = schema.toString(includeExtraProperties = false, version = Draft7, indent = true)
     assert(schemaString.trim()).isEqualIgnoringWhitespace("{\n" +
         "    \"\$schema\": \"http://json-schema.org/draft-07/schema#\",\n" +
-        "    \"\$id\": \"https://something.com\",\n" +
+        "    \"\$id\": \"https://something.com/field-order\",\n" +
         "    \"properties\": {\n" +
         "        \"childSchema\": {\n" +
         "            \"properties\": {\n" +
@@ -134,7 +135,7 @@ class JsonSchemaImplTest {
 
   @Test
   fun testToStringCustomSchema() {
-    val schema = JsonSchema.schema("https://something.com") {
+    val schema = JsonSchema.schema("https://something.com/custom-metaschema") {
       metaSchema = URI("http://custom-meta-schema.com")
 
       extraProperties["bobTheBuilder"] = JsrTrue
@@ -151,7 +152,7 @@ class JsonSchemaImplTest {
     val schemaString = schema.toString(includeExtraProperties = false, version = Draft7, indent = true)
     assert(schemaString.trim()).isEqualIgnoringWhitespace("{\n" +
         "    \"\$schema\": \"http://custom-meta-schema.com\",\n" +
-        "    \"\$id\": \"https://something.com\",\n" +
+        "    \"\$id\": \"https://something.com/custom-metaschema\",\n" +
         "    \"properties\": {\n" +
         "        \"childSchema\": {\n" +
         "            \"properties\": {\n" +
@@ -166,7 +167,7 @@ class JsonSchemaImplTest {
   @Test fun testLoadCustomMetaSchema() {
     val schema = "{\n" +
         "    \"\$schema\": \"http://custom-meta-schema.com\",\n" +
-        "    \"\$id\": \"https://something.com\",\n" +
+        "    \"\$id\": \"https://something.com/custom-metaschema\",\n" +
         "    \"properties\": {\n" +
         "        \"childSchema\": {\n" +
         "            \"properties\": {\n" +
@@ -178,13 +179,13 @@ class JsonSchemaImplTest {
         "}"
     val readSchema = JsonSchema.createSchemaReader().readSchema(schema).asDraft7()
     assert(readSchema.keywords.containsKey(SCHEMA)).isTrue()
-    assert(readSchema.keywords.get(SCHEMA)!!.value).isEqualTo(URI("http://custom-meta-schema.com"))
+    assert(readSchema.keywords.getValue(SCHEMA).value).isEqualTo(URI("http://custom-meta-schema.com"))
   }
 
   @Test fun testLoadStandardMetaSchema() {
     val schema = "{\n" +
         "    \"\$schema\": \"http://json-schema.org/draft-07/schema#\",\n" +
-        "    \"\$id\": \"https://something.com\",\n" +
+        "    \"\$id\": \"https://something.com/standard-metaschema\",\n" +
         "    \"properties\": {\n" +
         "        \"childSchema\": {\n" +
         "            \"properties\": {\n" +

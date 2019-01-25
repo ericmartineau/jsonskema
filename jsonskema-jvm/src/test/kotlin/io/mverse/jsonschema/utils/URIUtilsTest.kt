@@ -13,6 +13,7 @@ import lang.json.toKtArray
 import lang.net.URI
 import lang.net.isFragmentOnly
 import lang.net.resolveUri
+import lang.net.withNewFragment
 import kotlin.test.Test
 
 class URIUtilsTest {

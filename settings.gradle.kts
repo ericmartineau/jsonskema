@@ -40,8 +40,6 @@ pluginManagement {
       if (requested.id.id == "kotlinx-serialization") {
         useModule("org.jetbrains.kotlin:kotlin-serialization:${target.version}")
       }
-
-
     }
   }
 }

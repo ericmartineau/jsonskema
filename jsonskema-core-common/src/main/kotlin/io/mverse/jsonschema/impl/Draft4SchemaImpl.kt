@@ -12,6 +12,7 @@ import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
 import io.mverse.jsonschema.keyword.Keywords.ID
 import io.mverse.jsonschema.keyword.Keywords.MAXIMUM
 import io.mverse.jsonschema.keyword.Keywords.MINIMUM
+import io.mverse.jsonschema.loading.SchemaLoader
 import lang.collection.freezeMap
 import lang.json.JsrValue
 import lang.net.URI
@@ -39,15 +40,17 @@ class Draft4SchemaImpl : JsonSchemaImpl<Draft4Schema>, Draft4Schema {
   override val isAllowAdditionalItems: Boolean get() = super.isAllowAdditionalItems
   override val isAllowAdditionalProperties: Boolean get() = super.isAllowAdditionalProperties
 
-  constructor(from: Schema) : super(from, Draft4)
-  constructor(location: SchemaLocation,
+  constructor(schemaLoader: SchemaLoader, from: Schema) : super(schemaLoader, from, Draft4)
+  constructor(schemaLoader: SchemaLoader, location: SchemaLocation,
               keywords: Map<KeywordInfo<*>, Keyword<*>>,
-              extraProperties: Map<String, JsrValue>) : super(location, keywords.freezeMap(), extraProperties.freezeMap(), Draft4)
+              extraProperties: Map<String, JsrValue>) : super(schemaLoader, location, keywords.freezeMap(), extraProperties.freezeMap(), Draft4)
 
   override val version: JsonSchemaVersion = Draft4
   override fun asDraft4(): Draft4Schema = this
   override fun convertVersion(source: Schema): Draft4Schema = source.asDraft4()
-  override fun withId(id: URI): Schema = Draft4SchemaImpl(location = location.withId(id),
+  override fun withId(id: URI): Schema = Draft4SchemaImpl(
+      schemaLoader = schemaLoader,
+      location = location.withId(id),
       keywords = keywords.toMutableMap().also {
         it.remove(ID)
         it[DOLLAR_ID] = IdKeyword(id)
