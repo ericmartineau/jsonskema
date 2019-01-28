@@ -1,5 +1,7 @@
 package io.mverse.jsonschema.loading
 
+import assertk.assert
+import assertk.assertions.hasSize
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Assert.assertEquals
 
@@ -28,12 +30,12 @@ class CombinedSchemaFactoryTest : BaseLoaderTest("combinedtestschemas.json") {
   @Test
   fun combinedSchemaWithExplicitBaseSchema() {
     val actual = getSchemaForKey("combinedSchemaWithExplicitBaseSchema")
-    assertThat<Schema>(actual.anyOfSchemas).hasSize(2)
+    assert(actual.anyOfSchemas).hasSize(2)
   }
 
   @Test
   fun combinedSchemaWithMultipleBaseSchemas() {
     val actual = getSchemaForKey("combinedSchemaWithMultipleBaseSchemas")
-    assertThat<Schema>(actual.anyOfSchemas).hasSize(2)
+    assert(actual.anyOfSchemas).hasSize(2)
   }
 }

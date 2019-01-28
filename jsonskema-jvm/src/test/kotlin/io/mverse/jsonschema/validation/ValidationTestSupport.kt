@@ -147,7 +147,7 @@ object ValidationTestSupport {
     val error = JsonSchema.getValidator(failingSchema).validate(input)
     assert(error, failingSchema.toString() + " did not fail for " + input).isNotNull()
     if (expectedPointer != null) {
-      assertEquals(expectedPointer, error!!.pathToViolation)
+      assert(expectedPointer).isEqualTo(error?.pathToViolation)
     }
     return error
   }
@@ -289,8 +289,8 @@ object ValidationTestSupport {
 
   fun verifyFailure(validationFn: () -> ValidationError?): ValidationError {
     val error = validationFn()
-    assert(error, "Should have failed").isNotNull()
-    return error!!
+    assert(error != null, "Should have failed").isTrue()
+    return error ?: throw AssertionError("Failed")
   }
 
   fun expectSuccess(validationFn: () -> ValidationError?) {

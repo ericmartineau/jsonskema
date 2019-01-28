@@ -1,0 +1,23 @@
+{
+  "properties": {
+    "numberProp": {
+      "type": "number"
+    },
+    "boolProp": {
+      "type": "boolean"
+    },
+    "nested": {
+      "properties": {
+        "nested": {}
+      }
+    }
+  },
+  "required": [
+    "boolProp"
+  ],
+  "patternProperties": {
+    "^string.*": {
+      "type": "string"
+    }
+  }
+}

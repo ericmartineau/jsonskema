@@ -7,6 +7,8 @@ import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.SchemaLocation.Companion.BLANK_URI
 import io.mverse.jsonschema.SchemaLocation.Companion.ROOT_URI
 import io.mverse.jsonschema.builder.MutableSchema
+import io.mverse.jsonschema.enums.JsonSchemaVersion
+import io.mverse.jsonschema.enums.JsonSchemaVersion.*
 import io.mverse.jsonschema.schemaException
 import io.mverse.jsonschema.utils.JsonUtils
 import io.mverse.jsonschema.utils.isJsonPointer
@@ -61,7 +63,8 @@ data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoa
       return cachedSchema
     }
 
-    val schemaBuilder = findRefInDocument(documentURI, absoluteReferenceURI, currentDocument, report)
+    val document = currentDocument ?: schemaLoader.findLoadedSchema(documentURI)?.toJson(Draft7)
+    val schemaBuilder = findRefInDocument(documentURI, absoluteReferenceURI, document, report)
         ?: return null //Couldn't be resolved yet
     val refSchema = schemaBuilder.build()
     schemaLoader += refSchema

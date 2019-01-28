@@ -7,38 +7,21 @@ import lang.json.JsrArray
 import lang.json.JsrValue
 import lang.net.URI
 
-interface Draft7Schema : DraftSchema<Draft7Schema> {
-
-  override val version: JsonSchemaVersion
-    get() = JsonSchemaVersion.Draft7
-
-  override val location: SchemaLocation
-
-  // ###################################
-  // #### Meta KEYWORDS ##############
-  // ###################################
-
-  override val schemaURI: URI?
-
-  override val id: URI?
-
-  override val title: String?
-
-  override val description: String?
+interface Draft7Schema : DraftSchema {
 
   val examples: JsrArray
 
-  val definitions: Map<String, Schema>
+  val definitions: Map<String, DraftSchema>
 
   // ###################################
   // #### Draft 7 KEYWORDS #############
   // ###################################
 
-  val ifSchema: Schema?
+  val ifSchema: DraftSchema?
 
-  val elseSchema: Schema?
+  val elseSchema: DraftSchema?
 
-  val thenSchema: Schema?
+  val thenSchema: DraftSchema?
 
   val comment: String?
 
@@ -50,91 +33,27 @@ interface Draft7Schema : DraftSchema<Draft7Schema> {
 
   val contentMediaType: String?
 
-  // ###################################
-  // #### Shared KEYWORDS ##############
-  // ###################################
-
-  override val types: Set<JsonSchemaType>
-
-  override val enumValues: JsrArray?
-
-  override val defaultValue: JsrValue?
-
-  val notSchema: Schema?
+  val notSchema: DraftSchema?
 
   val constValue: JsrValue?
 
-  val allOfSchemas: List<Schema>
+  val allOfSchemas: List<DraftSchema>
 
-  val anyOfSchemas: List<Schema>
+  val anyOfSchemas: List<DraftSchema>
 
-  val oneOfSchemas: List<Schema>
-
-  // ###################################
-  // #### String KEYWORDS ##############
-  // ###################################
-
-  override val format: String?
-
-  override val minLength: Int?
-
-  override val maxLength: Int?
-
-  override val pattern: String?
-
-  // ###################################
-  // #### NUMBER KEYWORDS ##############
-  // ###################################
-
-  override val multipleOf: Number?
-
-  override val maximum: Number?
-
-  override val minimum: Number?
+  val oneOfSchemas: List<DraftSchema>
 
   val exclusiveMinimum: Number?
 
   val exclusiveMaximum: Number?
 
-  // ###################################
-  // #### ARRAY KEYWORDS  ##############
-  // ###################################
+  val containsSchema: DraftSchema?
 
-  override val minItems: Int?
-
-  override val maxItems: Int?
-
-  override val allItemSchema: Draft7Schema?
-
-  override val itemSchemas: List<Schema>
-
-  override val additionalItemsSchema: Draft7Schema?
-
-  val containsSchema: Draft7Schema?
-
-  // ###################################
-  // #### OBJECT KEYWORDS  ##############
-  // ###################################
-
-  override val properties: Map<String, Schema>
-
-  override val patternProperties: Map<String, Schema>
-
-  override val additionalPropertiesSchema: Draft7Schema?
-
-  val propertyNameSchema: Draft7Schema?
-
-  override val propertyDependencies: SetMultimap<String, String>
-  override val propertySchemaDependencies: Map<String, Schema>
-  override val requiresUniqueItems: Boolean
+  val propertyNameSchema: DraftSchema?
 
   val maxProperties: Int?
 
   val minProperties: Int?
 
   val requiredProperties: Set<String>
-
-  override fun asDraft7(): Draft7Schema {
-    return this
-  }
 }

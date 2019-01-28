@@ -6,6 +6,7 @@ import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import io.mverse.jsonschema.assertj.asserts.asserting
 import io.mverse.jsonschema.assertj.asserts.hasKeyword
+import io.mverse.jsonschema.assertj.asserts.isEqualIgnoringWhitespace
 import io.mverse.jsonschema.assertj.asserts.isVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.impl.RefSchemaImpl
@@ -20,7 +21,7 @@ class RefSchemaTest {
     jsrJson {
       val withRef = RefSchemaImpl(JsonSchema.schemaReader.loader, location = SchemaLocation.documentRoot("https://nonexistant.com/#/foo"),
           refURI = URI("https://nonexistant.com"),
-          refSchema = JsonSchema.schema {
+          refSchema = schema {
             constValue = 42.0.toJsrJson()
           })
 
@@ -39,9 +40,7 @@ class RefSchemaTest {
     val withRef = RefSchemaImpl(JsonSchema.schemaReader.loader, location = SchemaLocation.documentRoot("https://nonexistant.com/#/foo"),
         refURI = URI("https://nonexistant.com"))
 
-    withRef.asDraft4()
-        .asserting()
-        .isVersion(JsonSchemaVersion.Draft4)
+    assert(withRef.toString(true)).isEqualIgnoringWhitespace("{\"\$ref\": \"https://nonexistant.com\"}")
   }
 
   /**
@@ -49,25 +48,26 @@ class RefSchemaTest {
    */
   @Test
   fun testRefResolutionWithBuilders() {
-    val loader = JsonSchema.schemaReader.loader
-    val  childSchema = JsonSchema.schema("http://schemas/child") {
-      "parent" required URI("http://schemas/parent")
-    }.asDraft7()
+    val  childSchema = JsonSchema.schema(id = "http://schemas/child") {
+      properties {
+        "parent" required URI("http://schemas/parent")
+      }
+    }
 
-    val  parentSchema = JsonSchema.schema("http://schemas/parent") {
-      "name" required string
-    }.asDraft7()
+    val  parentSchema = JsonSchema.schema(id = "http://schemas/parent") {
+      properties {
+        "name" required string
+      }
+    }
 
     assert(JsonSchema.schemaReader.readSchema(URI("http://schemas/parent"))).isEqualTo(parentSchema)
     assert(JsonSchema.schemaReader.readSchema(URI("http://schemas/child"))).isEqualTo(childSchema)
 
-    val childRef = childSchema.properties["parent"]?.asDraft7()
+    val childRef = childSchema.asDraft7().properties["parent"]?.asDraft7()
     assert(childRef).isNotNull {
-      it.isInstanceOf(RefSchema::class) {
-        assert(it.actual.refSchema).isEqualTo(parentSchema)
-      }
-
+        assert(it.actual.schema).isInstanceOf(RefSchema::class) {
+          assert(it.actual.refSchema).isEqualTo(parentSchema)
+        }
     }
-
   }
 }

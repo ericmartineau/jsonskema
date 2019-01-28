@@ -10,8 +10,10 @@ import lang.json.JsonPath
 import lang.json.MutableJsrObject
 import lang.json.jsrObject
 
-data class SchemaMapKeyword(override val value: Map<String, Schema> = emptyMap()) : SubschemaKeyword,
+data class SchemaMapKeyword(val input: Map<String, Schema> = emptyMap()) : SubschemaKeyword,
     KeywordImpl<Map<String, Schema>>() {
+
+  override val value = input.freezeMap()
 
   override val subschemas: List<Schema>
     get() = value.values.toList()
@@ -21,7 +23,7 @@ data class SchemaMapKeyword(override val value: Map<String, Schema> = emptyMap()
       keyword.key *= jsrObject {
         for ((key, schema) in value) {
           val schemaJson = when (schema) {
-            is RefSchema -> schema.toJson(includeExtraProperties = includeExtraProperties)
+            is RefSchema -> schema.asVersion(version).toJson(includeExtraProperties = includeExtraProperties)
             else -> schema.asVersion(version).toJson(includeExtraProperties = includeExtraProperties)
           }
 
@@ -38,14 +40,14 @@ data class SchemaMapKeyword(override val value: Map<String, Schema> = emptyMap()
     other.value.forEach { (prop,schema) ->
       val child = path.child(prop)
       if (prop in schemas) {
-        schemas[prop] = schemas[prop]!!.merge(child, schema, report)
+        schemas[prop] = schemas[prop]!!.merge(child, schema, report, null)
       } else {
         report += mergeAdd(child, keyword)
         schemas[prop] = schema
       }
     }
 
-    return SchemaMapKeyword(value = schemas.freezeMap())
+    return SchemaMapKeyword(input = schemas.freezeMap())
   }
 
   operator fun plus(schema: Pair<String, Schema>): SchemaMapKeyword {
@@ -57,6 +59,6 @@ data class SchemaMapKeyword(override val value: Map<String, Schema> = emptyMap()
   }
 
   override fun withValue(value: Map<String, Schema>): Keyword<Map<String, Schema>> {
-    return this.copy(value = value)
+    return this.copy(input = value)
   }
 }

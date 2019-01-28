@@ -40,7 +40,7 @@ class EmptySchemaTest {
 
   @Test
   fun testBuilder() {
-    Assert.assertEquals(JsonSchema.schemaBuilder().build(), JsonSchema.schemaBuilder().build())
+    Assert.assertEquals(schemaBuilder{}.build(), schemaBuilder{}.build())
   }
 
   @Test
@@ -66,21 +66,21 @@ class EmptySchemaTest {
 
   @Test
   fun testToString() {
-    assert(JsonSchema.schemaBuilder().build().toString()).isEqualTo("{}")
+    assert(schemaBuilder{}.build().toString()).isEqualTo("{}")
   }
 
   @Test
   fun testValidate() {
-    expectSuccess { ValidationMocks.createTestValidator(JsonSchema.schemaBuilder().build()).validate("something".toJsrValue()) }
+    expectSuccess { ValidationMocks.createTestValidator(schemaBuilder{}.build()).validate("something".toJsrValue()) }
   }
 
   private fun roundTripSchema(title: String? = null,
                               description: String? = null,
                               id: String? = null): lang.json.JsrObject {
     val builder: MutableSchema = if (id?.isNotBlank() == true) {
-      JsonSchema.schemaBuilder(id)
+      JsonSchema.schemaBuilder(id = id)
     } else {
-      JsonSchema.schemaBuilder()
+      schemaBuilder{}
     }
     if (title != null) builder.title = title
     if (description != null) builder.description = description

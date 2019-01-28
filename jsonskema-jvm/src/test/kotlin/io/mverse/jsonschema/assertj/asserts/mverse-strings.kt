@@ -6,10 +6,15 @@ import assertk.fail
 
 fun Assert<String?>.isEqualIgnoringWhitespace(other:String?) {
   assert(actual).isNotNull()
-  if(actual!!.stripWhitespace() != other?.stripWhitespace()) {
+  val strippedActual = actual!!.stripWhitespace()
+  val strippedOther = other?.stripWhitespace()
+  if(strippedActual != strippedOther) {
     fail("Expecting match (ignoring whitespace)\n" +
         " - ACTUAL: ${actual!!.prependIndent("   ")}\n" +
-        " - EXPECTED: ${other!!.prependIndent("   ")}")
+        " - EXPECTED: ${other!!.prependIndent("   ")}\n" +
+        " - COMPARE1: $strippedOther\n" +
+        " - COMPARE2: $strippedActual"
+    )
   }
 }
 

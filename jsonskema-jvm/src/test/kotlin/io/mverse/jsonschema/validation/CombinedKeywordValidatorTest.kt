@@ -24,8 +24,8 @@ import io.mverse.jsonschema.keyword.Keywords.ALL_OF
 import io.mverse.jsonschema.keyword.Keywords.ANY_OF
 import io.mverse.jsonschema.keyword.Keywords.ONE_OF
 import io.mverse.jsonschema.loading.parseJsrJson
+import io.mverse.jsonschema.schema
 import io.mverse.jsonschema.validation.ValidationMocks.mockNumberSchema
-import lang.json.toJsrValue
 import lang.json.toJsrValue
 import org.junit.Test
 import java.util.Arrays.asList

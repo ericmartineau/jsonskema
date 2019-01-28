@@ -10,6 +10,7 @@ import io.mverse.jsonschema.enums.JsonSchemaType.NULL
 import io.mverse.jsonschema.enums.JsonSchemaType.NUMBER
 import io.mverse.jsonschema.enums.JsonSchemaType.OBJECT
 import io.mverse.jsonschema.enums.JsonSchemaType.STRING
+import io.mverse.jsonschema.schema
 import kotlinx.serialization.json.JsonNull
 import lang.json.jsrArrayOf
 import org.junit.Test
@@ -25,7 +26,7 @@ class JsonSchemaInspectionsTest {
 
   @Test
   fun testArraySchema() {
-    val draft6Schema = JsonSchema.schema {
+    val draft6Schema = schema {
       maxItems = 23
     }
     assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(ARRAY)

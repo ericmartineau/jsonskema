@@ -38,7 +38,6 @@ class InvalidObjectInArrayTest {
     val schema = JsonSchema.createSchemaReader().readSchema(schemaJson)
 
     assert(schema)
-        .isDraft7()
         .validating(valueJson)
         .hasViolationAt("#/notification/target/apps/0")
         .hasErrorCode("validation.keyword.required")

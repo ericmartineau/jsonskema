@@ -9,7 +9,6 @@ import lang.hashKode
 import lang.json.JsonPath
 import lang.net.URI
 import lang.net.resolveUri
-import lang.serializer.JsrValueSerializer
 import lang.serializer.URISerializer
 
 /**
@@ -144,12 +143,13 @@ class SchemaLocation(
         resolutionScope = resolutionScope, jsonPath = jsonPath)
   }
 
-  class SchemaLocationBuilder(private var documentURI: URI? = null,
-                              private var resolutionScope: URI? = null,
-                              private var id: URI? = null,
-                              private var jsonPath: JsonPath? = null) {
+  class SchemaLocationBuilder(internal var documentURI: URI? = null,
+                              internal var resolutionScope: URI? = null,
+                              internal var id: URI? = null,
+                              internal var jsonPath: JsonPath? = null) {
 
-    fun build(): SchemaLocation {
+    fun build(block: SchemaLocationBuilder.() -> Unit = {}): SchemaLocation {
+      block()
       // Initialize everything from the id
       if (this.documentURI == null && this.id != null) {
         check(id!!.isAbsolute()) { "ID must be absolute" }
@@ -202,11 +202,10 @@ class SchemaLocation(
     val BLANK_URI = URI("")
 
     fun documentRoot(id: URI): SchemaLocation {
-      val path: JsonPath
-      if (id.isJsonPointer()) {
-        path = JsonPath.fromURI(id)
+      val path: JsonPath = if (id.isJsonPointer()) {
+        JsonPath.fromURI(id)
       } else {
-        path = ROOT_PATH
+        ROOT_PATH
       }
       return SchemaLocationBuilder(id).jsonPath(path).build()
     }
@@ -242,5 +241,22 @@ class SchemaLocation(
 
   override fun hashCode(): Int {
     return hashKode(documentURI, jsonPath, resolutionScope)
+  }
+
+  fun withDocumentURI(documentURI: URI): SchemaLocation {
+    check(jsonPath == JsonPath.rootPath) { "withDocumentURI cannot be used in the middle of a document" }
+    return toBuilder().build {
+      val builder = this
+      builder.documentURI = documentURI
+      builder.id = documentURI
+      builder.resolutionScope = documentURI
+      builder.jsonPath = ROOT_PATH
+    }
+  }
+
+  fun withJsonPath(jsonPath: JsonPath):SchemaLocation {
+    return toBuilder().build {
+      this.jsonPath = jsonPath
+    }
   }
 }

@@ -2,6 +2,8 @@ package io.mverse.jsonschema
 
 import assertk.Assert
 import assertk.assert
+import io.mverse.jsonschema.builder.MutableSchema
+import io.mverse.jsonschema.utils.SchemaPaths
 import kotlinx.serialization.json.JsonNull
 import lang.BigInteger
 import lang.exception.illegalState
@@ -10,7 +12,25 @@ import lang.json.jsrArrayOf
 import lang.json.jsrNumber
 import lang.json.jsrObject
 import lang.json.toJsrValue
+import lang.net.URI
+import lang.uuid.randomUUID
 import java.math.BigDecimal
+
+fun schema(block:MutableSchema.()->Unit):Schema {
+  return JsonSchema.schemaBuilder(SchemaPaths.fromNonSchemaSource(randomUUID())).build(block)
+}
+
+fun JsonSchema.schema(block:MutableSchema.()->Unit):Schema {
+  return JsonSchema.schemaBuilder(SchemaPaths.fromNonSchemaSource(randomUUID())).build(block)
+}
+
+fun schema(id:URI, block:MutableSchema.()->Unit):Schema {
+  return JsonSchema.schemaBuilder(id).build(block)
+}
+
+fun schemaBuilder(block:MutableSchema.()->Unit):MutableSchema {
+  return JsonSchema.schemaBuilder(SchemaPaths.fromNonSchemaSource(randomUUID())).apply(block)
+}
 
 object TestUtils {
 

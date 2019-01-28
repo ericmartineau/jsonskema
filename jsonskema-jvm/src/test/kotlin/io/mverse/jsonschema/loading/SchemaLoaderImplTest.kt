@@ -11,7 +11,9 @@ import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
+import assertk.assertions.isTrue
 import com.google.common.collect.ImmutableSet
+import io.mverse.jsonschema.DraftSchema
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.SchemaException
@@ -20,7 +22,6 @@ import io.mverse.jsonschema.assertj.asserts.isSchemaEqual
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.enums.JsonSchemaType
-import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.StringKeyword
 import io.mverse.jsonschema.loading.reference.DefaultJsonDocumentClient
@@ -120,8 +121,10 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   fun jsonPointerInArray() {
     val jsonSchema = getSchemaForKey("jsonPointerInArray")
     assert(jsonSchema.itemSchemas).hasSize(2)
-    assert(jsonSchema.itemSchemas.get(1))
-        .isInstanceOf(RefSchema::class.java)
+    assert(jsonSchema.itemSchemas[1])
+        .isInstanceOf(DraftSchema::class) {
+          assert(it.actual.isRefSchema, "Is ref schema").isTrue()
+        }
   }
 
   @Test
@@ -211,7 +214,7 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   fun refWithType() {
     val actualRoot = getSchemaForKey("refWithType")
     assert(actualRoot).isNotNull()
-    val prop = actualRoot.getPropertySchema("prop")
+    val prop = actualRoot.properties.getValue("prop").asDraft7()
     assert(prop).isNotNull()
     assert(prop.requiredProperties).containsAll("a", "b")
   }
@@ -341,14 +344,14 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
    */
   @Test
   fun testEqualsWithNumberPrecision() {
-    val schemaOne = JsonSchema.schema("https://storage.googleapis.com/mverse-test/mverse/petStore/0.0.1/schema/dog/jsonschema-draft6.json") {
+    val schemaOne = JsonSchema.schema(id = "https://storage.googleapis.com/mverse-test/mverse/petStore/0.0.1/schema/dog/jsonschema-draft6.json") {
       isUseSchemaKeyword = true
       properties["maxNumber"] = {
         minItems = 32
       }
-    }.asDraft7()
+    }
 
-    val asString = schemaOne.toString(Draft7)
+    val asString = schemaOne.asDraft7().toString(includeExtraProperties = true)
 
     val deserialized = JsonSchema.createSchemaReader().readSchema(asString)
     assert(schemaOne).isSchemaEqual(deserialized)

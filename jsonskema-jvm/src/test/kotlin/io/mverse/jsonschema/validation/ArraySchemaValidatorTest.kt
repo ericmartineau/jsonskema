@@ -19,7 +19,6 @@ import assertk.assert
 import assertk.assertions.containsExactly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
-import io.mverse.json.jsr353.toBuilder
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.JsonSchema.schema
 import io.mverse.jsonschema.JsonSchema.schemaBuilder
@@ -39,6 +38,7 @@ import io.mverse.jsonschema.keyword.Keywords.UNIQUE_ITEMS
 import io.mverse.jsonschema.loading.parseJsrJson
 import io.mverse.jsonschema.loading.parseJsrObject
 import io.mverse.jsonschema.resourceLoader
+import io.mverse.jsonschema.schema
 import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.ValidationMocks.mockArraySchema
 import io.mverse.jsonschema.validation.ValidationMocks.mockBooleanSchema
@@ -49,8 +49,6 @@ import io.mverse.jsonschema.validation.ValidationTestSupport.expectFailure
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import io.mverse.jsonschema.validation.ValidationTestSupport.failureOf
 import lang.json.JsrObject
-import kotlinx.serialization.json.json
-import lang.collection.asList
 import lang.json.JsonKey
 import lang.json.JsrArray
 import lang.json.get
@@ -59,9 +57,7 @@ import lang.json.jsrArrayOf
 import lang.json.jsrJson
 import lang.json.jsrObject
 import lang.json.mutate
-import lang.json.toJsonElement
 import lang.json.toJsrObject
-import lang.json.toMutableJsonObject
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -84,7 +80,7 @@ class ArraySchemaValidatorTest {
 
   @Test
   fun additionalItemsSchemaFailure() {
-    val nullSchema = JsonSchema.schemaBuilder("nulls") {
+    val nullSchema = JsonSchema.schemaBuilder(id = "nulls") {
       type = NULL
     }
 
@@ -148,7 +144,7 @@ class ArraySchemaValidatorTest {
 
   @Test
   fun noItemSchema() {
-    val schema = schema()
+    val schema = schema{}
     expectSuccess(schema, arrayTestCases["noItemSchema".jkey])
   }
 
@@ -210,11 +206,11 @@ class ArraySchemaValidatorTest {
     // }
     // itemSchemas.add(requireNonNull(itemSchema, "itemSchema cannot be null"));
     // return this;
-    val subject = JsonSchema.schema { itemSchemas = listOf(mockBooleanSchema) }.asDraft6()
-    val expectedSchema = subject.itemSchemas[0]
+    val subject = JsonSchema.schema { itemSchemas = listOf(mockBooleanSchema) }
+    val expectedSchema = subject.asDraft6().itemSchemas[0]
 
     failureOf(subject)
-        .expectedViolatedSchema(expectedSchema)
+        .expectedViolatedSchema(expectedSchema.schema)
         .expectedSchemaLocation("#/items/0")
         .expectedPointer("#/0")
         .input(arrayTestCases["tupleWithOneItem"])

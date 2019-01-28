@@ -3,10 +3,47 @@ package io.mverse.jsonschema.utils
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaType
 import lang.collection.runLengths
+import lang.exception.illegalState
+import lang.exception.nullPointer
 import lang.json.JsrArray
 import lang.json.JsrType
 import lang.json.type
 import lang.json.values
+import lang.net.URI
+import lang.net.authority
+import lang.net.compareURI
+import lang.net.mutate
+import lang.net.path
+import lang.string.join
+
+/**
+ * Given two schema URIs, attempts to build a calculated merge URI for the two.
+ */
+fun URI.calculateMergeURI(override: URI?): URI {
+  if (override == null) return this
+  val diffURI = this.compareURI(override)
+  if (diffURI.authority != null) {
+    illegalState("Unable to automatically calculate merge schema URI.  The schemas must " +
+        "contain the same base URI")
+  }
+  val path = diffURI.path ?: nullPointer("Invalid null path.  Either the target schema has no " +
+      "path, or the schemas have identical paths")
+  val qualifier = path.removeSuffix(".json").replace('/', '-')
+  if (qualifier.isEmpty()) {
+    illegalState("The merge source and target have the same base URI")
+  }
+  return this.mutate {
+    val segments = this.path.orEmpty().split('/').toMutableList()
+    val lastSegment = segments.last { it.isNotEmpty() }
+    val replaced = if (lastSegment.endsWith(".json")) {
+      lastSegment.removeSuffix(".json") + "-$qualifier.json"
+    } else {
+      "$lastSegment-$qualifier"
+    }
+    segments[segments.lastIndex] = replaced
+    this.path = segments.join("/")
+  }
+}
 
 fun Schema.calculateJsonSchemaType(): JsonSchemaType? {
   val schema = this.asDraft7()

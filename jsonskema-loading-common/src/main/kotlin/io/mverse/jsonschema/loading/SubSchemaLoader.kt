@@ -52,7 +52,7 @@ data class SubSchemaLoader(val extraKeywordLoaders: List<KeywordDigester<*>>,
     }
 
     val schemaBuilder = JsonUtils.extractIdFromObject(schemaJson.jsonObject!!)
-        ?.let { schemaBuilder(schemaJson.location, it) }
+        ?.let { id->  schemaBuilder(schemaJson.location, id) }
         ?: schemaBuilder(schemaJson.location)
     schemaBuilder.also {
       it.currentDocument = rootDocument
@@ -63,8 +63,8 @@ data class SubSchemaLoader(val extraKeywordLoaders: List<KeywordDigester<*>>,
     return schemaBuilder
   }
 
-  internal fun schemaBuilder(location: SchemaLocation, `$id`: URI): MutableSchema {
-    return MutableJsonSchema(schemaLoader, location, `$id`)
+  internal fun schemaBuilder(location: SchemaLocation, dollarId: URI): MutableSchema {
+    return MutableJsonSchema(schemaLoader, location, dollarId)
   }
 
   internal fun schemaBuilder(location: SchemaLocation): MutableSchema {

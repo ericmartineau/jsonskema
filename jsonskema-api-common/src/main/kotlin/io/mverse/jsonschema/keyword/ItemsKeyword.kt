@@ -2,6 +2,7 @@ package io.mverse.jsonschema.keyword
 
 import io.mverse.jsonschema.MergeReport
 import io.mverse.jsonschema.Schema
+import io.mverse.jsonschema.asVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.utils.isFalseSchema
 import lang.json.JsonPath
@@ -18,12 +19,12 @@ data class ItemsKeyword(val indexedSchemas: List<Schema> = emptyList(),
   override fun toJson(keyword: KeywordInfo<*>, builder: MutableJsrObject, version: JsonSchemaVersion, includeExtraProperties: Boolean) {
     if (!indexedSchemas.isEmpty()) {
       builder.apply {
-        Keywords.ITEMS.key *= createJsrArray(indexedSchemas.map { it.asVersion(version).toJson() })
+        Keywords.ITEMS.key *= createJsrArray(indexedSchemas.map { it.asVersion(version).toJson(includeExtraProperties = true) })
       }
     } else {
       allItemSchema?.let { schema ->
         builder.run {
-          Keywords.ITEMS.key *= schema.asVersion(version).toJson()
+          Keywords.ITEMS.key *= schema.asVersion(version).toJson(includeExtraProperties = includeExtraProperties)
         }
       }
     }
@@ -32,7 +33,7 @@ data class ItemsKeyword(val indexedSchemas: List<Schema> = emptyList(),
         if (version.isBefore(JsonSchemaVersion.Draft6) && schema.isFalseSchema) {
           Keywords.ADDITIONAL_ITEMS.key *= false
         } else {
-          Keywords.ADDITIONAL_ITEMS.key *= additionalItemSchema.asVersion(version).toJson()
+          Keywords.ADDITIONAL_ITEMS.key *= additionalItemSchema.asVersion(version).toJson(includeExtraProperties = true)
         }
       }
 

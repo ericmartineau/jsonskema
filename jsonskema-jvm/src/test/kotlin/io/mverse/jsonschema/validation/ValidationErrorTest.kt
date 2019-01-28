@@ -25,11 +25,11 @@ import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.assertThat
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.resourceLoader
+import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.ValidationMocks.mockBooleanSchema
 import io.mverse.jsonschema.validation.ValidationMocks.mockNullSchema
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import io.mverse.jsonschema.validation.ValidationTestSupport.verifyFailure
-import kotlinx.serialization.json.JsonNull
 import lang.json.JsrObject
 import lang.json.JsonPath
 import lang.json.JsrNull
@@ -42,7 +42,7 @@ import java.util.Collections.emptyList
 class ValidationErrorTest {
 
   private val loader = JsonSchema.resourceLoader()
-  private val rootSchema = JsonSchema.schemaBuilder().build()
+  private val rootSchema = schemaBuilder{}.build()
 
   @Test
   fun testConstructor() {

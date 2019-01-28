@@ -1,9 +1,15 @@
 package io.mverse.jsonschema
 
 import io.mverse.jsonschema.enums.JsonSchemaType
+import io.mverse.jsonschema.enums.JsonSchemaVersion
+import io.mverse.jsonschema.keyword.Keyword
+import io.mverse.jsonschema.keyword.KeywordInfo
+import io.mverse.jsonschema.utils.calculateJsonSchemaType
 import lang.collection.SetMultimap
 import lang.json.JsrArray
+import lang.json.JsrObject
 import lang.json.JsrValue
+import lang.net.URI
 
 /**
  * This interface provides convenience methods for retrieving subschemas in the same version as the
@@ -11,7 +17,21 @@ import lang.json.JsrValue
  *
  * @param <SELF> The version of the schema that should be returned.
 </SELF> */
-interface DraftSchema<SELF : DraftSchema<SELF>> : Schema {
+interface DraftSchema {
+  val schema: Schema
+  val keywords: Map<KeywordInfo<*>, Keyword<*>> get() = schema.keywords
+  val location: SchemaLocation get() = schema.location
+  val id: URI?
+
+  val schemaURI: URI?
+
+  val title: String?
+
+  val description: String?
+
+  val version: JsonSchemaVersion?
+
+  val extraProperties: Map<String, JsrValue> get() = schema.extraProperties
 
   val types: Set<JsonSchemaType>
 
@@ -37,41 +57,50 @@ interface DraftSchema<SELF : DraftSchema<SELF>> : Schema {
 
   val maxItems: Int?
 
-  val allItemSchema: SELF?
+  val allItemSchema: DraftSchema?
 
-  val itemSchemas: List<Schema>
+  val itemSchemas: List<DraftSchema>
 
-  val additionalItemsSchema: SELF?
+  val additionalItemsSchema: DraftSchema?
 
-  val properties: Map<String, Schema>
+  val properties: Map<String, DraftSchema>
 
-  val patternProperties: Map<String, Schema>
+  val patternProperties: Map<String, DraftSchema>
 
-  val additionalPropertiesSchema: SELF?
+  val additionalPropertiesSchema: DraftSchema?
 
   val propertyDependencies: SetMultimap<String, String>
 
-  val propertySchemaDependencies: Map<String, Schema>
+  val propertySchemaDependencies: Map<String, DraftSchema>
 
   val requiresUniqueItems: Boolean
 
-  fun convertVersion(source: Schema): SELF
+  fun asDraft7(): Draft7Schema
+  fun asDraft6(): Draft6Schema
+  fun toDraft4(): Draft4Schema
+  fun toDraft3(): Draft3Schema
+//  fun findPropertySchema(schemaName: String): SELF? {
+//    val found = properties[schemaName]
+//    return found?.let { convertVersion(it) }
+//  }
+//
+//  fun findPatternSchema(pattern: String): SELF? {
+//    val found = patternProperties[pattern]
+//    return found?.let { convertVersion(it) }
+//  }
+//
+//  fun getPropertySchema(property: String): SELF {
+//    return findPropertySchema(property) ?: missingProperty(this, property)
+//  }
+//
+//  fun getPatternSchema(pattern: String): SELF {
+//    return findPatternSchema(pattern) ?: missingProperty(this, pattern)
+//  }
 
-  fun findPropertySchema(schemaName: String): SELF? {
-    val found = properties[schemaName]
-    return found?.let { convertVersion(it) }
-  }
+  fun toJson(includeExtraProperties: Boolean = false): JsrObject
 
-  fun findPatternSchema(pattern: String): SELF? {
-    val found = patternProperties[pattern]
-    return found?.let { convertVersion(it) }
-  }
-
-  fun getPropertySchema(property: String): SELF {
-    return findPropertySchema(property) ?: missingProperty(this, property)
-  }
-
-  fun getPatternSchema(pattern: String): SELF {
-    return findPatternSchema(pattern) ?: missingProperty(this, pattern)
-  }
+  fun toString(includeExtraProperties: Boolean = false, indent:Boolean = false): String
+  operator fun contains(keyword: KeywordInfo<*>):Boolean = keywords.contains(keyword)
+  fun calculateJsonSchemaType(): JsonSchemaType? = schema.calculateJsonSchemaType()
+  val isRefSchema: Boolean
 }

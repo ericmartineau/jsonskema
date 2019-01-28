@@ -16,17 +16,25 @@
 package io.mverse.jsonschema.validation
 
 import assertk.assert
+import assertk.assertAll
 import assertk.assertions.hasSize
 import assertk.assertions.hasToString
 import assertk.assertions.isEqualTo
 import io.mverse.json.jsr353.raw
 import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.assertj.asserts.hasViolationAt
+import io.mverse.jsonschema.assertj.asserts.hasViolationCount
+import io.mverse.jsonschema.assertj.asserts.isNotValid
+import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.createSchemaReader
+import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.loading.parseJsrJson
 import io.mverse.jsonschema.loading.parseJsrObject
 import io.mverse.jsonschema.minus
 import io.mverse.jsonschema.resourceLoader
+import io.mverse.jsonschema.schema
+import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.ValidationMocks.createTestValidator
 import io.mverse.jsonschema.validation.ValidationMocks.mockBooleanSchema
 import io.mverse.jsonschema.validation.ValidationMocks.mockNullSchema
@@ -41,14 +49,12 @@ import io.mverse.jsonschema.validation.ValidationTestSupport.expectFailure
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import io.mverse.jsonschema.validation.ValidationTestSupport.failureOf
 import io.mverse.jsonschema.validation.ValidationTestSupport.verifyFailure
-import lang.collection.Multimaps
 import lang.collection.MutableSetMultimap
-import lang.collection.SetMultimap
 import lang.collection.plus
-import lang.collection.size
 import lang.json.JsrValue
 import lang.json.jsrObject
 import lang.json.toJsrValue
+import lang.json.toPrettyString
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -96,84 +102,104 @@ class ObjectKeywordsValidatorTest {
 
   @Test
   fun multipleSchemaDepViolation() {
-    val billingAddressSchema = mockStringSchema
-    val billingNameSchema = mockStringSchema.apply { minLength = 4 }
-    val subject = mockObjectSchema {
-      properties["name"] = mockStringSchema
-      properties["credit_card"] = mockNumberSchema
-      schemaDependencies += "credit_card" to  mockObjectSchema.apply {
-        properties["billing_address"] = billingAddressSchema
-        properties["billing_name"] = billingNameSchema
-        requiredProperties += "billing_address"
+    val subject = schema {
+      properties {
+        "name" required string
+        "credit_card" required number
+        "age" optional number
       }
-      schemaDependencies += "name" to mockObjectSchema.apply {
+      schemaDependencies["credit_card"] = {
+        properties {
+          "billing_address" required string
+          "billing_name" optional string {
+            minLength = 4
+          }
+        }
+      }
+      schemaDependencies["name"] = {
         requiredProperties += "age"
       }
     }
 
-    val e = verifyFailure { ValidationMocks.createTestValidator(subject).validate(objectTestCases["schemaDepViolation"] as JsrValue) }
-    var creditCardFailure = e.causes[0]
-    var ageFailure = e.causes[1]
-    // due to schemaDeps being stored in (unsorted) HashMap, the exceptions may need to be swapped
-    if (creditCardFailure.causes.isEmpty()) {
-      val tmp = creditCardFailure
-      creditCardFailure = ageFailure
-      ageFailure = tmp
-    }
-    val billingAddressFailure = creditCardFailure.causes[0]
-    assertEquals("#/billing_address", billingAddressFailure.pathToViolation)
-    assertEquals(billingAddressSchema.build(), billingAddressFailure.violatedSchema)
-    val billingNameFailure = creditCardFailure
-        .causes[1]
-    assertEquals("#/billing_name", billingNameFailure.pathToViolation)
-    assertEquals(billingNameSchema.build(), billingNameFailure.violatedSchema)
-    assertEquals("#", ageFailure.pathToViolation)
-    assertEquals("#: required key [age] not found", ageFailure.message)
+    val depViolation = objectTestCases["schemaDepViolation"]
+    println(depViolation?.toPrettyString())
+    subject.validating(depViolation)
+        .isNotValid {
+          hasViolationAt("#/billing_address")
+          hasViolationAt("#/billing_name")
+          hasViolationAt("#")
+        }
   }
 
   @Test
   fun multipleViolations() {
-    val subject = mockObjectSchema {
-      properties["numberProp"] = mockNumberSchema
-      properties["boolProp"] = mockBooleanSchema
-      patternProperties["^string.*"] = mockStringSchema
+    val subject = schema {
+      properties["numberProp"] = {type = JsonSchemaType.NUMBER}
+      properties["boolProp"] = {type = JsonSchemaType.BOOLEAN }
+      patternProperties["^string.*"] = {type = JsonSchemaType.STRING}
       requiredProperties += "boolProp"
     }
 
-    val e = verifyFailure {
-      ValidationMocks.createTestValidator(subject)
-          .validate(objectTestCases.get("multipleViolations") as JsrValue)
-    }
-
-    assertEquals(3, e.causes.size)
-    assertEquals(1, countCauseByJsonPointer(e, "#"))
-    assertEquals(1, countCauseByJsonPointer(e, "#/numberProp"))
-    assertEquals(1, countCauseByJsonPointer(e, "#/stringPatternMatch"))
-
-    val messages = e.allMessages
-    assertEquals(3, messages.size)
-    assertEquals(1, countMatchingMessage(messages, "#:"))
-    assertEquals(1, countMatchingMessage(messages, "#/numberProp:"))
-    assertEquals(1, countMatchingMessage(messages, "#/stringPatternMatch:"))
-  }
-
-  @Test
-  @Throws(Exception::class)
-  fun multipleViolationsNested() {
-    val newBuilder = {
-      mockObjectSchema.apply {
-        properties["numberProp"] = mockNumberSchema
-        properties["boolProp"] = mockBooleanSchema
-        patternProperties["^string.*"] = mockStringSchema
-        requiredProperties += "boolProp"
+    val multiple = jsrObject {
+      "numberProp" *= "not number"
+      "stringPatternMatch" *= 2
+      "nested" *= jsrObject {
+        "numberProp" *= "not number 1"
+        "stringPatternMatch" *= 11
+        "nested" *= jsrObject {
+          "numberProp" *= "not number 2"
+          "stringPatternMatch" *= 22
+        }
       }
     }
 
-    val nested2 = newBuilder()
-    val nested1 = newBuilder().apply { properties["nested"] = nested2 }
-    val subject = newBuilder().invoke { properties["nested"] = nested1 }
+    subject.validating(multiple)
+        .isNotValid {
+          hasViolationCount(3)
+          hasViolationAt("#")
+          hasViolationAt("#/numberProp")
+          hasViolationAt("#/stringPatternMatch")
+        }
+  }
 
-    val subjectException = verifyFailure { ValidationMocks.createTestValidator(subject).validate(objectTestCases.raw.get<JsrValue>("multipleViolationsNested")) }
+  @Test
+  fun multipleViolationsNested() {
+    val subject = schemaBuilder {
+      properties["numberProp"] = { type = JsonSchemaType.NUMBER }
+      properties["boolProp"] = { type = JsonSchemaType.BOOLEAN }
+      patternProperties["^string.*"] = { type = JsonSchemaType.STRING }
+      requiredProperties += "boolProp"
+      properties["nested"] = {
+        properties["numberProp"] = { type = JsonSchemaType.NUMBER }
+        properties["boolProp"] = { type = JsonSchemaType.BOOLEAN }
+        patternProperties["^string.*"] = { type = JsonSchemaType.STRING }
+        requiredProperties += "boolProp"
+        properties["nested"] = {
+          properties["numberProp"] = { type = JsonSchemaType.NUMBER }
+          properties["boolProp"] = { type = JsonSchemaType.BOOLEAN }
+          patternProperties["^string.*"] = { type = JsonSchemaType.STRING }
+          requiredProperties += "boolProp"
+        }
+      }
+    }.build()
+
+    val multiple = jsrObject {
+      "numberProp" *= "not number"
+      "stringPatternMatch" *= 2
+      "nested" *= jsrObject {
+        "numberProp" *= "not number 1"
+        "stringPatternMatch" *= 11
+        "nested" *= jsrObject {
+          "numberProp" *= "not number 2"
+          "stringPatternMatch" *= 22
+        }
+      }
+    }
+
+    val v = subject
+        .validating(multiple)
+
+    val subjectException = v.actual!!
 
     assertEquals("#: 9 schema violations found", subjectException.message)
     assertEquals(4, subjectException.causes.size)
@@ -230,7 +256,7 @@ class ObjectKeywordsValidatorTest {
 
   @Test
   fun patternPropertyOnEmptyObjct() {
-    val schema = mockObjectSchema {
+    val schema = mockObjectSchema.apply {
       patternProperties["b_.*"] = mockBooleanSchema
     }
     expectSuccess { ValidationMocks.createTestValidator(schema).validate(jsrObject {}) }
@@ -247,12 +273,14 @@ class ObjectKeywordsValidatorTest {
 
   @Test
   fun patternPropertyViolation() {
-    val subject = mockObjectSchema.build {
-      patternProperties["^b_.*"] = mockBooleanSchema
-      patternProperties["^s_.*"] = mockStringSchema
+    val subject = schema {
+      patternProperties["^b_.*"] = {type = JsonSchemaType.BOOLEAN}
+      patternProperties["^s_.*"] = {type = JsonSchemaType.STRING}
     }
-    expectFailure(subject, mockBooleanSchema.build(), "#/b_1",
-        objectTestCases["patternPropertyViolation"] as JsrValue)
+    subject.validating(objectTestCases["patternPropertyViolation"] as JsrValue)
+        .isNotValid {
+          hasViolationAt("#/b_1")
+        }
   }
 
   @Test
@@ -268,11 +296,11 @@ class ObjectKeywordsValidatorTest {
   @Test
   fun propertyDepViolation() {
     mockObjectSchema {
-      properties["ifPresent"] = mockNullSchema
-      properties["mustBePresent"] = mockBooleanSchema
+      properties["ifPresent"] = {type = JsonSchemaType.NULL}
+      properties["mustBePresent"] = {type = JsonSchemaType.BOOLEAN}
     }
     val subject = mockObjectSchema {
-      properties["ifPresent"] = mockNullSchema
+      properties["ifPresent"] = {type = JsonSchemaType.NULL}
       propertyDependencies += MutableSetMultimap<String, String>()
           .apply {
             add("ifPresent", "mustBePresent")
@@ -304,8 +332,10 @@ class ObjectKeywordsValidatorTest {
 
   @Test
   fun propertySchemaViolation() {
-    val subject = mockObjectSchema.build() {
-      properties["boolProp"] = mockBooleanSchema
+    val subject = mockObjectSchema.build {
+      properties["boolProp"] = {
+        type = JsonSchemaType.BOOLEAN
+      }
     }
 
     expectFailure(subject, mockBooleanSchema.build(), "#/boolProp",
@@ -320,8 +350,8 @@ class ObjectKeywordsValidatorTest {
   @Test
   fun requiredProperties() {
     val subject = mockObjectSchema {
-      properties.set("boolProp", mockBooleanSchema)
-      properties.set("nullProp", mockNullSchema)
+      properties["boolProp"] = {type = JsonSchemaType.BOOLEAN}
+      properties["nullProp"] = {type = JsonSchemaType.NULL}
       requiredProperties += "boolProp"
     }
 
@@ -334,22 +364,14 @@ class ObjectKeywordsValidatorTest {
 
   @Test
   fun schemaDepViolation() {
-    val billingAddressSchema = mockStringSchema
-
-    val schemaBuilder = mockObjectSchema.apply {
-      properties["billing_address"] = billingAddressSchema
-      properties["name"] = mockStringSchema
-      properties["credit_card"] = mockNumberSchema
-    }
-
-    val subject = schemaBuilder.build {
-      schemaDependencies += "credit_card" to mockObjectSchema.apply {
-        requiredProperties += "billing_address"
+    schema {
+      properties {
+        "billing_address" required string
+        "name" required { type = JsonSchemaType.STRING }
+        "credit_card" optional { type = JsonSchemaType.NUMBER }
       }
-    }
-
-    expectFailure(subject, billingAddressSchema.build(), "#/billing_address",
-        objectTestCases["schemaDepViolation"] as JsrValue)
+    }.validating(objectTestCases["schemaDepViolation"] as JsrValue)
+        .hasViolationAt("#/billing_address")
   }
 
   @Test
@@ -367,9 +389,9 @@ class ObjectKeywordsValidatorTest {
 
   @Test
   fun testImmutability() {
-    val builder = mockObjectSchema.apply {
-      propertyDependencies += "a" to "b"
-      schemaDependencies += "a" to mockBooleanSchema
+    val builder = schemaBuilder {
+      propertyDependencies += ("a" to "b")
+      schemaDependencies["a"] = { type = JsonSchemaType.BOOLEAN }
       patternProperties["aaa"] = mockBooleanSchema
     }
 
@@ -381,12 +403,15 @@ class ObjectKeywordsValidatorTest {
 
     builder.apply {
       propertyDependencies += ("c" to "a")
-      schemaDependencies += "b" to mockBooleanSchema
+      schemaDependencies["b"] = { type = JsonSchemaType.BOOLEAN }
       patternProperties["bbb"] = mockBooleanSchema
     }
-    assertEquals(1, schema.propertyDependencies.size)
-    assertEquals(1, schema.propertySchemaDependencies.size)
-    assertEquals(1, schema.patternProperties.size)
+
+    assertAll {
+      assert(schema.propertyDependencies.size(), "propertyDependencies").isEqualTo(1)
+      assert(schema.propertySchemaDependencies, "propertySchemaDependencies size").hasSize(1)
+      assert(schema.patternProperties.size, "patternProperties").isEqualTo(1)
+    }
   }
 
   @Test

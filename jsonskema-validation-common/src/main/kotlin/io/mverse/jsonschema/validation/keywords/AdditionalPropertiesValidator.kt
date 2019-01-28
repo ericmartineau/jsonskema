@@ -43,7 +43,7 @@ class AdditionalPropertiesValidator(keyword: SingleSchemaKeyword, schema: Schema
         }
       }
     }
-    invalidProps.forEach { (subject, errors) ->
+    invalidProps.forEach { (subject) ->
       parentReport += buildKeywordFailure(subject)
           .copy(keyword = ADDITIONAL_PROPERTIES,
               code = "validation.keyword.additionalProperties",

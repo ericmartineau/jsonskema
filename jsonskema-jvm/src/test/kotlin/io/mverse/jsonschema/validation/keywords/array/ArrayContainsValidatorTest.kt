@@ -8,25 +8,24 @@ import io.mverse.jsonschema.assertj.asserts.isValid
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.keyword.Keywords
+import io.mverse.jsonschema.schema
+import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.ValidationMocks
 import lang.json.jsrArrayOf
 import lang.json.jsrJson
 import lang.json.jsrNumber
 import lang.json.jsrString
-import lang.json.toJsrValue
-import lang.json.toKtArray
 import org.junit.Test
 
 class ArrayContainsValidatorTest {
   @Test
   fun validate_DoesntContains() {
-    val containsSchema = JsonSchema.schema {
+    val containsSchema = schema {
       type = JsonSchemaType.ARRAY
-      containsSchema = JsonSchema.schemaBuilder {
-        anyOfSchemas = listOf(
-            schemaBuilder { constValue = jsrNumber(3) },
-            schemaBuilder { constValue = jsrNumber(4.0) },
-            schemaBuilder { constValue = jsrString("5") })
+      containsSchema {
+        anyOf { constValue = jsrNumber(3) }
+        anyOf { constValue = jsrNumber(4.0) }
+        anyOf { constValue = jsrString("5") }
       }
     }
 
@@ -44,11 +43,10 @@ class ArrayContainsValidatorTest {
     jsrJson {
       val containsSchema = JsonSchema.schema {
         type = JsonSchemaType.ARRAY
-        containsSchema = JsonSchema.schemaBuilder().apply {
-          anyOfSchemas = listOf(
-              schemaBuilder { constValue = 3.toJsrJson() },
-              schemaBuilder { constValue = 4.0.toJsrJson() },
-              schemaBuilder { constValue = "5".toJsrJson() })
+        containsSchema {
+          anyOf { constValue = 3.toJsrJson() }
+          anyOf { constValue = 4.0.toJsrJson() }
+          anyOf { constValue = "5".toJsrJson() }
         }
       }
 

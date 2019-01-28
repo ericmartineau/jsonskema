@@ -69,7 +69,6 @@ object SchemaPaths {
   }
 
   fun fromDocumentWithProvidedId(documentRoot: JsrObject, id: URI?): SchemaLocation {
-
     return when {
       id == null -> SchemaLocation.builderFromId(generateUniqueURI(documentRoot)).build()
       id.isAbsolute() -> SchemaLocation.builderFromId(id).build()

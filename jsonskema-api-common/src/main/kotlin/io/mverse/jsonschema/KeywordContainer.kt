@@ -7,7 +7,9 @@ import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-abstract class KeywordContainer(open val keywords: Map<KeywordInfo<*>, Keyword<*>> = emptyMap()) {
+abstract class KeywordContainer(keywordGetter: ()-> Map<KeywordInfo<*>, Keyword<*>> = {emptyMap()}) {
+  open val keywords:Map<KeywordInfo<*>, Keyword<*>> by lazy(keywordGetter)
+
   inline fun <reified X : Keyword<*>> keyword(keyword: KeywordInfo<X>): X? {
     return keywords[keyword] as X?
   }
@@ -44,11 +46,16 @@ abstract class KeywordContainer(open val keywords: Map<KeywordInfo<*>, Keyword<*
   }
 }
 
-abstract class MutableKeywordContainer(override val keywords: MutableMap<KeywordInfo<*>, Keyword<*>> = mutableMapOf()) : KeywordContainer() {
+abstract class MutableKeywordContainer(keywordGetter: ()-> MutableMap<KeywordInfo<*>, Keyword<*>> = {mutableMapOf()}) : KeywordContainer(keywordGetter) {
+
+  override val keywords by lazy(keywordGetter)
+
   inline fun <reified T, reified K : Keyword<T>> mutableKeyword(info: KeywordInfo<K>,
                                                                 crossinline supplier: () -> K = { this::class.newInstance() as K },
                                                                 crossinline updater: K.(T) -> K = { this.withValue(it) as K })
       : ReadWriteProperty<MutableKeywordContainer, T?> {
+
+
     return object : ReadWriteProperty<MutableKeywordContainer, T?> {
       override fun setValue(thisRef: MutableKeywordContainer, property: KProperty<*>, value: T?) {
         if (value == null) {

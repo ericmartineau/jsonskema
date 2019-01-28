@@ -6,6 +6,7 @@ import assertk.assertions.containsAll
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.fail
+import io.mverse.jsonschema.Schema
 import lang.json.JsonPath
 import io.mverse.jsonschema.assertThat
 import io.mverse.jsonschema.assertj.subject.ValidationErrorPredicate
@@ -34,7 +35,7 @@ fun SchemaValidationAssert.isValid(): SchemaValidationAssert {
 }
 
 fun SchemaValidationAssert.isNotValid(assertions: SchemaValidationAssert.()->Unit = {}): SchemaValidationAssert {
-  if(this.actual?.allMessages?.size == 0) {
+  if(this.actual?.allMessages?.size ?: 0 == 0) {
     fail("Was unexpectedly valid. We should have encountered errors")
   }
   this.all {
@@ -97,7 +98,8 @@ fun SchemaValidationAssert.hasErrorCode(errorCode: String): SchemaValidationAsse
 
 fun SchemaValidationAssert.hasViolationAt(pointerToViolation: String): SchemaValidationAssert {
   val filtered = filter(pointerToViolationEquals(pointerToViolation))
-  return ValidationError.collectErrors(actual!!.violatedSchema!!,
+  val violatedSchema = this.actual?.violatedSchema ?: return this
+  return ValidationError.collectErrors(violatedSchema,
       JsonPath.fromURI(pointerToViolation),
       filtered)
       .assertThat()

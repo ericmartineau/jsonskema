@@ -3,6 +3,7 @@ package io.mverse.jsonschema.validation.keywords
 import assertk.assert
 import io.mverse.jsonschema.Draft7Schema
 import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.assertj.asserts.hasErrorArguments
 import io.mverse.jsonschema.assertj.asserts.hasErrorCode
 import io.mverse.jsonschema.assertj.asserts.hasViolationAt
@@ -20,7 +21,7 @@ class LogicValidatorTest {
   @Test
   fun testLogic_WhenStartsWithQ_ThenMaxLengthIs10() {
     val jsonObject = loader.readJsonObject("/draft7-keywords.json")
-    val schema = JsonSchema.createSchemaReader().readSchema(jsonObject).asDraft7()
+    val schema = JsonSchema.createSchemaReader().readSchema(jsonObject)
 
     assert(schema)
         .validating(jsrObject { "ifTest" *= "quadrilateralus" })
@@ -31,8 +32,8 @@ class LogicValidatorTest {
         }
   }
 
-  fun lang.json.JsrObject.toJsonSchema(): Draft7Schema =
-      JsonSchema.createSchemaReader().readSchema(this).asDraft7()
+  fun lang.json.JsrObject.toJsonSchema(): Schema =
+      JsonSchema.createSchemaReader().readSchema(this)
 
   @Test
   fun testLogic_WhenStartsWithQ_ThenMaxLengthIs10_Success() {
@@ -46,7 +47,7 @@ class LogicValidatorTest {
 
   @Test
   fun testLogic_WhenStartsWithS_ThenMaxLengthIs5_Failure() {
-    val schema = loader.readJsonObject("/draft7-keywords.json").toJsonSchema().asDraft7()
+    val schema = loader.readJsonObject("/draft7-keywords.json").toJsonSchema()
 
     assert(schema)
         .validating(jsrObject { "ifTest" *= "smasher" })

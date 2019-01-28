@@ -7,7 +7,8 @@ import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.enums.JsonSchemaType
-import io.mverse.jsonschema.impl.Draft7SchemaImpl
+import io.mverse.jsonschema.enums.JsonSchemaVersion
+import io.mverse.jsonschema.impl.JsonSchemaImpl
 import io.mverse.jsonschema.impl.RefSchemaImpl
 import io.mverse.jsonschema.keyword.BooleanKeyword
 import io.mverse.jsonschema.keyword.DependenciesKeyword
@@ -37,6 +38,7 @@ import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
 import io.mverse.jsonschema.keyword.Keywords.ELSE
 import io.mverse.jsonschema.keyword.Keywords.ENUM
 import io.mverse.jsonschema.keyword.Keywords.FORMAT
+import io.mverse.jsonschema.keyword.Keywords.ID
 import io.mverse.jsonschema.keyword.Keywords.IF
 import io.mverse.jsonschema.keyword.Keywords.ITEMS
 import io.mverse.jsonschema.keyword.Keywords.MAXIMUM
@@ -52,7 +54,6 @@ import io.mverse.jsonschema.keyword.Keywords.NOT
 import io.mverse.jsonschema.keyword.Keywords.ONE_OF
 import io.mverse.jsonschema.keyword.Keywords.PATTERN
 import io.mverse.jsonschema.keyword.Keywords.PATTERN_PROPERTIES
-import io.mverse.jsonschema.keyword.Keywords.PROPERTIES
 import io.mverse.jsonschema.keyword.Keywords.PROPERTY_NAMES
 import io.mverse.jsonschema.keyword.Keywords.READ_ONLY
 import io.mverse.jsonschema.keyword.Keywords.REF
@@ -82,9 +83,11 @@ import io.mverse.jsonschema.mergeError
 import io.mverse.jsonschema.utils.SchemaPaths
 import io.mverse.jsonschema.utils.Schemas.nullSchema
 import io.mverse.jsonschema.utils.Schemas.nullSchemaBuilder
+import io.mverse.jsonschema.utils.isGeneratedURI
 import io.mverse.logging.mlogger
 import lang.collection.Multimaps
 import lang.collection.SetMultimap
+import lang.collection.freezeMap
 import lang.exception.illegalState
 import lang.hashKode
 import lang.json.JsonPath
@@ -100,32 +103,29 @@ import lang.uuid.randomUUID
 @Deprecated("Use MutableJsonSchema", replaceWith = ReplaceWith("MutableJsonSchema"))
 typealias JsonSchemaBuilder = MutableJsonSchema
 
-class MutableJsonSchema(
+data class MutableJsonSchema(
     override val schemaLoader: SchemaLoader,
-    keywords: MutableMap<KeywordInfo<*>, Keyword<*>> = mutableMapOf(),
+    override var parent: Schema? = null,
+    private val internalKeywords: Map<KeywordInfo<*>, Keyword<*>> = mapOf(),
     override var extraProperties: MutableMap<String, JsrValue> = mutableMapOf(),
-    private val location: SchemaLocation = SchemaPaths.fromNonSchemaSource(randomUUID()),
+    override val location: SchemaLocation = SchemaPaths.fromNonSchemaSource(randomUUID()),
     override var currentDocument: JsrObject? = null,
     override var loadingReport: LoadingReport = LoadingReport())
-  : SchemaBuilder, MutableKeywordContainer(keywords = keywords) {
+  : MutableSchema, MutableKeywordContainer({ internalKeywords.toMutableMap() }) {
 
-  constructor(schemaLoader: SchemaLoader, fromSchema: Schema, id: URI) : this(schemaLoader = schemaLoader, fromSchema = fromSchema,
-      location = SchemaLocation.builderFromId(id).build()) {
+  constructor(schemaLoader: SchemaLoader, fromSchema: Schema, id: URI)
+      : this(schemaLoader = schemaLoader, fromSchema = fromSchema, location = SchemaLocation.builderFromId(id).build()) {
     keywords[DOLLAR_ID] = IdKeyword(id)
   }
 
-  constructor(schemaLoader: SchemaLoader, fromSchema: Schema, location: SchemaLocation) : this(schemaLoader = schemaLoader, location = location,
-      keywords = fromSchema.keywords.toMutableMap(),
-      extraProperties = fromSchema.extraProperties.toMutableMap())
-
-  constructor(schemaLoader: SchemaLoader, fromSchema: Schema) : this(schemaLoader = schemaLoader, fromSchema = fromSchema,
-      location = fromSchema.location)
-
-  constructor(schemaLoader: SchemaLoader, fromSchema: RefSchema) : this(schemaLoader = schemaLoader, location = fromSchema.location) {
-    if (fromSchema.refSchemaOrNull != null) {
-      this.refSchema = fromSchema.refSchemaOrNull!!
+  constructor(schemaLoader: SchemaLoader, fromSchema: Schema, location: SchemaLocation = fromSchema.location)
+      : this(schemaLoader = schemaLoader, location = location, internalKeywords = fromSchema.keywords, extraProperties = fromSchema.extraProperties.toMutableMap()) {
+    if (fromSchema is RefSchema) {
+      if (fromSchema.refSchemaOrNull != null) {
+        this.refSchema = fromSchema.refSchemaOrNull!!
+      }
+      this.ref = fromSchema.refURI
     }
-    this.ref = fromSchema.refURI
   }
 
   constructor(schemaLoader: SchemaLoader, id: URI) : this(schemaLoader = schemaLoader, location = SchemaPaths.fromIdNonAbsolute(id)) {
@@ -136,7 +136,7 @@ class MutableJsonSchema(
     keywords[DOLLAR_ID] = IdKeyword(id)
   }
 
-  constructor(schemaLoader: SchemaLoader, location: SchemaLocation) : this(schemaLoader = schemaLoader, keywords = mutableMapOf(), location = location)
+  constructor(schemaLoader: SchemaLoader, location: SchemaLocation) : this(schemaLoader = schemaLoader, internalKeywords = mapOf(), location = location)
 
   operator fun <X, K : Keyword<X>> set(keyword: KeywordInfo<K>, value: X?, block: (X) -> K) {
     when (value) {
@@ -145,14 +145,14 @@ class MutableJsonSchema(
     }
   }
 
-  operator fun set(keyword: KeywordInfo<SingleSchemaKeyword>, value: SchemaBuilder?) {
+  operator fun set(keyword: KeywordInfo<SingleSchemaKeyword>, value: MutableSchema?) {
     when (value) {
       null -> keywords.remove(keyword)
       else -> keywords[keyword] = SingleSchemaKeyword(buildSubSchema(value, keyword))
     }
   }
 
-  operator fun set(keyword: KeywordInfo<SingleSchemaKeyword>, property: String, value: SchemaBuilder?) {
+  operator fun set(keyword: KeywordInfo<SingleSchemaKeyword>, property: String, value: MutableSchema?) {
     when (value) {
       null -> keywords.remove(keyword)
       else -> keywords[keyword] = SingleSchemaKeyword(buildSubSchema(value, keyword, property))
@@ -183,7 +183,7 @@ class MutableJsonSchema(
     }
   }
 
-  override fun invoke(block: SchemaBuilder.() -> Unit): SchemaBuilder {
+  override fun invoke(block: MutableSchema.() -> Unit): MutableSchema {
     return apply(block)
   }
 
@@ -216,24 +216,26 @@ class MutableJsonSchema(
       extraProperties[k] = v
     }
 
-    other.keywords.forEach { (keyword, value) ->
-      val kwPath = path.child(keyword.key)
-      if (keyword !in this) {
-        keywords[keyword] = value
-        report += mergeAdd(kwPath, keyword)
-      } else {
-        @Suppress(UNCHECKED_CAST)
-        val thisValue = keywords[keyword] as Keyword<Any>
-        @Suppress(UNCHECKED_CAST)
-        val otherValue = value as Keyword<Any>
-        try {
-          val mergeKeyword = thisValue.merge(kwPath, keyword, otherValue, report)
-          keywords[keyword] = mergeKeyword
-        } catch (e: MergeException) {
-          report += mergeError(kwPath, keyword, e)
+    other.keywords
+        .filter { (keyword) -> keyword != DOLLAR_ID && keyword != ID }
+        .forEach { (keyword, value) ->
+          val kwPath = path.child(keyword.key)
+          if (keyword !in this) {
+            keywords[keyword] = value
+            report += mergeAdd(kwPath, keyword)
+          } else {
+            @Suppress(UNCHECKED_CAST)
+            val thisValue = keywords[keyword] as Keyword<Any>
+            @Suppress(UNCHECKED_CAST)
+            val otherValue = value as Keyword<Any>
+            try {
+              val mergeKeyword = thisValue.merge(kwPath, keyword, otherValue, report)
+              keywords[keyword] = mergeKeyword
+            } catch (e: MergeException) {
+              report += mergeError(kwPath, keyword, e)
+            }
+          }
         }
-      }
-    }
   }
 
   override var refSchema: Schema? = null
@@ -342,16 +344,49 @@ class MutableJsonSchema(
       }
     }
 
+  override fun oneOf(block: MutableSchema.() -> Unit) {
+    oneOfSchemas += subSchemaBuilder(Keywords.ONE_OF).apply(block)
+  }
+
+  override fun allOf(block: MutableSchema.() -> Unit) {
+    oneOfSchemas += subSchemaBuilder(Keywords.ALL_OF).apply(block)
+  }
+
+  override fun anyOf(block: MutableSchema.() -> Unit) {
+    oneOfSchemas += subSchemaBuilder(Keywords.ANY_OF).apply(block)
+  }
+
+  override fun allItemsSchema(block: MutableSchema.() -> Unit) {
+    this.allItemSchema = subSchemaBuilder(Keywords.ITEMS).apply(block)
+  }
+
+  override fun containsSchema(block: MutableSchema.() -> Unit) {
+    this.containsSchema = subSchemaBuilder(Keywords.CONTAINS).apply(block)
+  }
+
+  override fun ifSchema(block: MutableSchema.() -> Unit) {
+    ifSchema = subSchemaBuilder(Keywords.IF).apply(block)
+  }
+
+  override fun thenSchema(block: MutableSchema.() -> Unit) {
+    thenSchema = subSchemaBuilder(Keywords.THEN).apply(block)
+  }
+
+  override fun elseSchema(block: MutableSchema.() -> Unit) {
+    elseSchema = subSchemaBuilder(Keywords.ELSE).apply(block)
+  }
+
+  override fun notSchema(block: MutableSchema.() -> Unit) {
+    notSchema = subSchemaBuilder(Keywords.NOT).apply(block)
+  }
+
+  override fun schemaOfAdditionalProperties(block: MutableSchema.() -> Unit) {
+    schemaOfAdditionalProperties = subSchemaBuilder(keyword = Keywords.ADDITIONAL_PROPERTIES).apply(block)
+  }
+
   override var schemaOfAdditionalProperties: MutableSchema?
     get() = values[ADDITIONAL_PROPERTIES]?.toMutableSchema()
     set(value) = set(ADDITIONAL_PROPERTIES, value)
-
-  override var schemaDependencies: Map<String, SchemaBuilder>
-    get() = values[DEPENDENCIES].toBuilders()
-    set(value) {
-      val existing = this[DEPENDENCIES] ?: DependenciesKeyword()
-      this[DEPENDENCIES] = existing.copy(dependencySchemas = existing.dependencySchemas.copy(value.buildSchemaMap()))
-    }
 
   fun Map<String, MutableSchema>.buildSchemaMap(): Map<String, Schema> = this.mapValues { e ->
     buildSubSchema(e.value, DEPENDENCIES, e.key)
@@ -370,8 +405,9 @@ class MutableJsonSchema(
       keywords[DEPENDENCIES] = dependencies.copy(propertyDependencies = value)
     }
 
-  override var properties: MutableSchemaMap = MutableSchemaMap(PROPERTIES, this)
+  override var properties = MutableProperties(this)
   override var patternProperties = MutableSchemaMap(PATTERN_PROPERTIES, this)
+  override var schemaDependencies = MutableSchemaDependencies(this)
   override var definitions = MutableSchemaMap(DEFINITIONS, this)
 
   override fun contains(keyword: KeywordInfo<*>): Boolean {
@@ -539,27 +575,40 @@ class MutableJsonSchema(
 
     val finalLocation = loc
 
-    val thisSchemaURI = finalLocation.uniqueURI
-
-    val cachedSchema = schemaLoader.findLoadedSchema(thisSchemaURI)
-    if (cachedSchema != null) {
-      return cachedSchema
-    }
-
     val refSchema = this.refSchema
     val ref = this.ref
-    return when {
+    val built = when {
       refSchema != null -> RefSchemaImpl(schemaLoader, refURI = this.refSchema!!.absoluteURI,
           location = finalLocation,
           refSchema = this.refSchema!!)
-      ref != null -> RefSchemaImpl(refURI = this.refURI!!,
-          factory = schemaLoader,
-          currentDocument = currentDocument,
+      ref != null && currentDocument != null -> RefSchemaImpl(loader = schemaLoader,
+          refURI = this.refURI!!,
+          currentDocument = currentDocument!!,
           location = finalLocation,
+          version = JsonSchemaVersion.Draft7,
           report = report)
-      else -> Draft7SchemaImpl(schemaLoader, finalLocation, this.keywords, this.extraProperties)
-          .apply { schemaLoader += this }
+      ref != null -> RefSchemaImpl(
+          loader = schemaLoader,
+          internalLocation = finalLocation,
+          refURI = this.refURI!!,
+          internalParent = null,
+          version = JsonSchemaVersion.Draft7,
+          refResolver = {
+            schemaLoader.loadRefSchema(it, it.refURI, null, LoadingReport())
+          })
+      else -> JsonSchemaImpl(schemaLoader, parent, finalLocation, this.keywords.freezeMap(),
+          this.extraProperties.freezeMap(), JsonSchemaVersion.Draft7)
+          .also { built ->
+            if (!built.absoluteURI.isGeneratedURI() && built.location.jsonPath == JsonPath.rootPath) {
+              schemaLoader += built
+            }
+          }
     }
+
+    if (!built.absoluteURI.isGeneratedURI() && built.location.jsonPath == JsonPath.rootPath) {
+      built.relocate()
+    }
+    return built
   }
 
   override fun build(): Schema = this.build(block = {})
@@ -588,6 +637,20 @@ class MutableJsonSchema(
   private fun buildSubSchema(toBuild: MutableSchema, keyword: KeywordInfo<*>): Schema {
     val childLocation = this.location.child(keyword)
     return toBuild.build(childLocation, loadingReport)
+  }
+
+  override fun withLocation(location: SchemaLocation): MutableSchema {
+    return this.copy(location = location)
+  }
+
+  //  override fun relocateSubschema(subschema: MutableSchema, keyword: KeywordInfo<*>, path: String, vararg paths: String): MutableSchema {
+  //    val childLocation = this.location.child(keyword).child(path).child(*paths)
+  //    return subschema.withLocation(childLocation)
+  //  }
+  //
+  override fun subSchemaBuilder(keyword: KeywordInfo<*>, vararg child: String): MutableSchema {
+    val childLocation = this.location.child(keyword).child(*child)
+    return MutableJsonSchema(location = childLocation, schemaLoader = schemaLoader)
   }
 
   override fun buildSubSchema(toBuild: MutableSchema, keyword: KeywordInfo<*>, path: String, vararg paths: String): Schema {

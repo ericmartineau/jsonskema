@@ -21,7 +21,7 @@ import lang.net.resolveUri
  */
 data class SchemaCache(
     private val documentIdRefs: MutableMap<URI, Map<URI, JsonPath>> = hashMapOf(),
-    private val absoluteDocumentCache: MutableMap<URI, lang.json.JsrObject> = hashMapOf(),
+    private val absoluteDocumentCache: MutableMap<URI, JsrObject> = hashMapOf(),
     private val absoluteSchemaCache: MutableMap<URI, Schema> = hashMapOf()) {
 
   operator fun plusAssign(pair: Pair<URI, Schema>) = cacheSchema(pair.first, pair.second)

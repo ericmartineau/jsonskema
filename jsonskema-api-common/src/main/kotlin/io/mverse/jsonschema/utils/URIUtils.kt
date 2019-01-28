@@ -7,7 +7,7 @@ import lang.net.scheme
 import lang.net.schemeSpecificPart
 import lang.toHex
 
-const val SCHEME_AUTOASSIGN = "mverse"
+const val SCHEME_AUTOASSIGN = "mvuuid"
 
 fun URI.trimEmptyFragment(): URI {
   return if (this.fragment.isNullOrEmpty())

@@ -14,6 +14,8 @@ import io.mverse.jsonschema.assertj.asserts.isDraft7
 import io.mverse.jsonschema.assertj.asserts.isReadOnly
 import io.mverse.jsonschema.assertj.asserts.isWriteOnly
 import io.mverse.jsonschema.assertj.asserts.withAssertion
+import io.mverse.jsonschema.createSchemaReader
+import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaType.STRING
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
 import io.mverse.jsonschema.keyword.Keywords
@@ -22,7 +24,6 @@ import io.mverse.jsonschema.keyword.Keywords.CONTENT_ENCODING
 import io.mverse.jsonschema.keyword.Keywords.CONTENT_MEDIA_TYPE
 import io.mverse.jsonschema.keyword.Keywords.PATTERN
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.createSchemaReader
 import org.junit.Before
 import org.junit.Test
 
@@ -43,26 +44,25 @@ class Draft7KeywordTest {
 
   @Test
   fun readOnlyKeywordIsLoaded() {
-    assert(schema).isDraft7()
+    assert(schema)
         .hasProperty("readMe")
         .isReadOnly()
   }
 
   @Test
   fun writeOnlyKeywordIsLoaded() {
-
-    assert(schema).isDraft7()
+    assert(schema)
         .hasProperty("writeMe")
         .isWriteOnly()
   }
 
   @Test
   fun ifKeywordIsLoaded() {
-    assert(schema).isDraft7()
+    assert(schema)
         .hasProperty("ifTest")
         .hasIfSchema()
         .hasKeyword(Keywords.TYPE)
-        .withAssertion { type ->
+        .withAssertion { type:Set<JsonSchemaType>? ->
           assert(type).isNotNull {
             it.contains(STRING)
           }
@@ -71,7 +71,7 @@ class Draft7KeywordTest {
 
   @Test
   fun nestedifKeywordIsLoaded() {
-    assert(schema).isDraft7()
+    assert(schema)
         .hasProperty("ifTest")
         .hasThenSchema()
         .hasIfSchema()
@@ -80,14 +80,14 @@ class Draft7KeywordTest {
 
   @Test
   fun commentIsLoaded() {
-    assert(schema).isDraft7()
+    assert(schema)
         .hasKeyword(COMMENT)
         .hasValue("This is cool")
   }
 
   @Test
   fun contentEncodingIsLoaded() {
-    assert(schema).isDraft7()
+    assert(schema)
         .hasProperty("base64")
         .hasKeyword(CONTENT_ENCODING)
         .hasValue("base64")
@@ -95,7 +95,7 @@ class Draft7KeywordTest {
 
   @Test
   fun contentMediaTypeIsLoaded() {
-    assert(schema).isDraft7()
+    assert(schema)
         .hasProperty("base64")
         .hasKeyword(CONTENT_MEDIA_TYPE)
         .hasValue("image/png")

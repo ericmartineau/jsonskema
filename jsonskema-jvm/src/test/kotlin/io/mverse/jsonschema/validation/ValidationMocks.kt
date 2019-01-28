@@ -36,11 +36,11 @@ object ValidationMocks {
     }
 
   fun mockBooleanSchema(id: URI): MutableSchema {
-    return schemaBuilder(id) { type = BOOLEAN }
+    return schemaBuilder(id = id) { type = BOOLEAN }
   }
 
   fun mockBooleanSchema(id: String): MutableSchema {
-    return JsonSchema.schemaBuilder(id) { type = BOOLEAN }
+    return JsonSchema.schemaBuilder(id = id) { type = BOOLEAN }
   }
 
   val mockIntegerSchema: MutableSchema
@@ -66,11 +66,11 @@ object ValidationMocks {
   val mockSchema: MutableSchema get() = MutableJsonSchema(JsonSchema.schemaLoader)
 
   fun mockObjectSchema(id: String): MutableSchema {
-    return JsonSchema.schemaBuilder(id) { type = OBJECT }
+    return JsonSchema.schemaBuilder(id = id) { type = OBJECT }
   }
 
   fun mockObjectSchema(id: URI): MutableSchema {
-    return schemaBuilder(id) { type = OBJECT }
+    return schemaBuilder(id = id) { type = OBJECT }
   }
 
   fun createTestValidator(schema: Schema): SchemaValidator =

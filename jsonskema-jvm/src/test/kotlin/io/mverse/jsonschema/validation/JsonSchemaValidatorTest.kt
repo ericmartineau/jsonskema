@@ -3,17 +3,16 @@ package io.mverse.jsonschema.validation
 import assertk.assert
 import assertk.assertions.isNotNull
 import io.mverse.jsonschema.JsonSchema
-import kotlinx.serialization.json.JsonNull
+import io.mverse.jsonschema.schema
 import lang.json.JsrNull
 import lang.json.jsrNumber
-import lang.json.toJsrValue
 import org.junit.Test
 
 class JsonSchemaValidatorTest {
 
   @Test
   fun validate_WhenValueIsNull_AppliesNullValidators() {
-    val constSchema = JsonSchema.schema {
+    val constSchema = schema {
       constValue = jsrNumber(3.0)
     }
 

@@ -8,9 +8,9 @@ import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.keyword.Keywords
+import io.mverse.jsonschema.schema
 import io.mverse.jsonschema.validation.ValidationErrorHelper.buildKeywordFailure
 import kotlinx.serialization.ImplicitReflectionSerializer
-import kotlinx.serialization.json.json
 import kotlinx.serialization.stringify
 import lang.json.JSON
 import lang.json.jsrObject

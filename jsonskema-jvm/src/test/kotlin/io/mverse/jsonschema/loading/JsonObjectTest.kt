@@ -48,7 +48,7 @@ class JsonObjectTest : BaseLoaderTest("objecttestcases.json") {
   fun childForConsidersIdAttr() {
     val input = testSchemas["remotePointerResolution"] as JsrObject
     val fc = input["properties"]?.asJsonObject()?.getJsonObject("folderChange")!!
-    val sIF = fc.getJsonObject("properties").getJsonObject("schemaInFolder")
+    fc.getJsonObject("properties").getJsonObject("schemaInFolder")
     //Assertion?
   }
 }

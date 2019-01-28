@@ -6,102 +6,32 @@ import lang.collection.SetMultimap
 import lang.json.JsrArray
 import lang.json.JsrValue
 import lang.net.URI
+import kotlin.reflect.KClass
 
-interface Draft3Schema : DraftSchema<Draft3Schema> {
-
-  override val location: SchemaLocation
-
-  // ###################################
-  // #### Meta KEYWORDS ##############
-  // ###################################
-
-  override val schemaURI: URI?
-
-  override val id: URI?
-
-  override val title: String?
-
-  override val description: String?
-
-  // ###################################
-  // #### Shared KEYWORDS ##############
-  // ###################################
-
-  override val types: Set<JsonSchemaType>
+interface Draft3Schema : DraftSchema {
 
   val isAnyType: Boolean
 
   val disallow: Set<JsonSchemaType>
 
-  val extendsSchema: Schema?
+  val extendsSchema: DraftSchema?
 
   val isRequired: Boolean
-
-  override val enumValues: JsrArray?
-
-  override val defaultValue: JsrValue?
-
-  // ###################################
-  // #### String KEYWORDS ##############
-  // ###################################
-
-  override val format: String?
-
-  override val minLength: Int?
-
-  override val maxLength: Int?
-
-  override val pattern: String?
 
   // ###################################
   // #### NUMBER KEYWORDS ##############
   // ###################################
   val divisibleBy: Number?
 
-  override val maximum: Number?
-
-  override val minimum: Number?
-
   val isExclusiveMinimum: Boolean?
 
   val isExclusiveMaximum: Boolean?
 
-  // ###################################
-  // #### ARRAY KEYWORDS  ##############
-  // ###################################
-
-  override val minItems: Int?
-
-  override val maxItems: Int?
-
-  override val allItemSchema: Draft3Schema?
-
-  override val itemSchemas: List<Schema>
-
   val isAllowAdditionalItems: Boolean
-
-  override val additionalItemsSchema: Draft3Schema?
 
   // ###################################
   // #### OBJECT KEYWORDS  ##############
   // ###################################
 
-  override val properties: Map<String, Schema>
-
-  override val patternProperties: Map<String, Schema>
-
   val isAllowAdditionalProperties: Boolean
-
-  override val additionalPropertiesSchema: Draft3Schema?
-
-  override val propertyDependencies: SetMultimap<String, String>
-
-  override val propertySchemaDependencies: Map<String, Schema>
-
-  override val version: JsonSchemaVersion
-    get() = JsonSchemaVersion.Draft3
-
-  override val requiresUniqueItems: Boolean
-
-  override fun asDraft3(): Draft3Schema = this
 }

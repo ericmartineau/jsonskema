@@ -9,6 +9,10 @@ import io.mverse.jsonschema.Draft6Schema
 import io.mverse.jsonschema.Draft7Schema
 import io.mverse.jsonschema.DraftSchema
 import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchema.draft3Schema
+import io.mverse.jsonschema.JsonSchema.draft4Schema
+import io.mverse.jsonschema.JsonSchema.draft6Schema
+import io.mverse.jsonschema.JsonSchema.draft7Schema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.loading.parseJsrObject
@@ -27,7 +31,7 @@ class DraftSchemaTest {
 
   @Test
   @Parameters(method = "testingDraftSchemas")
-  fun <D : DraftSchema<D>> testCommonKeywords(param: TestParam<DraftSchema<D>>) {
+  fun <D : DraftSchema> testCommonKeywords(param: TestParam<DraftSchema>) {
     val schema = param.get()
     assertAll {
       assert(schema.types).isNotNull()
@@ -50,10 +54,10 @@ class DraftSchemaTest {
       assert(schema.propertyDependencies).isNotNull()
       assert(schema.propertySchemaDependencies).isNotNull()
       assert(schema.requiresUniqueItems).isNotNull()
-      assert(schema.findPropertySchema("selfRef")).isNotNull()
-      assert(schema.getPropertySchema("selfRef")).isNotNull()
-      assert(schema.findPatternSchema("^abc.*$")).isNotNull()
-      assert(schema.getPatternSchema("^abc.*$")).isNotNull()
+      assert(schema.properties["selfRef"]).isNotNull()
+      assert(schema.properties.getValue("selfRef")).isNotNull()
+      assert(schema.patternProperties["^abc.*$"]).isNotNull()
+      assert(schema.patternProperties.getValue("^abc.*$")).isNotNull()
     }
   }
 
@@ -359,32 +363,28 @@ class DraftSchemaTest {
     }
   }
 
-  fun testingDraftSchemas(): Array<TestParam<DraftSchema<*>>> {
+  fun testingDraftSchemas(): Array<TestParam<DraftSchema>> {
     val schema = kitchenSinkSchema
     val dogSchemaLocation = "https://storage.googleapis.com/mverse-test/mverse/petStore/0.0.1/schema/dog/jsonschema-draft6.json"
-    return TestParam.builder<DraftSchema<*>>()
-        .addTestParam("draft3", Draft3SchemaImpl(loader, schema))
-        .addTestParam("draft4", Draft4SchemaImpl(loader, schema))
-        .addTestParam("draft6", Draft6SchemaImpl(loader, schema))
-        .addTestParam("draft7", Draft7SchemaImpl(loader, schema))
-        .addTestParam("draft3Ref", Draft3RefSchemaImpl(loader, schema.location, URI(dogSchemaLocation), schema.asDraft3()))
-        .addTestParam("draft4Ref", Draft4RefSchemaImpl(loader, schema.location, URI(dogSchemaLocation), schema.asDraft4()))
-        .addTestParam("draft6Ref", Draft6RefSchemaImpl(loader, schema.location,
-            URI(dogSchemaLocation),
-            schema.asDraft6()))
-        .addTestParam("draft7Ref", Draft7RefSchemaImpl(loader, schema.location,
-            URI(dogSchemaLocation),
-            schema.asDraft7()))
+    return TestParam.builder<DraftSchema>()
+        .addTestParam("draft3", draft3Schema(schema))
+        .addTestParam("draft4", draft4Schema(schema))
+        .addTestParam("draft6", draft6Schema(schema))
+        .addTestParam("draft7", draft7Schema(schema))
+        .addTestParam("draft3Ref", RefSchemaImpl(loader, schema.location, URI(dogSchemaLocation), schema).asDraft3())
+        .addTestParam("draft4Ref", RefSchemaImpl(loader, schema.location, URI(dogSchemaLocation), schema).asDraft4())
+        .addTestParam("draft6Ref", RefSchemaImpl(loader, schema.location, URI(dogSchemaLocation), schema).asDraft6())
+        .addTestParam("draft7Ref", RefSchemaImpl(loader, schema.location, URI(dogSchemaLocation), schema).asDraft7())
         .build()
   }
 
   fun paramsForDraft3Schema(): Array<TestParam<Draft3Schema>> {
     val schema = kitchenSinkSchema
     return TestParam.builder<Draft3Schema>()
-        .addTestParam("draft3Schema", Draft3SchemaImpl(loader, schema))
-        .addTestParam("draft3RefSchema", Draft3RefSchemaImpl(loader, schema.location,
+        .addTestParam("draft3Schema", draft3Schema(schema))
+        .addTestParam("draft3RefSchema", RefSchemaImpl(loader, schema.location,
             dogRefURI,
-            schema.asDraft3()))
+            schema).asDraft3())
         .build()
   }
 
@@ -392,26 +392,30 @@ class DraftSchemaTest {
     val schema = kitchenSinkSchema
 
     return TestParam.builder<Draft4Schema>()
-        .addTestParam("draft4Schema", Draft4SchemaImpl(loader, schema))
-        .addTestParam("draft4RefSchema", Draft4RefSchemaImpl(loader, schema.location,
+        .addTestParam("draft4Schema", draft4Schema(schema))
+        .addTestParam("draft4RefSchema", RefSchemaImpl(loader, schema.location,
             dogRefURI,
-            schema.asDraft4()))
+            schema).asDraft4())
         .build()
   }
 
   fun paramsForDraft6Schema(): Array<TestParam<Draft6Schema>> {
     val schema = kitchenSinkSchema
     return TestParam.builder<Draft6Schema>()
-        .addTestParam("draft6Schema", Draft6SchemaImpl(loader, schema))
-        .addTestParam("draft6RefSchema", Draft6RefSchemaImpl(loader, schema.location, dogRefURI, schema.asDraft6()))
+        .addTestParam("draft6Schema", draft6Schema(schema))
+        .addTestParam("draft6RefSchema", RefSchemaImpl(loader, schema.location,
+            dogRefURI,
+            schema).asDraft6())
         .build()
   }
 
   fun paramsForDraft7Schema(): Array<TestParam<Draft7Schema>> {
     val schema = kitchenSinkSchema
     return TestParam.builder<Draft7Schema>()
-        .addTestParam("draft7Schema", Draft7SchemaImpl(loader, schema))
-        .addTestParam("draft7RefSchema", Draft7RefSchemaImpl(loader, schema.location, dogRefURI, schema.asDraft7()))
+        .addTestParam("draft7Schema", draft7Schema(schema))
+        .addTestParam("draft7RefSchema", RefSchemaImpl(loader, schema.location,
+            dogRefURI,
+            schema).asDraft7())
         .build()
   }
 

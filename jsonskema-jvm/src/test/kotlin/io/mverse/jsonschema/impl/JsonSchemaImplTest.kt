@@ -2,10 +2,10 @@ package io.mverse.jsonschema.impl
 
 import assertk.Assert
 import assertk.assert
-import assertk.assertAll
 import assertk.assertions.hasToString
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
+import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import io.mverse.jsonschema.Draft3Schema
@@ -17,11 +17,11 @@ import io.mverse.jsonschema.MergeReport
 import io.mverse.jsonschema.assertj.asserts.isEqualIgnoringWhitespace
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.enums.JsonSchemaType.STRING
-import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft7
 import io.mverse.jsonschema.keyword.DollarSchemaKeyword.Companion.emptyUri
 import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
 import io.mverse.jsonschema.keyword.Keywords.SCHEMA
 import io.mverse.jsonschema.schema
+import io.mverse.jsonschema.schemaBuilder
 import lang.json.JsonPath
 import lang.json.JsrTrue
 import lang.json.jsrString
@@ -32,7 +32,7 @@ class JsonSchemaImplTest {
 
   @Test
   fun testWithIdDraft7() {
-    val theSchema = JsonSchema.schema("https://www.schema.org/foo")
+    val theSchema = JsonSchema.schema(id = "https://www.schema.org/foo")
     assert(theSchema.id).hasToString("https://www.schema.org/foo")
     val newURI = URI("https://google.com/hosted/foo/blah")
     val withId = theSchema.withId(newURI)
@@ -41,76 +41,76 @@ class JsonSchemaImplTest {
 
   @Test
   fun testWithIdDraft6() {
-    val theSchema: Draft6Schema = JsonSchema.schema("https://www.schema.org/foo").asDraft6()
+    val theSchema: Draft6Schema = JsonSchema.schema(id = "https://www.schema.org/foo").asDraft6()
     assert(theSchema.id).hasToString("https://www.schema.org/foo")
     val newURI = URI("https://google.com/hosted/foo/blah")
-    val withId = theSchema.withId(newURI).asDraft6()
+    val withId = theSchema.schema.withId(newURI).asDraft6()
     assert(withId.id).isEqualTo(newURI)
   }
 
   @Test
   fun testWithIdDraft4() {
-    val theSchema: Draft4Schema = JsonSchema.schema("https://www.schema.org/foo").asDraft4()
+    val theSchema: Draft4Schema = JsonSchema.schema(id = "https://www.schema.org/foo").asDraft4()
     assert(theSchema.id).hasToString("https://www.schema.org/foo")
     val newURI = URI("https://google.com/hosted/foo/blah")
-    val withId = theSchema.withId(newURI).asDraft4()
+    val withId = theSchema.schema.withId(newURI).asDraft4()
     assert(withId.id).isEqualTo(newURI)
   }
 
   @Test
   fun testWithIdDraft3() {
-    val theSchema: Draft3Schema = JsonSchema.schema("https://www.schema.org/foo").asDraft3()
+    val theSchema: Draft3Schema = JsonSchema.schema(id = "https://www.schema.org/foo").asDraft3()
     assert(theSchema.id).hasToString("https://www.schema.org/foo")
     val newURI = URI("https://google.com/hosted/foo/blah")
-    val withId = theSchema.withId(newURI).asDraft3()
+    val withId = theSchema.schema.withId(newURI).asDraft3()
     assert(withId.id).isEqualTo(newURI)
   }
 
   @Test
   fun testToStringExtraProperties() {
-    val schema = JsonSchema.schema {
+    val schema = schema {
       extraProperties["bobTheBuilder"] = JsrTrue
 
-      properties["childSchema"] = schemaBuilder {
+      properties["childSchema"] = {
         extraProperties["bobsType"] = jsrString("Chainsaw Murderer")
 
-        properties["grandchildSchema"] = schemaBuilder {
+        properties["grandchildSchema"] = {
           extraProperties["theNestStatus"] = jsrString("FULL")
         }
       }
     }
 
-    val schemaString = schema.toString(includeExtraProperties = true, version = Draft7)
+    val schemaString = schema.asDraft7().toString(includeExtraProperties = true)
     assert(schemaString).isEqualTo("{\"properties\":{\"childSchema\":{\"properties\":{\"grandchildSchema\":{\"theNestStatus\":\"FULL\"}},\"bobsType\":\"Chainsaw Murderer\"}},\"bobTheBuilder\":true}")
   }
 
   @Test
   fun testToStringNoExtraProperties() {
-    val schema = JsonSchema.schema {
+    val schema = schema {
       extraProperties["bobTheBuilder"] = JsrTrue
 
-      properties["childSchema"] = schemaBuilder {
+      properties["childSchema"] = {
         extraProperties["bobsType"] = jsrString("Chainsaw Murderer")
 
-        properties["grandchildSchema"] = schemaBuilder {
+        properties["grandchildSchema"] = {
           extraProperties["theNestStatus"] = jsrString("FULL")
         }
       }
     }
 
-    val schemaString = schema.toString(includeExtraProperties = false, version = Draft7)
+    val schemaString = schema.asDraft7().toString(includeExtraProperties = false)
     assert(schemaString).isEqualTo("{\"properties\":{\"childSchema\":{\"properties\":{\"grandchildSchema\":{}}}}}")
   }
 
   @Test
   fun testToStringFieldOrder() {
-    val schema = JsonSchema.schema("https://something.com/field-order") {
+    val schema = JsonSchema.schema(id = "https://something.com/field-order") {
       extraProperties["bobTheBuilder"] = JsrTrue
 
-      properties["childSchema"] = schemaBuilder {
+      properties["childSchema"] = {
         extraProperties["bobsType"] = jsrString("Chainsaw Murderer")
 
-        properties["grandchildSchema"] = schemaBuilder {
+        properties["grandchildSchema"] = {
           extraProperties["theNestStatus"] = jsrString("FULL")
         }
       }
@@ -118,7 +118,7 @@ class JsonSchemaImplTest {
       isUseSchemaKeyword = true
     }
 
-    val schemaString = schema.toString(includeExtraProperties = false, version = Draft7, indent = true)
+    val schemaString = schema.asDraft7().toString(includeExtraProperties = false, indent = true)
     assert(schemaString.trim()).isEqualIgnoringWhitespace("{\n" +
         "    \"\$schema\": \"http://json-schema.org/draft-07/schema#\",\n" +
         "    \"\$id\": \"https://something.com/field-order\",\n" +
@@ -135,21 +135,21 @@ class JsonSchemaImplTest {
 
   @Test
   fun testToStringCustomSchema() {
-    val schema = JsonSchema.schema("https://something.com/custom-metaschema") {
+    val schema = JsonSchema.schema(id = "https://something.com/custom-metaschema") {
       metaSchema = URI("http://custom-meta-schema.com")
 
       extraProperties["bobTheBuilder"] = JsrTrue
-      properties["childSchema"] = schemaBuilder {
+      properties["childSchema"] = {
         extraProperties["bobsType"] = jsrString("Chainsaw Murderer")
 
-        properties["grandchildSchema"] = schemaBuilder {
+        properties["grandchildSchema"] = {
           extraProperties["theNestStatus"] to jsrString("FULL")
         }
       }
       isUseSchemaKeyword = true
     }
 
-    val schemaString = schema.toString(includeExtraProperties = false, version = Draft7, indent = true)
+    val schemaString = schema.asDraft7().toString(includeExtraProperties = false, indent = true)
     assert(schemaString.trim()).isEqualIgnoringWhitespace("{\n" +
         "    \"\$schema\": \"http://custom-meta-schema.com\",\n" +
         "    \"\$id\": \"https://something.com/custom-metaschema\",\n" +
@@ -197,7 +197,7 @@ class JsonSchemaImplTest {
         "}"
     val readSchema = JsonSchema.createSchemaReader().readSchema(schema).asDraft7()
     assert(readSchema.keywords.containsKey(SCHEMA)).isTrue()
-    assert(readSchema.keywords.get(SCHEMA)!!.value).isEqualTo(emptyUri)
+    assert(readSchema.keywords.getValue(SCHEMA).value).isEqualTo(emptyUri)
   }
 
   @Test fun testLoadStandardMetaSchemaNoFragment() {
@@ -219,55 +219,63 @@ class JsonSchemaImplTest {
   }
 
   @Test fun testMergeSchemas() {
-    val schemaA = JsonSchema.schema(URI("https://nba.com")) {
+    val schemaA = JsonSchema.schema(id = URI("http://schemas/schemaA")) {
       isUseSchemaKeyword = true
-      "name" required schemaBuilder {
-        minLength = 1
-        oneOfSchemas += schemaBuilder {
-          type = STRING
-          pattern = "^[A-Z]*$"
-        }
+      properties {
+        "name" required {
+          minLength = 1
+          oneOf {
+            type = STRING
+            pattern = "^[A-Z]*$"
+          }
 
-        oneOfSchemas += schemaBuilder {
-          type = STRING
-          pattern = "^[a-z]*$"
+          oneOf {
+            type = STRING
+            pattern = "^[a-z]*$"
+          }
+        }
+        "age" required string
+        "address" required {
+          properties {
+            "street1" required string {
+              minLength = 10
+            }
+            "number" required number {
+              exclusiveMaximum = 10
+            }
+            "const" required string {
+              const = "10"
+            }
+          }
         }
       }
-      "age" required string
-      "address" required schemaBuilder {
-        "street1" required string {
-          minLength = 10
-        }
-        "number" required number {
-          exclusiveMaximum = 10
-        }
-        "const" required string {
-          const = "10"
-        }
-      }
-    }.asDraft6()
+    }
 
-    val schemaB = JsonSchema.schema("https://foo.com") {
-      "name" optional string {
-        minLength = 3
+    val schemaB = JsonSchema.schema(id = "http://schemas/schemaB") {
+      properties {
+        "name" optional string {
+          minLength = 3
 
-        oneOfSchemas += schemaBuilder {
-          type = STRING
-          const = "R2D2"
+          oneOfSchemas += schemaBuilder {
+            type = STRING
+            const = "R2D2"
+          }
+          oneOfSchemas += schemaBuilder {
+            type = STRING
+            pattern = "^[A-Za-z]$"
+          }
         }
-        oneOfSchemas += schemaBuilder {
-          type = STRING
-          pattern = "^[A-Za-z]$"
+        "age" optional number {
+          minimum = 1
         }
-      }
-      "age" optional number {
-        minimum = 1
-      }
-      "address" required schemaBuilder {
-        "street1" required string
-        "street2" optional string
-        "state" optional string {
-          maxLength = 2
+        "address" required {
+          properties {
+            "street1" required string
+            "street2" optional string
+            "state" optional string {
+              maxLength = 2
+            }
+          }
         }
       }
     }
@@ -275,23 +283,23 @@ class JsonSchemaImplTest {
     val mergeReport = MergeReport()
     val mergedSchema = schemaA.merge(JsonPath.rootPath, schemaB, mergeReport)
 
-    assertAll {
-      val restricted = mergeReport.actions.firstOrNull {
-        it.keyword == SCHEMA || it.keyword== DOLLAR_ID
-      }
-      assert(restricted, "restricted keyword").isNull()
-      assert(mergeReport.isConflict).isTrue()
-      assert(mergeReport)
-          .contains(MergeActionType.CONFLICT, "/properties/name/minLength")
-          .contains(MergeActionType.MERGE, "/required")
-          .contains(MergeActionType.MERGE, "/properties/name/oneOf")
-          .contains(MergeActionType.ADD, "/properties/address/properties/street2")
-          .contains(MergeActionType.ADD, "/properties/age/minimum")
-          .contains(MergeActionType.MERGE, "/properties/address/required")
-          .contains(MergeActionType.MERGE, "/properties/age/type")
+    assert(mergedSchema.absoluteURI, "Merged schema URI").isNotEqualTo(schemaA.absoluteURI)
+    assert(mergedSchema.absoluteURI, "Merged schema uri").isNotEqualTo(schemaB.absoluteURI)
+
+    val restricted = mergeReport.actions.firstOrNull {
+      it.keyword == SCHEMA || it.keyword == DOLLAR_ID
     }
 
-    val mergedSchemaString = mergedSchema.toString(Draft7, includeExtraProperties = true, indent = true)
+    assert(restricted, "restricted keyword").isNull()
+    assert(mergeReport.isConflict).isTrue()
+    assert(mergeReport)
+        .contains(MergeActionType.CONFLICT, "/properties/name/minLength")
+        .contains(MergeActionType.MERGE, "/required")
+        .contains(MergeActionType.MERGE, "/properties/name/oneOf")
+        .contains(MergeActionType.ADD, "/properties/address/properties/street2")
+        .contains(MergeActionType.ADD, "/properties/age/minimum")
+        .contains(MergeActionType.MERGE, "/properties/address/required")
+        .contains(MergeActionType.MERGE, "/properties/age/type")
   }
 
   fun Assert<MergeReport>.contains(type: MergeActionType, path: String): Assert<MergeReport> {

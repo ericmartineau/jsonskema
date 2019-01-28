@@ -2,7 +2,7 @@ package io.mverse.jsonschema.validation
 
 import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.JsonSchema.schema
-import io.mverse.jsonschema.JsonSchema.schemaBuilder
+import io.mverse.jsonschema.schema
 import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.ValidationMocks.createTestValidator
 import io.mverse.jsonschema.validation.ValidationMocks.mockBooleanSchema
@@ -24,7 +24,7 @@ class BaseSchemaValidatorNotSchemaTest {
 
   @Test
   fun success() {
-    val schemaWithNot = JsonSchema.schemaBuilder { notSchema = mockBooleanSchema }
+    val schemaWithNot = schemaBuilder { notSchema = mockBooleanSchema }
     expectSuccess { ValidationMocks.createTestValidator(schemaWithNot).validate("foo".toJsrValue()) }
   }
 }

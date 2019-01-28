@@ -18,10 +18,11 @@ package io.mverse.jsonschema.validation
 import assertk.assert
 import assertk.assertions.hasToString
 import io.mverse.jsonschema.JsonSchema
-import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.resourceLoader
 import io.mverse.jsonschema.createSchemaReader
+import io.mverse.jsonschema.impl.RefSchemaImpl
 import io.mverse.jsonschema.loading.parseJsrObject
+import io.mverse.jsonschema.schema
 import lang.json.JsonKey
 import lang.json.getOrNull
 import lang.net.URI
@@ -43,7 +44,7 @@ class RefSchemaEqualsTest {
 
   @Test
   fun toStringTest_Builder() {
-    val schema = JsonSchema.schema {
+    val schema = schema {
       properties["foo"] = {
         ref = URI("#")
       }
@@ -53,7 +54,7 @@ class RefSchemaEqualsTest {
 
   @Test
   fun equalsTest() {
-    EqualsVerifier.forClass(RefSchema::class.java)
+    EqualsVerifier.forClass(RefSchemaImpl::class.java)
         .withOnlyTheseFields("refURI")
         .suppress(Warning.STRICT_INHERITANCE)
         .verify()

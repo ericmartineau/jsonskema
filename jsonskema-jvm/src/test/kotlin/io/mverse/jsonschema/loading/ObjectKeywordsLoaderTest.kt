@@ -5,9 +5,9 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import io.mverse.jsonschema.JsonSchema
-import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaException
 import io.mverse.jsonschema.enums.JsonSchemaType
+import io.mverse.jsonschema.schema
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
@@ -21,9 +21,9 @@ class ObjectKeywordsLoaderTest : BaseLoaderTest("objecttestschemas.json") {
     val actual = getSchemaForKey("objectSchema")
 
     val propertySchemas = actual.properties
-    assertThat<String, Schema>(propertySchemas).isNotNull()
-    assertThat<String, Schema>(propertySchemas).hasSize(2)
-    val boolProp = actual.getPropertySchema("boolProp")
+    assertThat(propertySchemas).isNotNull
+    assertThat(propertySchemas).hasSize(2)
+    val boolProp = actual.properties["boolProp"]
     assert(boolProp).isNotNull()
 
     assertThat<String>(actual.requiredProperties).hasSize(2)
@@ -56,14 +56,14 @@ class ObjectKeywordsLoaderTest : BaseLoaderTest("objecttestschemas.json") {
   @Test
   fun objectWithSchemaDep() {
     val actual = getSchemaForKey("objectWithSchemaDep")
-    assertThat<String, Schema>(actual.propertySchemaDependencies).hasSize(1)
+    assert(actual.propertySchemaDependencies).hasSize(1)
   }
 
   @Test
   fun patternProperties() {
     val actual = getSchemaForKey("patternProperties")
     assert(actual).isNotNull()
-    assertThat<String, Schema>(actual.patternProperties).hasSize(2)
+    assert(actual.patternProperties).hasSize(2)
   }
 
   @Test(expected = SchemaException::class)
@@ -77,7 +77,7 @@ class ObjectKeywordsLoaderTest : BaseLoaderTest("objecttestschemas.json") {
   }
 
   companion object {
-    val BOOLEAN_SCHEMA = JsonSchema.schema {
+    val BOOLEAN_SCHEMA = schema {
       type = JsonSchemaType.BOOLEAN
     }
   }

@@ -11,14 +11,14 @@ import io.mverse.jsonschema.assertj.asserts.isValid
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.keyword.Keywords.ADDITIONAL_PROPERTIES
-import kotlinx.serialization.json.json
+import io.mverse.jsonschema.schema
 import lang.json.jsrObject
 import kotlin.test.Test
 
 class AdditionalPropertiesValidatorTest {
   @Test
   fun testValidationFailureMessage() {
-    val nameOnly = JsonSchema.schema {
+    val nameOnly = schema {
       type = JsonSchemaType.OBJECT
       properties["name"] = {
         type = JsonSchemaType.STRING

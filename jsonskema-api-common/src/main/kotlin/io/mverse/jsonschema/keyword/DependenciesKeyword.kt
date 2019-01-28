@@ -2,6 +2,7 @@ package io.mverse.jsonschema.keyword
 
 import io.mverse.jsonschema.MergeReport
 import io.mverse.jsonschema.Schema
+import io.mverse.jsonschema.asVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import lang.collection.Multimaps
 import lang.collection.MutableSetMultimap
@@ -31,7 +32,7 @@ data class DependenciesKeyword(val dependencySchemas: SchemaMapKeyword = SchemaM
         }
 
         dependencySchemas.value.forEach { (key, schema) ->
-          key *= schema.asVersion(version).toJson()
+          key *= schema.asVersion(version).toJson(includeExtraProperties = true)
         }
       }
     }

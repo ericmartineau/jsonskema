@@ -6,8 +6,10 @@ import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
+import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
+import kotlinx.serialization.context.MutableSerialContext
 import lang.Name
 import lang.collection.SetMultimap
 import lang.json.JsonPath
@@ -16,6 +18,7 @@ import lang.json.JsrObject
 import lang.json.JsrValue
 import lang.net.URI
 
+@Deprecated("Use MutableSchema", replaceWith = ReplaceWith("MutableSchema"))
 typealias SchemaBuilder = MutableSchema
 
 interface MutableSchema {
@@ -27,7 +30,10 @@ interface MutableSchema {
   @Name("id")
   val id: URI?
 
+  var parent: Schema?
+
   var metaSchema: URI?
+  val location: SchemaLocation
 
   @Name("ref")
   var ref: Any?
@@ -69,9 +75,9 @@ interface MutableSchema {
   // ##################################################################
 
   var schemaOfAdditionalProperties: MutableSchema?
-  var schemaDependencies: Map<String, SchemaBuilder>
+  var schemaDependencies: MutableSchemaDependencies
   var propertyDependencies: SetMultimap<String, String>
-  var properties: MutableSchemaMap
+  var properties: MutableProperties
 
   var propertyNameSchema: MutableSchema?
   var patternProperties: MutableSchemaMap
@@ -122,6 +128,17 @@ interface MutableSchema {
 
   operator fun invoke(block: MutableSchema.() -> Unit): MutableSchema
 
+  fun oneOf(block: MutableSchema.()->Unit)
+  fun allOf(block: MutableSchema.()->Unit)
+  fun anyOf(block: MutableSchema.()->Unit)
+  fun allItemsSchema(block: MutableSchema.() -> Unit)
+  fun containsSchema(block: MutableSchema.() -> Unit)
+  fun ifSchema(block: MutableSchema.() -> Unit)
+  fun notSchema(block: MutableSchema.() -> Unit)
+  fun thenSchema(block: MutableSchema.() -> Unit)
+  fun elseSchema(block: MutableSchema.() -> Unit)
+  fun schemaOfAdditionalProperties(block: MutableSchema.() -> Unit)
+
   // ##################################################################
   // ########           INNER KEYWORDS                   ##############
   // ##################################################################
@@ -141,10 +158,19 @@ interface MutableSchema {
   operator fun <X, K : Keyword<X>> get(keyword: KeywordInfo<K>): K?
   fun buildSubSchema(toBuild: MutableSchema, keyword: KeywordInfo<*>, path: String, vararg paths: String): Schema
 
+  fun subSchemaBuilder(keyword: KeywordInfo<*>, vararg child:String): MutableSchema
+
+
   @Name("build")
   fun build(): Schema
 
   operator fun contains(keyword: KeywordInfo<*>): Boolean
+
   fun merge(path: JsonPath, other: Schema, report: MergeReport)
   operator fun plusAssign(other: Schema) = merge(JsonPath.rootPath, other, MergeReport())
+
+  /**
+   * Returns a copy of this schema with the specified locatiion
+   */
+  fun withLocation(location: SchemaLocation): MutableSchema
 }
