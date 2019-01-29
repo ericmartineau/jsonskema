@@ -15,7 +15,7 @@
  */
 package io.mverse.jsonschema.validation
 
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.loading.parseJsrObject
 import io.mverse.jsonschema.minus
@@ -119,16 +119,16 @@ class StringSchemaTest {
 
   @Test
   fun toStringNoExplicitType() {
-    val rawSchemaJson = JsonSchema.resourceLoader().readJsonObject("tostring/stringschema.json") - "type"
-    val schema = JsonSchema.createSchemaReader().readSchema(rawSchemaJson)
-    val actual = JsonSchema.createSchemaReader().readSchema(schema.toString()).toString()
+    val rawSchemaJson = JsonSchemas.resourceLoader().readJsonObject("tostring/stringschema.json") - "type"
+    val schema = JsonSchemas.createSchemaReader().readSchema(rawSchemaJson)
+    val actual = JsonSchemas.createSchemaReader().readSchema(schema.toString()).toString()
     assertEquals(rawSchemaJson, actual.parseJsrObject())
   }
 
   @Test
   fun toStringTest() {
-    val rawSchemaJson = JsonSchema.resourceLoader().readJsonObject("tostring/stringschema.json")
-    val actual = JsonSchema.createSchemaReader().readSchema(rawSchemaJson).toString()
+    val rawSchemaJson = JsonSchemas.resourceLoader().readJsonObject("tostring/stringschema.json")
+    val actual = JsonSchemas.createSchemaReader().readSchema(rawSchemaJson).toString()
     assertEquals(rawSchemaJson, actual.parseJsrObject())
   }
 

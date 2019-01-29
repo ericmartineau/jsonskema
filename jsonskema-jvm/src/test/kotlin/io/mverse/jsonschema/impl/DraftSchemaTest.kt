@@ -7,12 +7,12 @@ import io.mverse.jsonschema.Draft3Schema
 import io.mverse.jsonschema.Draft4Schema
 import io.mverse.jsonschema.Draft6Schema
 import io.mverse.jsonschema.Draft7Schema
-import io.mverse.jsonschema.DraftSchema
-import io.mverse.jsonschema.JsonSchema
-import io.mverse.jsonschema.JsonSchema.draft3Schema
-import io.mverse.jsonschema.JsonSchema.draft4Schema
-import io.mverse.jsonschema.JsonSchema.draft6Schema
-import io.mverse.jsonschema.JsonSchema.draft7Schema
+import io.mverse.jsonschema.AllKeywords
+import io.mverse.jsonschema.JsonSchemas
+import io.mverse.jsonschema.JsonSchemas.draft3Schema
+import io.mverse.jsonschema.JsonSchemas.draft4Schema
+import io.mverse.jsonschema.JsonSchemas.draft6Schema
+import io.mverse.jsonschema.JsonSchemas.draft7Schema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.loading.parseJsrObject
@@ -31,7 +31,7 @@ class DraftSchemaTest {
 
   @Test
   @Parameters(method = "testingDraftSchemas")
-  fun <D : DraftSchema> testCommonKeywords(param: TestParam<DraftSchema>) {
+  fun <D : AllKeywords> testCommonKeywords(param: TestParam<AllKeywords>) {
     val schema = param.get()
     assertAll {
       assert(schema.types).isNotNull()
@@ -72,7 +72,7 @@ class DraftSchemaTest {
       // ###################################
 
       assert(schema.location).isNotNull()
-      assert(schema.schemaURI).isNotNull()
+      assert(schema.metaSchemaURI).isNotNull()
       assert(schema.id).isNotNull()
       assert(schema.title).isNotNull()
       assert(schema.description).isNotNull()
@@ -144,7 +144,7 @@ class DraftSchemaTest {
       // ###################################
 
       assert(schema.location).isNotNull()
-      assert(schema.schemaURI).isNotNull()
+      assert(schema.metaSchemaURI).isNotNull()
       assert(schema.id).isNotNull()
       assert(schema.title).isNotNull()
       assert(schema.description).isNotNull()
@@ -207,7 +207,7 @@ class DraftSchemaTest {
       // #### Meta KEYWORDS ##############
       // ###################################
 
-      assert(schema.schemaURI).isNotNull()
+      assert(schema.metaSchemaURI).isNotNull()
       assert(schema.id).isNotNull()
       assert(schema.title).isNotNull()
       assert(schema.description).isNotNull()
@@ -284,7 +284,7 @@ class DraftSchemaTest {
       // #### Meta KEYWORDS ##############
       // ###################################
 
-      assert(schema.schemaURI).isNotNull()
+      assert(schema.metaSchemaURI).isNotNull()
       assert(schema.id).isNotNull()
       assert(schema.title).isNotNull()
       assert(schema.description).isNotNull()
@@ -363,18 +363,18 @@ class DraftSchemaTest {
     }
   }
 
-  fun testingDraftSchemas(): Array<TestParam<DraftSchema>> {
+  fun testingDraftSchemas(): Array<TestParam<Schema>> {
     val schema = kitchenSinkSchema
     val dogSchemaLocation = "https://storage.googleapis.com/mverse-test/mverse/petStore/0.0.1/schema/dog/jsonschema-draft6.json"
-    return TestParam.builder<DraftSchema>()
+    return TestParam.builder<Schema>()
         .addTestParam("draft3", draft3Schema(schema))
         .addTestParam("draft4", draft4Schema(schema))
         .addTestParam("draft6", draft6Schema(schema))
         .addTestParam("draft7", draft7Schema(schema))
-        .addTestParam("draft3Ref", RefSchemaImpl(loader, schema.location, URI(dogSchemaLocation), schema).asDraft3())
-        .addTestParam("draft4Ref", RefSchemaImpl(loader, schema.location, URI(dogSchemaLocation), schema).asDraft4())
-        .addTestParam("draft6Ref", RefSchemaImpl(loader, schema.location, URI(dogSchemaLocation), schema).asDraft6())
-        .addTestParam("draft7Ref", RefSchemaImpl(loader, schema.location, URI(dogSchemaLocation), schema).asDraft7())
+        .addTestParam("draft3Ref", RefJsonSchema(loader, schema.location, URI(dogSchemaLocation), schema).asDraft3())
+        .addTestParam("draft4Ref", RefJsonSchema(loader, schema.location, URI(dogSchemaLocation), schema).asDraft4())
+        .addTestParam("draft6Ref", RefJsonSchema(loader, schema.location, URI(dogSchemaLocation), schema).asDraft6())
+        .addTestParam("draft7Ref", RefJsonSchema(loader, schema.location, URI(dogSchemaLocation), schema).asDraft7())
         .build()
   }
 
@@ -382,7 +382,7 @@ class DraftSchemaTest {
     val schema = kitchenSinkSchema
     return TestParam.builder<Draft3Schema>()
         .addTestParam("draft3Schema", draft3Schema(schema))
-        .addTestParam("draft3RefSchema", RefSchemaImpl(loader, schema.location,
+        .addTestParam("draft3RefSchema", RefJsonSchema(loader, schema.location,
             dogRefURI,
             schema).asDraft3())
         .build()
@@ -393,7 +393,7 @@ class DraftSchemaTest {
 
     return TestParam.builder<Draft4Schema>()
         .addTestParam("draft4Schema", draft4Schema(schema))
-        .addTestParam("draft4RefSchema", RefSchemaImpl(loader, schema.location,
+        .addTestParam("draft4RefSchema", RefJsonSchema(loader, schema.location,
             dogRefURI,
             schema).asDraft4())
         .build()
@@ -403,7 +403,7 @@ class DraftSchemaTest {
     val schema = kitchenSinkSchema
     return TestParam.builder<Draft6Schema>()
         .addTestParam("draft6Schema", draft6Schema(schema))
-        .addTestParam("draft6RefSchema", RefSchemaImpl(loader, schema.location,
+        .addTestParam("draft6RefSchema", RefJsonSchema(loader, schema.location,
             dogRefURI,
             schema).asDraft6())
         .build()
@@ -413,7 +413,7 @@ class DraftSchemaTest {
     val schema = kitchenSinkSchema
     return TestParam.builder<Draft7Schema>()
         .addTestParam("draft7Schema", draft7Schema(schema))
-        .addTestParam("draft7RefSchema", RefSchemaImpl(loader, schema.location,
+        .addTestParam("draft7RefSchema", RefJsonSchema(loader, schema.location,
             dogRefURI,
             schema).asDraft7())
         .build()
@@ -421,7 +421,7 @@ class DraftSchemaTest {
 
   companion object {
 
-    private val schemaReader = JsonSchema.createSchemaReader()
+    private val schemaReader = JsonSchemas.createSchemaReader()
     private val loader = schemaReader.loader
     private var kitchenSinkSchema: Schema
 

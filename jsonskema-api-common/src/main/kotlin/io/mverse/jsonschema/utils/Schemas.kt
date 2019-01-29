@@ -1,20 +1,21 @@
 package io.mverse.jsonschema.utils
 
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.enums.JsonSchemaType
 import lang.uuid.randomUUID
 
 object Schemas {
-  val nullSchema: Schema = JsonSchema.schemaBuilder(SchemaPaths.fromNonSchemaSource(randomUUID())) {
+  val nullSchema: Schema = JsonSchemas.schema(randomLocation(), JsonSchemas.schemaLoader) {
     type = JsonSchemaType.NULL
-  }.build()
-  val emptySchema: Schema = JsonSchema.schemaBuilder(SchemaPaths.fromNonSchemaSource(randomUUID())).build()
+  }
 
-  val falseSchema: Schema = JsonSchema.schemaBuilder(SchemaPaths.fromNonSchemaSource(randomUUID())) {
+  val emptySchema: Schema = JsonSchemas.schema(randomLocation(), JsonSchemas.schemaLoader)
+
+  val falseSchema: Schema = JsonSchemas.schema(randomLocation(), JsonSchemas.schemaLoader) {
     notSchema { }
-  }.build()
+  }
 
   fun nullSchemaBuilder(): MutableSchema {
     return nullSchema.toMutableSchema()
@@ -23,6 +24,8 @@ object Schemas {
   fun falseSchemaBuilder(): MutableSchema {
     return falseSchema.toMutableSchema()
   }
+
+  fun randomLocation() = SchemaPaths.fromNonSchemaSource(randomUUID())
 }
 
 val Schema.isNullSchema: Boolean get() = this == Schemas.nullSchema

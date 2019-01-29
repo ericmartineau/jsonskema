@@ -23,7 +23,10 @@ data class ArrayPerItemValidator(override val schema: Schema,
           valid = indexedValidators[idx].validate(item, parentReport)
           success = success && valid
         }
-        additionalItemValidator != null -> valid = additionalItemValidator.validate(item, parentReport)
+        additionalItemValidator != null -> {
+          val additionalItemsValid = additionalItemValidator.validate(item, parentReport)
+          valid = additionalItemsValid
+        }
         else -> valid = true
       }
       success = success && valid

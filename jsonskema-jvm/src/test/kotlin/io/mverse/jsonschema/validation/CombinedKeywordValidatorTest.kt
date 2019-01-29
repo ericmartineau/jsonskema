@@ -15,7 +15,7 @@
  */
 package io.mverse.jsonschema.validation
 
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.assertj.asserts.hasKeyword
 import io.mverse.jsonschema.assertj.asserts.hasViolationCount
 import io.mverse.jsonschema.assertj.asserts.isNotValid
@@ -34,7 +34,7 @@ class CombinedKeywordValidatorTest {
 
   @Test
   fun reportCauses() {
-    val parentSchema = JsonSchema.schema {
+    val parentSchema = JsonSchemas.schema {
       allOfSchemas = SUBSCHEMAS
     }
     val subject = "24".parseJsrJson()
@@ -46,21 +46,21 @@ class CombinedKeywordValidatorTest {
 
   @Test
   fun validateAll() {
-    JsonSchema.schema { allOfSchemas = SUBSCHEMAS }
+    JsonSchemas.schema { allOfSchemas = SUBSCHEMAS }
         .validating(20.toJsrValue())
         .hasKeyword(ALL_OF)
   }
 
   @Test
   fun validateAny() {
-    JsonSchema.schema { anyOfSchemas = SUBSCHEMAS }
+    JsonSchemas.schema { anyOfSchemas = SUBSCHEMAS }
         .validating(5.toJsrValue())
         .hasKeyword(ANY_OF)
   }
 
   @Test
   fun validateOne() {
-    JsonSchema.schema { oneOfSchemas = SUBSCHEMAS }
+    JsonSchemas.schema { oneOfSchemas = SUBSCHEMAS }
         .validating(30.toJsrValue())
         .hasKeyword(ONE_OF)
   }

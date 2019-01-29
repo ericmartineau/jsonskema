@@ -4,7 +4,6 @@ import assertk.assert
 import assertk.assertions.containsAll
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
-import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.assertj.asserts.asserting
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.schema
@@ -18,7 +17,7 @@ class ArrayKeywordsLoaderTest : BaseLoaderTest("arraytestschemas.json") {
   @Test
   fun arrayByAdditionalItems() {
     val actual = getSchemaForKey("arrayByAdditionalItems")
-    assert(actual.additionalItemsSchema?.types).isNotNull {
+    assert(actual.additionalItemsSchema?.asDraft7()?.types).isNotNull {
       it.containsAll(JsonSchemaType.NULL)
     }
   }

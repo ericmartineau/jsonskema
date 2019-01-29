@@ -25,7 +25,7 @@ fun recurseProperties(draftSchema: Draft7Schema, currentPath: String, isRequired
     processed += currentPath
 
     // If this property is a deterministic primitive, add it
-    val calculateType = draftSchema.schema.calculateJsonSchemaType()
+    val calculateType = draftSchema.calculateJsonSchemaType()
     if (calculateType != null && calculateType != JsonSchemaType.OBJECT && calculateType != JsonSchemaType.ARRAY &&
         calculateType != JsonSchemaType.NULL) {
       holder[currentPath] = draftSchema with isRequired
@@ -59,7 +59,8 @@ fun recurseProperties(draftSchema: Draft7Schema, currentPath: String, isRequired
       }
 
       draftSchema.allItemSchema?.run {
-        recurseProperties(this.asDraft7(), currentPath, isRequired && this.minItems ?: 0 > 0, holder, processed)
+        val d7 = this.asDraft7()
+        recurseProperties(d7, currentPath, isRequired && d7.minItems ?: 0 > 0, holder, processed)
       }
     }
   }

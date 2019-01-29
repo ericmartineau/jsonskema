@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.loading
 
 import io.mverse.jsonschema.JsonValueWithPath
+import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaException
 import io.mverse.jsonschema.SchemaLocation
@@ -63,7 +64,19 @@ data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoa
       return cachedSchema
     }
 
-    val document = currentDocument ?: schemaLoader.findLoadedSchema(documentURI)?.toJson(Draft7)
+    // Attempt to load a subschema (aka definitions)
+    val fragment = absoluteReferenceURI.fragment
+    if (fragment != null && fragment.isNotBlank()) {
+      val cachedDocumentSchema = schemaLoader.findLoadedSchema(absoluteReferenceURI.withoutFragment())
+      if (cachedDocumentSchema != null && cachedDocumentSchema !is RefSchema) {
+        val pathFromFragment = JsonPath.fromURI("#$fragment")
+        val found = cachedDocumentSchema[pathFromFragment]
+        schemaLoader += found
+        return found
+      }
+    }
+
+    val document = currentDocument ?: schemaLoader.findLoadedSchema(documentURI)?.asDraft7()?.toJson(true)
     val schemaBuilder = findRefInDocument(documentURI, absoluteReferenceURI, document, report)
         ?: return null //Couldn't be resolved yet
     val refSchema = schemaBuilder.build()

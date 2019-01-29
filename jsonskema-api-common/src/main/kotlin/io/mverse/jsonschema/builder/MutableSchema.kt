@@ -1,15 +1,13 @@
 package io.mverse.jsonschema.builder
 
 import io.mverse.jsonschema.MergeReport
+import io.mverse.jsonschema.MutableKeywordContainer
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.enums.JsonSchemaType
-import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
-import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
-import kotlinx.serialization.context.MutableSerialContext
 import lang.Name
 import lang.collection.SetMultimap
 import lang.json.JsonPath
@@ -21,7 +19,7 @@ import lang.net.URI
 @Deprecated("Use MutableSchema", replaceWith = ReplaceWith("MutableSchema"))
 typealias SchemaBuilder = MutableSchema
 
-interface MutableSchema {
+interface MutableSchema : MutableKeywordContainer {
 
   // ##################################################################
   // ########           COUPLE OF GETTERS                ##############
@@ -29,8 +27,6 @@ interface MutableSchema {
 
   @Name("id")
   val id: URI?
-
-  var parent: Schema?
 
   var metaSchema: URI?
   val location: SchemaLocation
@@ -128,9 +124,10 @@ interface MutableSchema {
 
   operator fun invoke(block: MutableSchema.() -> Unit): MutableSchema
 
-  fun oneOf(block: MutableSchema.()->Unit)
-  fun allOf(block: MutableSchema.()->Unit)
-  fun anyOf(block: MutableSchema.()->Unit)
+  fun itemSchema(block: MutableSchema.() -> Unit)
+  fun oneOf(block: MutableSchema.() -> Unit)
+  fun allOf(block: MutableSchema.() -> Unit)
+  fun anyOf(block: MutableSchema.() -> Unit)
   fun allItemsSchema(block: MutableSchema.() -> Unit)
   fun containsSchema(block: MutableSchema.() -> Unit)
   fun ifSchema(block: MutableSchema.() -> Unit)
@@ -138,6 +135,7 @@ interface MutableSchema {
   fun thenSchema(block: MutableSchema.() -> Unit)
   fun elseSchema(block: MutableSchema.() -> Unit)
   fun schemaOfAdditionalProperties(block: MutableSchema.() -> Unit)
+  fun schemaOfAdditionalItems(block: MutableSchema.() -> Unit)
 
   // ##################################################################
   // ########           INNER KEYWORDS                   ##############
@@ -154,12 +152,8 @@ interface MutableSchema {
   val schemaLoader: SchemaLoader
   var currentDocument: JsrObject?
 
-  operator fun <K : Keyword<*>> set(keyword: KeywordInfo<K>, value: K)
-  operator fun <X, K : Keyword<X>> get(keyword: KeywordInfo<K>): K?
   fun buildSubSchema(toBuild: MutableSchema, keyword: KeywordInfo<*>, path: String, vararg paths: String): Schema
-
-  fun subSchemaBuilder(keyword: KeywordInfo<*>, vararg child:String): MutableSchema
-
+  fun subSchemaBuilder(keyword: KeywordInfo<*>, vararg child: String): MutableSchema
 
   @Name("build")
   fun build(): Schema

@@ -1,13 +1,10 @@
 package io.mverse.jsonschema.integration
 
-import io.mverse.json.jsr353.clean
 import io.mverse.json.jsr353.raw
-import io.mverse.json.jsr353.untyped
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.utils.SchemaPaths
 import io.mverse.jsonschema.validation.SchemaValidator
 import io.mverse.jsonschema.validation.SchemaValidatorFactoryImpl
@@ -20,12 +17,12 @@ class PerfBenchmark {
 
   @Test
   fun testPerformance() {
-    val draft6 = JsonSchema.resourceLoader().readJsonObject("json-schema-draft-06.json")
-    val draft6Schema = JsonSchema.createSchemaReader()
+    val draft6 = JsonSchemas.resourceLoader().readJsonObject("json-schema-draft-06.json")
+    val draft6Schema = JsonSchemas.createSchemaReader()
         .readSchema(draft6)
     val validator = SchemaValidatorFactoryImpl.createValidatorForSchema(draft6Schema)
 
-    val jsonObject = JsonSchema.resourceLoader().readJsonObject("perftest.json")
+    val jsonObject = JsonSchemas.resourceLoader().readJsonObject("perftest.json")
     val testSubjects = ArrayList<JsonValueWithPath>()
     jsonObject.raw.get<JsrObject>("schemas").forEach { (_, v) ->
       testSubjects.add(JsonValueWithPath.fromJsonValue(v, v, SchemaPaths.fromNonSchemaSource(v)))

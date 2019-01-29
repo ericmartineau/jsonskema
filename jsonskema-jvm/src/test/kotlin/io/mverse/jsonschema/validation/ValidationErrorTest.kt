@@ -21,7 +21,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.fail
 import com.google.common.collect.Lists.newArrayList
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.assertThat
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.resourceLoader
@@ -41,7 +41,7 @@ import java.util.Collections.emptyList
 
 class ValidationErrorTest {
 
-  private val loader = JsonSchema.resourceLoader()
+  private val loader = JsonSchemas.resourceLoader()
   private val rootSchema = schemaBuilder{}.build()
 
   @Test

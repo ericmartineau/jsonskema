@@ -22,7 +22,7 @@ import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.assertj.subject.ValidationErrorPredicate
 import io.mverse.jsonschema.builder.MutableSchema
@@ -144,7 +144,7 @@ object ValidationTestSupport {
   private fun test(failingSchema: Schema, expectedPointer: String?,
                    input: JsrValue): ValidationError? {
 
-    val error = JsonSchema.getValidator(failingSchema).validate(input)
+    val error = JsonSchemas.getValidator(failingSchema).validate(input)
     assert(error, failingSchema.toString() + " did not fail for " + input).isNotNull()
     if (expectedPointer != null) {
       assert(expectedPointer).isEqualTo(error?.pathToViolation)
@@ -315,7 +315,7 @@ object ValidationTestSupport {
   }
 
   fun expectSuccess(schema: Schema, input: JsrValue) {
-    val error = JsonSchema.createValidatorFactory().createValidator(schema).validate(input)
+    val error = JsonSchemas.createValidatorFactory().createValidator(schema).validate(input)
     assert(error, "Found validation: " + error.toString()).isNull()
   }
 }

@@ -16,16 +16,12 @@
 package io.mverse.jsonschema.integration
 
 import assertk.assert
-import io.mverse.jsonschema.JsonSchema
-import io.mverse.jsonschema.assertj.asserts.assertValidation
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.assertj.asserts.hasErrorCode
 import io.mverse.jsonschema.assertj.asserts.hasViolationAt
-import io.mverse.jsonschema.assertj.asserts.hasViolationsAt
-import io.mverse.jsonschema.assertj.asserts.isDraft7
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.createSchemaReader
 import org.junit.Test
 
 class InvalidObjectInArrayTest {
@@ -33,9 +29,9 @@ class InvalidObjectInArrayTest {
   @Test
   fun test() {
 
-    val schemaJson = JsonSchema.resourceLoader().readJsonObject("/io/mverse/jsonschema/invalidobjectinarray/schema.json")
-    val valueJson = JsonSchema.resourceLoader().readJsonObject("/io/mverse/jsonschema/invalidobjectinarray/subject.json")
-    val schema = JsonSchema.createSchemaReader().readSchema(schemaJson)
+    val schemaJson = JsonSchemas.resourceLoader().readJsonObject("/io/mverse/jsonschema/invalidobjectinarray/schema.json")
+    val valueJson = JsonSchemas.resourceLoader().readJsonObject("/io/mverse/jsonschema/invalidobjectinarray/subject.json")
+    val schema = JsonSchemas.createSchemaReader().readSchema(schemaJson)
 
     assert(schema)
         .validating(valueJson)

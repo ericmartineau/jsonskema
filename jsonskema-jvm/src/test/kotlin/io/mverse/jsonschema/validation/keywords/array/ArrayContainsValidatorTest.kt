@@ -3,13 +3,12 @@ package io.mverse.jsonschema.validation.keywords.array
 import assertk.assert
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.assertj.asserts.isValid
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.schema
-import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.ValidationMocks
 import lang.json.jsrArrayOf
 import lang.json.jsrJson
@@ -41,7 +40,7 @@ class ArrayContainsValidatorTest {
   @Test
   fun validate_Contains() {
     jsrJson {
-      val containsSchema = JsonSchema.schema {
+      val containsSchema = JsonSchemas.schema {
         type = JsonSchemaType.ARRAY
         containsSchema {
           anyOf { constValue = 3.toJsrJson() }

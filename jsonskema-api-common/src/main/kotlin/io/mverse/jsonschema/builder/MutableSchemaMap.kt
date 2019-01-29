@@ -1,9 +1,8 @@
 package io.mverse.jsonschema.builder
 
-import io.mverse.jsonschema.JsonSchema.schemaBuilder
+import io.mverse.jsonschema.JsonSchemas.schemaBuilder
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.keyword.KeywordInfo
-import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.SchemaMapKeyword
 
 class MutableSchemaMap(val keyword: KeywordInfo<SchemaMapKeyword>,

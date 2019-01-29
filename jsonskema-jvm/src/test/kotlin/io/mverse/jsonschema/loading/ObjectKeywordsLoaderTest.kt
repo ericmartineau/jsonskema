@@ -4,7 +4,6 @@ import assertk.assert
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
-import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.SchemaException
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.schema

@@ -2,24 +2,14 @@ package io.mverse.jsonschema.validation
 
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.Schema
-import io.mverse.jsonschema.utils.Schemas.falseSchema
-import io.mverse.jsonschema.utils.Schemas.nullSchema
 import io.mverse.jsonschema.validation.ValidationErrorHelper.buildKeywordFailure
 
-class FalseSchemaValidator private constructor() : SchemaValidator {
-
-  override val schema: Schema
-    get() = falseSchema
+class FalseSchemaValidator(override val schema: Schema) : SchemaValidator {
 
   override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
-    parentReport += buildKeywordFailure(subject, nullSchema, null)
+    parentReport += buildKeywordFailure(subject, schema, null)
         .withError("no value allowed, found [%s]", subject.wrapped)
 
     return parentReport.isValid
-  }
-
-  companion object {
-
-    val instance = FalseSchemaValidator()
   }
 }

@@ -13,7 +13,6 @@ object ArrayItemsValidator {
       allItems - you provide a single validator for any item in the array
      */
     return when {
-
       keyword.hasIndexedSchemas -> {
         val additionItemValidator = keyword.additionalItemSchema
             ?.let { factory.createValidator(it) }

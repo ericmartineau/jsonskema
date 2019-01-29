@@ -2,7 +2,6 @@ package io.mverse.jsonschema.keyword
 
 import io.mverse.jsonschema.MergeReport
 import io.mverse.jsonschema.Schema
-import io.mverse.jsonschema.asVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import lang.collection.Multimaps
 import lang.collection.MutableSetMultimap
@@ -48,13 +47,13 @@ data class DependenciesKeyword(val dependencySchemas: SchemaMapKeyword = SchemaM
     val multimap = MutableSetMultimap<String, String>()
 
     thisProps.forEach {
-      it.value.forEach { value->
+      it.value.forEach { value ->
         multimap[it.key] += value
       }
     }
 
     deps.propertyDependencies.asMap().forEach {
-      it.value.forEach { value->
+      it.value.forEach { value ->
         multimap[it.key] += value
       }
     }

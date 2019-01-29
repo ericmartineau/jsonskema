@@ -9,7 +9,7 @@ import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.KeywordLoader
 import io.mverse.jsonschema.loading.keyword.versions.KeywordDigesterImpl
 import io.mverse.jsonschema.loading.reference.DefaultJsonDocumentClient
-import io.mverse.jsonschema.loading.reference.SchemaCache
+import io.mverse.jsonschema.loading.reference.JsonSchemaCache
 import io.mverse.jsonschema.utils.JsonUtils
 import lang.json.JsrObject
 import lang.net.URI
@@ -19,7 +19,7 @@ import lang.net.URI
  * instance.  This also includes looking up any referenced schemas.
  */
 data class SchemaLoaderImpl(
-    internal val schemaCache: SchemaCache = SchemaCache(),
+    internal val schemaCache: JsonSchemaCache,
     override val documentClient: JsonDocumentClient = DefaultJsonDocumentClient(schemaCache = schemaCache),
     private val additionalDigesters: List<KeywordDigester<*>> = emptyList(),
     private val versions: Set<JsonSchemaVersion> = emptySet(),
@@ -74,7 +74,8 @@ data class SchemaLoaderImpl(
   }
 
   override fun withDocumentClient(documentClient: JsonDocumentClient): SchemaLoaderImpl {
-    return this.copy(documentClient = documentClient)
+    // Also copy the cache, because we want the caches to be synced
+    return this.copy(documentClient = documentClient.withCache(schemaCache))
   }
 
   // #############################################################

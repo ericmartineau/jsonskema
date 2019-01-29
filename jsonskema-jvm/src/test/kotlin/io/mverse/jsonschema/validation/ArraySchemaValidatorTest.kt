@@ -19,9 +19,7 @@ import assertk.assert
 import assertk.assertions.containsExactly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
-import io.mverse.jsonschema.JsonSchema
-import io.mverse.jsonschema.JsonSchema.schema
-import io.mverse.jsonschema.JsonSchema.schemaBuilder
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.assertj.asserts.asserting
 import io.mverse.jsonschema.assertj.asserts.hasKeyword
 import io.mverse.jsonschema.assertj.asserts.hasSchemaLocation
@@ -48,9 +46,10 @@ import io.mverse.jsonschema.validation.ValidationTestSupport.buildWithLocation
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectFailure
 import io.mverse.jsonschema.validation.ValidationTestSupport.expectSuccess
 import io.mverse.jsonschema.validation.ValidationTestSupport.failureOf
-import lang.json.JsrObject
+import io.mverse.logging.mlogger
 import lang.json.JsonKey
 import lang.json.JsrArray
+import lang.json.JsrObject
 import lang.json.get
 import lang.json.jkey
 import lang.json.jsrArrayOf
@@ -64,12 +63,12 @@ import org.junit.Test
 
 class ArraySchemaValidatorTest {
 
-  private var loader = JsonSchema.resourceLoader()
+  private var loader = JsonSchemas.resourceLoader()
   private lateinit var arrayTestCases: JsrObject
 
   @Test
   fun additionalItemsSchema() {
-    JsonSchema.schema {
+    JsonSchemas.schema {
       itemSchemas = listOf(mockBooleanSchema)
       schemaOfAdditionalItems = mockNullSchema
     }
@@ -80,17 +79,15 @@ class ArraySchemaValidatorTest {
 
   @Test
   fun additionalItemsSchemaFailure() {
-    val nullSchema = JsonSchema.schemaBuilder(id = "nulls") {
-      type = NULL
+    val subject = JsonSchemas.schema {
+      itemSchema { type = JsonSchemaType.BOOLEAN }
+      schemaOfAdditionalItems { type = NULL }
     }
 
-    val subject = JsonSchema.schema {
-      itemSchemas = listOf(mockBooleanSchema("#booleans"))
-      schemaOfAdditionalItems = nullSchema
-    }
-
+    val validatee = arrayTestCases["additionalItemsSchemaFailure"]
+    log.info { "Validating $validatee" }
     subject.asserting()
-        .validating(arrayTestCases["additionalItemsSchemaFailure"])
+        .validating(validatee)
         .hasViolationAt("#/2")
         .hasKeyword(Keywords.TYPE)
         .hasSchemaLocation("#/additionalItems")
@@ -98,12 +95,12 @@ class ArraySchemaValidatorTest {
 
   @Before
   fun before() {
-    arrayTestCases = JsonSchema.resourceLoader().readJsonObject("arraytestcases.json")
+    arrayTestCases = JsonSchemas.resourceLoader().readJsonObject("arraytestcases.json")
   }
 
   @Test
   fun booleanItems() {
-    val subject = JsonSchema.schema { allItemSchema = mockBooleanSchema }
+    val subject = JsonSchemas.schema { allItemSchema = mockBooleanSchema }
     assert(subject)
         .validating(arrayTestCases["boolArrFailure"])
         .isNotValid()
@@ -112,7 +109,7 @@ class ArraySchemaValidatorTest {
 
   @Test
   fun doesNotRequireExplicitArray() {
-    val arraySchema = JsonSchema.schema {
+    val arraySchema = JsonSchemas.schema {
       needsUniqueItems = true
     }
     assert(arraySchema)
@@ -144,7 +141,7 @@ class ArraySchemaValidatorTest {
 
   @Test
   fun noItemSchema() {
-    val schema = schema{}
+    val schema = schema {}
     expectSuccess(schema, arrayTestCases["noItemSchema".jkey])
   }
 
@@ -169,10 +166,9 @@ class ArraySchemaValidatorTest {
             add("additionalItems", addtlProps)
           }
 
-      val actual = JsonSchema.schemaReader.readSchema(rawSchemaJson).toString()
+      val actual = JsonSchemas.schemaReader.readSchema(rawSchemaJson).toString()
       assertEquals(addtlProps, actual.parseJsrObject()["additionalItems"])
     }
-
   }
 
   @Test
@@ -180,7 +176,7 @@ class ArraySchemaValidatorTest {
     jsrJson {
 
       val rawSchemaJson = loader.readJsonObject("tostring/arrayschema-list.json") - "type"
-      val serializedSchema = JsonSchema.schemaReader.readSchema(rawSchemaJson.toJsrObject()).toString()
+      val serializedSchema = JsonSchemas.schemaReader.readSchema(rawSchemaJson.toJsrObject()).toString()
       assertEquals(rawSchemaJson, serializedSchema.parseJsrObject())
     }
   }
@@ -188,14 +184,14 @@ class ArraySchemaValidatorTest {
   @Test
   fun toStringTest() {
     val rawSchemaJson = loader.readJsonObject("tostring/arrayschema-list.json")
-    val serializedSchema = JsonSchema.schemaReader.readSchema(rawSchemaJson).toString()
+    val serializedSchema = JsonSchemas.schemaReader.readSchema(rawSchemaJson).toString()
     assertEquals(rawSchemaJson, serializedSchema.parseJsrObject())
   }
 
   @Test
   fun toStringTupleSchema() {
     val rawSchemaJson = loader.readJsonObject("tostring/arrayschema-tuple.json")
-    val serializaedSchema = JsonSchema.schemaReader.readSchema(rawSchemaJson).toString()
+    val serializaedSchema = JsonSchemas.schemaReader.readSchema(rawSchemaJson).toString()
     assertEquals(rawSchemaJson, serializaedSchema.parseJsrObject())
   }
 
@@ -206,11 +202,11 @@ class ArraySchemaValidatorTest {
     // }
     // itemSchemas.add(requireNonNull(itemSchema, "itemSchema cannot be null"));
     // return this;
-    val subject = JsonSchema.schema { itemSchemas = listOf(mockBooleanSchema) }
+    val subject = JsonSchemas.schema { itemSchemas = listOf(mockBooleanSchema) }
     val expectedSchema = subject.asDraft6().itemSchemas[0]
 
     failureOf(subject)
-        .expectedViolatedSchema(expectedSchema.schema)
+        .expectedViolatedSchema(expectedSchema)
         .expectedSchemaLocation("#/items/0")
         .expectedPointer("#/0")
         .input(arrayTestCases["tupleWithOneItem"])
@@ -233,19 +229,19 @@ class ArraySchemaValidatorTest {
 
   @Test
   fun uniqueItemsViolation() {
-    val subject = JsonSchema.schema { needsUniqueItems = true }
+    val subject = JsonSchemas.schema { needsUniqueItems = true }
     expectFailure(subject, "#", arrayTestCases.get("nonUniqueItems".jkey))
   }
 
   @Test
   fun uniqueItemsWithSameToString() {
-    val schema = JsonSchema.schema { needsUniqueItems = true }
+    val schema = JsonSchemas.schema { needsUniqueItems = true }
     expectSuccess(schema, arrayTestCases.get("uniqueItemsWithSameToString".jkey))
   }
 
   @Test
   fun uniqueObjectValues() {
-    val schema = JsonSchema.schema { needsUniqueItems = true }
+    val schema = JsonSchemas.schema { needsUniqueItems = true }
     expectSuccess(schema, arrayTestCases.get("uniqueObjectValues".jkey))
   }
 
@@ -317,5 +313,9 @@ class ArraySchemaValidatorTest {
         .hasViolationAt("#/1")
         .hasKeyword(ENUM)
         .hasSchemaLocation("#/items")
+  }
+
+  companion object {
+    val log = mlogger {}
   }
 }

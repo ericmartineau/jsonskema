@@ -1,6 +1,5 @@
 package io.mverse.jsonschema.validation
 
-import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.enums.JsonSchemaType.NULL
 import io.mverse.jsonschema.enums.JsonSchemaType.NUMBER
 import io.mverse.jsonschema.enums.JsonSchemaType.STRING
@@ -17,7 +16,7 @@ class SchemaExceptionTest {
 
   @Test
   fun nullWithMessage() {
-    val schema = JsonSchema.schemaBuilder(id = "#/required/2") { type = (NULL) }.build()
+    val schema = schemaBuilder("#/required/2") { type = (NULL) }.build()
     val actual = failure(schema, STRING, NULL).message
     assertEquals("#/required/2: expected type: string, found: null", actual)
   }

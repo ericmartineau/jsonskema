@@ -2,11 +2,10 @@ package io.mverse.jsonschema.loading
 
 import assertk.assert
 import assertk.assertions.hasToString
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.resourceLoader
-import kotlinx.serialization.json.json
 import lang.json.JsrObject
 import lang.json.jsrObject
 import org.junit.Assert.assertTrue
@@ -20,7 +19,7 @@ class JsonObjectTest : BaseLoaderTest("objecttestcases.json") {
   private val testSchemas: JsrObject
 
   init {
-    testSchemas = JsonSchema.resourceLoader().readJsonObject("loading/testschemas.json")
+    testSchemas = JsonSchemas.resourceLoader().readJsonObject("loading/testschemas.json")
   }
 
   @Test

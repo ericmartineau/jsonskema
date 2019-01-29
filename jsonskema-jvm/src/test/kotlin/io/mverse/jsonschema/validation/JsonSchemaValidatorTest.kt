@@ -2,7 +2,6 @@ package io.mverse.jsonschema.validation
 
 import assertk.assert
 import assertk.assertions.isNotNull
-import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.schema
 import lang.json.JsrNull
 import lang.json.jsrNumber

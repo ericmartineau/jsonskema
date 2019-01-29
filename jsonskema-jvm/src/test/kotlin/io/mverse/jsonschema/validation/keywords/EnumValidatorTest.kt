@@ -1,6 +1,6 @@
 package io.mverse.jsonschema.validation.keywords
 
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.assertj.asserts.hasKeyword
 import io.mverse.jsonschema.assertj.asserts.isNotValid
 import io.mverse.jsonschema.assertj.asserts.isValid
@@ -15,7 +15,7 @@ class EnumValidatorTest {
 
   @Test
   fun testEnumValidator_Vararg() {
-    val schema = JsonSchema.schema {
+    val schema = JsonSchemas.schema {
       enumValues = jsrArrayOf("Bob", "Richard")
     }
 
@@ -29,7 +29,7 @@ class EnumValidatorTest {
 
   @Test
   fun testEnumValidator_JsonArray() {
-    val schema = JsonSchema.schema {
+    val schema = JsonSchemas.schema {
       enumValues = jsrArrayOf("Bob", "Richard")
     }
 

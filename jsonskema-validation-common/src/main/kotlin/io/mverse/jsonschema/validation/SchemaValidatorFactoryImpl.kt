@@ -74,9 +74,9 @@ class SchemaValidatorFactoryImpl(private val validatorCache: MutableMap<URI, Sch
 
   override fun createValidator(schema: Schema): SchemaValidator {
     if (nullSchema == schema) {
-      return NullSchemaValidator.instance
+      return NullSchemaValidator(schema)
     } else if (falseSchema == schema) {
-      return FalseSchemaValidator.instance
+      return FalseSchemaValidator(schema)
     }
 
     val schemaURI = schema.location.uniqueURI

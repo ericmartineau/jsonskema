@@ -4,7 +4,7 @@ import assertk.Assert
 import assertk.assert
 import assertk.assertions.isEqualTo
 import assertk.fail
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.createSchemaReader
 import lang.json.JsrObject
 
@@ -13,8 +13,8 @@ typealias SafeSchemaLoadingAssert = Assert<LoadingReport>
 typealias LoadingIssueAssert = Assert<LoadingIssue?>
 typealias SafeLoadingIssueAssert = Assert<LoadingIssue>
 
-fun JsrObject.assertAsSchema(reader: SchemaReader = JsonSchema.createSchemaReader(),
-                              block:SafeSchemaLoadingAssert.()->Unit = {}): SchemaLoadingAssert {
+fun JsrObject.assertAsSchema(reader: SchemaReader = JsonSchemas.createSchemaReader(),
+                             block:SafeSchemaLoadingAssert.()->Unit = {}): SchemaLoadingAssert {
   return try {
     reader.readSchema(this)
     assert(null as LoadingReport?)

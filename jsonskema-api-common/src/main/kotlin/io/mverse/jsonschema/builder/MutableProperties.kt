@@ -1,6 +1,6 @@
 package io.mverse.jsonschema.builder
 
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.FormatType
 import io.mverse.jsonschema.enums.JsonSchemaType
@@ -21,7 +21,7 @@ class MutableProperties(val builder: MutableSchema) {
   operator fun set(key: String, block: MutableSchema.() -> Unit) {
     val existing = builder[keyword] ?: SchemaMapKeyword()
     val childLocation = builder.location.child(PROPERTIES).child(key)
-    val childBuilder = JsonSchema.schemaBuilder(childLocation, builder.schemaLoader, block)
+    val childBuilder = JsonSchemas.schemaBuilder(childLocation, builder.schemaLoader, block)
     builder[keyword] = existing + (key to builder.buildSubSchema(childBuilder, keyword, key))
   }
 
@@ -47,7 +47,6 @@ class MutableProperties(val builder: MutableSchema) {
     val key = this
     set(key) propSchema@{
       type = JsonSchemaType.ARRAY
-
       builder.allItemsSchema(block)
     }
   }

@@ -17,7 +17,7 @@ package io.mverse.jsonschema.integration
 
 import assertk.assert
 import assertk.assertions.isNull
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.resourceLoader
 import io.mverse.jsonschema.validation.ValidationMocks
@@ -33,9 +33,9 @@ class EmptyObjectTest {
       "type" *= "object"
       "properties" *= jsrObject {}
     }
-    val schemaJson = JsonSchema.resourceLoader().readJson("json-schema-draft-06.json")
+    val schemaJson = JsonSchemas.resourceLoader().readJson("json-schema-draft-06.json")
 
-    val schema = JsonSchema.createSchemaReader().readSchema(schemaJson as JsrObject)
+    val schema = JsonSchemas.createSchemaReader().readSchema(schemaJson as JsrObject)
     val validator = ValidationMocks.createTestValidator(schema)
     val errors = validator.validate(jsonSubject)
     assert(errors).isNull()

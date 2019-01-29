@@ -15,7 +15,7 @@
  */
 package io.mverse.jsonschema.validation
 
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.getValidator
 import io.mverse.jsonschema.resourceLoader
@@ -29,13 +29,13 @@ import javax.json.JsonObject
 
 class PointerBubblingTest {
   private val allSchemas = loader.readJsonObject("testschemas.json")
-  private val rectangleSchema = JsonSchema.createSchemaReader().readSchema(allSchemas[JsonKey("pointerResolution")].asJsonObject())
+  private val rectangleSchema = JsonSchemas.createSchemaReader().readSchema(allSchemas[JsonKey("pointerResolution")].asJsonObject())
   private val testInputs = loader.readJsonObject("objecttestcases.json")
 
   @Test
   fun rectangleMultipleFailures() {
     val input = testInputs.get("rectangleMultipleFailures") as JsonObject
-    val e = verifyFailure { JsonSchema.getValidator(rectangleSchema).validate(input) }
+    val e = verifyFailure { JsonSchemas.getValidator(rectangleSchema).validate(input) }
     Assert.assertEquals("#/rectangle", e.pathToViolation)
     Assert.assertEquals(2, e.causes.size)
     Assert.assertEquals(1, ValidationTestSupport.countCauseByJsonPointer(e, "#/rectangle/a"))
@@ -49,6 +49,6 @@ class PointerBubblingTest {
   }
 
   companion object {
-    private val loader = JsonSchema.resourceLoader()
+    private val loader = JsonSchemas.resourceLoader()
   }
 }

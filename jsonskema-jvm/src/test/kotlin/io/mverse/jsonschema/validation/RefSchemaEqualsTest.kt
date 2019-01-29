@@ -17,10 +17,11 @@ package io.mverse.jsonschema.validation
 
 import assertk.assert
 import assertk.assertions.hasToString
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
+import io.mverse.jsonschema.assertj.asserts.isEqualIgnoringWhitespace
 import io.mverse.jsonschema.resourceLoader
 import io.mverse.jsonschema.createSchemaReader
-import io.mverse.jsonschema.impl.RefSchemaImpl
+import io.mverse.jsonschema.impl.RefJsonSchema
 import io.mverse.jsonschema.loading.parseJsrObject
 import io.mverse.jsonschema.schema
 import lang.json.JsonKey
@@ -35,8 +36,8 @@ class RefSchemaEqualsTest {
 
   @Test
   fun toStringTest() {
-    val rawSchemaJson = JsonSchema.resourceLoader().readJsonObject("tostring/ref.json")
-    val schema = JsonSchema.createSchemaReader().readSchema(rawSchemaJson)
+    val rawSchemaJson = JsonSchemas.resourceLoader().readJsonObject("tostring/ref.json")
+    val schema = JsonSchemas.createSchemaReader().readSchema(rawSchemaJson)
     val actual = schema.toString()
 
     assertThat(actual.parseJsrObject().getOrNull(JsonKey("properties"))).isEqualTo(rawSchemaJson["properties"])
@@ -49,12 +50,12 @@ class RefSchemaEqualsTest {
         ref = URI("#")
       }
     }
-    assert(schema).hasToString("{\"properties\":{\"foo\":{\"\$ref\":\"#\"}}}")
+    assert(schema.toString()).isEqualIgnoringWhitespace("{\"properties\":{\"foo\":{\"\$ref\":\"#\"}}}")
   }
 
   @Test
   fun equalsTest() {
-    EqualsVerifier.forClass(RefSchemaImpl::class.java)
+    EqualsVerifier.forClass(RefJsonSchema::class.java)
         .withOnlyTheseFields("refURI")
         .suppress(Warning.STRICT_INHERITANCE)
         .verify()

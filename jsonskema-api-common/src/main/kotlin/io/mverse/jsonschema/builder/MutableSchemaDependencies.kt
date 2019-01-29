@@ -1,6 +1,6 @@
 package io.mverse.jsonschema.builder
 
-import io.mverse.jsonschema.JsonSchema.schemaBuilder
+import io.mverse.jsonschema.JsonSchemas.schemaBuilder
 import io.mverse.jsonschema.keyword.DependenciesKeyword
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.DEPENDENCIES

@@ -6,7 +6,7 @@ import org.junit.Test
 
 class SchemaExtensionsTest {
   @Test fun testAllProperties() {
-    val schema = JsonSchema.schema(id = "http://schema.org/test") {
+    val schema = schema(id = "http://schema.org/test") {
       properties {
         "EMAILS" required string
         "NUMBER" optional number

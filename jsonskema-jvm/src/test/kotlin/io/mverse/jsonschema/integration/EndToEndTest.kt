@@ -1,7 +1,7 @@
 package io.mverse.jsonschema.integration
 
 import assertk.assert
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.assertj.asserts.hasErrorArguments
 import io.mverse.jsonschema.assertj.asserts.hasErrorCode
 import io.mverse.jsonschema.assertj.asserts.hasKeyword
@@ -22,11 +22,11 @@ class EndToEndTest {
 
   @Test
   fun testParseAndValidate() {
-    val primitives = JsonSchema.resourceLoader().getStream("primitives.json").asInput()
-    val jsonSchema = JsonSchema.resourceLoader().getStream("mverse-account-profile.json")
-    val jsonData = JsonSchema.resourceLoader().readJson("account-data.json") as JsrObject
+    val primitives = JsonSchemas.resourceLoader().getStream("primitives.json").asInput()
+    val jsonSchema = JsonSchemas.resourceLoader().getStream("mverse-account-profile.json")
+    val jsonData = JsonSchemas.resourceLoader().readJson("account-data.json") as JsrObject
     val preloadedSchema = primitives.parseJsrObject()
-    val loadedSchema = JsonSchema.createSchemaReader()
+    val loadedSchema = JsonSchemas.createSchemaReader()
         .withPreloadedDocument(preloadedSchema)
         .readSchema(jsonSchema)
     assert(loadedSchema)

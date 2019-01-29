@@ -32,7 +32,7 @@ val expectedSlowpoke = 2000L
 class DefaultJsonDocumentClientTest {
   @Test fun testFetchingNoProvidersFound() {
     assert {
-      DefaultJsonDocumentClient(mutableListOf())
+      DefaultJsonDocumentClient(mutableListOf(), schemaCache = JsonSchemaCache())
     }.thrownError { }
   }
 

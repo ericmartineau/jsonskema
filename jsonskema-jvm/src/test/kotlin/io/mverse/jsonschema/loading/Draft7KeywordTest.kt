@@ -3,14 +3,13 @@ package io.mverse.jsonschema.loading
 import assertk.assert
 import assertk.assertions.contains
 import assertk.assertions.isNotNull
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.assertj.asserts.hasIfSchema
 import io.mverse.jsonschema.assertj.asserts.hasKeyword
 import io.mverse.jsonschema.assertj.asserts.hasProperty
 import io.mverse.jsonschema.assertj.asserts.hasThenSchema
 import io.mverse.jsonschema.assertj.asserts.hasValue
-import io.mverse.jsonschema.assertj.asserts.isDraft7
 import io.mverse.jsonschema.assertj.asserts.isReadOnly
 import io.mverse.jsonschema.assertj.asserts.isWriteOnly
 import io.mverse.jsonschema.assertj.asserts.withAssertion
@@ -36,8 +35,8 @@ class Draft7KeywordTest {
 
   @Before
   fun readSchema() {
-    val schemaReader = JsonSchema.createSchemaReader().withStrictValidation(Draft7)
-    val loader = JsonSchema.resourceLoader(this::class)
+    val schemaReader = JsonSchemas.createSchemaReader().withStrictValidation(Draft7)
+    val loader = JsonSchemas.resourceLoader(this::class)
     val schemaObject = loader.readJsonObject("/draft7-keywords.json")
     this.schema = schemaReader.readSchema(schemaObject)
   }

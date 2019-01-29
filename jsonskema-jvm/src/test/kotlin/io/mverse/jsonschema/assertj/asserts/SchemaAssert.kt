@@ -7,8 +7,8 @@ import assertk.assertions.isNotNull
 import assertk.assertions.key
 import com.google.common.collect.Maps
 import io.mverse.jsonschema.Draft7Schema
-import io.mverse.jsonschema.DraftSchema
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.AllKeywords
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.validation.ValidationMocks
 import io.mverse.jsonschema.enums.JsonSchemaVersion
@@ -22,8 +22,8 @@ import lang.json.JsrValue
 typealias Draft7Assert = Assert<Draft7Schema>
 typealias SchemaAssert = Assert<Schema>
 
-fun DraftSchema.asserting(): SchemaAssert = assert(this.schema)
-fun DraftSchema.validating(input:JsrValue?): SchemaValidationAssert = assert(this.schema).validating(input)
+fun AllKeywords.asserting(): SchemaAssert = assert(this)
+fun AllKeywords.validating(input:JsrValue?): SchemaValidationAssert = assert(this).validating(input)
 
 fun Schema.asserting(): SchemaAssert = assert(this)
 fun Schema.validating(input:JsrValue?): SchemaValidationAssert = assert(this).validating(input)
@@ -80,7 +80,7 @@ fun SchemaAssert.hasProperty(property: String): SchemaAssert {
 
   val propSchema = actual.asDraft7().properties[property]
   assert(propSchema, "contains $property").isNotNull()
-  return assert(propSchema!!.schema)
+  return assert(propSchema!!)
 }
 
 fun SchemaAssert.validating(toValidate: JsrValue?): SchemaValidationAssert {
@@ -90,7 +90,7 @@ fun SchemaAssert.validating(toValidate: JsrValue?): SchemaValidationAssert {
 }
 
 fun SchemaAssert.validating(resourcePath: String): SchemaValidationAssert {
-  val toValidate = JsonSchema.resourceLoader().readJson(resourcePath)
+  val toValidate = JsonSchemas.resourceLoader().readJson(resourcePath)
   val result = ValidationMocks.createTestValidator(actual).validate(toValidate)
   return assert(result)
 }

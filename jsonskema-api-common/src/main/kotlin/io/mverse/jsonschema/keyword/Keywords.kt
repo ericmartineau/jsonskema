@@ -11,13 +11,15 @@ import io.mverse.jsonschema.keyword.KeywordInfo.KeywordInfoBuilder
 
 import lang.Field
 import lang.Global
+import lang.collection.freezeList
 import lang.json.JsrType
-import lang.json.JsrType.*
 
 object Keywords {
 
   @Field val DOLLAR_ID_KEY = "\$id"
   @Field val ID_KEY = "id"
+
+  internal val keywordCollector = mutableListOf<KeywordInfo<*>>()
 
   @Field
   val SCHEMA = keyword<DollarSchemaKeyword>().key("\$schema").expects(JsrType.STRING).build()
@@ -781,6 +783,11 @@ object Keywords {
    * successfully against exactly one schema defined by this keyword's value.
    */
   @Field val ONE_OF = schemaListKeyword("oneOf").expects(JsrType.ARRAY).since(Draft4).build()
+
+  /**
+   * Can be used to inspect all keywords
+   */
+  val all:List<KeywordInfo<*>> = keywordCollector.freezeList()
 
   fun schemaMapKeyword(keyword: String): KeywordInfo.KeywordInfoBuilder<SchemaMapKeyword> {
     return KeywordInfoBuilder<SchemaMapKeyword>().key(keyword)

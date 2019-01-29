@@ -15,6 +15,7 @@
  */
 package io.mverse.jsonschema.loading
 
+import io.mverse.jsonschema.loading.reference.SchemaCache
 import io.mverse.jsonschema.resolver.FetchedDocument
 import io.mverse.jsonschema.resolver.FetchedDocumentResults
 import io.mverse.jsonschema.resolver.JsonDocumentFetcher
@@ -35,6 +36,7 @@ interface JsonDocumentClient {
 
   fun registerFetchedDocument(documentLocation: URI, document: JsrObject)
   fun registerFetchedDocument(document: FetchedDocument)
+  fun withCache(cache: SchemaCache): JsonDocumentClient
 
   fun resolveSchemaWithinDocument(documentURI: URI, schemaURI: URI, document: JsrObject): JsonPath?
 

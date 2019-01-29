@@ -4,7 +4,7 @@ import assertk.assert
 import assertk.assertions.hasSize
 import assertk.assertions.hasToString
 import assertk.assertions.isEqualTo
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.resourceLoader
@@ -14,7 +14,7 @@ class SchemaLoaderImplVersionTest {
 
   @Test
   fun testStrictDraft6_FailsForDraft4() {
-    val schemaReader = JsonSchema.createSchemaReader().withStrictValidation(JsonSchemaVersion.Draft6)
+    val schemaReader = JsonSchemas.createSchemaReader().withStrictValidation(JsonSchemaVersion.Draft6)
     val draft4Schema = loader.readJsonObject("valid-draft4-schema.json")
     draft4Schema.assertAsSchema(schemaReader) {
       isFailed(errorCount = 2) {
@@ -33,7 +33,7 @@ class SchemaLoaderImplVersionTest {
 
   @Test
   fun testStrictDraft6_Successful() {
-    val schemaReader = JsonSchema.createSchemaReader().withStrictValidation(JsonSchemaVersion.Draft6)
+    val schemaReader = JsonSchemas.createSchemaReader().withStrictValidation(JsonSchemaVersion.Draft6)
     val draft6Schema = loader.readJsonObject("valid-draft6-schema.json")
     val schema = schemaReader.readSchema(draft6Schema)
     assert(schema.id).hasToString("https://schema.org/valid-draft6.json")
@@ -41,7 +41,7 @@ class SchemaLoaderImplVersionTest {
 
   @Test
   fun testStrictDraft4_Successful() {
-    val schemaReader = JsonSchema.createSchemaReader().withStrictValidation(JsonSchemaVersion.Draft4)
+    val schemaReader = JsonSchemas.createSchemaReader().withStrictValidation(JsonSchemaVersion.Draft4)
     val draft4Schema = loader.readJsonObject("valid-draft4-schema.json")
     val schema = schemaReader.readSchema(draft4Schema)
     assert(schema.id).hasToString("https://schema.org/valid-draft4.json")
@@ -49,7 +49,7 @@ class SchemaLoaderImplVersionTest {
 
   @Test(expected = SchemaLoadingException::class)
   fun testStrictDraft4_FailsForDraft6() {
-    val draft4Reader = JsonSchema.createSchemaReader().withStrictValidation(JsonSchemaVersion.Draft4)
+    val draft4Reader = JsonSchemas.createSchemaReader().withStrictValidation(JsonSchemaVersion.Draft4)
     val draft6 = loader.readJsonObject("valid-draft6-schema.json")
     try {
       draft4Reader.readSchema(draft6)
@@ -65,6 +65,6 @@ class SchemaLoaderImplVersionTest {
   }
 
   companion object {
-    internal val loader = JsonSchema.resourceLoader(SchemaLoaderImplVersionTest::class)
+    internal val loader = JsonSchemas.resourceLoader(SchemaLoaderImplVersionTest::class)
   }
 }

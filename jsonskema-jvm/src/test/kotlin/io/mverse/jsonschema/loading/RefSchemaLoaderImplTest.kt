@@ -3,10 +3,9 @@ package io.mverse.jsonschema.loading
 import assertk.assert
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.resourceLoader
-import io.mverse.jsonschema.schema
 import lang.json.JsrObject
 import lang.net.URI
 import lang.net.resolveUri
@@ -21,7 +20,7 @@ class RefSchemaLoaderImplTest {
 
   @Before
   fun before() {
-    val schemaLoader = JsonSchema.createSchemaReader() as SchemaLoaderImpl
+    val schemaLoader = JsonSchemas.createSchemaReader() as SchemaLoaderImpl
     this.refSchemaLoader = schemaLoader.refSchemaLoader
     accountProfileJson = readResource("mverse-account-profile.json")
     documentURI = URI("http://schema.mverse.io/mverse-account-profile.json")
@@ -78,6 +77,6 @@ class RefSchemaLoaderImplTest {
   }
 
   private fun readResource(relativePath: String): JsrObject {
-    return JsonSchema.resourceLoader(this::class).readJsonObject(relativePath)
+    return JsonSchemas.resourceLoader(this::class).readJsonObject(relativePath)
   }
 }

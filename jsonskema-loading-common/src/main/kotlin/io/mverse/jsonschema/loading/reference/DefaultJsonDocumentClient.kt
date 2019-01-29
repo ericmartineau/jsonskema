@@ -48,15 +48,15 @@ import kotlin.reflect.KClass
  * check all fetcher instances, and the first one to return a valid result wins, while the others
  * are cancelled.
  */
-open class DefaultJsonDocumentClient(val fetchers: MutableList<JsonDocumentFetcher> = defaultFetchers.toMutableList(),
-                                     val schemaCache: SchemaCache = SchemaCache(),
+data class DefaultJsonDocumentClient(val fetchers: MutableList<JsonDocumentFetcher> = defaultFetchers.toMutableList(),
+                                     val schemaCache: SchemaCache,
                                      val fetchTimeout: Long = 10000L) : JsonDocumentClient {
 
   constructor(fetcher: JsonDocumentFetcher, vararg moreFetchers: JsonDocumentFetcher, fetchTimeout: Long = 10000L)
-      : this((fetcher.asList() + moreFetchers).toMutableList(), SchemaCache(), fetchTimeout)
+      : this((fetcher.asList() + moreFetchers).toMutableList(), JsonSchemaCache(), fetchTimeout)
 
   constructor(fetchTimeout: Long = 10000L)
-      : this(schemaCache = SchemaCache(), fetchTimeout = fetchTimeout)
+      : this(schemaCache = JsonSchemaCache(), fetchTimeout = fetchTimeout)
 
   init {
     if (fetchers.isEmpty()) {
@@ -68,6 +68,10 @@ open class DefaultJsonDocumentClient(val fetchers: MutableList<JsonDocumentFetch
 
   override fun findLoadedDocument(documentLocation: URI): JsrObject? {
     return schemaCache.lookupDocument(documentLocation)
+  }
+
+  override fun withCache(cache: SchemaCache): JsonDocumentClient {
+    return copy(schemaCache= cache)
   }
 
   override fun registerFetchedDocument(document: FetchedDocument) {

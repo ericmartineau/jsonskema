@@ -1,6 +1,5 @@
 package io.mverse.jsonschema.validation.keywords
 
-import io.mverse.jsonschema.JsonSchema
 import io.mverse.jsonschema.assertj.asserts.assertValidation
 import io.mverse.jsonschema.assertj.asserts.hasErrorArguments
 import io.mverse.jsonschema.assertj.asserts.hasErrorCode

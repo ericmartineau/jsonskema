@@ -17,19 +17,34 @@ import lang.uuid.randomUUID
 import java.math.BigDecimal
 
 fun schema(block:MutableSchema.()->Unit):Schema {
-  return JsonSchema.schemaBuilder(SchemaPaths.fromNonSchemaSource(randomUUID())).build(block)
+  return JsonSchemas.schemaBuilder(SchemaPaths.fromNonSchemaSource(randomUUID()), loader = JsonSchemas.schemaLoader).build(block)
 }
 
-fun JsonSchema.schema(block:MutableSchema.()->Unit):Schema {
-  return JsonSchema.schemaBuilder(SchemaPaths.fromNonSchemaSource(randomUUID())).build(block)
+fun JsonSchemas.schema(block:MutableSchema.()->Unit):Schema {
+  return JsonSchemas.schemaBuilder(SchemaPaths.fromNonSchemaSource(randomUUID()), loader = JsonSchemas.schemaLoader).build(block)
 }
 
 fun schema(id:URI, block:MutableSchema.()->Unit):Schema {
-  return JsonSchema.schemaBuilder(id).build(block)
+  return JsonSchemas.schemaBuilder(id, loader = JsonSchemas.schemaLoader).build(block)
+}
+
+fun schema(id:String, block:MutableSchema.()->Unit):Schema {
+  return JsonSchemas.schemaBuilder(id, loader = JsonSchemas.schemaLoader).build(block)
+}
+
+fun JsonSchemas.schema(id:String, block:MutableSchema.()->Unit):Schema {
+  return JsonSchemas.schemaBuilder(id, loader = JsonSchemas.schemaLoader).build(block)
 }
 
 fun schemaBuilder(block:MutableSchema.()->Unit):MutableSchema {
-  return JsonSchema.schemaBuilder(SchemaPaths.fromNonSchemaSource(randomUUID())).apply(block)
+  return JsonSchemas.schemaBuilder(SchemaPaths.fromNonSchemaSource(randomUUID()), loader = JsonSchemas.schemaLoader).apply(block)
+}
+
+fun schemaBuilder(id:String, block:MutableSchema.()->Unit):MutableSchema {
+  return JsonSchemas.schemaBuilder(id = id, loader = JsonSchemas.schemaLoader).apply(block)
+}
+fun schemaBuilder(id:URI, block:MutableSchema.()->Unit):MutableSchema {
+  return JsonSchemas.schemaBuilder(id = id, loader = JsonSchemas.schemaLoader).apply(block)
 }
 
 object TestUtils {

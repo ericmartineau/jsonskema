@@ -19,8 +19,10 @@ import assertk.assert
 import assertk.assertions.containsAll
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
+import io.mverse.jsonschema.assertj.asserts.isEqualIgnoringWhitespace
 import io.mverse.jsonschema.builder.MutableSchema
+import io.mverse.jsonschema.defaultSchemaReader
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.loading.parseJsrObject
 import io.mverse.jsonschema.schemaBuilder
@@ -66,7 +68,7 @@ class EmptySchemaTest {
 
   @Test
   fun testToString() {
-    assert(schemaBuilder{}.build().toString()).isEqualTo("{}")
+    assert(schemaBuilder{}.build().toString()).isEqualIgnoringWhitespace("{}")
   }
 
   @Test
@@ -78,7 +80,7 @@ class EmptySchemaTest {
                               description: String? = null,
                               id: String? = null): lang.json.JsrObject {
     val builder: MutableSchema = if (id?.isNotBlank() == true) {
-      JsonSchema.schemaBuilder(id = id)
+      JsonSchemas.schemaBuilder(id = id, loader = defaultSchemaReader)
     } else {
       schemaBuilder{}
     }

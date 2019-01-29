@@ -1,7 +1,6 @@
 package io.mverse.jsonschema.validation
 
-import io.mverse.jsonschema.JsonSchema
-import io.mverse.jsonschema.JsonSchema.schemaBuilder
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.builder.MutableJsonSchema
 import io.mverse.jsonschema.builder.MutableSchema
@@ -40,7 +39,7 @@ object ValidationMocks {
   }
 
   fun mockBooleanSchema(id: String): MutableSchema {
-    return JsonSchema.schemaBuilder(id = id) { type = BOOLEAN }
+    return schemaBuilder(id = id) { type = BOOLEAN }
   }
 
   val mockIntegerSchema: MutableSchema
@@ -63,10 +62,10 @@ object ValidationMocks {
       return schemaBuilder { type = OBJECT }
     }
 
-  val mockSchema: MutableSchema get() = MutableJsonSchema(JsonSchema.schemaLoader)
+  val mockSchema: MutableSchema get() = MutableJsonSchema(JsonSchemas.schemaLoader)
 
   fun mockObjectSchema(id: String): MutableSchema {
-    return JsonSchema.schemaBuilder(id = id) { type = OBJECT }
+    return schemaBuilder(id = id) { type = OBJECT }
   }
 
   fun mockObjectSchema(id: URI): MutableSchema {
@@ -74,7 +73,7 @@ object ValidationMocks {
   }
 
   fun createTestValidator(schema: Schema): SchemaValidator =
-      JsonSchema.createValidatorFactory().createValidator(schema)
+      JsonSchemas.createValidatorFactory().createValidator(schema)
 
   val mockStringSchema: MutableSchema
     get() {

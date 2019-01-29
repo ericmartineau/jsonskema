@@ -15,7 +15,7 @@
  */
 package io.mverse.jsonschema.loading
 
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.createSchemaReader
 import org.junit.Test
 
@@ -24,6 +24,6 @@ class ResolutionScopeTest : BaseLoaderTest("testschemas.json") {
   @Test
   fun resolutionScopeTest() {
     val schemaJson = getJsonObjectForKey("resolutionScopeTest")
-    JsonSchema.createSchemaReader().readSchema(schemaJson)
+    JsonSchemas.createSchemaReader().readSchema(schemaJson)
   }
 }

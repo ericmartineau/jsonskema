@@ -42,17 +42,17 @@ fun SchemaAssert.isNotWriteOnly(): SchemaAssert {
 
 fun SchemaAssert.hasIfSchema(): SchemaAssert {
   hasKeyword(keyword = Keywords.IF)
-  return assert(actual.asDraft7().ifSchema!!.schema)
+  return assert(actual.asDraft7().ifSchema!!)
 }
 
 fun SchemaAssert.hasThenSchema(): SchemaAssert {
   hasKeyword(keyword = Keywords.THEN)
-  return assert(actual.asDraft7().thenSchema!!.schema)
+  return assert(actual.asDraft7().thenSchema!!)
 }
 
 fun SchemaAssert.hasElseSchema(): SchemaAssert {
   hasKeyword(keyword = Keywords.ELSE)
-  return assert(actual.asDraft7().elseSchema!!.schema)
+  return assert(actual.asDraft7().elseSchema!!)
 }
 
 

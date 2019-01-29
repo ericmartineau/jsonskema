@@ -8,8 +8,8 @@ import lang.json.JsrObject
 import kotlin.reflect.KClass
 
 
-fun JsonSchema.resourceLoader():JsonResourceLoader = JsonResourceLoader(JsonResourceLoader::class)
-fun JsonSchema.resourceLoader(klass:KClass<*>):JsonResourceLoader = JsonResourceLoader(klass)
+fun JsonSchemas.resourceLoader():JsonResourceLoader = JsonResourceLoader(JsonResourceLoader::class)
+fun JsonSchemas.resourceLoader(klass:KClass<*>):JsonResourceLoader = JsonResourceLoader(klass)
 
 class JsonResourceLoader(private val loadFrom: KClass<*>) {
 

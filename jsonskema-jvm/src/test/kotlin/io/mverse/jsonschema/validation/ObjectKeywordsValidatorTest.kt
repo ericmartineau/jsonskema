@@ -21,7 +21,7 @@ import assertk.assertions.hasSize
 import assertk.assertions.hasToString
 import assertk.assertions.isEqualTo
 import io.mverse.json.jsr353.raw
-import io.mverse.jsonschema.JsonSchema
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.assertj.asserts.hasViolationAt
 import io.mverse.jsonschema.assertj.asserts.hasViolationCount
 import io.mverse.jsonschema.assertj.asserts.isNotValid
@@ -37,7 +37,6 @@ import io.mverse.jsonschema.schema
 import io.mverse.jsonschema.schemaBuilder
 import io.mverse.jsonschema.validation.ValidationMocks.createTestValidator
 import io.mverse.jsonschema.validation.ValidationMocks.mockBooleanSchema
-import io.mverse.jsonschema.validation.ValidationMocks.mockNullSchema
 import io.mverse.jsonschema.validation.ValidationMocks.mockNumberSchema
 import io.mverse.jsonschema.validation.ValidationMocks.mockObjectSchema
 import io.mverse.jsonschema.validation.ValidationMocks.mockSchema
@@ -66,7 +65,7 @@ class ObjectKeywordsValidatorTest {
 
   @Before
   fun before() {
-    objectTestCases = JsonSchema.resourceLoader().readJsonObject("objecttestcases.json")
+    objectTestCases = JsonSchemas.resourceLoader().readJsonObject("objecttestcases.json")
   }
 
   @Test
@@ -417,28 +416,28 @@ class ObjectKeywordsValidatorTest {
   @Test
   fun toStringNoAdditionalProperties() {
     val rawSchemaJson = readResourceAsJson("tostring/objectschema.json")
-    val actual = JsonSchema.createSchemaReader().readSchema(rawSchemaJson).toString()
+    val actual = JsonSchemas.createSchemaReader().readSchema(rawSchemaJson).toString()
     assertEquals(rawSchemaJson, actual.parseJsrObject())
   }
 
   @Test
   fun toStringNoExplicitType() {
     val rawSchemaJson = readResourceAsJson("tostring/objectschema.json") - "type"
-    val actual = JsonSchema.createSchemaReader().readSchema(rawSchemaJson).toString()
+    val actual = JsonSchemas.createSchemaReader().readSchema(rawSchemaJson).toString()
     assertEquals(rawSchemaJson, actual.parseJsrJson())
   }
 
   @Test
   fun toStringSchemaDependencies() {
     val rawSchemaJson = readResourceAsJson("tostring/objectschema-schemadep.json")
-    val actual = JsonSchema.createSchemaReader().readSchema(rawSchemaJson).toString()
+    val actual = JsonSchemas.createSchemaReader().readSchema(rawSchemaJson).toString()
     assertEquals(rawSchemaJson, actual.parseJsrJson())
   }
 
   @Test
   fun toStringTest() {
     val rawSchemaJson = readResourceAsJson("tostring/objectschema.json")
-    val actual = JsonSchema.createSchemaReader().readSchema(rawSchemaJson).toString()
+    val actual = JsonSchemas.createSchemaReader().readSchema(rawSchemaJson).toString()
     assertEquals(rawSchemaJson, actual.parseJsrJson())
   }
 
@@ -451,6 +450,6 @@ class ObjectKeywordsValidatorTest {
   }
 
   internal fun readResourceAsJson(url: String): lang.json.JsrObject {
-    return JsonSchema.resourceLoader().readJsonObject(url)
+    return JsonSchemas.resourceLoader().readJsonObject(url)
   }
 }

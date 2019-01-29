@@ -1,37 +1,26 @@
 package io.mverse.jsonschema
 
 import io.mverse.jsonschema.enums.JsonSchemaType
-import io.mverse.jsonschema.enums.JsonSchemaVersion
-import lang.collection.SetMultimap
-import lang.json.JsrArray
-import lang.json.JsrValue
-import lang.net.URI
-import kotlin.reflect.KClass
+import io.mverse.jsonschema.keyword.Keywords
 
-interface Draft3Schema : DraftSchema {
-
+interface Draft3Schema : DraftSharedKeywords {
   val isAnyType: Boolean
-
   val disallow: Set<JsonSchemaType>
-
-  val extendsSchema: DraftSchema?
-
+  val extendsSchema: Schema?
   val isRequired: Boolean
-
-  // ###################################
-  // #### NUMBER KEYWORDS ##############
-  // ###################################
   val divisibleBy: Number?
-
   val isExclusiveMinimum: Boolean?
-
   val isExclusiveMaximum: Boolean?
+}
 
-  val isAllowAdditionalItems: Boolean
+fun main() {
+  Keywords.all.groupBy {
+    it.applicableVersions.first()
+  }.forEach {
+    println("${it.key}:")
+    it.value.forEach {
+      println("\t- ${it.key}")
+    }
+  }
 
-  // ###################################
-  // #### OBJECT KEYWORDS  ##############
-  // ###################################
-
-  val isAllowAdditionalProperties: Boolean
 }

@@ -1,13 +1,11 @@
 package io.mverse.jsonschema.loading.reference
 
-import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.utils.JsonUtils.tryParseURI
 import io.mverse.jsonschema.utils.recurse
 import io.mverse.jsonschema.utils.trimEmptyFragment
-import lang.collection.MutableListMultimap
 import lang.json.JsonPath
 import lang.json.JsrObject
 import lang.net.URI
@@ -19,13 +17,17 @@ import lang.net.resolveUri
  *
  * @author ericmartineau
  */
-data class SchemaCache(
+data class JsonSchemaCache(
     private val documentIdRefs: MutableMap<URI, Map<URI, JsonPath>> = hashMapOf(),
     private val absoluteDocumentCache: MutableMap<URI, JsrObject> = hashMapOf(),
-    private val absoluteSchemaCache: MutableMap<URI, Schema> = hashMapOf()) {
+    private val absoluteSchemaCache: MutableMap<URI, Schema> = hashMapOf()) : SchemaCache {
 
-  operator fun plusAssign(pair: Pair<URI, Schema>) = cacheSchema(pair.first, pair.second)
-  operator fun plus(pair: Pair<URI, Schema>): SchemaCache = apply { cacheSchema(pair.first, pair.second) }
+  override fun set(uri: URI, schema: Schema) {
+    cacheSchema(uri, schema)
+  }
+
+  override operator fun plusAssign(pair: Pair<URI, Schema>) = cacheSchema(pair.first, pair.second)
+  override operator fun plus(pair: Pair<URI, Schema>): JsonSchemaCache = apply { cacheSchema(pair.first, pair.second) }
 
   fun cacheSchema(schemaURI: URI, schema: Schema) {
     check(schemaURI.isAbsolute()) { "Must be an absolute URI" }
@@ -33,18 +35,18 @@ data class SchemaCache(
     absoluteSchemaCache[normalized] = schema
   }
 
-  fun cacheDocument(documentURI: URI, document: JsrObject) {
+  override fun cacheDocument(documentURI: URI, document: JsrObject) {
     val docURI = documentURI.trimEmptyFragment()
     if (docURI.isAbsolute()) {
       absoluteDocumentCache[docURI] = document
     }
   }
 
-  fun lookupDocument(documentURI: URI): lang.json.JsrObject? {
+  override fun lookupDocument(documentURI: URI): lang.json.JsrObject? {
     return absoluteDocumentCache[documentURI.trimEmptyFragment()]
   }
 
-  fun cacheSchema(schema: Schema) {
+  override fun cacheSchema(schema: Schema) {
     cacheSchema(schema.location, schema)
   }
 
@@ -60,7 +62,7 @@ data class SchemaCache(
     return getSchema(schemaLocation.uniqueURI, schemaLocation.canonicalURI)
   }
 
-  operator fun get(schemaUri: URI): Schema? = this.getSchema(schemaUri)
+  override operator fun get(schemaUri: URI): Schema? = this.getSchema(schemaUri)
 
   fun getSchema(vararg schemaURI: URI): Schema? {
     return schemaURI.asSequence()
@@ -69,7 +71,7 @@ data class SchemaCache(
         .firstOrNull()
   }
 
-  fun resolveURIToDocumentUsingLocalIdentifiers(documentURI: URI, absoluteURI: URI, document: lang.json.JsrObject): JsonPath? {
+  override fun resolveURIToDocumentUsingLocalIdentifiers(documentURI: URI, absoluteURI: URI, document: JsrObject): JsonPath? {
 
     val paths = documentIdRefs.getOrPut(documentURI.trimEmptyFragment()) {
       val values = hashMapOf<URI, JsonPath>()

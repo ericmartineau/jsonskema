@@ -159,7 +159,9 @@ data class KeywordInfo<K : Keyword<*>>(
 
     fun build(): KeywordInfo<K> {
       this.versions.add(current)
-      return KeywordInfo(main, versions)
+      return KeywordInfo(main, versions).apply {
+        Keywords.keywordCollector += this
+      }
     }
 
     fun onlyForVersion(version: JsonSchemaVersion): KeywordInfoBuilder<K> {

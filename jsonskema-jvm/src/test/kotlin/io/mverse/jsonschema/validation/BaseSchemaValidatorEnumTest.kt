@@ -5,8 +5,7 @@ import assertk.assertAll
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
-import io.mverse.jsonschema.JsonSchema
-import io.mverse.jsonschema.JsonSchema.schemaBuilder
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.assertj.asserts.isValid
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.builder.MutableSchema
@@ -95,7 +94,7 @@ class BaseSchemaValidatorEnumTest {
     val testEnum = "[1, 1.0, 1.00]".parseJsrJson().asJsonArray()
     val testValNotSame = toJsrValue("1.000")
 
-    val schema = JsonSchema.schema { enumValues = testEnum }
+    val schema = JsonSchemas.schema { enumValues = testEnum }
 
     val validate = ValidationMocks.createTestValidator(schema).validate(testValNotSame)
 

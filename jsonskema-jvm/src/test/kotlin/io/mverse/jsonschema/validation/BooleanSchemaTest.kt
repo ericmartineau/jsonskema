@@ -15,7 +15,9 @@
  */
 package io.mverse.jsonschema.validation
 
+import assertk.assert
 import io.mverse.jsonschema.assertj.asserts.hasKeyword
+import io.mverse.jsonschema.assertj.asserts.isEqualIgnoringWhitespace
 import io.mverse.jsonschema.assertj.asserts.isNotValid
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.keyword.Keywords
@@ -44,6 +46,6 @@ class BooleanSchemaTest {
 
   @Test
   fun toStringTest() {
-    Assert.assertEquals("{\"type\":\"boolean\"}", mockBooleanSchema.build().toString())
+    assert(mockBooleanSchema.build().toString()).isEqualIgnoringWhitespace("{\"type\":\"boolean\"}")
   }
 }

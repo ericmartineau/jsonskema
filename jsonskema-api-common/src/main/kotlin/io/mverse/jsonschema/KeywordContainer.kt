@@ -7,16 +7,13 @@ import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-abstract class KeywordContainer(keywordGetter: ()-> Map<KeywordInfo<*>, Keyword<*>> = {emptyMap()}) {
-  open val keywords:Map<KeywordInfo<*>, Keyword<*>> by lazy(keywordGetter)
+interface KeywordContainer {
+  val keywords: Map<KeywordInfo<*>, Keyword<*>>
+  val values get() = Values(this)
 
-  inline fun <reified X : Keyword<*>> keyword(keyword: KeywordInfo<X>): X? {
-    return keywords[keyword] as X?
-  }
-
-  protected inner class Values {
+  class Values(val container: KeywordContainer) {
     operator fun <X, K : Keyword<X>> get(keyword: KeywordInfo<K>): X? {
-      return this@KeywordContainer[keyword]?.value
+      return container[keyword]?.value
     }
   }
 
@@ -24,52 +21,57 @@ abstract class KeywordContainer(keywordGetter: ()-> Map<KeywordInfo<*>, Keyword<
     @Suppress("UNCHECKED_CAST")
     return keywords[keyword] as K?
   }
+}
 
-  protected val values = Values()
+interface MutableKeywordContainer : KeywordContainer {
+  operator fun <K : Keyword<*>> set(key: KeywordInfo<K>, value: K?)
+  operator fun <T, K : Keyword<T>> set(key: KeywordInfo<K>, value: T?, updater: (T)-> K)
+  operator fun <T, K : Keyword<T>> set(keyword: KeywordInfo<K>, value: T?)
+  operator fun minusAssign(key: KeywordInfo<*>)
+}
 
-  inline fun <reified T, reified K : Keyword<T>> keywords(info: KeywordInfo<K>): ReadOnlyProperty<KeywordContainer, T?> {
-    return object : ReadOnlyProperty<KeywordContainer, T?> {
-      override fun getValue(thisRef: KeywordContainer, property: KProperty<*>): T? {
-        val keyword = thisRef.keyword(info) ?: return null
-        return keyword.value
+inline fun <reified T, reified K : Keyword<T>> MutableKeywordContainer.mutableKeyword(
+    info: KeywordInfo<K>,
+    crossinline supplier: () -> K = { this::class.newInstance() as K },
+    crossinline updater: K.(T) -> K = { this.withValue(it) as K })
+    : ReadWriteProperty<MutableKeywordContainer, T?> {
+
+  return object : ReadWriteProperty<MutableKeywordContainer, T?> {
+    override fun setValue(thisRef: MutableKeywordContainer, property: KProperty<*>, value: T?) {
+      if (value == null) {
+        thisRef -= info
+      } else {
+        val jsonSchemaKeyword = (thisRef.keywords[info] ?: supplier()) as K
+        thisRef[info] = jsonSchemaKeyword.updater(value)
       }
     }
-  }
 
-  inline fun <reified T, reified K : Keyword<T>> keywords(info: KeywordInfo<K>, default: T): ReadOnlyProperty<KeywordContainer, T> {
-    return object : ReadOnlyProperty<KeywordContainer, T> {
-      override fun getValue(thisRef: KeywordContainer, property: KProperty<*>): T {
-        val keyword = thisRef.keyword(info)
-        return keyword?.value ?: default
-      }
+    override fun getValue(thisRef: MutableKeywordContainer, property: KProperty<*>): T? {
+      val keyword = thisRef.keyword(info) ?: return null
+      return keyword.value
     }
   }
 }
 
-abstract class MutableKeywordContainer(keywordGetter: ()-> MutableMap<KeywordInfo<*>, Keyword<*>> = {mutableMapOf()}) : KeywordContainer(keywordGetter) {
+inline fun <reified X : Keyword<*>> KeywordContainer.keyword(keyword: KeywordInfo<X>): X? {
+  return keywords[keyword] as X?
+}
 
-  override val keywords by lazy(keywordGetter)
-
-  inline fun <reified T, reified K : Keyword<T>> mutableKeyword(info: KeywordInfo<K>,
-                                                                crossinline supplier: () -> K = { this::class.newInstance() as K },
-                                                                crossinline updater: K.(T) -> K = { this.withValue(it) as K })
-      : ReadWriteProperty<MutableKeywordContainer, T?> {
-
-
-    return object : ReadWriteProperty<MutableKeywordContainer, T?> {
-      override fun setValue(thisRef: MutableKeywordContainer, property: KProperty<*>, value: T?) {
-        if (value == null) {
-          thisRef.keywords.remove(info)
-        } else {
-          val jsonSchemaKeyword = (thisRef.keywords[info] ?: supplier()) as K
-          keywords[info] = jsonSchemaKeyword.updater(value)
-        }
-      }
-
-      override fun getValue(thisRef: MutableKeywordContainer, property: KProperty<*>): T? {
-        val keyword = thisRef.keyword(info) ?: return null
-        return keyword.value
-      }
+inline fun <reified T, reified K : Keyword<T>> KeywordContainer.keywords(info: KeywordInfo<K>): ReadOnlyProperty<KeywordContainer, T?> {
+  return object : ReadOnlyProperty<KeywordContainer, T?> {
+    override fun getValue(thisRef: KeywordContainer, property: KProperty<*>): T? {
+      val keyword = thisRef.keyword(info) ?: return null
+      return keyword.value
     }
   }
 }
+
+inline fun <reified T, reified K : Keyword<T>> KeywordContainer.keywords(info: KeywordInfo<K>, default: T): ReadOnlyProperty<KeywordContainer, T> {
+  return object : ReadOnlyProperty<KeywordContainer, T> {
+    override fun getValue(thisRef: KeywordContainer, property: KProperty<*>): T {
+      val keyword = thisRef.keyword(info)
+      return keyword?.value ?: default
+    }
+  }
+}
+
