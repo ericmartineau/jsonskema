@@ -35,31 +35,31 @@ fun recurseProperties(draftSchema: Draft7Schema, currentPath: String, isRequired
       draftSchema.properties.forEach { (path, prop) ->
         val propIsRequired = isRequired && draftSchema.requiredProperties.contains(path)
         val propPath = "$currentPath/$path"
-        recurseProperties(prop.asDraft7(), propPath, propIsRequired, holder, processed)
+        recurseProperties(prop.draft7(), propPath, propIsRequired, holder, processed)
       }
 
       draftSchema.allOfSchemas.forEach { allOf ->
-        recurseProperties(allOf.asDraft7(), currentPath, isRequired, holder, processed)
+        recurseProperties(allOf.draft7(), currentPath, isRequired, holder, processed)
       }
 
       draftSchema.oneOfSchemas.forEach { oneOf ->
-        recurseProperties(oneOf.asDraft7(), currentPath, false, holder, processed)
+        recurseProperties(oneOf.draft7(), currentPath, false, holder, processed)
       }
 
       draftSchema.anyOfSchemas.forEach { anyOf ->
-        recurseProperties(anyOf.asDraft7(), currentPath, false, holder, processed)
+        recurseProperties(anyOf.draft7(), currentPath, false, holder, processed)
       }
 
       if (draftSchema.thenSchema != null) {
-        recurseProperties(draftSchema.thenSchema!!.asDraft7(), currentPath, false, holder, processed)
+        recurseProperties(draftSchema.thenSchema!!.draft7(), currentPath, false, holder, processed)
       }
 
       if (draftSchema.elseSchema != null) {
-        recurseProperties(draftSchema.elseSchema!!.asDraft7(), currentPath, false, holder, processed)
+        recurseProperties(draftSchema.elseSchema!!.draft7(), currentPath, false, holder, processed)
       }
 
       draftSchema.allItemSchema?.run {
-        val d7 = this.asDraft7()
+        val d7 = this.draft7()
         recurseProperties(d7, currentPath, isRequired && d7.minItems ?: 0 > 0, holder, processed)
       }
     }

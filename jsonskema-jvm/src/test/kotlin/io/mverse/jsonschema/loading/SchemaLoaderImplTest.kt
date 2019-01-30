@@ -171,9 +171,9 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   fun pointerResolution() {
     val actual = getSchemaForKey("pointerResolution")
 
-    val rectangleSchema = actual.properties.get("rectangle")?.asDraft6()
+    val rectangleSchema = actual.properties.get("rectangle")?.draft6()
     assert(rectangleSchema).isNotNull {
-      val schemaA = rectangleSchema!!.properties.get("a")?.asDraft6()
+      val schemaA = rectangleSchema!!.properties.get("a")?.draft6()
       assert(schemaA).isNotNull {
         assert(schemaA!!.minimum!!.toInt()).isEqualTo(0)
       }
@@ -210,7 +210,7 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   fun refWithType() {
     val actualRoot = getSchemaForKey("refWithType")
     assert(actualRoot).isNotNull()
-    val prop = actualRoot.properties.getValue("prop").asDraft7()
+    val prop = actualRoot.properties.getValue("prop").draft7()
     assert(prop).isNotNull()
     assert(prop.requiredProperties).containsAll("a", "b")
   }
@@ -262,7 +262,7 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   fun schemaPointerIsPopulated() {
     val rawSchema = JsonSchemas.resourceLoader(this::class).readJsonObject("objecttestschemas.json")
         .getJsonObject("objectWithSchemaDep")
-    val actual = JsonSchemas.createSchemaReader().readSchema(rawSchema).asDraft6()
+    val actual = JsonSchemas.createSchemaReader().readSchema(rawSchema).draft6()
 
     assertAll {
       assert(actual).isNotNull()
@@ -285,7 +285,7 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   @Test
   fun sniffByFormat() {
     val schemaJson = jsrObject { "format" *= "hostname" }
-    val actual = JsonSchemas.createSchemaReader().readSchema(schemaJson).asDraft6()
+    val actual = JsonSchemas.createSchemaReader().readSchema(schemaJson).draft6()
     assert(actual.format).isEqualTo("hostname")
   }
 
@@ -359,7 +359,7 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
       }
     }
 
-    val asString = schemaOne.asDraft7().toString(includeExtraProperties = true)
+    val asString = schemaOne.draft7().toString(includeExtraProperties = true)
 
     val deserialized = JsonSchemas.createSchemaReader().readSchema(asString)
     assert(schemaOne).isSchemaEqual(deserialized)

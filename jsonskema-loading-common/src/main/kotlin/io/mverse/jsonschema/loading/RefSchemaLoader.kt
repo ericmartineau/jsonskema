@@ -76,7 +76,7 @@ data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoa
       }
     }
 
-    val document = currentDocument ?: schemaLoader.findLoadedSchema(documentURI)?.asDraft7()?.toJson(true)
+    val document = currentDocument ?: schemaLoader.findLoadedSchema(documentURI)?.draft7()?.toJson(true)
     val schemaBuilder = findRefInDocument(documentURI, absoluteReferenceURI, document, report)
         ?: return null //Couldn't be resolved yet
     val refSchema = schemaBuilder.build()

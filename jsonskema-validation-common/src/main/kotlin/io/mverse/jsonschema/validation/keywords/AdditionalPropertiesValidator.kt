@@ -16,7 +16,7 @@ class AdditionalPropertiesValidator(keyword: SingleSchemaKeyword, schema: Schema
   private val patternProperties: Set<Regex>
 
   init {
-    val draft6Schema = schema.asDraft6()
+    val draft6Schema = schema.draft6()
     this.additionalPropertiesValidator = factory.createValidator(keyword.value)
     this.patternProperties = draft6Schema.patternProperties.keys
         .map { Regex(it) }

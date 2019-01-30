@@ -96,10 +96,10 @@ data class JsonSchema(
   }
 
   override fun getOrNull(path: JsonPath): Schema? {
-    var schema: Schema = asDraft7()
+    var schema: Schema = draft7()
     val segments = path.iterator()
     while (segments.hasNext()) {
-      val draft7 = schema.asDraft7()
+      val draft7 = schema.draft7()
       val segment = segments.next()
       when (segment) {
         "properties"-> schema = draft7.properties[segments.next()] ?: return null
@@ -121,19 +121,19 @@ data class JsonSchema(
     return schema
   }
 
-  override fun asDraft3(): Draft3Schema {
+  override fun draft3(): Draft3Schema {
     return copy(version = JsonSchemaVersion.Draft3)
   }
 
-  override fun asDraft4(): Draft4Schema {
+  override fun draft4(): Draft4Schema {
     return copy(version = JsonSchemaVersion.Draft4)
   }
 
-  override fun asDraft6(): Draft6Schema {
+  override fun draft6(): Draft6Schema {
     return copy(version = JsonSchemaVersion.Draft6)
   }
 
-  override fun asDraft7(): Draft7Schema {
+  override fun draft7(): Draft7Schema {
     return copy(version = JsonSchemaVersion.Draft7)
   }
 
@@ -198,7 +198,7 @@ data class JsonSchema(
 
     init {
       jsrJson.registerConversion<Schema> {
-        it.asDraft7().toJson(true)
+        it.draft7().toJson(true)
       }
     }
   }

@@ -17,7 +17,7 @@ class ArrayKeywordsLoaderTest : BaseLoaderTest("arraytestschemas.json") {
   @Test
   fun arrayByAdditionalItems() {
     val actual = getSchemaForKey("arrayByAdditionalItems")
-    assert(actual.additionalItemsSchema?.asDraft7()?.types).isNotNull {
+    assert(actual.additionalItemsSchema?.draft7()?.types).isNotNull {
       it.containsAll(JsonSchemaType.NULL)
     }
   }
@@ -31,7 +31,7 @@ class ArrayKeywordsLoaderTest : BaseLoaderTest("arraytestschemas.json") {
 
   @Test
   fun arraySchema() {
-    val actual = getSchemaForKey("arraySchema").asDraft6()
+    val actual = getSchemaForKey("arraySchema").draft6()
     assert(actual.minItems).isEqualTo(2)
     assert(actual.maxItems).isEqualTo(3)
     assert(actual.allItemSchema).isEqualTo(NULL_SCHEMA)

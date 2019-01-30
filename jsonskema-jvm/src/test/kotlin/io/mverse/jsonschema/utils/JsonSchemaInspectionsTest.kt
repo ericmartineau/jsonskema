@@ -20,7 +20,7 @@ class JsonSchemaInspectionsTest {
   fun testAmbiguous_EnumValues() {
     val draft6Schema = JsonSchemas.schema {
       enumValues = jsrArrayOf(1, true)
-    }.asDraft6()
+    }.draft6()
     assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(NULL)
   }
 
@@ -36,7 +36,7 @@ class JsonSchemaInspectionsTest {
   fun testBooleanSchema() {
     val draft6Schema = JsonSchemas.schema {
       type = BOOLEAN
-    }.asDraft6()
+    }.draft6()
     assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(BOOLEAN)
   }
 
@@ -44,7 +44,7 @@ class JsonSchemaInspectionsTest {
   fun testBooleanSchema_EnumValues() {
     val draft6Schema = JsonSchemas.schema {
       enumValues = jsrArrayOf(true, false)
-    }.asDraft6()
+    }.draft6()
     assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(BOOLEAN)
   }
 
@@ -60,7 +60,7 @@ class JsonSchemaInspectionsTest {
   fun testNullSchema_EnumValues() {
     val draft6Schema = JsonSchemas.schema {
       enumValues = jsrArrayOf(JsonNull)
-    }.asDraft6()
+    }.draft6()
     assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(NULL)
   }
 
@@ -68,7 +68,7 @@ class JsonSchemaInspectionsTest {
   fun testNumberSchema() {
     val draft6Schema = JsonSchemas.schema {
       maximum = 23
-    }.asDraft6()
+    }.draft6()
     assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(NUMBER)
   }
 
@@ -76,7 +76,7 @@ class JsonSchemaInspectionsTest {
   fun testNumberSchema_EnumValues() {
     val draft6Schema = JsonSchemas.schema {
       enumValues = jsrArrayOf(1, 4)
-    }.asDraft6()
+    }.draft6()
     assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(NUMBER)
   }
 
@@ -84,7 +84,7 @@ class JsonSchemaInspectionsTest {
   fun testObjectSchema() {
     val draft6Schema = JsonSchemas.schema {
       maxProperties = 23
-    }.asDraft6()
+    }.draft6()
     assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(OBJECT)
   }
 
@@ -92,7 +92,7 @@ class JsonSchemaInspectionsTest {
   fun testStringSchema() {
     val draft6Schema = JsonSchemas.schema {
       format = FormatType.DATE.toString()
-    }.asDraft6()
+    }.draft6()
     assert(draft6Schema.calculateJsonSchemaType()).isEqualTo(STRING)
   }
 }

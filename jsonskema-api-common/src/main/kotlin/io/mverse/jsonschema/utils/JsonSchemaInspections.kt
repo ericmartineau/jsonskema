@@ -46,7 +46,7 @@ fun URI.calculateMergeURI(override: URI?): URI {
 }
 
 fun Schema.calculateJsonSchemaType(): JsonSchemaType? {
-  val schema = this.asDraft7()
+  val schema = this.draft7()
   if (schema.types.isNotEmpty()) {
     return schema.types.first()
   }

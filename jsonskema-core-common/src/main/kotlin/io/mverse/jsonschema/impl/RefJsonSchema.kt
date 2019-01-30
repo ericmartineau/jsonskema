@@ -128,10 +128,10 @@ data class RefJsonSchema(val schemaLoader: SchemaLoader,
     return null
   }
 
-  override fun asDraft3(): Draft3Schema = copy(version = Draft3)
-  override fun asDraft4(): Draft4Schema = copy(version = Draft4)
-  override fun asDraft6(): Draft6Schema = copy(version = Draft6)
-  override fun asDraft7(): Draft7Schema = copy(version = Draft7)
+  override fun draft3(): Draft3Schema = copy(version = Draft3)
+  override fun draft4(): Draft4Schema = copy(version = Draft4)
+  override fun draft6(): Draft6Schema = copy(version = Draft6)
+  override fun draft7(): Draft7Schema = copy(version = Draft7)
 
   override fun equals(other: Any?): Boolean {
     return when (other) {

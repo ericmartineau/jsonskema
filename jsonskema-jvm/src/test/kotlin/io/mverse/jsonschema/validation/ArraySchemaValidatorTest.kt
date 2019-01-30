@@ -203,7 +203,7 @@ class ArraySchemaValidatorTest {
     // itemSchemas.add(requireNonNull(itemSchema, "itemSchema cannot be null"));
     // return this;
     val subject = JsonSchemas.schema { itemSchemas = listOf(mockBooleanSchema) }
-    val expectedSchema = subject.asDraft6().itemSchemas[0]
+    val expectedSchema = subject.draft6().itemSchemas[0]
 
     failureOf(subject)
         .expectedViolatedSchema(expectedSchema)

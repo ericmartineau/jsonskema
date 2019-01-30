@@ -26,7 +26,7 @@ class SchemaExtensionsTest {
         }
       }
     }
-    val allSchemaProps = schema.asDraft7().allProperties
+    val allSchemaProps = schema.draft7().allProperties
     assertk.assert(allSchemaProps.keys).containsAll("/EMAILS", "/NUMBER", "/OBJECT/NAME", "/OBJECT/PHONE",
         "/OBJECT/ADDRESS/STREET1", "/OBJECT/ADDRESS/STREET2")
   }

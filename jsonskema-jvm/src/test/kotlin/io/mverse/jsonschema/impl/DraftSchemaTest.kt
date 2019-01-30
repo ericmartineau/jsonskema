@@ -371,10 +371,10 @@ class DraftSchemaTest {
         .addTestParam("draft4", draft4Schema(schema))
         .addTestParam("draft6", draft6Schema(schema))
         .addTestParam("draft7", draft7Schema(schema))
-        .addTestParam("draft3Ref", RefJsonSchema(loader, schema.location, URI(dogSchemaLocation), schema).asDraft3())
-        .addTestParam("draft4Ref", RefJsonSchema(loader, schema.location, URI(dogSchemaLocation), schema).asDraft4())
-        .addTestParam("draft6Ref", RefJsonSchema(loader, schema.location, URI(dogSchemaLocation), schema).asDraft6())
-        .addTestParam("draft7Ref", RefJsonSchema(loader, schema.location, URI(dogSchemaLocation), schema).asDraft7())
+        .addTestParam("draft3Ref", RefJsonSchema(loader, schema.location, URI(dogSchemaLocation), schema).draft3())
+        .addTestParam("draft4Ref", RefJsonSchema(loader, schema.location, URI(dogSchemaLocation), schema).draft4())
+        .addTestParam("draft6Ref", RefJsonSchema(loader, schema.location, URI(dogSchemaLocation), schema).draft6())
+        .addTestParam("draft7Ref", RefJsonSchema(loader, schema.location, URI(dogSchemaLocation), schema).draft7())
         .build()
   }
 
@@ -383,8 +383,8 @@ class DraftSchemaTest {
     return TestParam.builder<Draft3Schema>()
         .addTestParam("draft3Schema", draft3Schema(schema))
         .addTestParam("draft3RefSchema", RefJsonSchema(loader, schema.location,
-            dogRefURI,
-            schema).asDraft3())
+                dogRefURI,
+                schema).draft3())
         .build()
   }
 
@@ -394,8 +394,8 @@ class DraftSchemaTest {
     return TestParam.builder<Draft4Schema>()
         .addTestParam("draft4Schema", draft4Schema(schema))
         .addTestParam("draft4RefSchema", RefJsonSchema(loader, schema.location,
-            dogRefURI,
-            schema).asDraft4())
+                dogRefURI,
+                schema).draft4())
         .build()
   }
 
@@ -404,8 +404,8 @@ class DraftSchemaTest {
     return TestParam.builder<Draft6Schema>()
         .addTestParam("draft6Schema", draft6Schema(schema))
         .addTestParam("draft6RefSchema", RefJsonSchema(loader, schema.location,
-            dogRefURI,
-            schema).asDraft6())
+                dogRefURI,
+                schema).draft6())
         .build()
   }
 
@@ -414,8 +414,8 @@ class DraftSchemaTest {
     return TestParam.builder<Draft7Schema>()
         .addTestParam("draft7Schema", draft7Schema(schema))
         .addTestParam("draft7RefSchema", RefJsonSchema(loader, schema.location,
-            dogRefURI,
-            schema).asDraft7())
+                dogRefURI,
+                schema).draft7())
         .build()
   }
 

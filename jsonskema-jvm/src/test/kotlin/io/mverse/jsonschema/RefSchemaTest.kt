@@ -26,7 +26,7 @@ class RefSchemaTest {
             constValue = 42.0.toJsrJson()
           })
 
-      withRef.asDraft4()
+      withRef.draft4()
           .asserting()
           .isVersion(JsonSchemaVersion.Draft4)
           .hasKeyword(Keywords.CONST)
@@ -64,7 +64,7 @@ class RefSchemaTest {
     assert(JsonSchemas.schemaReader.readSchema(URI("http://schemas/parent"))).isEqualTo(parentSchema)
     assert(JsonSchemas.schemaReader.readSchema(URI("http://schemas/child"))).isEqualTo(childSchema)
 
-    val childRef = childSchema.asDraft7().properties["parent"]?.asDraft7()
+    val childRef = childSchema.draft7().properties["parent"]?.draft7()
     assert(childRef).isNotNull {
         assert(it.actual).isInstanceOf(RefSchema::class) {
           assert(it.actual.refSchema).isEqualTo(parentSchema)

@@ -41,28 +41,28 @@ class JsonSchemaTest {
 
   @Test
   fun testWithIdDraft6() {
-    val theSchema: Draft6Schema = JsonSchemas.schema(id = "https://www.schema.org/foo") {}.asDraft6()
+    val theSchema: Draft6Schema = JsonSchemas.schema(id = "https://www.schema.org/foo") {}.draft6()
     assert(theSchema.id).hasToString("https://www.schema.org/foo")
     val newURI = URI("https://google.com/hosted/foo/blah")
-    val withId = theSchema.withId(newURI).asDraft6()
+    val withId = theSchema.withId(newURI).draft6()
     assert(withId.id).isEqualTo(newURI)
   }
 
   @Test
   fun testWithIdDraft4() {
-    val theSchema: Draft4Schema = schema(id = "https://www.schema.org/foo") {}.asDraft4()
+    val theSchema: Draft4Schema = schema(id = "https://www.schema.org/foo") {}.draft4()
     assert(theSchema.id).hasToString("https://www.schema.org/foo")
     val newURI = URI("https://google.com/hosted/foo/blah")
-    val withId = theSchema.withId(newURI).asDraft4()
+    val withId = theSchema.withId(newURI).draft4()
     assert(withId.id).isEqualTo(newURI)
   }
 
   @Test
   fun testWithIdDraft3() {
-    val theSchema: Draft3Schema = schema(id = "https://www.schema.org/foo") {}.asDraft3()
+    val theSchema: Draft3Schema = schema(id = "https://www.schema.org/foo") {}.draft3()
     assert(theSchema.id).hasToString("https://www.schema.org/foo")
     val newURI = URI("https://google.com/hosted/foo/blah")
-    val withId = theSchema.withId(newURI).asDraft3()
+    val withId = theSchema.withId(newURI).draft3()
     assert(withId.id).isEqualTo(newURI)
   }
 
@@ -80,7 +80,7 @@ class JsonSchemaTest {
       }
     }
 
-    val schemaString = schema.asDraft7().toString(includeExtraProperties = true)
+    val schemaString = schema.draft7().toString(includeExtraProperties = true)
     assert(schemaString).isEqualIgnoringWhitespace("{\"properties\":{\"childSchema\":{\"properties\":{\"grandchildSchema\":{\"theNestStatus\":\"FULL\"}},\"bobsType\":\"Chainsaw Murderer\"}},\"bobTheBuilder\":true}")
   }
 
@@ -98,7 +98,7 @@ class JsonSchemaTest {
       }
     }
 
-    val schemaString = schema.asDraft7().toString(includeExtraProperties = false)
+    val schemaString = schema.draft7().toString(includeExtraProperties = false)
     assert(schemaString).isEqualIgnoringWhitespace("{\"properties\":{\"childSchema\":{\"properties\":{\"grandchildSchema\":{}}}}}")
   }
 
@@ -118,7 +118,7 @@ class JsonSchemaTest {
       isUseSchemaKeyword = true
     }
 
-    val schemaString = schema.asDraft7().toString(includeExtraProperties = false, indent = true)
+    val schemaString = schema.draft7().toString(includeExtraProperties = false, indent = true)
     assert(schemaString.trim()).isEqualIgnoringWhitespace("{\n" +
         "    \"\$schema\": \"http://json-schema.org/draft-07/schema#\",\n" +
         "    \"\$id\": \"https://something.com/field-order\",\n" +
@@ -149,7 +149,7 @@ class JsonSchemaTest {
       isUseSchemaKeyword = true
     }
 
-    val schemaString = schema.asDraft7().toString(includeExtraProperties = false, indent = true)
+    val schemaString = schema.draft7().toString(includeExtraProperties = false, indent = true)
     assert(schemaString.trim()).isEqualIgnoringWhitespace("{\n" +
         "    \"\$schema\": \"http://custom-meta-schema.com\",\n" +
         "    \"\$id\": \"https://something.com/custom-metaschema\",\n" +
@@ -177,7 +177,7 @@ class JsonSchemaTest {
         "        }\n" +
         "    }\n" +
         "}"
-    val readSchema = JsonSchemas.createSchemaReader().readSchema(schema).asDraft7()
+    val readSchema = JsonSchemas.createSchemaReader().readSchema(schema).draft7()
     assert(readSchema.keywords.containsKey(SCHEMA)).isTrue()
     assert(readSchema.keywords.getValue(SCHEMA).value).isEqualTo(URI("http://custom-meta-schema.com"))
   }
@@ -195,7 +195,7 @@ class JsonSchemaTest {
         "        }\n" +
         "    }\n" +
         "}"
-    val readSchema = JsonSchemas.createSchemaReader().readSchema(schema).asDraft7()
+    val readSchema = JsonSchemas.createSchemaReader().readSchema(schema).draft7()
     assert(readSchema.keywords.containsKey(SCHEMA)).isTrue()
     assert(readSchema.keywords.getValue(SCHEMA).value).isEqualTo(emptyUri)
   }
@@ -213,7 +213,7 @@ class JsonSchemaTest {
         "        }\n" +
         "    }\n" +
         "}"
-    val readSchema = JsonSchemas.createSchemaReader().readSchema(schema).asDraft7()
+    val readSchema = JsonSchemas.createSchemaReader().readSchema(schema).draft7()
     assert(readSchema.keywords.containsKey(SCHEMA)).isTrue()
     assert(readSchema.keywords.get(SCHEMA)!!.value).isEqualTo(emptyUri)
   }

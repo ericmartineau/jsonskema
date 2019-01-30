@@ -11,13 +11,11 @@ import lang.json.JsonPath
 import lang.json.JsrObject
 import lang.json.JsrValue
 import lang.net.URI
-import lang.suppress.Suppressions
-import lang.suppress.Suppressions.Companion.UNCHECKED_CAST
 
 /**
  * A json-schema instance.
  */
-interface Schema: KeywordContainer {
+interface Schema : KeywordContainer {
 
   /**
    * The $id keyword, if specified
@@ -70,35 +68,40 @@ interface Schema: KeywordContainer {
 
   fun toMutableSchema(id: URI): MutableSchema
 
-  @Name("asDraft3")
-  fun asDraft3(): Draft3Schema
+  @Deprecated("use draft3", replaceWith = ReplaceWith("draft3()"))
+  fun asDraft3(): Draft3Schema = draft3()
 
-  @Name("asDraft4")
-  fun asDraft4(): Draft4Schema
+  @Deprecated("use draft4", replaceWith = ReplaceWith("draft4()"))
+  fun asDraft4(): Draft4Schema = draft4()
 
-  @Name("asDraft6")
-  fun asDraft6(): Draft6Schema
+  @Deprecated("use draft6", replaceWith = ReplaceWith("draft6()"))
+  fun asDraft6(): Draft6Schema = draft6()
 
-  @Name("asDraft7")
-  fun asDraft7(): Draft7Schema
+  @Deprecated("use draft7", replaceWith = ReplaceWith("draft7()"))
+  fun asDraft7(): Draft7Schema = draft7()
 
-  fun <D:Schema> asVersion(version: JsonSchemaVersion): D {
-    @Suppress(UNCHECKED_CAST)
+  fun draft3(): Draft3Schema
+  fun draft4(): Draft4Schema
+  fun draft6(): Draft6Schema
+  fun draft7(): Draft7Schema
+
+  fun asVersion(version: JsonSchemaVersion): Schema {
     return when (version) {
-      JsonSchemaVersion.Draft7 -> asDraft7()
-      JsonSchemaVersion.Draft6 -> asDraft6()
-      JsonSchemaVersion.Draft4 -> asDraft4()
-      JsonSchemaVersion.Draft3 -> asDraft3()
+      JsonSchemaVersion.Draft7 -> draft7()
+      JsonSchemaVersion.Draft6 -> draft6()
+      JsonSchemaVersion.Draft4 -> draft4()
+      JsonSchemaVersion.Draft3 -> draft3()
       else -> illegalState("Cant convert to custom")
-    } as D
+    }
   }
 
-  operator fun get(path:JsonPath): Schema = getOrNull(path) ?: nullPointer("Unable to resolve schema for path $path")
+  operator fun get(path: JsonPath): Schema = getOrNull(path)
+      ?: nullPointer("Unable to resolve schema for path $path")
 
-  fun getOrNull(path:JsonPath): Schema?
+  fun getOrNull(path: JsonPath): Schema?
 
-  fun toJson(includeExtraProperties:Boolean): JsrObject
-  fun toString(includeExtraProperties:Boolean, indent:Boolean = true): String
+  fun toJson(includeExtraProperties: Boolean): JsrObject
+  fun toString(includeExtraProperties: Boolean, indent: Boolean = true): String
 
   /**
    * Creates a copy of this schema with the provided schema id
@@ -111,15 +114,14 @@ interface Schema: KeywordContainer {
    */
   @Name("withDocumentURI")
   fun withDocumentURI(documentURI: URI): Schema
-
 }
 
 inline fun <reified D : Schema> Schema.asVersion(): D {
   return when (D::class) {
-    Draft3Schema::class -> asDraft3() as D
-    Draft4Schema::class -> asDraft4() as D
-    Draft6Schema::class -> asDraft6() as D
-    Draft7Schema::class -> asDraft7() as D
+    Draft3Schema::class -> draft3() as D
+    Draft4Schema::class -> draft4() as D
+    Draft6Schema::class -> draft6() as D
+    Draft7Schema::class -> draft7() as D
     else -> throw IllegalArgumentException("Unable to determine version from: $version")
   }
 }

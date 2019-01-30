@@ -32,7 +32,7 @@ fun Assert<Schema>.isDraft7(): Draft7Assert {
   assert(actual.version, "schema.version")
       .isEqualTo(Draft7)
 
-  return assert(actual.asDraft7())
+  return assert(actual.draft7())
 }
 
 fun SchemaAssert.isVersion(version: JsonSchemaVersion): SchemaAssert {
@@ -78,7 +78,7 @@ fun SchemaAssert.hasProperty(property: String): SchemaAssert {
         it.isNotNull()
       }
 
-  val propSchema = actual.asDraft7().properties[property]
+  val propSchema = actual.draft7().properties[property]
   assert(propSchema, "contains $property").isNotNull()
   return assert(propSchema!!)
 }

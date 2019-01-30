@@ -394,7 +394,7 @@ class ObjectKeywordsValidatorTest {
       patternProperties["aaa"] = mockBooleanSchema
     }
 
-    val schema = builder.build().asDraft6()
+    val schema = builder.build().draft6()
 
     assert(schema.patternProperties).hasSize(1)
     assert(schema.propertyDependencies.size()).isEqualTo(1)

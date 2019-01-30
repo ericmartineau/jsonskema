@@ -32,7 +32,7 @@ open class BaseLoaderTest(resourceURL: String) {
   protected fun getSchemaForKey(propertyKey: String): Draft6Schema {
     log.info {"Loading schema from ${path(propertyKey)}"}
     val jsonObjectForKey = getJsonObjectForKey(propertyKey)
-    return JsonSchemas.createSchemaReader().readSchema(jsonObjectForKey).asDraft6()
+    return JsonSchemas.createSchemaReader().readSchema(jsonObjectForKey).draft6()
   }
 
   protected fun readResource(relativeURL: String): JsrObject {

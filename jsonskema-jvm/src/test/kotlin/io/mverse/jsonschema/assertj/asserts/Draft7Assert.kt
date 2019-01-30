@@ -9,7 +9,7 @@ import io.mverse.jsonschema.Draft7Schema
 import io.mverse.jsonschema.keyword.Keywords
 
 fun SchemaAssert.isReadOnly(): SchemaAssert {
-  assert(actual.asDraft7().isReadOnly, "readOnly").all {
+  assert(actual.draft7().isReadOnly, "readOnly").all {
     isNotNull()
     isTrue()
   }
@@ -17,7 +17,7 @@ fun SchemaAssert.isReadOnly(): SchemaAssert {
 }
 
 fun SchemaAssert.isNotReadOnly(): SchemaAssert {
-  assert(actual.asDraft7().isReadOnly, "readOnly").all {
+  assert(actual.draft7().isReadOnly, "readOnly").all {
     isNotNull()
     isFalse()
   }
@@ -25,7 +25,7 @@ fun SchemaAssert.isNotReadOnly(): SchemaAssert {
 }
 
 fun SchemaAssert.isWriteOnly(): SchemaAssert {
-  assert(actual.asDraft7().isWriteOnly, "writeOnly").all {
+  assert(actual.draft7().isWriteOnly, "writeOnly").all {
     isNotNull()
     isTrue()
   }
@@ -33,7 +33,7 @@ fun SchemaAssert.isWriteOnly(): SchemaAssert {
 }
 
 fun SchemaAssert.isNotWriteOnly(): SchemaAssert {
-  assert(actual.asDraft7().isWriteOnly, "writeOnly").all {
+  assert(actual.draft7().isWriteOnly, "writeOnly").all {
     isNotNull()
     isTrue()
   }
@@ -42,17 +42,17 @@ fun SchemaAssert.isNotWriteOnly(): SchemaAssert {
 
 fun SchemaAssert.hasIfSchema(): SchemaAssert {
   hasKeyword(keyword = Keywords.IF)
-  return assert(actual.asDraft7().ifSchema!!)
+  return assert(actual.draft7().ifSchema!!)
 }
 
 fun SchemaAssert.hasThenSchema(): SchemaAssert {
   hasKeyword(keyword = Keywords.THEN)
-  return assert(actual.asDraft7().thenSchema!!)
+  return assert(actual.draft7().thenSchema!!)
 }
 
 fun SchemaAssert.hasElseSchema(): SchemaAssert {
   hasKeyword(keyword = Keywords.ELSE)
-  return assert(actual.asDraft7().elseSchema!!)
+  return assert(actual.draft7().elseSchema!!)
 }
 
 
