@@ -97,7 +97,7 @@ import lang.json.JsrValue
 import lang.json.toJsrValue
 import lang.json.unboxAsAny
 import lang.net.URI
-import lang.suppress.Suppressions.Companion.UNCHECKED_CAST
+import lang.suppress.Suppressions.UNCHECKED_CAST
 import lang.uuid.randomUUID
 
 @Deprecated("Use MutableJsonSchema", replaceWith = ReplaceWith("MutableJsonSchema"))

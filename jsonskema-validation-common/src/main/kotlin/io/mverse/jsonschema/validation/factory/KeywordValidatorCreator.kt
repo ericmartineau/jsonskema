@@ -4,7 +4,7 @@ import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.keywords.KeywordValidator
-import lang.suppress.Suppressions.Companion.UNCHECKED_CAST
+import lang.suppress.Suppressions.UNCHECKED_CAST
 
 /**
  * Extracts any necessary validation keywords from a [Schema] instance.

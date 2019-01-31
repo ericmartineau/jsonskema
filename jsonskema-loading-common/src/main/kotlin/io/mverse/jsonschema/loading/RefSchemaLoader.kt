@@ -23,7 +23,7 @@ import lang.json.type
 import lang.net.URI
 import lang.net.fragment
 import lang.net.resolveUri
-import lang.suppress.Suppressions.Companion.NAME_SHADOWING
+import lang.suppress.Suppressions.NAME_SHADOWING
 
 data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoader: SchemaLoader) {
 

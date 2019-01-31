@@ -14,7 +14,7 @@ import lang.enums.range
 import lang.exception.illegalState
 import lang.hashKode
 import lang.json.JsrType
-import lang.suppress.Suppressions.Companion.UNUSED_PARAMETER
+import lang.suppress.Suppressions.UNUSED_PARAMETER
 
 /**
  * Represents a single keyword and its applicable versions, and acceptable input types.
