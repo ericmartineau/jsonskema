@@ -70,7 +70,7 @@ interface SchemaLoader {
    * @param schemaLocation The absolute URI for the schema
    * @return A schema, if one has been loaded
    */
-  fun findLoadedSchema(schemaLocation: URI): Schema?
+  fun findLoadedSchema(schemaLocation: URI, allowRefSchema: Boolean = true): Schema?
 
   /**
    * Registers a schema that's been loaded

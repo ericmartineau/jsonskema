@@ -59,7 +59,7 @@ data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoa
     val documentURI = currentLocation.documentURI
 
     // Look for a cache schema at this URI
-    val cachedSchema = schemaLoader.findLoadedSchema(absoluteReferenceURI)
+    val cachedSchema = schemaLoader.findLoadedSchema(absoluteReferenceURI, allowRefSchema = false)
     if (cachedSchema != null) {
       return cachedSchema
     }
@@ -67,7 +67,7 @@ data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoa
     // Attempt to load a subschema (aka definitions)
     val fragment = absoluteReferenceURI.fragment
     if (fragment != null && fragment.isNotBlank()) {
-      val cachedDocumentSchema = schemaLoader.findLoadedSchema(absoluteReferenceURI.withoutFragment())
+      val cachedDocumentSchema = schemaLoader.findLoadedSchema(absoluteReferenceURI.withoutFragment(), allowRefSchema = false)
       if (cachedDocumentSchema != null && cachedDocumentSchema !is RefSchema) {
         val pathFromFragment = JsonPath.fromURI("#$fragment")
         val found = cachedDocumentSchema[pathFromFragment]
@@ -76,7 +76,7 @@ data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoa
       }
     }
 
-    val document = currentDocument ?: schemaLoader.findLoadedSchema(documentURI)?.draft7()?.toJson(true)
+    val document = currentDocument ?: schemaLoader.findLoadedSchema(documentURI, allowRefSchema = false)?.draft7()?.toJson(true)
     val schemaBuilder = findRefInDocument(documentURI, absoluteReferenceURI, document, report)
         ?: return null //Couldn't be resolved yet
     val refSchema = schemaBuilder.build()

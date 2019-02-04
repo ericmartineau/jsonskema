@@ -27,6 +27,7 @@ allprojects {
   tasks.withType<KotlinCompile> {
     kotlinOptions {
       jvmTarget = "1.8"
+      freeCompilerArgs += "-Xuse-experimental=kotlin.Experimental"
     }
   }
 

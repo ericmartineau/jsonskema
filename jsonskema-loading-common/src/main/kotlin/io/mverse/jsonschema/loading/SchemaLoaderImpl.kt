@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.loading
 
 import io.mverse.jsonschema.JsonValueWithPath
+import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
@@ -60,8 +61,8 @@ data class SchemaLoaderImpl(
   // ############  FINDING/STORING LOADED SCHEMAS  ###############
   // #############################################################
 
-  override fun findLoadedSchema(schemaLocation: URI): Schema? {
-    return schemaCache.getSchema(schemaLocation)
+  override fun findLoadedSchema(schemaLocation: URI, allowRefSchema: Boolean): Schema? {
+    return schemaCache.getSchema(schemaLocation)?.takeUnless { it.isRefSchema }
   }
 
   override fun withPreloadedSchema(schema: Schema): SchemaLoader {
