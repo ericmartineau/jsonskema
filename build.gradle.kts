@@ -3,7 +3,6 @@ import io.spring.gradle.dependencymanagement.dsl.DependenciesHandler
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("kotlin-multiplatform")
   id("io.mverse.project")
   id("io.mverse.multi-platform")
   id("kotlinx-serialization")
@@ -11,17 +10,14 @@ plugins {
 
 allprojects {
   plugins.apply("kotlinx-serialization")
+  plugins.apply("java")
   mverse {
     isDefaultDependencies = false
-    coverageRequirement = 0.60
+    coverageRequirement = 0.72
     bom = "io.mverse:mverse-bom:0.5.13"
     dependencies {
       compile(kotlinSerialization())
     }
-  }
-
-  jacoco {
-
   }
 
   tasks.withType<KotlinCompile> {
