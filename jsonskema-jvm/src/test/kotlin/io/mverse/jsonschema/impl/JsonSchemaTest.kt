@@ -2,10 +2,12 @@ package io.mverse.jsonschema.impl
 
 import assertk.Assert
 import assertk.assert
+import assertk.assertAll
 import assertk.assertions.hasToString
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
+import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import io.mverse.jsonschema.Draft3Schema
@@ -25,6 +27,7 @@ import io.mverse.jsonschema.schemaBuilder
 import lang.json.JsonPath
 import lang.json.JsrTrue
 import lang.json.jsrString
+import lang.json.toJsonPath
 import lang.net.URI
 import org.junit.Test
 
@@ -82,6 +85,45 @@ class JsonSchemaTest {
 
     val schemaString = schema.draft7().toString(includeExtraProperties = true)
     assert(schemaString).isEqualIgnoringWhitespace("{\"properties\":{\"childSchema\":{\"properties\":{\"grandchildSchema\":{\"theNestStatus\":\"FULL\"}},\"bobsType\":\"Chainsaw Murderer\"}},\"bobTheBuilder\":true}")
+  }
+
+  @Test
+  fun testGetOrNull() {
+    val schema = JsonSchemas.schema {
+      properties {
+        "foo" required string
+        "bar" required {
+          definitions["rad"] = {
+
+          }
+          oneOf {}
+          allOf {}
+          anyOf {}
+          ifSchema {}
+          thenSchema {}
+          elseSchema {}
+          containsSchema {}
+          properties {
+            "none" required {
+              properties {
+                "ya" required string
+              }
+            }
+          }
+        }
+      }
+    }
+    assertAll {
+      assert(schema.getOrNull("/properties/bar/properties/none".toJsonPath())).isNotNull()
+      assert(schema.getOrNull("/properties/bar/oneOf/0".toJsonPath())).isNotNull()
+      assert(schema.getOrNull("/properties/bar/anyOf/0".toJsonPath())).isNotNull()
+      assert(schema.getOrNull("/properties/bar/allOf/0".toJsonPath())).isNotNull()
+      assert(schema.getOrNull("/properties/bar/if".toJsonPath())).isNotNull()
+      assert(schema.getOrNull("/properties/bar/then".toJsonPath())).isNotNull()
+      assert(schema.getOrNull("/properties/bar/else".toJsonPath())).isNotNull()
+      assert(schema.getOrNull("/properties/bar/contains".toJsonPath())).isNotNull()
+      assert(schema.getOrNull("/properties/bar/definitions/rad".toJsonPath())).isNotNull()
+    }
   }
 
   @Test

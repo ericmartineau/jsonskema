@@ -13,7 +13,7 @@ allprojects {
   plugins.apply("java")
   mverse {
     isDefaultDependencies = false
-    coverageRequirement = 0.8
+    coverageRequirement = 0.75
     bom = "io.mverse:mverse-bom:0.5.13"
     dependencies {
       compile(kotlinSerialization())

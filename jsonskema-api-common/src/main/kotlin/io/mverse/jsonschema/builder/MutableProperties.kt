@@ -18,6 +18,10 @@ class MutableProperties(val builder: MutableSchema) {
 
   val keyword = PROPERTIES
 
+  operator fun get(key: String): Schema {
+    return (builder[keyword] ?: SchemaMapKeyword()).value.getValue(key)
+  }
+
   operator fun set(key: String, block: MutableSchema.() -> Unit) {
     val existing = builder[keyword] ?: SchemaMapKeyword()
     val childLocation = builder.location.child(PROPERTIES).child(key)
@@ -33,7 +37,7 @@ class MutableProperties(val builder: MutableSchema) {
     builder[keyword] = existing + (key to childBuilder.build())
   }
 
-  operator fun invoke(block: MutableProperties.()->Unit) {
+  operator fun invoke(block: MutableProperties.() -> Unit) {
     block()
   }
 
@@ -53,7 +57,7 @@ class MutableProperties(val builder: MutableSchema) {
 
   infix fun String.optional(schema: MutableSchema.() -> Unit) {
     val key = this
-    set(key)  {
+    set(key) {
       schema()
       if (!types.isEmpty()) {
         types += JsonSchemaType.NULL
@@ -147,65 +151,65 @@ class MutableProperties(val builder: MutableSchema) {
       type = JsonSchemaType.ARRAY
     }
 
-  fun number(block: MutableSchema.() -> Unit): (MutableSchema.()->Unit) {
-    return  {
+  fun number(block: MutableSchema.() -> Unit): (MutableSchema.() -> Unit) {
+    return {
       this.type = JsonSchemaType.NUMBER
       this.block()
     }
   }
 
-  fun integer(block: MutableSchema.() -> Unit): (MutableSchema.()->Unit) {
+  fun integer(block: MutableSchema.() -> Unit): (MutableSchema.() -> Unit) {
     return {
       this.type = JsonSchemaType.INTEGER
       this.block()
     }
   }
 
-  fun string(block: MutableSchema.() -> Unit): (MutableSchema.()->Unit) {
+  fun string(block: MutableSchema.() -> Unit): (MutableSchema.() -> Unit) {
     return {
       this.type = JsonSchemaType.STRING
       this.block()
     }
   }
 
-  fun boolean(block: MutableSchema.() -> Unit): (MutableSchema.()->Unit) {
-    return  {
+  fun boolean(block: MutableSchema.() -> Unit): (MutableSchema.() -> Unit) {
+    return {
       this.type = JsonSchemaType.BOOLEAN
       this.block()
     }
   }
 
-  fun array(block: MutableSchema.() -> Unit = {}): (MutableSchema.()->Unit) {
+  fun array(block: MutableSchema.() -> Unit = {}): (MutableSchema.() -> Unit) {
     return {
       this.type = JsonSchemaType.ARRAY
       this.block()
     }
   }
 
-  fun enum(vararg values: String): (MutableSchema.()->Unit) = enum(values.toList())
+  fun enum(vararg values: String): (MutableSchema.() -> Unit) = enum(values.toList())
 
-  fun enum(enumValues: Iterable<Any?>): (MutableSchema.()->Unit) {
-    return  {
+  fun enum(enumValues: Iterable<Any?>): (MutableSchema.() -> Unit) {
+    return {
       this.enumValues = createJsrArray(enumValues.map { toJsrValue(it) })
       this.type = this.enumValues?.jsonSchemaType
     }
   }
 
-  fun enum(values: JsrArray, block: MutableSchema.() -> Unit = {}): (MutableSchema.()->Unit) {
+  fun enum(values: JsrArray, block: MutableSchema.() -> Unit = {}): (MutableSchema.() -> Unit) {
     return {
       enumValues = values
       block()
     }
   }
 
-  fun enum(values: KtArray, block: MutableSchema.() -> Unit = {}): (MutableSchema.()->Unit) {
+  fun enum(values: KtArray, block: MutableSchema.() -> Unit = {}): (MutableSchema.() -> Unit) {
     return {
       enumValues = values.toJsrArray()
       block()
     }
   }
 
-  fun datetime(block: MutableSchema.() -> Unit = {}): (MutableSchema.()->Unit) {
+  fun datetime(block: MutableSchema.() -> Unit = {}): (MutableSchema.() -> Unit) {
     return {
       this.type = JsonSchemaType.STRING
       this.format = FormatType.DATE_TIME.toString()
@@ -213,7 +217,7 @@ class MutableProperties(val builder: MutableSchema) {
     }
   }
 
-  fun date(block: MutableSchema.() -> Unit = {}): (MutableSchema.()->Unit) {
+  fun date(block: MutableSchema.() -> Unit = {}): (MutableSchema.() -> Unit) {
     return {
       this.type = JsonSchemaType.STRING
       this.format = FormatType.DATE.toString()

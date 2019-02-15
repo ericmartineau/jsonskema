@@ -366,11 +366,11 @@ data class MutableJsonSchema(
   }
 
   override fun allOf(block: MutableSchema.() -> Unit) {
-    oneOfSchemas += subSchemaBuilder(Keywords.ALL_OF).apply(block)
+    allOfSchemas += subSchemaBuilder(Keywords.ALL_OF).apply(block)
   }
 
   override fun anyOf(block: MutableSchema.() -> Unit) {
-    oneOfSchemas += subSchemaBuilder(Keywords.ANY_OF).apply(block)
+    anyOfSchemas += subSchemaBuilder(Keywords.ANY_OF).apply(block)
   }
 
   override fun allItemsSchema(block: MutableSchema.() -> Unit) {

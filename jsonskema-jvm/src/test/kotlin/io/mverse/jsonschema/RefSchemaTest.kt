@@ -37,7 +37,8 @@ class RefSchemaTest {
    */
   @Test
   fun testRefSchemaNullToVersion() {
-    val withRef = RefJsonSchema(JsonSchemas.schemaReader.loader, location = SchemaLocation.documentRoot("https://nonexistant.com/#/foo"),
+    val withRef = RefJsonSchema(JsonSchemas.schemaReader.loader,
+        location = SchemaLocation.documentRoot("https://nonexistant.com/#/foo"),
         refURI = URI("https://nonexistant.com"))
 
     assert(withRef.toString(true)).isEqualIgnoringWhitespace("{\"\$ref\": \"https://nonexistant.com\"}")
