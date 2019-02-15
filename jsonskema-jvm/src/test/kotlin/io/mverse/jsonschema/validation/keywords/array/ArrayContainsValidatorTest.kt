@@ -11,9 +11,9 @@ import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.schema
 import io.mverse.jsonschema.validation.ValidationMocks
 import lang.json.jsrArrayOf
-import lang.json.jsrJson
 import lang.json.jsrNumber
 import lang.json.jsrString
+import lang.json.toJsrValue
 import org.junit.Test
 
 class ArrayContainsValidatorTest {
@@ -39,19 +39,18 @@ class ArrayContainsValidatorTest {
 
   @Test
   fun validate_Contains() {
-    jsrJson {
-      val containsSchema = JsonSchemas.schema {
-        type = JsonSchemaType.ARRAY
-        containsSchema {
-          anyOf { constValue = 3.toJsrJson() }
-          anyOf { constValue = 4.0.toJsrJson() }
-          anyOf { constValue = "5".toJsrJson() }
-        }
-      }
 
-      containsSchema
-          .validating(jsrArrayOf(24, "Bob", 5, 3))
-          .isValid()
+    val containsSchema = JsonSchemas.schema {
+      type = JsonSchemaType.ARRAY
+      containsSchema {
+        anyOf { constValue = 3.toJsrValue() }
+        anyOf { constValue = 4.0.toJsrValue() }
+        anyOf { constValue = "5".toJsrValue() }
+      }
     }
+
+    containsSchema
+        .validating(jsrArrayOf(24, "Bob", 5, 3))
+        .isValid()
   }
 }

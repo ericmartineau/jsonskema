@@ -53,7 +53,6 @@ import lang.json.JsrObject
 import lang.json.get
 import lang.json.jkey
 import lang.json.jsrArrayOf
-import lang.json.jsrJson
 import lang.json.jsrObject
 import lang.json.mutate
 import lang.json.toJsrObject
@@ -157,28 +156,23 @@ class ArraySchemaValidatorTest {
 
   @Test
   fun toStringAdditionalItems() {
-    jsrJson {
-      val addtlProps = jsrObject { "type" *= "boolean" }
-      val rawSchemaJson = loader
-          .readJsonObject("tostring/arrayschema-list.json")
-          .mutate {
-            removePath("items")
-            add("additionalItems", addtlProps)
-          }
+    val addtlProps = jsrObject { "type" *= "boolean" }
+    val rawSchemaJson = loader
+        .readJsonObject("tostring/arrayschema-list.json")
+        .mutate {
+          removePath("items")
+          add("additionalItems", addtlProps)
+        }
 
-      val actual = JsonSchemas.schemaReader.readSchema(rawSchemaJson).toString()
-      assertEquals(addtlProps, actual.parseJsrObject()["additionalItems"])
-    }
+    val actual = JsonSchemas.schemaReader.readSchema(rawSchemaJson).toString()
+    assertEquals(addtlProps, actual.parseJsrObject()["additionalItems"])
   }
 
   @Test
   fun toStringNoExplicitType() {
-    jsrJson {
-
-      val rawSchemaJson = loader.readJsonObject("tostring/arrayschema-list.json") - "type"
-      val serializedSchema = JsonSchemas.schemaReader.readSchema(rawSchemaJson.toJsrObject()).toString()
-      assertEquals(rawSchemaJson, serializedSchema.parseJsrObject())
-    }
+    val rawSchemaJson = loader.readJsonObject("tostring/arrayschema-list.json") - "type"
+    val serializedSchema = JsonSchemas.schemaReader.readSchema(rawSchemaJson.toJsrObject()).toString()
+    assertEquals(rawSchemaJson, serializedSchema.parseJsrObject())
   }
 
   @Test
