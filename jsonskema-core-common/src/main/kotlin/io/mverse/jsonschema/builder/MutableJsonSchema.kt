@@ -18,6 +18,7 @@ import io.mverse.jsonschema.keyword.IdKeyword
 import io.mverse.jsonschema.keyword.ItemsKeyword
 import io.mverse.jsonschema.keyword.JsonArrayKeyword
 import io.mverse.jsonschema.keyword.JsonValueKeyword
+import io.mverse.jsonschema.keyword.JsrIterable
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
@@ -75,6 +76,7 @@ import io.mverse.jsonschema.keyword.StringKeyword
 import io.mverse.jsonschema.keyword.StringSetKeyword
 import io.mverse.jsonschema.keyword.TypeKeyword
 import io.mverse.jsonschema.keyword.URIKeyword
+import io.mverse.jsonschema.keyword.iterableOf
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
 import io.mverse.jsonschema.loading.SchemaLoadingException
@@ -190,6 +192,7 @@ data class MutableJsonSchema(
         is List<*> -> SchemaListKeyword(value as List<Schema>)
         is Map<*, *> -> SchemaMapKeyword(value as Map<String, Schema>)
         is Set<*> -> StringSetKeyword(value as Set<String>)
+        is Iterable<*> -> JsonArrayKeyword(value as Iterable<JsrValue>)
         is URI -> URIKeyword(value)
         else -> illegalState("Dont know how to handle keyword $keyword, value: $value")
       }
@@ -547,7 +550,7 @@ data class MutableJsonSchema(
     get() = values[NOT]?.toMutableSchema()
     set(value) = set(NOT, value)
 
-  override var enumValues: JsrArray?
+  override var enumValues: JsrIterable?
     get() = values[ENUM]
     set(value) = set(ENUM, value)
 
@@ -625,8 +628,14 @@ data class MutableJsonSchema(
     return built
   }
 
-  override fun build(): Schema = this.build(block = {})
+  /**
+   * Allows the iterable values to be evaluated each time they are accessed.
+   */
+  fun enumValues(block: () -> JsrIterable) {
+    this.enumValues = iterableOf(block)
+  }
 
+  override fun build(): Schema = this.build(block = {})
   override fun build(block: MutableSchema.() -> Unit): Schema {
     this.block()
     val location: SchemaLocation =

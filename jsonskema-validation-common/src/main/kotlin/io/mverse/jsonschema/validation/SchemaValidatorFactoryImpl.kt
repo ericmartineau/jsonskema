@@ -97,10 +97,10 @@ class SchemaValidatorFactoryImpl(private val validatorCache: MutableMap<URI, Sch
 
   companion object {
 
-    val DEFAULT_VALIDATOR_FACTORY: SchemaValidatorFactory = SchemaValidatorFactoryBuilder().build()
+    val DefaultValidatorFactory: SchemaValidatorFactory = SchemaValidatorFactoryBuilder().build()
 
     fun createValidatorForSchema(schema: Schema): SchemaValidator {
-      return DEFAULT_VALIDATOR_FACTORY.createValidator(schema)
+      return DefaultValidatorFactory.createValidator(schema)
     }
 
     fun builder(): SchemaValidatorFactoryBuilder {

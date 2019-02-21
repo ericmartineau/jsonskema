@@ -1,23 +1,21 @@
 package io.mverse.jsonschema
 
 import io.mverse.jsonschema.enums.JsonSchemaType
-import io.mverse.jsonschema.enums.JsonSchemaVersion
-import io.mverse.jsonschema.keyword.Keywords
+import io.mverse.jsonschema.keyword.JsrIterable
 import lang.collection.SetMultimap
-import lang.json.JsrArray
 import lang.json.JsrValue
 import lang.net.URI
-import kotlin.reflect.KClass
 
-interface DraftSharedKeywords: Schema {
+interface DraftSharedKeywords : Schema {
   @Deprecated("Use metaSchemaURI", replaceWith = ReplaceWith("metaSchemaURI"))
-  val schemaURI: URI? get() = metaSchemaURI
+  val schemaURI: URI?
+    get() = metaSchemaURI
 
   val metaSchemaURI: URI?
   val title: String?
   val description: String?
   val types: Set<JsonSchemaType>
-  val enumValues: JsrArray?
+  val enumValues: JsrIterable?
   val defaultValue: JsrValue?
   val format: String?
   val minLength: Int?

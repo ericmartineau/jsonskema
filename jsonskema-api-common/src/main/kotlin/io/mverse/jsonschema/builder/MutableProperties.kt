@@ -12,6 +12,7 @@ import lang.json.KtArray
 import lang.json.createJsrArray
 import lang.json.toJsrArray
 import lang.json.toJsrValue
+import lang.json.values
 import lang.net.URI
 
 class MutableProperties(val builder: MutableSchema) {
@@ -190,23 +191,20 @@ class MutableProperties(val builder: MutableSchema) {
 
   fun enum(enumValues: Iterable<Any?>): (MutableSchema.() -> Unit) {
     return {
-      this.enumValues = createJsrArray(enumValues.map { toJsrValue(it) })
+      this.enumValues = enumValues.map { toJsrValue(it) }
       this.type = this.enumValues?.jsonSchemaType
     }
   }
 
   fun enum(values: JsrArray, block: MutableSchema.() -> Unit = {}): (MutableSchema.() -> Unit) {
     return {
-      enumValues = values
+      enumValues = values.values
       block()
     }
   }
 
   fun enum(values: KtArray, block: MutableSchema.() -> Unit = {}): (MutableSchema.() -> Unit) {
-    return {
-      enumValues = values.toJsrArray()
-      block()
-    }
+    return enum(values.toJsrArray(),  block)
   }
 
   fun datetime(block: MutableSchema.() -> Unit = {}): (MutableSchema.() -> Unit) {

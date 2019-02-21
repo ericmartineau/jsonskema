@@ -73,7 +73,7 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   fun enumSchema() {
     val actual = getSchemaForKey("enumSchema")
     assert(actual.enumValues).isNotNull {
-      it.hasSize(4)
+      assert(it.actual.count(), "count").isEqualTo(4)
     }
   }
 

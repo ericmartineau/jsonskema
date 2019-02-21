@@ -1,10 +1,10 @@
 package io.mverse.jsonschema
 
-import lang.json.JsrArray
+import io.mverse.jsonschema.keyword.JsrIterable
 import lang.json.JsrValue
 
 interface Draft6Schema : Draft4Schema {
-  val examples: JsrArray
+  val examples: JsrIterable
   val definitions: Map<String, Schema>
 
   val constValue: JsrValue?

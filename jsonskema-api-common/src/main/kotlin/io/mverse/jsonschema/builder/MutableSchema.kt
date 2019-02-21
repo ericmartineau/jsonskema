@@ -5,6 +5,7 @@ import io.mverse.jsonschema.MutableKeywordContainer
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.enums.JsonSchemaType
+import io.mverse.jsonschema.keyword.JsrIterable
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
@@ -111,7 +112,7 @@ interface MutableSchema : MutableKeywordContainer {
   // ##################################################################
 
   var notSchema: MutableSchema?
-  var enumValues: JsrArray?
+  var enumValues: JsrIterable?
   var const: Any?
   var constValue: JsrValue?
 

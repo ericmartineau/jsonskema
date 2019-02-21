@@ -2,6 +2,7 @@ package io.mverse.jsonschema.utils
 
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.JsonSchemaType
+import io.mverse.jsonschema.keyword.JsrIterable
 import lang.collection.runLengths
 import lang.exception.illegalState
 import lang.exception.nullPointer
@@ -77,10 +78,9 @@ fun Schema.calculateJsonSchemaType(): JsonSchemaType? {
   }
 }
 
-val JsrArray.jsonSchemaType: JsonSchemaType?
+val JsrIterable.jsonSchemaType: JsonSchemaType?
   get() {
-    val counts = this.values
-        .map { it.type.toJsonSchemaType() }
+    val counts = map { it.type.toJsonSchemaType() }
         .distinct()
         .toList()
     return when (counts.size) {

@@ -8,14 +8,13 @@ import io.mverse.jsonschema.utils.equalsLexically
 import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.ValidationReport
 import lang.json.JsrValue
-import lang.json.values
 
 data class EnumValidator(val keyword: JsonArrayKeyword,
                          val parent: Schema,
                          val factory: SchemaValidatorFactory)
   : KeywordValidator<JsonArrayKeyword>(ENUM, parent) {
 
-  private val enumValues: List<JsrValue> = keyword.value.values
+  private val enumValues: Iterable<JsrValue> = keyword.value
 
   override fun validate(subject: JsonValueWithPath, parentReport: ValidationReport): Boolean {
     for (enumValue in enumValues) {

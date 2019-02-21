@@ -1,10 +1,12 @@
 package io.mverse.jsonschema.builder
 
 import assertk.assert
+import assertk.assertAll
 import assertk.assertions.isEqualTo
 import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.keyword.JsonValueKeyword
 import io.mverse.jsonschema.keyword.Keywords
+import lang.json.jsrNumber
 import lang.json.jsrString
 import lang.net.toURI
 import org.junit.Test
@@ -40,6 +42,7 @@ class MutableJsonSchemaTest {
     mutable.oneOf {
       const = "oneOf"
     }
+
     mutable.anyOf {
       const = "anyOf"
     }
@@ -56,11 +59,21 @@ class MutableJsonSchemaTest {
       const = "allItems"
     }
 
-    assert(mutable.anyOfSchemas.first().const).isEqualTo("anyOf")
-    assert(mutable.oneOfSchemas.first().const).isEqualTo("oneOf")
-    assert(mutable.allOfSchemas.first().const).isEqualTo("allOf")
-    assert(mutable.itemSchemas.first().const).isEqualTo("items")
-    assert(mutable.allItemSchema?.const).isEqualTo("allItems")
-    assert(mutable.properties["property"].draft7().constValue).isEqualTo(jsrString("property"))
+    var count = 0
+    mutable.enumValues { listOf(jsrNumber(count++)) }
+
+    assertAll {
+      assert(mutable.enumValues?.firstOrNull()).isEqualTo(jsrNumber(0))
+      assert(mutable.enumValues?.firstOrNull()).isEqualTo(jsrNumber(1))
+      assert(mutable.enumValues?.firstOrNull()).isEqualTo(jsrNumber(2))
+
+      assert(mutable.anyOfSchemas.first().const).isEqualTo("anyOf")
+      assert(mutable.oneOfSchemas.first().const).isEqualTo("oneOf")
+      assert(mutable.allOfSchemas.first().const).isEqualTo("allOf")
+      assert(mutable.itemSchemas.first().const).isEqualTo("items")
+      assert(mutable.allItemSchema?.const).isEqualTo("allItems")
+      assert(mutable.properties["property"].draft7().constValue).isEqualTo(jsrString("property"))
+    }
+
   }
 }

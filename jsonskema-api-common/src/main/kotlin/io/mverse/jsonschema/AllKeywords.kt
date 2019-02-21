@@ -1,6 +1,7 @@
 package io.mverse.jsonschema
 
 import io.mverse.jsonschema.keyword.Draft3Keywords
+import io.mverse.jsonschema.keyword.JsrIterable
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.Keywords.ADDITIONAL_ITEMS
@@ -10,8 +11,6 @@ import io.mverse.jsonschema.keyword.Keywords.ITEMS
 import io.mverse.jsonschema.keyword.Keywords.SCHEMA
 import io.mverse.jsonschema.utils.Schemas.nullSchema
 import lang.collection.Multimaps
-import lang.json.JsrArray
-import lang.json.jsrArrayOf
 import lang.net.URI
 
 /**
@@ -68,7 +67,7 @@ interface AllKeywords : Draft3Schema, Draft7Schema {
   override val contentEncoding: String? get() = values[Keywords.CONTENT_ENCODING]
   override val contentMediaType: String? get() = values[Keywords.CONTENT_MEDIA_TYPE]
 
-  override val examples: JsrArray get() = values[Keywords.EXAMPLES] ?: jsrArrayOf()
+  override val examples: JsrIterable get() = values[Keywords.EXAMPLES] ?: emptyList()
   override val definitions: Map<String, Schema> get() = values[Keywords.DEFINITIONS] ?: emptyMap()
 
   // #####################################################
