@@ -12,7 +12,6 @@ import io.mverse.jsonschema.loading.SchemaLoader
 import lang.Name
 import lang.collection.SetMultimap
 import lang.json.JsonPath
-import lang.json.JsrArray
 import lang.json.JsrObject
 import lang.json.JsrValue
 import lang.net.URI
@@ -101,6 +100,7 @@ interface MutableSchema : MutableKeywordContainer {
   var maxItems: Int?
   var minItems: Int?
 
+  var additionalItems:Boolean
   var schemaOfAdditionalItems: MutableSchema?
   var containsSchema: MutableSchema?
 
@@ -116,9 +116,9 @@ interface MutableSchema : MutableKeywordContainer {
   var const: Any?
   var constValue: JsrValue?
 
-  var oneOfSchemas: List<MutableSchema>
-  var anyOfSchemas: List<MutableSchema>
-  var allOfSchemas: List<MutableSchema>
+  val oneOfSchemas: List<MutableSchema>
+  val anyOfSchemas: List<MutableSchema>
+  val allOfSchemas: List<MutableSchema>
   var ifSchema: MutableSchema?
   var thenSchema: MutableSchema?
   var elseSchema: MutableSchema?
@@ -126,15 +126,16 @@ interface MutableSchema : MutableKeywordContainer {
   operator fun invoke(block: MutableSchema.() -> Unit): MutableSchema
 
   fun itemSchema(block: MutableSchema.() -> Unit)
-  fun oneOf(block: MutableSchema.() -> Unit)
-  fun allOf(block: MutableSchema.() -> Unit)
-  fun anyOf(block: MutableSchema.() -> Unit)
+  fun oneOfSchema(block: MutableSchema.() -> Unit)
+  fun allOfSchema(block: MutableSchema.() -> Unit)
+  fun anyOfSchema(block: MutableSchema.() -> Unit)
   fun allItemsSchema(block: MutableSchema.() -> Unit)
   fun containsSchema(block: MutableSchema.() -> Unit)
   fun ifSchema(block: MutableSchema.() -> Unit)
   fun notSchema(block: MutableSchema.() -> Unit)
   fun thenSchema(block: MutableSchema.() -> Unit)
   fun elseSchema(block: MutableSchema.() -> Unit)
+  fun propertyNameSchema(block: MutableSchema.() -> Unit)
   fun schemaOfAdditionalProperties(block: MutableSchema.() -> Unit)
   fun schemaOfAdditionalItems(block: MutableSchema.() -> Unit)
 
@@ -146,21 +147,18 @@ interface MutableSchema : MutableKeywordContainer {
 
   @Name("buildWithLocation")
   fun build(itemsLocation: SchemaLocation? = null, report: LoadingReport): Schema
-
   fun build(block: MutableSchema.() -> Unit): Schema
 
   var loadingReport: LoadingReport
   val schemaLoader: SchemaLoader
   var currentDocument: JsrObject?
 
-  fun buildSubSchema(toBuild: MutableSchema, keyword: KeywordInfo<*>, path: String, vararg paths: String): Schema
-  fun subSchemaBuilder(keyword: KeywordInfo<*>, vararg child: String): MutableSchema
+//  fun buildSubSchema(toBuild: MutableSchema, keyword: KeywordInfo<*>, path: String, vararg paths: String): Schema
 
   @Name("build")
   fun build(): Schema
 
   operator fun contains(keyword: KeywordInfo<*>): Boolean
-
   fun merge(path: JsonPath, other: Schema, report: MergeReport)
   operator fun plusAssign(other: Schema) = merge(JsonPath.rootPath, other, MergeReport())
 

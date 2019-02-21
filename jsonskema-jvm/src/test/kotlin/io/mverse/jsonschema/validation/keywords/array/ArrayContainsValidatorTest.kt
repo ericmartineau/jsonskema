@@ -22,9 +22,9 @@ class ArrayContainsValidatorTest {
     val containsSchema = schema {
       type = JsonSchemaType.ARRAY
       containsSchema {
-        anyOf { constValue = jsrNumber(3) }
-        anyOf { constValue = jsrNumber(4.0) }
-        anyOf { constValue = jsrString("5") }
+        anyOfSchema { constValue = jsrNumber(3) }
+        anyOfSchema { constValue = jsrNumber(4.0) }
+        anyOfSchema { constValue = jsrString("5") }
       }
     }
 
@@ -43,9 +43,9 @@ class ArrayContainsValidatorTest {
     val containsSchema = JsonSchemas.schema {
       type = JsonSchemaType.ARRAY
       containsSchema {
-        anyOf { constValue = 3.toJsrValue() }
-        anyOf { constValue = 4.0.toJsrValue() }
-        anyOf { constValue = "5".toJsrValue() }
+        anyOfSchema { constValue = 3.toJsrValue() }
+        anyOfSchema { constValue = 4.0.toJsrValue() }
+        anyOfSchema { constValue = "5".toJsrValue() }
       }
     }
 

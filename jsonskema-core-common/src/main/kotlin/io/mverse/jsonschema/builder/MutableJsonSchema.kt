@@ -10,11 +10,14 @@ import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.impl.JsonSchema
 import io.mverse.jsonschema.impl.RefJsonSchema
 import io.mverse.jsonschema.keyword
+import io.mverse.jsonschema.keyword.BooleanKeyword
 import io.mverse.jsonschema.keyword.DependenciesKeyword
 import io.mverse.jsonschema.keyword.DollarSchemaKeyword
 import io.mverse.jsonschema.keyword.DollarSchemaKeyword.Companion.emptyUri
 import io.mverse.jsonschema.keyword.IdKeyword
 import io.mverse.jsonschema.keyword.ItemsKeyword
+import io.mverse.jsonschema.keyword.JsonArrayKeyword
+import io.mverse.jsonschema.keyword.JsonValueKeyword
 import io.mverse.jsonschema.keyword.JsrIterable
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
@@ -65,6 +68,11 @@ import io.mverse.jsonschema.keyword.Keywords.WRITE_ONLY
 import io.mverse.jsonschema.keyword.LimitKeyword
 import io.mverse.jsonschema.keyword.LimitKeyword.Companion.maximumKeyword
 import io.mverse.jsonschema.keyword.LimitKeyword.Companion.minimumKeyword
+import io.mverse.jsonschema.keyword.NumberKeyword
+import io.mverse.jsonschema.keyword.SchemaListKeyword
+import io.mverse.jsonschema.keyword.SingleSchemaKeyword
+import io.mverse.jsonschema.keyword.StringKeyword
+import io.mverse.jsonschema.keyword.StringSetKeyword
 import io.mverse.jsonschema.keyword.TypeKeyword
 import io.mverse.jsonschema.keyword.URIKeyword
 import io.mverse.jsonschema.keyword.iterableOf
@@ -75,7 +83,6 @@ import io.mverse.jsonschema.mergeAdd
 import io.mverse.jsonschema.mergeError
 import io.mverse.jsonschema.utils.SchemaPaths
 import io.mverse.jsonschema.utils.Schemas.nullSchema
-import io.mverse.jsonschema.utils.Schemas.nullSchemaBuilder
 import io.mverse.jsonschema.utils.isGeneratedURI
 import io.mverse.logging.mlogger
 import lang.collection.Multimaps
@@ -90,6 +97,8 @@ import lang.json.unboxAsAny
 import lang.net.URI
 import lang.suppress.Suppressions.UNCHECKED_CAST
 import lang.uuid.randomUUID
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 @Deprecated("Use MutableJsonSchema", replaceWith = ReplaceWith("MutableJsonSchema"))
 typealias JsonSchemaBuilder = MutableJsonSchema
@@ -110,7 +119,7 @@ data class MutableJsonSchema(
     override var extraProperties: MutableMap<String, JsrValue> = mutableMapOf(),
     override val location: SchemaLocation = SchemaPaths.fromNonSchemaSource(randomUUID()),
     override var currentDocument: JsrObject? = null,
-    override var loadingReport: LoadingReport = LoadingReport()) : MutableSchemaHelpers {
+    override var loadingReport: LoadingReport = LoadingReport()) : MutableSchema {
 
   constructor(schemaLoader: SchemaLoader, fromSchema: Schema, id: URI)
       : this(schemaLoader = schemaLoader, fromSchema = fromSchema, location = SchemaLocation.builderFromId(id).build()) {
@@ -154,6 +163,8 @@ data class MutableJsonSchema(
     return apply(block)
   }
 
+
+
   // #######  KEYWORDS  ########  //
 
   override val id: URI? get() = values[Keywords.DOLLAR_ID]
@@ -169,50 +180,11 @@ data class MutableJsonSchema(
       this[SCHEMA] = value?.let { DollarSchemaKeyword(value) }
     }
 
-  override fun merge(path: JsonPath, other: Schema, report: MergeReport) {
-    other.extraProperties.forEach { (k, v) ->
-      extraProperties[k] = v
-    }
-
-    other.keywords
-        .filter { (keyword) -> keyword != DOLLAR_ID && keyword != ID }
-        .forEach { (keyword, value) ->
-          val kwPath = path.child(keyword.key)
-          if (keyword !in this) {
-            internalKeywords[keyword] = value
-            report += mergeAdd(kwPath, keyword)
-          } else {
-            @Suppress(UNCHECKED_CAST)
-            val thisValue = internalKeywords[keyword] as Keyword<Any>
-            @Suppress(UNCHECKED_CAST)
-            val otherValue = value as Keyword<Any>
-            try {
-              val mergeKeyword = thisValue.merge(kwPath, keyword, otherValue, report)
-              internalKeywords[keyword] = mergeKeyword
-            } catch (e: MergeException) {
-              report += mergeError(kwPath, keyword, e)
-            }
-          }
-        }
-  }
-
   override var refSchema: Schema? = null
-
-  override var refURI: URI?
-    get() = values[Keywords.REF]
-    set(ref) = set(REF, ref)
-
-  override var title: String?
-    get() = values[TITLE]
-    set(value) = set(TITLE, value)
-
-  override var defaultValue: JsrValue?
-    get() = values[DEFAULT]
-    set(value) = set(DEFAULT, value)
-
-  override var description: String?
-    get() = values[DESCRIPTION]
-    set(value) = set(DESCRIPTION, value)
+  override var refURI: URI? by uri(REF)
+  override var title: String? by string(TITLE)
+  override var defaultValue: JsrValue? by jsrValue(DEFAULT)
+  override var description: String? by string(DESCRIPTION)
 
   override var type: JsonSchemaType?
     get() = values[TYPE]?.firstOrNull()
@@ -234,17 +206,21 @@ data class MutableJsonSchema(
     set(value) {
       when (value) {
         true -> this -= ADDITIONAL_PROPERTIES
-        false -> this[ADDITIONAL_PROPERTIES] = nullSchemaBuilder()
+        false -> this[ADDITIONAL_PROPERTIES] = SingleSchemaKeyword(nullSchema)
       }
     }
 
-  override var format: String?
-    get() = values[FORMAT]
-    set(value) = set(FORMAT, value)
+  override var additionalItems: Boolean
+    get() = values[ADDITIONAL_ITEMS] != nullSchema
+    set(value) {
+      when (value) {
+        true -> this -= ADDITIONAL_ITEMS
+        false -> this[ADDITIONAL_ITEMS] = ItemsKeyword(additionalItemSchema = nullSchema)
+      }
+    }
 
-  override var pattern: String?
-    get() = values[PATTERN]
-    set(value) = set(PATTERN, value)
+  override var format: String? by string(FORMAT)
+  override var pattern: String? by string(PATTERN)
 
   override var types: Set<JsonSchemaType>
     get() = keyword(TYPE)?.types ?: emptySet()
@@ -259,39 +235,18 @@ data class MutableJsonSchema(
 
   override var regex: Regex?
     get() = this.values[Keywords.PATTERN]?.let { Regex(it) }
-    set(value) = set(PATTERN, value?.pattern)
+    set(value) = set(PATTERN, value?.let { StringKeyword(value.pattern) })
 
-  override var minLength: Int?
-    get() = values[MIN_LENGTH]?.toInt()
-    set(value) = set(MIN_LENGTH, value)
+  override var minLength: Int? by int(MIN_LENGTH)
+  override var maxLength: Int? by int(MAX_LENGTH)
+  override var comment: String? by string(COMMENT)
+  override var readOnly: Boolean by boolean(READ_ONLY)
+  override var writeOnly: Boolean by boolean(WRITE_ONLY)
+  override var requiredProperties: Set<String> by stringSet(REQUIRED)
+  override var schemaOfAdditionalProperties: MutableSchema? by singleSchema(ADDITIONAL_PROPERTIES)
 
-  override var maxLength: Int?
-    get() = values[MAX_LENGTH]?.toInt()
-    set(value) = set(MAX_LENGTH, value)
-
-  override var comment: String?
-    get() = values[COMMENT]
-    set(value) = set(COMMENT, value)
-
-  override var readOnly: Boolean
-    get() = values[READ_ONLY] ?: false
-    set(value) = set(READ_ONLY, value)
-
-  override var writeOnly: Boolean
-    get() = values[WRITE_ONLY] ?: false
-    set(value) = set(WRITE_ONLY, value)
-
-  override var requiredProperties: Set<String>
-    get() = values[REQUIRED] ?: emptySet()
-    set(value) = set(REQUIRED, value)
-
-  override var contentEncoding: String?
-    get() = values[CONTENT_ENCODING]
-    set(value) = set(CONTENT_ENCODING, value)
-
-  override var contentMediaType: String?
-    get() = values[CONTENT_MEDIA_TYPE]
-    set(value) = set(CONTENT_MEDIA_TYPE, value)
+  override var contentEncoding: String? by string(CONTENT_ENCODING)
+  override var contentMediaType: String? by string(CONTENT_MEDIA_TYPE)
 
   override var isUseSchemaKeyword: Boolean
     get() = keywords.containsKey(SCHEMA)
@@ -302,20 +257,24 @@ data class MutableJsonSchema(
       }
     }
 
+  override fun propertyNameSchema(block: MutableSchema.() -> Unit) {
+    propertyNameSchema = subSchemaBuilder(PROPERTY_NAMES).apply(block)
+  }
+
   override fun itemSchema(block: MutableSchema.() -> Unit) {
-    itemSchemas += subSchemaBuilder(Keywords.ITEMS).apply(block)
+    itemSchemas = itemSchemas + subSchemaBuilder(Keywords.ITEMS).apply(block)
   }
 
-  override fun oneOf(block: MutableSchema.() -> Unit) {
-    oneOfSchemas += subSchemaBuilder(Keywords.ONE_OF).apply(block)
+  override fun oneOfSchema(block: MutableSchema.() -> Unit) {
+    oneOfSchemas = oneOfSchemas + subSchemaBuilder(Keywords.ONE_OF).apply(block)
   }
 
-  override fun allOf(block: MutableSchema.() -> Unit) {
-    allOfSchemas += subSchemaBuilder(Keywords.ALL_OF).apply(block)
+  override fun allOfSchema(block: MutableSchema.() -> Unit) {
+    allOfSchemas = allOfSchemas + subSchemaBuilder(Keywords.ALL_OF).apply(block)
   }
 
-  override fun anyOf(block: MutableSchema.() -> Unit) {
-    anyOfSchemas += subSchemaBuilder(Keywords.ANY_OF).apply(block)
+  override fun anyOfSchema(block: MutableSchema.() -> Unit) {
+    anyOfSchemas = anyOfSchemas + subSchemaBuilder(Keywords.ANY_OF).apply(block)
   }
 
   override fun allItemsSchema(block: MutableSchema.() -> Unit) {
@@ -350,18 +309,6 @@ data class MutableJsonSchema(
     schemaOfAdditionalItems = subSchemaBuilder(keyword = Keywords.ADDITIONAL_ITEMS).apply(block)
   }
 
-  override var schemaOfAdditionalProperties: MutableSchema?
-    get() = values[ADDITIONAL_PROPERTIES]?.toMutableSchema()
-    set(value) = set(ADDITIONAL_PROPERTIES, value)
-
-  fun Map<String, MutableSchema>.buildSchemaMap(): Map<String, Schema> = this.mapValues { e ->
-    buildSubSchema(e.value, DEPENDENCIES, e.key)
-  }
-
-  fun Map<String, Schema>?.toBuilders(): Map<String, MutableSchema> = this?.mapValues { e ->
-    e.value.toMutableSchema()
-  } ?: emptyMap()
-
   override var propertyDependencies: SetMultimap<String, String>
     get() = this[DEPENDENCIES]
         ?.propertyDependencies
@@ -380,21 +327,10 @@ data class MutableJsonSchema(
     return keywords.containsKey(keyword)
   }
 
-  override var propertyNameSchema: MutableSchema?
-    get() = values[PROPERTY_NAMES]?.toMutableSchema()
-    set(value) = set(PROPERTY_NAMES, value)
-
-  override var minProperties: Int?
-    get() = values[MIN_PROPERTIES]?.toInt()
-    set(value) = set(MIN_PROPERTIES, value)
-
-  override var maxProperties: Int?
-    get() = values[MAX_PROPERTIES]?.toInt()
-    set(value) = set(MAX_PROPERTIES, value)
-
-  override var multipleOf: Number?
-    get() = values[MULTIPLE_OF]
-    set(value) = set(MULTIPLE_OF, value)
+  override var propertyNameSchema: MutableSchema? by singleSchema(PROPERTY_NAMES)
+  override var minProperties: Int? by int(MIN_PROPERTIES)
+  override var maxProperties: Int? by int(MAX_PROPERTIES)
+  override var multipleOf: Number? by number(MULTIPLE_OF)
 
   override var exclusiveMinimum: Number?
     get() = this[MINIMUM]?.exclusiveLimit
@@ -444,17 +380,9 @@ data class MutableJsonSchema(
       }
     }
 
-  override var needsUniqueItems: Boolean
-    get() = values[UNIQUE_ITEMS] ?: false
-    set(value) = set(UNIQUE_ITEMS, value)
-
-  override var maxItems: Int?
-    get() = values[MAX_ITEMS]?.toInt()
-    set(value) = set(MAX_ITEMS, value)
-
-  override var minItems: Int?
-    get() = values[MIN_ITEMS]?.toInt()
-    set(value) = set(MIN_ITEMS, value)
+  override var needsUniqueItems: Boolean by boolean(UNIQUE_ITEMS)
+  override var maxItems: Int? by int(MAX_ITEMS)
+  override var minItems: Int? by int(MIN_ITEMS)
 
   override var schemaOfAdditionalItems: MutableSchema?
     get() = this[ITEMS]?.additionalItemSchema?.toMutableSchema()
@@ -467,9 +395,7 @@ data class MutableJsonSchema(
       this[ITEMS] = existing.copy(additionalItemSchema = additionalItemSchema)
     }
 
-  override var containsSchema: MutableSchema?
-    get() = values[CONTAINS]?.toMutableSchema()
-    set(value) = set(CONTAINS, value)
+  override var containsSchema: MutableSchema? by singleSchema(CONTAINS)
 
   override var itemSchemas: List<MutableSchema>
     get() = values[ITEMS]?.map { it.toMutableSchema() } ?: emptyList()
@@ -488,45 +414,25 @@ data class MutableJsonSchema(
       }
     }
 
-  override var notSchema: MutableSchema?
-    get() = values[NOT]?.toMutableSchema()
-    set(value) = set(NOT, value)
+  override var notSchema: MutableSchema? by singleSchema(NOT)
 
   override var enumValues: JsrIterable?
     get() = values[ENUM]
-    set(value) = set(ENUM, value)
+    set(value) {
+      this[ENUM] = value?.let { JsonArrayKeyword(value) }
+    }
 
   override var const: Any?
     get() = values[CONST]?.unboxAsAny()
-    set(value) = set(CONST, toJsrValue(value))
+    set(value) = set(CONST, value?.let { JsonValueKeyword(toJsrValue(value)) })
 
-  override var constValue: JsrValue?
-    get() = values[CONST]
-    set(value) = set(CONST, value)
-
-  override var oneOfSchemas: List<MutableSchema>
-    get() = values[ONE_OF]?.map { it.toMutableSchema() } ?: emptyList()
-    set(value) = set(ONE_OF, value)
-
-  override var anyOfSchemas: List<MutableSchema>
-    get() = values[ANY_OF]?.map { it.toMutableSchema() } ?: emptyList()
-    set(value) = set(ANY_OF, value)
-
-  override var allOfSchemas: List<MutableSchema>
-    get() = values[ALL_OF]?.map { it.toMutableSchema() } ?: emptyList()
-    set(value) = set(ALL_OF, value)
-
-  override var ifSchema: MutableSchema?
-    get() = values[IF]?.toMutableSchema()
-    set(value) = set(IF, value)
-
-  override var thenSchema: MutableSchema?
-    get() = values[THEN]?.toMutableSchema()
-    set(value) = set(THEN, value)
-
-  override var elseSchema: MutableSchema?
-    get() = values[ELSE]?.toMutableSchema()
-    set(value) = set(ELSE, value)
+  override var constValue: JsrValue? by jsrValue(CONST)
+  override var oneOfSchemas: List<MutableSchema> by schemaList(ONE_OF)
+  override var anyOfSchemas: List<MutableSchema> by schemaList(ANY_OF)
+  override var allOfSchemas: List<MutableSchema> by schemaList(ALL_OF)
+  override var ifSchema: MutableSchema? by singleSchema(IF)
+  override var thenSchema: MutableSchema? by singleSchema(THEN)
+  override var elseSchema: MutableSchema? by singleSchema(ELSE)
 
   override fun build(itemsLocation: SchemaLocation?, report: LoadingReport): Schema {
     // Use the location provided during building as an override
@@ -570,9 +476,6 @@ data class MutableJsonSchema(
     return built
   }
 
-  /**
-   * Allows the iterable values to be evaluated each time they are accessed.
-   */
   fun enumValues(block: () -> JsrIterable) {
     this.enumValues = iterableOf(block)
   }
@@ -595,27 +498,40 @@ data class MutableJsonSchema(
     return built
   }
 
-  // #######################################################
-  // HELPER FUNCTIONS
-  // #######################################################
+  override fun merge(path: JsonPath, other: Schema, report: MergeReport) {
+    other.extraProperties.forEach { (k, v) ->
+      extraProperties[k] = v
+    }
+
+    other.keywords
+        .filter { (keyword) -> keyword != DOLLAR_ID && keyword != ID }
+        .forEach { (keyword, value) ->
+          val kwPath = path.child(keyword.key)
+          if (keyword !in this) {
+            internalKeywords[keyword] = value
+            report += mergeAdd(kwPath, keyword)
+          } else {
+            @Suppress(UNCHECKED_CAST)
+            val thisValue = internalKeywords[keyword] as Keyword<Any>
+            @Suppress(UNCHECKED_CAST)
+            val otherValue = value as Keyword<Any>
+            try {
+              val mergeKeyword = thisValue.merge(kwPath, keyword, otherValue, report)
+              internalKeywords[keyword] = mergeKeyword
+            } catch (e: MergeException) {
+              report += mergeError(kwPath, keyword, e)
+            }
+          }
+        }
+  }
 
   override fun withLocation(location: SchemaLocation): MutableSchema {
     return this.copy(location = location)
   }
 
-  //  override fun relocateSubschema(subschema: MutableSchema, keyword: KeywordInfo<*>, path: String, vararg paths: String): MutableSchema {
-  //    val childLocation = this.location.child(keyword).child(path).child(*paths)
-  //    return subschema.withLocation(childLocation)
-  //  }
-  //
-  override fun subSchemaBuilder(keyword: KeywordInfo<*>, vararg child: String): MutableSchema {
+  fun subSchemaBuilder(keyword: KeywordInfo<*>, vararg child: String): MutableSchema {
     val childLocation = this.location.child(keyword).child(*child)
     return MutableJsonSchema(location = childLocation, schemaLoader = schemaLoader)
-  }
-
-  override fun buildSubSchema(toBuild: MutableSchema, keyword: KeywordInfo<*>, path: String, vararg paths: String): Schema {
-    val childLocation = this.location.child(keyword).child(path).child(*paths)
-    return toBuild.build(childLocation, loadingReport)
   }
 
   // #######################################################
@@ -628,6 +544,73 @@ data class MutableJsonSchema(
       other !is MutableJsonSchema -> false
       this.keywords == other.keywords -> true
       else -> false
+    }
+  }
+
+  private fun string(keyword: KeywordInfo<StringKeyword>): ReadWriteProperty<MutableJsonSchema, String?> = object : ReadWriteProperty<MutableJsonSchema, String?> {
+    override fun getValue(thisRef: MutableJsonSchema, property: KProperty<*>): String? = values[keyword]
+    override fun setValue(thisRef: MutableJsonSchema, property: KProperty<*>, value: String?) {
+      this@MutableJsonSchema[keyword] = value?.let { StringKeyword(value) }
+    }
+  }
+
+  private fun singleSchema(keyword: KeywordInfo<SingleSchemaKeyword>): ReadWriteProperty<MutableJsonSchema, MutableSchema?> = object : ReadWriteProperty<MutableJsonSchema, MutableSchema?> {
+    override fun getValue(thisRef: MutableJsonSchema, property: KProperty<*>): MutableSchema? = values[keyword]?.toMutableSchema()
+    override fun setValue(thisRef: MutableJsonSchema, property: KProperty<*>, value: MutableSchema?) {
+      this@MutableJsonSchema[keyword] = value?.let { SingleSchemaKeyword(buildSubSchema(value, keyword)) }
+    }
+  }
+
+  private fun boolean(keyword: KeywordInfo<BooleanKeyword>): ReadWriteProperty<MutableJsonSchema, Boolean> = object : ReadWriteProperty<MutableJsonSchema, Boolean> {
+    override fun getValue(thisRef: MutableJsonSchema, property: KProperty<*>): Boolean = values[keyword] == true
+    override fun setValue(thisRef: MutableJsonSchema, property: KProperty<*>, value: Boolean) {
+      this@MutableJsonSchema[keyword] = BooleanKeyword(value)
+    }
+  }
+
+  private fun number(keyword: KeywordInfo<NumberKeyword>): ReadWriteProperty<MutableJsonSchema, Number?> = object : ReadWriteProperty<MutableJsonSchema, Number?> {
+    override fun getValue(thisRef: MutableJsonSchema, property: KProperty<*>): Number? = values[keyword]
+    override fun setValue(thisRef: MutableJsonSchema, property: KProperty<*>, value: Number?) {
+      this@MutableJsonSchema[keyword] = value?.let { NumberKeyword(value) }
+    }
+  }
+
+  private fun int(keyword: KeywordInfo<NumberKeyword>): ReadWriteProperty<MutableJsonSchema, Int?> = object : ReadWriteProperty<MutableJsonSchema, Int?> {
+    override fun getValue(thisRef: MutableJsonSchema, property: KProperty<*>): Int? = values[keyword]?.toInt()
+    override fun setValue(thisRef: MutableJsonSchema, property: KProperty<*>, value: Int?) {
+      this@MutableJsonSchema[keyword] = value?.let { NumberKeyword(value) }
+    }
+  }
+
+  private fun jsrValue(keyword: KeywordInfo<JsonValueKeyword>): ReadWriteProperty<MutableJsonSchema, JsrValue?> = object : ReadWriteProperty<MutableJsonSchema, JsrValue?> {
+    override fun getValue(thisRef: MutableJsonSchema, property: KProperty<*>): JsrValue? = values[keyword]
+    override fun setValue(thisRef: MutableJsonSchema, property: KProperty<*>, value: JsrValue?) {
+      this@MutableJsonSchema[keyword] = value?.let { JsonValueKeyword(value) }
+    }
+  }
+
+  private fun stringSet(keyword: KeywordInfo<StringSetKeyword>): ReadWriteProperty<MutableJsonSchema, Set<String>> = object : ReadWriteProperty<MutableJsonSchema, Set<String>> {
+    override fun getValue(thisRef: MutableJsonSchema, property: KProperty<*>): Set<String> = values[keyword]
+        ?: emptySet()
+
+    override fun setValue(thisRef: MutableJsonSchema, property: KProperty<*>, value: Set<String>) {
+      this@MutableJsonSchema[keyword] = StringSetKeyword(value)
+    }
+  }
+
+  private fun schemaList(keyword: KeywordInfo<SchemaListKeyword>): ReadWriteProperty<MutableJsonSchema, List<MutableSchema>> = object : ReadWriteProperty<MutableJsonSchema, List<MutableSchema>> {
+    override fun getValue(thisRef: MutableJsonSchema, property: KProperty<*>): List<MutableSchema> = values[keyword]?.map { it.toMutableSchema() }
+        ?: emptyList()
+
+    override fun setValue(thisRef: MutableJsonSchema, property: KProperty<*>, value: List<MutableSchema>) {
+      this@MutableJsonSchema[keyword] = SchemaListKeyword(buildSubSchemas(value, keyword))
+    }
+  }
+
+  private fun uri(keyword: KeywordInfo<URIKeyword>): ReadWriteProperty<MutableJsonSchema, URI?> = object : ReadWriteProperty<MutableJsonSchema, URI?> {
+    override fun getValue(thisRef: MutableJsonSchema, property: KProperty<*>): URI? = values[keyword]
+    override fun setValue(thisRef: MutableJsonSchema, property: KProperty<*>, value: URI?) {
+      this@MutableJsonSchema[keyword] = value?.let { URIKeyword(value) }
     }
   }
 

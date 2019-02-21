@@ -11,7 +11,6 @@ import io.mverse.jsonschema.keyword.iterableOf
 import io.mverse.jsonschema.utils.jsonSchemaType
 import lang.json.JsrArray
 import lang.json.KtArray
-import lang.json.createJsrArray
 import lang.json.toJsrArray
 import lang.json.toJsrValue
 import lang.json.values

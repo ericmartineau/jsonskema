@@ -22,6 +22,10 @@ class MutableSchemaMap(val keyword: KeywordInfo<SchemaMapKeyword>,
     builder[keyword] = existing + (key to builder.buildSubSchema(newProperty, keyword, key))
   }
 
+  operator fun get(key: String): Schema? {
+    return builder[keyword]?.value?.get(key)
+  }
+
   operator fun invoke(block: MutableSchemaMap.() -> Unit) {
     block()
   }

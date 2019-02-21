@@ -96,9 +96,9 @@ class JsonSchemaTest {
           definitions["rad"] = {
 
           }
-          oneOf {}
-          allOf {}
-          anyOf {}
+          oneOfSchema {}
+          allOfSchema {}
+          anyOfSchema {}
           ifSchema {}
           thenSchema {}
           elseSchema {}
@@ -266,12 +266,12 @@ class JsonSchemaTest {
       properties {
         "name" required {
           minLength = 1
-          oneOf {
+          oneOfSchema {
             type = STRING
             pattern = "^[A-Z]*$"
           }
 
-          oneOf {
+          oneOfSchema {
             type = STRING
             pattern = "^[a-z]*$"
           }
@@ -298,11 +298,11 @@ class JsonSchemaTest {
         "name" optional string {
           minLength = 3
 
-          oneOfSchemas += schemaBuilder {
+          oneOfSchema {
             type = STRING
             const = "R2D2"
           }
-          oneOfSchemas += schemaBuilder {
+          oneOfSchema {
             type = STRING
             pattern = "^[A-Za-z]$"
           }

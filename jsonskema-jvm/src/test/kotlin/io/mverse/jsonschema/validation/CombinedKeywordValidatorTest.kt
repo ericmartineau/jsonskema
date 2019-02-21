@@ -20,22 +20,29 @@ import io.mverse.jsonschema.assertj.asserts.hasKeyword
 import io.mverse.jsonschema.assertj.asserts.hasViolationCount
 import io.mverse.jsonschema.assertj.asserts.isNotValid
 import io.mverse.jsonschema.assertj.asserts.validating
+import io.mverse.jsonschema.builder.MutableSchema
+import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords.ALL_OF
 import io.mverse.jsonschema.keyword.Keywords.ANY_OF
 import io.mverse.jsonschema.keyword.Keywords.ONE_OF
+import io.mverse.jsonschema.keyword.SchemaListKeyword
 import io.mverse.jsonschema.loading.parseJsrJson
 import io.mverse.jsonschema.schema
 import io.mverse.jsonschema.validation.ValidationMocks.mockNumberSchema
 import lang.json.toJsrValue
 import org.junit.Test
-import java.util.Arrays.asList
 
 class CombinedKeywordValidatorTest {
 
   @Test
   fun reportCauses() {
     val parentSchema = JsonSchemas.schema {
-      allOfSchemas = SUBSCHEMAS
+      allOfSchema {
+        multipleOf = 10
+      }
+      allOfSchema {
+        multipleOf = 3
+      }
     }
     val subject = "24".parseJsrJson()
     parentSchema.validating(subject)
@@ -46,28 +53,34 @@ class CombinedKeywordValidatorTest {
 
   @Test
   fun validateAll() {
-    JsonSchemas.schema { allOfSchemas = SUBSCHEMAS }
+    JsonSchemas.schema { addSubschemas(ALL_OF) }
         .validating(20.toJsrValue())
         .hasKeyword(ALL_OF)
   }
 
   @Test
   fun validateAny() {
-    JsonSchemas.schema { anyOfSchemas = SUBSCHEMAS }
+    JsonSchemas.schema { addSubschemas(ANY_OF) }
         .validating(5.toJsrValue())
         .hasKeyword(ANY_OF)
   }
 
   @Test
   fun validateOne() {
-    JsonSchemas.schema { oneOfSchemas = SUBSCHEMAS }
+
+    JsonSchemas.schema {
+      addSubschemas(ONE_OF)
+    }
         .validating(30.toJsrValue())
         .hasKeyword(ONE_OF)
   }
 
   companion object {
-    private val SUBSCHEMAS = asList(
-        mockNumberSchema.apply { multipleOf = 10 },
-        mockNumberSchema.apply { multipleOf = 3 })
+    fun MutableSchema.addSubschemas(keywordInfo: KeywordInfo<SchemaListKeyword>) {
+      this[keywordInfo] = SchemaListKeyword(listOf(
+          mockNumberSchema.apply { multipleOf = 10 }.build(),
+          mockNumberSchema.apply { multipleOf = 3 }.build())
+      )
+    }
   }
 }
