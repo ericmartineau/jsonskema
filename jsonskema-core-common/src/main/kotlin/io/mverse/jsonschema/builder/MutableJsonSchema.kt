@@ -10,14 +10,11 @@ import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.impl.JsonSchema
 import io.mverse.jsonschema.impl.RefJsonSchema
 import io.mverse.jsonschema.keyword
-import io.mverse.jsonschema.keyword.BooleanKeyword
 import io.mverse.jsonschema.keyword.DependenciesKeyword
 import io.mverse.jsonschema.keyword.DollarSchemaKeyword
 import io.mverse.jsonschema.keyword.DollarSchemaKeyword.Companion.emptyUri
 import io.mverse.jsonschema.keyword.IdKeyword
 import io.mverse.jsonschema.keyword.ItemsKeyword
-import io.mverse.jsonschema.keyword.JsonArrayKeyword
-import io.mverse.jsonschema.keyword.JsonValueKeyword
 import io.mverse.jsonschema.keyword.JsrIterable
 import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
@@ -68,12 +65,6 @@ import io.mverse.jsonschema.keyword.Keywords.WRITE_ONLY
 import io.mverse.jsonschema.keyword.LimitKeyword
 import io.mverse.jsonschema.keyword.LimitKeyword.Companion.maximumKeyword
 import io.mverse.jsonschema.keyword.LimitKeyword.Companion.minimumKeyword
-import io.mverse.jsonschema.keyword.NumberKeyword
-import io.mverse.jsonschema.keyword.SchemaListKeyword
-import io.mverse.jsonschema.keyword.SchemaMapKeyword
-import io.mverse.jsonschema.keyword.SingleSchemaKeyword
-import io.mverse.jsonschema.keyword.StringKeyword
-import io.mverse.jsonschema.keyword.StringSetKeyword
 import io.mverse.jsonschema.keyword.TypeKeyword
 import io.mverse.jsonschema.keyword.URIKeyword
 import io.mverse.jsonschema.keyword.iterableOf
@@ -90,10 +81,8 @@ import io.mverse.logging.mlogger
 import lang.collection.Multimaps
 import lang.collection.SetMultimap
 import lang.collection.freezeMap
-import lang.exception.illegalState
 import lang.hashKode
 import lang.json.JsonPath
-import lang.json.JsrArray
 import lang.json.JsrObject
 import lang.json.JsrValue
 import lang.json.toJsrValue
@@ -121,7 +110,7 @@ data class MutableJsonSchema(
     override var extraProperties: MutableMap<String, JsrValue> = mutableMapOf(),
     override val location: SchemaLocation = SchemaPaths.fromNonSchemaSource(randomUUID()),
     override var currentDocument: JsrObject? = null,
-    override var loadingReport: LoadingReport = LoadingReport()) : MutableSchema {
+    override var loadingReport: LoadingReport = LoadingReport()) : MutableSchemaHelpers {
 
   constructor(schemaLoader: SchemaLoader, fromSchema: Schema, id: URI)
       : this(schemaLoader = schemaLoader, fromSchema = fromSchema, location = SchemaLocation.builderFromId(id).build()) {
@@ -157,46 +146,8 @@ data class MutableJsonSchema(
     }
   }
 
-  override fun <T, K : Keyword<T>> set(key: KeywordInfo<K>, value: T?, updater: (T) -> K) {
-    when (value) {
-      null -> this -= key
-      else -> {
-        internalKeywords[key] = get(key)?.withValue(value) ?: updater(value)
-      }
-    }
-  }
-
   override operator fun minusAssign(key: KeywordInfo<*>) {
     internalKeywords.remove(key)
-  }
-
-  operator fun set(keyword: KeywordInfo<SingleSchemaKeyword>, value: MutableSchema?) {
-    this[keyword] = value?.let { SingleSchemaKeyword(buildSubSchema(it, keyword)) }
-  }
-
-  operator fun set(keyword: KeywordInfo<SingleSchemaKeyword>, property: String, value: MutableSchema?) {
-    this[keyword] = value?.let { SingleSchemaKeyword(buildSubSchema(it, keyword, property)) }
-  }
-
-  override operator fun <T, K : Keyword<T>> set(keyword: KeywordInfo<K>, value: T?) {
-    @Suppress("unchecked_cast")
-    when (value) {
-      null -> this -= keyword
-      else -> internalKeywords[keyword] = when (value) {
-        is String -> StringKeyword(value)
-        is Number -> NumberKeyword(value)
-        is Boolean -> BooleanKeyword(value)
-        is JsrArray -> JsonArrayKeyword(value)
-        is JsrValue -> JsonValueKeyword(value)
-        is Schema -> SingleSchemaKeyword(value)
-        is List<*> -> SchemaListKeyword(value as List<Schema>)
-        is Map<*, *> -> SchemaMapKeyword(value as Map<String, Schema>)
-        is Set<*> -> StringSetKeyword(value as Set<String>)
-        is Iterable<*> -> JsonArrayKeyword(value as Iterable<JsrValue>)
-        is URI -> URIKeyword(value)
-        else -> illegalState("Dont know how to handle keyword $keyword, value: $value")
-      }
-    }
   }
 
   override fun invoke(block: MutableSchema.() -> Unit): MutableSchema {
@@ -209,22 +160,13 @@ data class MutableJsonSchema(
   override var ref: Any?
     get() = values[REF]
     set(ref) {
-      val uri = when (ref) {
-        null -> null
-        else -> URI(ref.toString())
-      }
-      set(REF, uri)
+      set(REF, ref?.let { URIKeyword(URI("$ref")) })
     }
 
   override var metaSchema: URI?
-    get() {
-      return values[SCHEMA]
-    }
+    get() = values[SCHEMA]
     set(value) {
-      when (value) {
-        null -> this -= SCHEMA
-        else -> set(SCHEMA, value)
-      }
+      this[SCHEMA] = value?.let { DollarSchemaKeyword(value) }
     }
 
   override fun merge(path: JsonPath, other: Schema, report: MergeReport) {
@@ -564,15 +506,15 @@ data class MutableJsonSchema(
 
   override var oneOfSchemas: List<MutableSchema>
     get() = values[ONE_OF]?.map { it.toMutableSchema() } ?: emptyList()
-    set(value) = set(ONE_OF, buildSubSchemas(value, ONE_OF))
+    set(value) = set(ONE_OF, value)
 
   override var anyOfSchemas: List<MutableSchema>
     get() = values[ANY_OF]?.map { it.toMutableSchema() } ?: emptyList()
-    set(value) = set(ANY_OF, buildSubSchemas(value, ANY_OF))
+    set(value) = set(ANY_OF, value)
 
   override var allOfSchemas: List<MutableSchema>
     get() = values[ALL_OF]?.map { it.toMutableSchema() } ?: emptyList()
-    set(value) = set(ALL_OF, buildSubSchemas(value, ALL_OF))
+    set(value) = set(ALL_OF, value)
 
   override var ifSchema: MutableSchema?
     get() = values[IF]?.toMutableSchema()
@@ -657,11 +599,6 @@ data class MutableJsonSchema(
   // HELPER FUNCTIONS
   // #######################################################
 
-  private fun buildSubSchema(toBuild: MutableSchema, keyword: KeywordInfo<*>): Schema {
-    val childLocation = this.location.child(keyword)
-    return toBuild.build(childLocation, loadingReport)
-  }
-
   override fun withLocation(location: SchemaLocation): MutableSchema {
     return this.copy(location = location)
   }
@@ -679,12 +616,6 @@ data class MutableJsonSchema(
   override fun buildSubSchema(toBuild: MutableSchema, keyword: KeywordInfo<*>, path: String, vararg paths: String): Schema {
     val childLocation = this.location.child(keyword).child(path).child(*paths)
     return toBuild.build(childLocation, loadingReport)
-  }
-
-  private fun buildSubSchemas(toBuild: Collection<MutableSchema>, keyword: KeywordInfo<*>): List<Schema> {
-    var idx = 0
-    val childPath = this.location.child(keyword)
-    return toBuild.map { builder -> builder.build(childPath.child(idx++), loadingReport) }
   }
 
   // #######################################################

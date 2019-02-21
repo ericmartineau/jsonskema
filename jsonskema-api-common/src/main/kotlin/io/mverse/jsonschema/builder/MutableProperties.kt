@@ -4,8 +4,10 @@ import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.enums.FormatType
 import io.mverse.jsonschema.enums.JsonSchemaType
+import io.mverse.jsonschema.keyword.JsrIterable
 import io.mverse.jsonschema.keyword.Keywords.PROPERTIES
 import io.mverse.jsonschema.keyword.SchemaMapKeyword
+import io.mverse.jsonschema.keyword.iterableOf
 import io.mverse.jsonschema.utils.jsonSchemaType
 import lang.json.JsrArray
 import lang.json.KtArray
@@ -205,6 +207,10 @@ class MutableProperties(val builder: MutableSchema) {
 
   fun enum(values: KtArray, block: MutableSchema.() -> Unit = {}): (MutableSchema.() -> Unit) {
     return enum(values.toJsrArray(),  block)
+  }
+
+  fun enum(block:()-> JsrIterable): (MutableSchema.() -> Unit) {
+    return enum(iterableOf(block))
   }
 
   fun datetime(block: MutableSchema.() -> Unit = {}): (MutableSchema.() -> Unit) {

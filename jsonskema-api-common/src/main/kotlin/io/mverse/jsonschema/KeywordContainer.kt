@@ -25,8 +25,6 @@ interface KeywordContainer {
 
 interface MutableKeywordContainer : KeywordContainer {
   operator fun <K : Keyword<*>> set(key: KeywordInfo<K>, value: K?)
-  operator fun <T, K : Keyword<T>> set(key: KeywordInfo<K>, value: T?, updater: (T)-> K)
-  operator fun <T, K : Keyword<T>> set(keyword: KeywordInfo<K>, value: T?)
   operator fun minusAssign(key: KeywordInfo<*>)
 }
 

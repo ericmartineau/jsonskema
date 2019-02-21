@@ -15,7 +15,7 @@ class MutableJsonSchemaTest {
 
   @Test fun testSetters_WithUpdater() {
     val mutable = MutableJsonSchema(JsonSchemas.schemaLoader, "http://mverse/mutableSchemas".toURI())
-    mutable.set(Keywords.CONST, jsrString("yes")) { JsonValueKeyword(it) }
+    mutable.set(Keywords.CONST, jsrString("yes"))
 
     assert(mutable.const).isEqualTo("yes")
     assert(mutable.constValue).isEqualTo(jsrString("yes"))
@@ -74,6 +74,5 @@ class MutableJsonSchemaTest {
       assert(mutable.allItemSchema?.const).isEqualTo("allItems")
       assert(mutable.properties["property"].draft7().constValue).isEqualTo(jsrString("property"))
     }
-
   }
 }
