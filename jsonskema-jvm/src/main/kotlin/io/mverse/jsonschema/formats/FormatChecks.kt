@@ -4,6 +4,7 @@ import com.damnhandy.uri.template.UriTemplate
 import com.google.common.net.InetAddresses
 import com.google.common.net.InternetDomainName
 import com.google.i18n.phonenumbers.PhoneNumberUtil
+import lang.time.flexibleISOParser
 import org.apache.commons.validator.routines.EmailValidator
 import java.net.InetAddress
 import java.time.format.DateTimeFormatter
@@ -19,20 +20,12 @@ actual object FormatChecks {
       .appendPattern(ISO_DATE_FORMAT)
       .toFormatter()
 
-  private val isoDateTimeChecker: DateTimeFormatter
   private val isoTimeChecker: DateTimeFormatter
 
   init {
     val secondsFractionFormatter = DateTimeFormatterBuilder()
         .appendFraction(ChronoField.NANO_OF_SECOND, 1, 9, true)
         .toFormatter()
-
-    isoDateTimeChecker = DateTimeFormatterBuilder()
-        .appendPattern(PARTIAL_DATETIME_PATTERN)
-        .appendOptional(secondsFractionFormatter)
-        .appendPattern(ZONE_OFFSET_PATTERN)
-        .toFormatter()
-
 
     isoTimeChecker = DateTimeFormatterBuilder()
         .appendPattern(PARTIAL_TIME_PATTERN)
@@ -42,7 +35,7 @@ actual object FormatChecks {
   }
 
   actual fun isValidIsoDateTime(str: String): Boolean {
-    isoDateTimeChecker.parse(str)
+    flexibleISOParser.parse(str)
     return true
   }
 
