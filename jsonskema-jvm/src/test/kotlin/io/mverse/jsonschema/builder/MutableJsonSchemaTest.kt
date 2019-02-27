@@ -2,11 +2,15 @@ package io.mverse.jsonschema.builder
 
 import assertk.assert
 import assertk.assertAll
+import assertk.assertions.contains
+import assertk.assertions.doesNotContain
+import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.keyword.JsonValueKeyword
 import io.mverse.jsonschema.keyword.Keywords
+import io.mverse.jsonschema.schema
 import lang.json.jsrArrayOf
 import lang.json.jsrNumber
 import lang.json.jsrString
@@ -28,6 +32,23 @@ class MutableJsonSchemaTest {
 
     assert(mutable.const).isEqualTo("yes")
     assert(mutable.constValue).isEqualTo(jsrString("yes"))
+  }
+
+  @Test fun testRemoveProperty() {
+    val schema = JsonSchemas.schema {
+      properties {
+        "name" required string
+        "age" required number
+      }
+    }
+
+    val withoutAge = schema.toMutableSchema().build {
+      properties -= "age"
+    }
+
+    assert(withoutAge.draft7().properties.keys).hasSize(1)
+    assert(withoutAge.draft7().properties.keys).contains("name")
+    assert(withoutAge.draft7().properties.keys).doesNotContain("age")
   }
 
   @Test fun testSetters() {

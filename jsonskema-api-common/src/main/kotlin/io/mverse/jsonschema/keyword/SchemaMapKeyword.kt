@@ -55,6 +55,10 @@ data class SchemaMapKeyword(val input: Map<String, Schema> = emptyMap()) : Subsc
     return SchemaMapKeyword(this.value + schema)
   }
 
+  operator fun minus(key:String):SchemaMapKeyword {
+    return SchemaMapKeyword(this.value - key)
+  }
+
   override fun toString(): String {
     return value.toString()
   }

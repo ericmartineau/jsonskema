@@ -17,9 +17,12 @@ import lang.json.values
 import lang.net.URI
 
 class MutableProperties(val builder: MutableSchema) {
-
   val keyword = PROPERTIES
 
+  operator fun minusAssign(key:String) {
+    val properties = builder[keyword] ?: return
+    builder[keyword] = properties - key
+  }
   operator fun get(key: String): Schema {
     return (builder[keyword] ?: SchemaMapKeyword()).value.getValue(key)
   }
