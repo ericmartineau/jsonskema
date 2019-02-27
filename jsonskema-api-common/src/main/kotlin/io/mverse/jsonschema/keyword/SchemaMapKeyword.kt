@@ -3,6 +3,7 @@ package io.mverse.jsonschema.keyword
 import io.mverse.jsonschema.MergeReport
 import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.Schema
+import io.mverse.jsonschema.SchemaMergeStrategy
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.mergeAdd
 import lang.collection.freezeMap
@@ -34,13 +35,13 @@ data class SchemaMapKeyword(val input: Map<String, Schema> = emptyMap()) : Subsc
     }
   }
 
-  override fun merge(path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<Map<String, Schema>>, report: MergeReport): Keyword<Map<String, Schema>> {
+  override fun merge(strategy: SchemaMergeStrategy, path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<Map<String, Schema>>, report: MergeReport): Keyword<Map<String, Schema>> {
     val schemas = mutableMapOf<String, Schema>()
     schemas.putAll(this.value)
     other.value.forEach { (prop,schema) ->
       val child = path.child(prop)
       if (prop in schemas) {
-        schemas[prop] = schemas[prop]!!.merge(child, schema, report, null)
+        schemas[prop] = strategy.merge(child, schemas[prop]!!, schema, report, null)
       } else {
         report += mergeAdd(child, keyword)
         schemas[prop] = schema

@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.keyword
 
 import io.mverse.jsonschema.MergeReport
+import io.mverse.jsonschema.SchemaMergeStrategy
 import io.mverse.jsonschema.mergeConflict
 import lang.json.JsonPath
 
@@ -23,7 +24,7 @@ data class NumberKeyword(override val value: Number) : KeywordImpl<Number>() {
     return double.hashCode()
   }
 
-  override fun merge(path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<Number>, report: MergeReport): Keyword<Number> {
+  override fun merge(strategy: SchemaMergeStrategy, path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<Number>, report: MergeReport): Keyword<Number> {
     report += mergeConflict(path, keyword, this, other)
     return NumberKeyword(other.value)
   }

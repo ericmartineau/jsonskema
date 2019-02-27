@@ -3,7 +3,6 @@ package io.mverse.jsonschema
 import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.keyword.Keywords.REF
-import io.mverse.jsonschema.utils.calculateMergeURI
 import lang.Name
 import lang.exception.illegalState
 import lang.exception.nullPointer
@@ -46,17 +45,6 @@ interface Schema : KeywordContainer {
   val pointerFragmentURI: URI? get() = location.jsonPointerFragment
 
   val isRefSchema: Boolean get() = this is RefSchema || values[REF] != null
-
-  /**
-   * Combines this schema with another schema by merging the keywords, a new copy is returned
-   */
-  operator fun plus(override: Schema): Schema = merge(JsonPath.rootPath, override, MergeReport())
-
-  /**
-   * Merged this schema with another this schema, a copy is returned.
-   */
-  fun merge(path: JsonPath, override: Schema?, report: MergeReport,
-            mergedId: URI? = absoluteURI.calculateMergeURI(override?.absoluteURI)): Schema
 
   @Deprecated("Use toMutableSchema()", replaceWith = ReplaceWith("toMutableSchema()"))
   fun toBuilder(): MutableSchema = toMutableSchema()

@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.keyword
 
 import io.mverse.jsonschema.MergeReport
+import io.mverse.jsonschema.SchemaMergeStrategy
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.mergeConflict
 import lang.json.JsonPath
@@ -19,7 +20,7 @@ data class IdKeyword(override val value: URI) : KeywordImpl<URI>() {
     }
   }
 
-  override fun merge(path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<URI>, report: MergeReport): Keyword<URI> {
+  override fun merge(strategy: SchemaMergeStrategy, path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<URI>, report: MergeReport): Keyword<URI> {
     report += mergeConflict(path, keyword, this, other)
     return IdKeyword((other as IdKeyword).value)
   }

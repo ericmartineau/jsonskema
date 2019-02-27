@@ -115,7 +115,7 @@ typealias JsonSchemaBuilder = MutableJsonSchema
  */
 data class MutableJsonSchema(
     override val schemaLoader: SchemaLoader,
-    private val internalKeywords: MutableMap<KeywordInfo<*>, Keyword<*>> = mutableMapOf(),
+    internal val internalKeywords: MutableMap<KeywordInfo<*>, Keyword<*>> = mutableMapOf(),
     override var extraProperties: MutableMap<String, JsrValue> = mutableMapOf(),
     override val location: SchemaLocation = SchemaPaths.fromNonSchemaSource(randomUUID()),
     override var currentDocument: JsrObject? = null,
@@ -163,7 +163,9 @@ data class MutableJsonSchema(
     return apply(block)
   }
 
-
+  override fun unsafeSet(keyword: KeywordInfo<*>, value: Keyword<*>) {
+    internalKeywords[keyword] = value
+  }
 
   // #######  KEYWORDS  ########  //
 
@@ -499,30 +501,7 @@ data class MutableJsonSchema(
   }
 
   override fun merge(path: JsonPath, other: Schema, report: MergeReport) {
-    other.extraProperties.forEach { (k, v) ->
-      extraProperties[k] = v
-    }
 
-    other.keywords
-        .filter { (keyword) -> keyword != DOLLAR_ID && keyword != ID }
-        .forEach { (keyword, value) ->
-          val kwPath = path.child(keyword.key)
-          if (keyword !in this) {
-            internalKeywords[keyword] = value
-            report += mergeAdd(kwPath, keyword)
-          } else {
-            @Suppress(UNCHECKED_CAST)
-            val thisValue = internalKeywords[keyword] as Keyword<Any>
-            @Suppress(UNCHECKED_CAST)
-            val otherValue = value as Keyword<Any>
-            try {
-              val mergeKeyword = thisValue.merge(kwPath, keyword, otherValue, report)
-              internalKeywords[keyword] = mergeKeyword
-            } catch (e: MergeException) {
-              report += mergeError(kwPath, keyword, e)
-            }
-          }
-        }
   }
 
   override fun withLocation(location: SchemaLocation): MutableSchema {

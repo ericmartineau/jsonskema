@@ -1,10 +1,10 @@
 package io.mverse.jsonschema.keyword
 
 import io.mverse.jsonschema.MergeReport
+import io.mverse.jsonschema.SchemaMergeStrategy
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.mergeCombine
-import io.mverse.jsonschema.mergeConflict
 import lang.json.JsonPath
 import lang.json.MutableJsrObject
 
@@ -24,7 +24,7 @@ data class TypeKeyword(val types: Set<JsonSchemaType> = emptySet(),
     return TypeKeyword(types + another)
   }
 
-  override fun merge(path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<Set<JsonSchemaType>>, report: MergeReport): Keyword<Set<JsonSchemaType>> {
+  override fun merge(strategy: SchemaMergeStrategy, path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<Set<JsonSchemaType>>, report: MergeReport): Keyword<Set<JsonSchemaType>> {
     other as TypeKeyword
     if (this.types.isNotEmpty() && other.types.isNotEmpty() && other.types != this.types) {
       report += mergeCombine(path, keyword, this.types, other.types)

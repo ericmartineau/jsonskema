@@ -5,7 +5,6 @@ import io.mverse.jsonschema.Draft3Schema
 import io.mverse.jsonschema.Draft4Schema
 import io.mverse.jsonschema.Draft6Schema
 import io.mverse.jsonschema.Draft7Schema
-import io.mverse.jsonschema.MergeReport
 import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaLocation
@@ -57,15 +56,6 @@ data class JsonSchema(
     return MutableJsonSchema(schemaLoader, fromSchema = this, id = id)
   }
 
-  override fun merge(path: JsonPath, override: Schema?, report: MergeReport, mergedId: URI?): Schema {
-    val overrides = override ?: return this
-    val source = if (mergedId == null) this else this.withDocumentURI(mergedId)
-    val mutable = source.toMutableSchema()
-    mutable.merge(path, overrides, report)
-    val built = mutable.build()
-    return built
-  }
-
   override fun withId(id: URI): Schema {
     return copy(
         internalLocation = location.withId(id),
@@ -102,8 +92,8 @@ data class JsonSchema(
       val draft7 = schema.draft7()
       val segment = segments.next()
       when (segment) {
-        "properties"-> schema = draft7.properties[segments.next()] ?: return null
-        "definitions"-> schema = draft7.definitions[segments.next()] ?: return null
+        "properties" -> schema = draft7.properties[segments.next()] ?: return null
+        "definitions" -> schema = draft7.definitions[segments.next()] ?: return null
         "oneOf" -> schema = draft7.oneOfSchemas.getOrNull(segments.next().toInt()) ?: return null
         "anyOf" -> schema = draft7.anyOfSchemas.getOrNull(segments.next().toInt()) ?: return null
         "allOf" -> schema = draft7.allOfSchemas.getOrNull(segments.next().toInt()) ?: return null
@@ -115,7 +105,7 @@ data class JsonSchema(
         "propertyNames" -> schema = draft7.propertyNameSchema ?: return null
         "items" -> illegalState("Items not implemented")
         "dependencies" -> illegalState("Dependencies not implemented")
-        else-> illegalState("$segment can't be resolved within document")
+        else -> illegalState("$segment can't be resolved within document")
       }
     }
     return schema
@@ -141,7 +131,7 @@ data class JsonSchema(
 
   override fun toString(includeExtraProperties: Boolean, indent: Boolean): String {
     val json = toJson(includeExtraProperties)
-    return if(indent) json.writeJson(indent) else json.toString()
+    return if (indent) json.writeJson(indent) else json.toString()
   }
 
   override fun toJson(includeExtraProperties: Boolean): JsrObject {
@@ -174,7 +164,6 @@ data class JsonSchema(
           block(first, second)
         }
   }
-
 
   override fun equals(other: Any?): Boolean {
     return when {

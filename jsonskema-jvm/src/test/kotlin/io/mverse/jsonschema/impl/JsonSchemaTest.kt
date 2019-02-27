@@ -323,7 +323,7 @@ class JsonSchemaTest {
     }
 
     val mergeReport = MergeReport()
-    val mergedSchema = schemaA.merge(JsonPath.rootPath, schemaB, mergeReport)
+    val mergedSchema = JsonSchemas.schemaMerger.merge(JsonPath.rootPath, schemaA, schemaB, mergeReport)
 
     assert(mergedSchema.absoluteURI, "Merged schema URI").isNotEqualTo(schemaA.absoluteURI)
     assert(mergedSchema.absoluteURI, "Merged schema uri").isNotEqualTo(schemaB.absoluteURI)

@@ -15,6 +15,7 @@ expect object JsonSchemas {
   fun createValidatorFactory(): SchemaValidatorFactory
   var validatorFactory: SchemaValidatorFactory
   var schemaReader: SchemaReader
+  var schemaMerger: SchemaMergeStrategy
   val schemaLoader: SchemaLoader
 
   fun schemaBuilder(id: URI, loader: SchemaLoader, block: SchemaMutator = {}): MutableSchema

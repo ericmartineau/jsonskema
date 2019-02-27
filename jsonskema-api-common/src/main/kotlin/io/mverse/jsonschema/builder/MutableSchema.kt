@@ -6,6 +6,7 @@ import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.SchemaLocation
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.keyword.JsrIterable
+import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
@@ -166,4 +167,9 @@ interface MutableSchema : MutableKeywordContainer {
    * Returns a copy of this schema with the specified locatiion
    */
   fun withLocation(location: SchemaLocation): MutableSchema
+
+  /**
+   * Sets a keyword value without any compile-time checking
+   */
+  fun unsafeSet(keyword: KeywordInfo<*>, value: Keyword<*>)
 }

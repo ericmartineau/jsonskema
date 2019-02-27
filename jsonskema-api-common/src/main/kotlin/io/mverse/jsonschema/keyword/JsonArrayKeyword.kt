@@ -1,8 +1,8 @@
 package io.mverse.jsonschema.keyword
 
 import io.mverse.jsonschema.MergeReport
+import io.mverse.jsonschema.SchemaMergeStrategy
 import io.mverse.jsonschema.mergeConflict
-import io.mverse.jsonschema.mergeException
 import lang.json.JsonPath
 import lang.json.JsrArray
 import lang.json.JsrValue
@@ -12,7 +12,7 @@ data class JsonArrayKeyword(override val value: JsrIterable) : KeywordImpl<JsrIt
   constructor(jsrArray:JsrArray): this(jsrArray.values)
 
   override fun withValue(value: JsrIterable): Keyword<JsrIterable> = this.copy(value = value)
-  override fun merge(path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<JsrIterable>, report: MergeReport): Keyword<JsrIterable> {
+  override fun merge(strategy: SchemaMergeStrategy, path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<JsrIterable>, report: MergeReport): Keyword<JsrIterable> {
     report += mergeConflict(path, keyword, this, other)
     return JsonArrayKeyword(other.value)
   }

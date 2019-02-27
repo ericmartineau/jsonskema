@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.keyword
 
 import io.mverse.jsonschema.MergeReport
+import io.mverse.jsonschema.SchemaMergeStrategy
 import io.mverse.jsonschema.enums.JsonSchemaVersion
 import io.mverse.jsonschema.enums.JsonSchemaVersion.Draft6
 import io.mverse.jsonschema.mergeConflict
@@ -50,7 +51,7 @@ data class LimitKeyword(val keyword: KeywordInfo<LimitKeyword>,
     }
   }
 
-  override fun merge(path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<Number?>, report: MergeReport): Keyword<Number?> {
+  override fun merge(strategy: SchemaMergeStrategy, path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<Number?>, report: MergeReport): Keyword<Number?> {
     other as LimitKeyword
     if(this.isExclusive != other.isExclusive) report += mergeConflict(path.child("exclusive"), keyword, this.isExclusive, other.isExclusive)
     if(this.exclusiveLimit != null && this.exclusiveLimit != other.exclusiveLimit) report += mergeConflict(path.child("exclusive"), keyword, this.exclusiveLimit, other.exclusiveLimit)

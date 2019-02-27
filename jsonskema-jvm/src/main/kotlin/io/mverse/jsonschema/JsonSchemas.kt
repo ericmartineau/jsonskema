@@ -12,6 +12,8 @@ actual object JsonSchemas {
   actual var validatorFactory: SchemaValidatorFactory = defaultValidatorFactory
   actual var schemaReader: SchemaReader = defaultSchemaReader
   actual val schemaLoader: SchemaLoader get() = defaultSchemaReader.loader
+  actual var schemaMerger: SchemaMergeStrategy = DefaultSchemaMergeStrategy
+
   actual fun createValidatorFactory(): SchemaValidatorFactory = SchemaValidatorFactoryBuilder().build()
   actual fun schemaBuilder(id: URI, loader: SchemaLoader, block: SchemaMutator): MutableSchema = MutableJsonSchema(loader, id = id).apply(block)
 

@@ -82,11 +82,6 @@ data class RefJsonSchema(val schemaLoader: SchemaLoader,
       return refSchema.keywords
     }
 
-  @Suppress(Suppressions.NAME_SHADOWING)
-  override fun merge(path: JsonPath, override: Schema?, report: MergeReport, mergedId: URI?): Schema {
-    return override ?: this
-  }
-
   override fun toJson(includeExtraProperties: Boolean): JsrObject {
     return jsrObject {
       REF.key *= refURI
