@@ -25,6 +25,7 @@ import lang.net.URI
 import lang.time.currentTime
 import org.junit.Test
 import java.io.FileNotFoundException
+import java.io.IOException
 
 val slowpoke = 2000L
 val expectedSlowpoke = 2000L
@@ -53,7 +54,7 @@ class DefaultJsonDocumentClientTest {
           }
 
           assert(it.actual.failures[HttpDocumentFetcher::class]).isNotNull {
-            it.isInstanceOf(FileNotFoundException::class) {
+            it.isInstanceOf(IOException::class) {
               it.message().isNotNull {
                 it.contains("https://www.nba.com/no/document/here")
               }
