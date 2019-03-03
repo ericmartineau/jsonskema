@@ -42,6 +42,10 @@ allprojects {
       installKotlinDeps()
       installMverseShared()
 
+      val ktor: String by project
+      dependency("io.ktor:ktor-client-core:$ktor")
+      dependency("io.ktor:ktor-client-cio:$ktor")
+
       dependency("io.github.microutils:kotlin-logging:1.6.22")
 
       // Immutable Collections Library for Kotlin

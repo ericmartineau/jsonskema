@@ -1,5 +1,7 @@
 package io.mverse.jsonschema.utils
 
+import io.ktor.client.HttpClient
+import kotlinx.io.core.Input
 import lang.net.URI
 import lang.net.fragment
 import lang.net.isFragmentOnly
@@ -16,6 +18,8 @@ fun URI.trimEmptyFragment(): URI {
     this
   }
 }
+
+expect suspend fun URI.httpGet(): ByteArray
 
 fun URI.isJsonPointer(): Boolean {
   val uri = this

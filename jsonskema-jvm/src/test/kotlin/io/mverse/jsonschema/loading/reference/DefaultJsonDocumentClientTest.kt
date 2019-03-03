@@ -11,6 +11,7 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import assertk.assertions.message
+import io.ktor.client.features.BadResponseStatusException
 import io.mverse.assertk.hasStringValue
 import io.mverse.assertk.hasValueAtPointer
 import io.mverse.jsonschema.assertj.asserts.isEqualIgnoringWhitespace
@@ -54,9 +55,9 @@ class DefaultJsonDocumentClientTest {
           }
 
           assert(it.actual.failures[HttpDocumentFetcher::class]).isNotNull {
-            it.isInstanceOf(IOException::class) {
+            it.isInstanceOf(BadResponseStatusException::class) {
               it.message().isNotNull {
-                it.contains("https://www.nba.com/no/document/here")
+                it.contains("404 Not Found")
               }
             }
           }

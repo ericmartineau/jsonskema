@@ -90,9 +90,10 @@ data class DefaultJsonDocumentClient(val fetchers: MutableList<JsonDocumentFetch
   }
 
   override fun fetchDocument(uri: URI): FetchedDocumentResults {
-    debug.timed("fetchall: ${uri.path}") {
-      return fetchAll(uri, it)
+    val fetched = debug.timed("fetchall: ${uri.path}") {
+      fetchAll(uri, it)
     }
+    return fetched
   }
 
   fun fetchAll(uri: URI, mlog: MLog): FetchedDocumentResults {

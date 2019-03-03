@@ -11,6 +11,8 @@ mverse  {
     compile(kotlinImmutable())
     compile("mverse-lang-common")
     compile("kotlin-logging")
+    compile("ktor-client-core")
+    compile("ktor-client-cio")
     compile("mverse-log-common")
     compile(kotlinSerialization())
     compile("kotlinx-io")
