@@ -7,12 +7,14 @@ import io.mverse.jsonschema.keyword.Keyword
 typealias SchemaKeywordAssert<K> = Assert<Keyword<K>>
 
 fun <K> SchemaKeywordAssert<K>.withAssertion(assertion: (K?) -> Unit): SchemaKeywordAssert<K> {
-  assertion(actual.value)
+  given {actual->
+    assertion(actual.value)
+  }
   return this
 }
 
 fun <K> SchemaKeywordAssert<K>.hasValue(value: K): SchemaKeywordAssert<K> {
-  assert(actual.value, "keyword.value").isEqualTo(value)
+  transform("keyword.value"){it.value}.isEqualTo(value)
   return this
 }
 
