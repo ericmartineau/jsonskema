@@ -1,6 +1,8 @@
 package io.mverse.jsonschema.loading
 
+import assertk.Assert
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.containsAll
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
@@ -17,7 +19,7 @@ class ArrayKeywordsLoaderTest : BaseLoaderTest("arraytestschemas.json") {
   @Test
   fun arrayByAdditionalItems() {
     val actual = getSchemaForKey("arrayByAdditionalItems")
-    assert(actual.additionalItemsSchema?.draft7()?.types).isNotNull {
+    assertThat(actual.additionalItemsSchema?.draft7()?.types).isNotNull { it: Assert<Set<JsonSchemaType>> ->
       it.containsAll(JsonSchemaType.NULL)
     }
   }
@@ -32,9 +34,9 @@ class ArrayKeywordsLoaderTest : BaseLoaderTest("arraytestschemas.json") {
   @Test
   fun arraySchema() {
     val actual = getSchemaForKey("arraySchema").draft6()
-    assert(actual.minItems).isEqualTo(2)
-    assert(actual.maxItems).isEqualTo(3)
-    assert(actual.allItemSchema).isEqualTo(NULL_SCHEMA)
+    assertThat(actual.minItems).isEqualTo(2)
+    assertThat(actual.maxItems).isEqualTo(3)
+    assertThat(actual.allItemSchema).isEqualTo(NULL_SCHEMA)
   }
 
   @Test

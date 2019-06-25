@@ -129,9 +129,9 @@ data class RefSchemaLoader(val documentClient: JsonDocumentClient, val schemaLoa
 
     val jsrValue: JsrValue = parentDocument.getOrNull(pathWithinDocument) ?: JsrNull
     val schemaObject: JsrObject = when (jsrValue) {
-      JsrNull -> schemaException(referenceURI, "Unable to resolve '#$relativeURL' as JSON Pointer within '$documentURI'")
+      JsrNull -> schemaException(referenceURI, "Unable to resolve '$relativeURL' as JSON Pointer within '$documentURI'")
       is JsrObject -> jsrValue
-      else -> schemaException(referenceURI, "Expecting JsrObject at #$relativeURL, but found ${jsrValue.type}")
+      else -> schemaException(referenceURI, "Expecting JsrObject at '$relativeURL', but found ${jsrValue.type}")
     }
 
     val foundId = JsonUtils.extractIdFromObject(schemaObject)

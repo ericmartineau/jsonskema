@@ -2,6 +2,7 @@ package io.mverse.jsonschema.validation
 
 import assertk.assert
 import assertk.assertAll
+import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
@@ -84,9 +85,9 @@ class BaseSchemaValidatorEnumTest {
   fun toStringTest() {
     val toString = subjectBuilder().build().toString()
     val actual = toString.parseJsrObject()
-    assert(actual).hasSize(1)
+    assertThat(actual).hasSize(1)
     val pv = jsrArrayOf(true, "foo")
-    assert(actual["enum".jkey]).isEqualTo(pv)
+    assertThat(actual["enum".jkey]).isEqualTo(pv)
   }
 
   @Test
@@ -98,8 +99,8 @@ class BaseSchemaValidatorEnumTest {
 
     val validate = ValidationMocks.createTestValidator(schema).validate(testValNotSame)
 
-    assert(validate, "Should have an error").isNotNull()
-    assert(validate!!.keyword, "Should be for enum keyword").isEqualTo(Keywords.ENUM)
+    assertThat(validate, "Should have an error").isNotNull()
+    assertThat(validate!!.keyword, "Should be for enum keyword").isEqualTo(Keywords.ENUM)
   }
 
   @Test

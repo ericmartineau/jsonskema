@@ -15,14 +15,11 @@
  */
 package io.mverse.jsonschema.validation
 
-import assertk.assert
-import assertk.assertions.hasToString
 import io.mverse.jsonschema.JsonSchemas
-import io.mverse.jsonschema.assertj.asserts.isEqualIgnoringWhitespace
-import io.mverse.jsonschema.resourceLoader
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.impl.RefJsonSchema
 import io.mverse.jsonschema.loading.parseJsrObject
+import io.mverse.jsonschema.resourceLoader
 import io.mverse.jsonschema.schema
 import lang.json.JsonKey
 import lang.json.getOrNull
@@ -50,7 +47,7 @@ class RefSchemaEqualsTest {
         ref = URI("#")
       }
     }
-    assert(schema.toString()).isEqualIgnoringWhitespace("{\"properties\":{\"foo\":{\"\$ref\":\"#\"}}}")
+    assertThat(schema.toString()).isEqualToIgnoringWhitespace("{\"properties\":{\"foo\":{\"\$ref\":\"#\"}}}")
   }
 
   @Test

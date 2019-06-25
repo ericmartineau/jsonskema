@@ -22,7 +22,7 @@ class PropertyNameValidator(keyword: SingleSchemaKeyword, schema: Schema, factor
     val subjectProperties = subject.jsonObject!!.propNames
     for (subjectProperty in subjectProperties) {
       val value = jsrString(subjectProperty)
-      propertyNameValidator.validate(fromJsonValue(subject.root, value, subject.location), report)
+      propertyNameValidator.validate(fromJsonValue(subject.root, value, subject.location.child(subjectProperty)), report)
     }
 
     val errors = report.errors

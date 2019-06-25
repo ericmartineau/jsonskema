@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.loading.reference
 
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.hasSize
 import assertk.assertions.isBetween
@@ -11,7 +12,7 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import assertk.assertions.message
-import io.ktor.client.features.BadResponseStatusException
+import io.ktor.client.features.ResponseException
 import io.mverse.assertk.hasStringValue
 import io.mverse.assertk.hasValueAtPointer
 import io.mverse.jsonschema.assertj.asserts.isEqualIgnoringWhitespace
@@ -25,8 +26,6 @@ import lang.exception.illegalState
 import lang.net.URI
 import lang.time.currentTime
 import org.junit.Test
-import java.io.FileNotFoundException
-import java.io.IOException
 
 val slowpoke = 2000L
 val expectedSlowpoke = 2000L
@@ -44,23 +43,19 @@ class DefaultJsonDocumentClientTest {
       defaultClient.fetchDocument("https://nba.com/no/document/here")
     }
         .duration { isLessThan(2000) }
-        .returnedValue {
+        .returnedValue { result ->
+          result.transform { it.fetchedOrNull }.isNull()
+          result.transform { it.failures }.hasSize(2)
+          result.transform { it.failures[ClasspathDocumentFetcher::class] }.isNotNull()
+              .message()
+              .isNotNull()
+              .contains("No resource on classpath")
 
-          assert(it.actual.fetchedOrNull).isNull()
-          assert(it.actual.failures).hasSize(2)
-          assert(it.actual.failures[ClasspathDocumentFetcher::class]).isNotNull {
-            it.message().isNotNull {
-              it.contains("No resource on classpath")
-            }
-          }
-
-          assert(it.actual.failures[HttpDocumentFetcher::class]).isNotNull {
-            it.isInstanceOf(BadResponseStatusException::class) {
-              it.message().isNotNull {
-                it.contains("404 Not Found")
-              }
-            }
-          }
+          result.transform { it.failures[HttpDocumentFetcher::class] }.isNotNull()
+              .isInstanceOf(ResponseException::class)
+              .message()
+              .isNotNull()
+              .contains("404 Not Found")
 
         }
   }
@@ -68,9 +63,9 @@ class DefaultJsonDocumentClientTest {
   @Test fun testFetchingOneProviderSucceeded() {
     val defaultClient = DefaultJsonDocumentClient()
     val fetched = defaultClient.fetchDocument("https://nba.com/schemas/by/eric/hats.json").fetched
-    assert(fetched.isDifferentURI).isTrue()
-    assert(fetched.schemaData).isEqualIgnoringWhitespace("{}")
-    assert(fetched.jsrObject).hasValueAtPointer("/\$id") {
+    assertThat(fetched.isDifferentURI).isTrue()
+    assertThat(fetched.schemaData).isEqualIgnoringWhitespace("{}")
+    assertThat(fetched.jsrObject).hasValueAtPointer("/\$id") {
       hasStringValue("https://nba.com/schemas/by/eric/hats.json")
     }
   }
@@ -81,9 +76,9 @@ class DefaultJsonDocumentClientTest {
 
     assertTimed {
       val fetched = defaultClient.fetchDocument("https://nba.com/schemas/by/eric/hats.json").fetched
-      assert(fetched.isDifferentURI).isTrue()
-      assert(fetched.schemaData).isEqualIgnoringWhitespace("{}")
-      assert(fetched.jsrObject).hasValueAtPointer("/\$id") {
+      assertThat(fetched.isDifferentURI).isTrue()
+      assertThat(fetched.schemaData).isEqualIgnoringWhitespace("{}")
+      assertThat(fetched.jsrObject).hasValueAtPointer("/\$id") {
         hasStringValue("https://nba.com/schemas/by/eric/hats.json")
       }
     }.duration { isLessThan(expectedSlowpoke) }
@@ -95,8 +90,8 @@ class DefaultJsonDocumentClientTest {
       defaultClient.fetchDocument("https://unknown.com/path/is/bogus")
     }
         .returnedValue {
-          assert(it.actual.failures).hasSize(0)
-          assert(it.actual.fetchedOrNull).isNull()
+          assertThat(it.actual.failures).hasSize(0)
+          assertThat(it.actual.fetchedOrNull).isNull()
         }
         .duration { isBetween(500, expectedSlowpoke) }
   }
@@ -107,8 +102,8 @@ class DefaultJsonDocumentClientTest {
       defaultClient.fetchDocument("https://unknown.com/path/is/bogus")
     }
         .returnedValue {
-          assert(it.actual.failures).hasSize(0)
-          assert(it.actual.fetchedOrNull).isNull()
+          assertThat(it.actual.failures).hasSize(0)
+          assertThat(it.actual.fetchedOrNull).isNull()
         }
         .duration { isBetween(500, expectedSlowpoke) }
   }
@@ -123,11 +118,10 @@ class DefaultJsonDocumentClientTest {
       r
     }
         .doesNotThrowAnyException()
-        .returnedValue {
-          it.isNotNull {
-            val doc = it.actual
-            assert(doc.fetchedOrNull!!.schemaData).isEqualTo("{}")
-          }
+        .returnedValue { returned ->
+          returned.isNotNull()
+              .transform { it.fetchedOrNull!!.schemaData }
+              .isEqualTo("{}")
         }
         .duration { isLessThan(200) }
   }

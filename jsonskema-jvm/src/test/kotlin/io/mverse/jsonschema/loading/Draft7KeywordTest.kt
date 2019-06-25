@@ -1,6 +1,8 @@
 package io.mverse.jsonschema.loading
 
+import assertk.Assert
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isNotNull
 import io.mverse.jsonschema.JsonSchemas
@@ -43,26 +45,26 @@ class Draft7KeywordTest {
 
   @Test
   fun readOnlyKeywordIsLoaded() {
-    assert(schema)
+    assertThat(schema)
         .hasProperty("readMe")
         .isReadOnly()
   }
 
   @Test
   fun writeOnlyKeywordIsLoaded() {
-    assert(schema)
+    assertThat(schema)
         .hasProperty("writeMe")
         .isWriteOnly()
   }
 
   @Test
   fun ifKeywordIsLoaded() {
-    assert(schema)
+    assertThat(schema)
         .hasProperty("ifTest")
         .hasIfSchema()
         .hasKeyword(Keywords.TYPE)
         .withAssertion { type:Set<JsonSchemaType>? ->
-          assert(type).isNotNull {
+          assertThat(type).isNotNull { it: Assert<Set<JsonSchemaType>> ->
             it.contains(STRING)
           }
         }
@@ -70,7 +72,7 @@ class Draft7KeywordTest {
 
   @Test
   fun nestedifKeywordIsLoaded() {
-    assert(schema)
+    assertThat(schema)
         .hasProperty("ifTest")
         .hasThenSchema()
         .hasIfSchema()
@@ -79,14 +81,14 @@ class Draft7KeywordTest {
 
   @Test
   fun commentIsLoaded() {
-    assert(schema)
+    assertThat(schema)
         .hasKeyword(COMMENT)
         .hasValue("This is cool")
   }
 
   @Test
   fun contentEncodingIsLoaded() {
-    assert(schema)
+    assertThat(schema)
         .hasProperty("base64")
         .hasKeyword(CONTENT_ENCODING)
         .hasValue("base64")
@@ -94,7 +96,7 @@ class Draft7KeywordTest {
 
   @Test
   fun contentMediaTypeIsLoaded() {
-    assert(schema)
+    assertThat(schema)
         .hasProperty("base64")
         .hasKeyword(CONTENT_MEDIA_TYPE)
         .hasValue("image/png")

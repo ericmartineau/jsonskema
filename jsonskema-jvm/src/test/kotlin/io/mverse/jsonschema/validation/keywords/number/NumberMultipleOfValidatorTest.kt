@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.validation.keywords.number
 
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import io.mverse.jsonschema.keyword.NumberKeyword
@@ -15,7 +16,7 @@ class NumberMultipleOfValidatorTest {
     val validator = NumberMultipleOfValidator(numberKeyword = NumberKeyword(0.0001),
         schema = nullSchema)
     val validated = validator.validate(0.0075.toJsrValue())
-    assert(validated).isNull()
+    assertThat(validated).isNull()
   }
 
   @Test
@@ -23,6 +24,6 @@ class NumberMultipleOfValidatorTest {
     val validator = NumberMultipleOfValidator(numberKeyword = NumberKeyword(0.0001),
         schema = nullSchema)
     val validated = validator.validate(0.00751.toJsrValue())
-    assert(validated).isNotNull()
+    assertThat(validated).isNotNull()
   }
 }

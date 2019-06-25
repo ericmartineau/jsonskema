@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.loading
 
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.hasToString
 import assertk.assertions.isEqualTo
@@ -36,7 +37,7 @@ class SchemaLoaderImplVersionTest {
     val schemaReader = JsonSchemas.createSchemaReader().withStrictValidation(JsonSchemaVersion.Draft6)
     val draft6Schema = loader.readJsonObject("valid-draft6-schema.json")
     val schema = schemaReader.readSchema(draft6Schema)
-    assert(schema.id).hasToString("https://schema.org/valid-draft6.json")
+    assertThat(schema.id).hasToString("https://schema.org/valid-draft6.json")
   }
 
   @Test
@@ -44,7 +45,7 @@ class SchemaLoaderImplVersionTest {
     val schemaReader = JsonSchemas.createSchemaReader().withStrictValidation(JsonSchemaVersion.Draft4)
     val draft4Schema = loader.readJsonObject("valid-draft4-schema.json")
     val schema = schemaReader.readSchema(draft4Schema)
-    assert(schema.id).hasToString("https://schema.org/valid-draft4.json")
+    assertThat(schema.id).hasToString("https://schema.org/valid-draft4.json")
   }
 
   @Test(expected = SchemaLoadingException::class)
@@ -54,12 +55,12 @@ class SchemaLoaderImplVersionTest {
     try {
       draft4Reader.readSchema(draft6)
     } catch (e: SchemaLoadingException) {
-      assert(e.report.issues).hasSize(2)
+      assertThat(e.report.issues).hasSize(2)
 
       val issue = e.report.issues.get(0)
-      assert(issue.level).isEqualTo(LoadingIssueLevel.ERROR)
-      assert(issue.location!!.jsonPointerFragment).hasToString("#/contains")
-      assert(issue.code).isEqualTo("keyword.notFound")
+      assertThat(issue.level).isEqualTo(LoadingIssueLevel.ERROR)
+      assertThat(issue.location!!.jsonPointerFragment).hasToString("#/contains")
+      assertThat(issue.code).isEqualTo("keyword.notFound")
       throw e
     }
   }

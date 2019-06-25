@@ -1,6 +1,7 @@
 package io.mverse.jsonschema
 
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
@@ -42,20 +43,20 @@ class JsonValueWithPathTest {
       "num" *= 3
     }
     val value = fromJsonValue(jsonValue)
-    assert(value.type).isEqualTo(JsrType.OBJECT)
+    assertThat(value.type).isEqualTo(JsrType.OBJECT)
   }
 
   @Test
   fun testGetValueType_WhenNull_ThenNULL() {
     val value = JsrNull
-    assert(value.type).isEqualTo(JsrType.NULL)
+    assertThat(value.type).isEqualTo(JsrType.NULL)
   }
 
   @Test
   fun testAsJsonObject_HasValue() {
     val value = createJsonObjectWithLocation()
     val jsonValue = value.jsonObject!![JsonKey("foo")].unboxAsAny()
-    assert(jsonValue).isEqualTo("bar")
+    assertThat(jsonValue).isEqualTo("bar")
   }
 
   @Test
@@ -63,40 +64,40 @@ class JsonValueWithPathTest {
     val value = createJsonArrayWithLocation()
     val jsonArray = value.jsonArray
     val expected = "foo".toJsrValue()
-    assert(jsonArray!![0]).isEqualTo(expected)
+    assertThat(jsonArray!![0]).isEqualTo(expected)
   }
 
   @Test
   fun testGetJsonSchemaType_WhenObject_ReturnObject() {
     val value = createJsonObjectWithLocation()
-    assert(value.jsonSchemaType).isEqualTo(OBJECT)
+    assertThat(value.jsonSchemaType).isEqualTo(OBJECT)
   }
 
   @Test
   fun testGetJsonSchemaType_WhenArray_ReturnArray() {
     val value = createJsonArrayWithLocation()
-    assert(value.jsonSchemaType).isEqualTo(ARRAY)
+    assertThat(value.jsonSchemaType).isEqualTo(ARRAY)
   }
 
   @Test
   fun testArraySize_WhenArray_ReturnsSize() {
     val value = createJsonArrayWithLocation()
-    assert(value.jsonArray!!.size).isEqualTo(5)
+    assertThat(value.jsonArray!!.size).isEqualTo(5)
   }
 
   @Test
   fun testArraySize_WhenNotArray_ReturnsZero() {
-    assert(createJsonObjectWithLocation().size).isEqualTo(2)
+    assertThat(createJsonObjectWithLocation().size).isEqualTo(2)
   }
 
   @Test
   fun testJsonArray_WhenNotArray_ReturnsNull() {
-    assert(createJsonObjectWithLocation().jsonArray).isNull()
+    assertThat(createJsonObjectWithLocation().jsonArray).isNull()
   }
 
   @Test
   fun testAsJsonNumber_WhenNumber_ReturnsJsonNumber() {
-    assert(createJsonNumberWithLocation(34.4).number).isNotNull()
+    assertThat(createJsonNumberWithLocation(34.4).number).isNotNull()
   }
 
   @Test(expected = JsonException::class)
@@ -106,21 +107,21 @@ class JsonValueWithPathTest {
 
   @Test
   fun testAsJsonObject_WhenObject_ReturnsJsonObject() {
-    assert(createJsonObjectWithLocation().jsonObject).isNotNull()
+    assertThat(createJsonObjectWithLocation().jsonObject).isNotNull()
   }
 
   @Test
   fun testAsJsonObject_WhenNotObject_ReturnsNull() {
-    assert(createJsonArrayWithLocation().jsonObject).isNull()
+    assertThat(createJsonArrayWithLocation().jsonObject).isNull()
   }
 
   @Test
   fun testAsJsonString_WhenString_ReturnsJsonString() {
-    assert(createJsonStringWithLocation("joe").string).isEqualTo("joe")
+    assertThat<String?>(createJsonStringWithLocation("joe").string).isEqualTo("joe")
   }
 
   @Test
   fun testAsJsonString_WhenNull_ReturnsNull() {
-    assert(createValue(JsrNull).string).isNull()
+    assertThat<String?>(createValue(JsrNull).string).isNull()
   }
 }

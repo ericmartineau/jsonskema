@@ -4,12 +4,14 @@ import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialDescriptor
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.internal.SerialClassDescImpl
 
 /**
  * Represents the valid json-schema types.
  */
+@Serializable(with = JsonSchemaType.Companion::class)
 enum class JsonSchemaType {
   STRING,
   BOOLEAN,

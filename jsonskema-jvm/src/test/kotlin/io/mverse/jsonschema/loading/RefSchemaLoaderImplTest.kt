@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.loading
 
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import io.mverse.jsonschema.JsonSchemas
@@ -33,7 +34,7 @@ class RefSchemaLoaderImplTest {
     val absoluteURI = documentURI.resolveUri(relativeURI)
 
     val schema = refSchemaLoader.findRefInDocument(documentURI, absoluteURI, accountProfileJson, LoadingReport())
-    assert(schema).isNotNull()
+    assertThat(schema).isNotNull()
   }
 
   @Test
@@ -43,7 +44,7 @@ class RefSchemaLoaderImplTest {
     val absoluteURI = documentURI.resolveUri(relativeURI)
 
     val schema = refSchemaLoader.findRefInDocument(documentURI, absoluteURI, accountProfileJson, LoadingReport())
-    assert(schema).isNotNull()
+    assertThat(schema).isNotNull()
   }
 
   @Test
@@ -53,7 +54,7 @@ class RefSchemaLoaderImplTest {
     val absoluteURI = documentURI.resolveUri(relativeURI)
 
     val schema = refSchemaLoader.findRefInDocument(documentURI, absoluteURI, accountProfileJson, LoadingReport())
-    assert(schema).isNotNull()
+    assertThat(schema).isNotNull()
   }
 
   @Test
@@ -63,7 +64,7 @@ class RefSchemaLoaderImplTest {
     val absoluteURI = documentURI.resolveUri(relativeURI)
 
     val schema = refSchemaLoader.findRefInDocument(documentURI, absoluteURI, accountProfileJson, LoadingReport())
-    assert(schema).isNotNull()
+    assertThat(schema).isNotNull()
   }
 
   @Test
@@ -73,7 +74,7 @@ class RefSchemaLoaderImplTest {
     val absoluteURI = documentURI.resolveUri(relativeURI)
 
     val schema = refSchemaLoader.findRefInDocument(documentURI, absoluteURI, accountProfileJson, LoadingReport())
-    assert(schema).isNull()
+    assertThat(schema).isNull()
   }
 
   private fun readResource(relativePath: String): JsrObject {

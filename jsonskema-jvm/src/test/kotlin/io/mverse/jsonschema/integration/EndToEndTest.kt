@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.integration
 
 import assertk.assert
+import assertk.assertThat
 import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.assertj.asserts.hasErrorArguments
 import io.mverse.jsonschema.assertj.asserts.hasErrorCode
@@ -29,7 +30,7 @@ class EndToEndTest {
     val loadedSchema = JsonSchemas.createSchemaReader()
         .withPreloadedDocument(preloadedSchema)
         .readSchema(jsonSchema)
-    assert(loadedSchema)
+    assertThat(loadedSchema)
         .validating(jsonData)
         .isNotValid {
           hasViolationsAt("#/secondary_color", "#", "#/contact", "#/contact/email")

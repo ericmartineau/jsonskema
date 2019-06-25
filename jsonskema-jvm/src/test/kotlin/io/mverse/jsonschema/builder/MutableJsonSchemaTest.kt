@@ -2,6 +2,7 @@ package io.mverse.jsonschema.builder
 
 import assertk.assert
 import assertk.assertAll
+import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
 import assertk.assertions.hasSize
@@ -22,16 +23,16 @@ class MutableJsonSchemaTest {
     val mutable = MutableJsonSchema(JsonSchemas.schemaLoader, "http://mverse/mutableSchemas".toURI())
     mutable[Keywords.CONST] = JsonValueKeyword("yes")
 
-    assert(mutable.const).isEqualTo("yes")
-    assert(mutable.constValue).isEqualTo(jsrString("yes"))
+    assertThat(mutable.const).isEqualTo("yes")
+    assertThat(mutable.constValue).isEqualTo(jsrString("yes"))
   }
 
   @Test fun testSetters_WithoutUpdater() {
     val mutable = MutableJsonSchema(JsonSchemas.schemaLoader, "http://mverse/mutableSchemas".toURI())
     mutable[Keywords.CONST] = JsonValueKeyword("yes")
 
-    assert(mutable.const).isEqualTo("yes")
-    assert(mutable.constValue).isEqualTo(jsrString("yes"))
+    assertThat(mutable.const).isEqualTo("yes")
+    assertThat(mutable.constValue).isEqualTo(jsrString("yes"))
   }
 
   @Test fun testRemoveProperty() {
@@ -46,9 +47,9 @@ class MutableJsonSchemaTest {
       properties -= "age"
     }
 
-    assert(withoutAge.draft7().properties.keys).hasSize(1)
-    assert(withoutAge.draft7().properties.keys).contains("name")
-    assert(withoutAge.draft7().properties.keys).doesNotContain("age")
+    assertThat(withoutAge.draft7().properties.keys).hasSize(1)
+    assertThat(withoutAge.draft7().properties.keys).contains("name")
+    assertThat(withoutAge.draft7().properties.keys).doesNotContain("age")
   }
 
   @Test fun testSetters() {
@@ -123,44 +124,44 @@ class MutableJsonSchemaTest {
     mutable.enumValues { listOf(jsrNumber(count++)) }
 
     assertAll {
-      assert(mutable.enumValues?.firstOrNull()).isEqualTo(jsrNumber(0))
-      assert(mutable.enumValues?.firstOrNull()).isEqualTo(jsrNumber(1))
-      assert(mutable.enumValues?.firstOrNull()).isEqualTo(jsrNumber(2))
+      assertThat(mutable.enumValues?.firstOrNull()).isEqualTo(jsrNumber(0))
+      assertThat(mutable.enumValues?.firstOrNull()).isEqualTo(jsrNumber(1))
+      assertThat(mutable.enumValues?.firstOrNull()).isEqualTo(jsrNumber(2))
 
-      assert(mutable.anyOfSchemas.first().const).isEqualTo("anyOf")
-      assert(mutable.oneOfSchemas.first().const).isEqualTo("oneOf")
-      assert(mutable.allOfSchemas.first().const).isEqualTo("allOf")
-      assert(mutable.itemSchemas.first().const).isEqualTo("items")
-      assert(mutable.allItemSchema?.const).isEqualTo("allItems")
-      assert(mutable.properties["property"].draft7().constValue).isEqualTo(jsrString("property"))
+      assertThat(mutable.anyOfSchemas.first().const).isEqualTo("anyOf")
+      assertThat(mutable.oneOfSchemas.first().const).isEqualTo("oneOf")
+      assertThat(mutable.allOfSchemas.first().const).isEqualTo("allOf")
+      assertThat(mutable.itemSchemas.first().const).isEqualTo("items")
+      assertThat(mutable.allItemSchema?.const).isEqualTo("allItems")
+      assertThat(mutable.properties["property"].draft7().constValue).isEqualTo(jsrString("property"))
 
-      assert(mutable.maxProperties).isEqualTo(10)
-      assert(mutable.minProperties).isEqualTo(11)
-      assert(mutable.requiredProperties).isEqualTo(setOf("requiredProperties"))
-      assert(mutable.exclusiveMinimum).isEqualTo(12)
-      assert(mutable.exclusiveMaximum).isEqualTo(13)
-      assert(mutable.propertyNameSchema?.const).isEqualTo("propertyNames")
-      assert(mutable.title).isEqualTo("title")
-      assert(mutable.description).isEqualTo("description")
-      assert(mutable.types).isEqualTo(setOf(JsonSchemaType.STRING))
-      assert(mutable.defaultValue).isEqualTo(jsrString("default"))
-      assert(mutable.format).isEqualTo("format")
-      assert(mutable.minLength).isEqualTo(14)
-      assert(mutable.maxLength).isEqualTo(15)
-      assert(mutable.pattern).isEqualTo("pattern")
-      assert(mutable.minimum).isEqualTo(16)
-      assert(mutable.maximum).isEqualTo(17)
-      assert(mutable.multipleOf).isEqualTo(18)
-      assert(mutable.minItems).isEqualTo(19)
-      assert(mutable.maxItems).isEqualTo(20)
-      assert(mutable.needsUniqueItems).isEqualTo(true)
-      assert(mutable.comment).isEqualTo("comment")
-      assert(mutable.readOnly).isEqualTo(true)
-      assert(mutable.writeOnly).isEqualTo(true)
-      assert(mutable.contentEncoding).isEqualTo("contentEncoding")
-      assert(mutable.contentMediaType).isEqualTo("contentMediaType")
-      assert(mutable.definitions["definition"]?.draft7()?.constValue).isEqualTo(jsrString("definition"))
-      assert(mutable.schemaOfAdditionalItems?.const).isEqualTo("additionalItems")
+      assertThat(mutable.maxProperties).isEqualTo(10)
+      assertThat(mutable.minProperties).isEqualTo(11)
+      assertThat(mutable.requiredProperties).isEqualTo(setOf("requiredProperties"))
+      assertThat(mutable.exclusiveMinimum).isEqualTo(12)
+      assertThat(mutable.exclusiveMaximum).isEqualTo(13)
+      assertThat(mutable.propertyNameSchema?.const).isEqualTo("propertyNames")
+      assertThat(mutable.title).isEqualTo("title")
+      assertThat(mutable.description).isEqualTo("description")
+      assertThat(mutable.types).isEqualTo(setOf(JsonSchemaType.STRING))
+      assertThat(mutable.defaultValue).isEqualTo(jsrString("default"))
+      assertThat(mutable.format).isEqualTo("format")
+      assertThat(mutable.minLength).isEqualTo(14)
+      assertThat(mutable.maxLength).isEqualTo(15)
+      assertThat(mutable.pattern).isEqualTo("pattern")
+      assertThat(mutable.minimum).isEqualTo(16)
+      assertThat(mutable.maximum).isEqualTo(17)
+      assertThat(mutable.multipleOf).isEqualTo(18)
+      assertThat(mutable.minItems).isEqualTo(19)
+      assertThat(mutable.maxItems).isEqualTo(20)
+      assertThat(mutable.needsUniqueItems).isEqualTo(true)
+      assertThat(mutable.comment).isEqualTo("comment")
+      assertThat(mutable.readOnly).isEqualTo(true)
+      assertThat(mutable.writeOnly).isEqualTo(true)
+      assertThat(mutable.contentEncoding).isEqualTo("contentEncoding")
+      assertThat(mutable.contentMediaType).isEqualTo("contentMediaType")
+      assertThat(mutable.definitions["definition"]?.draft7()?.constValue).isEqualTo(jsrString("definition"))
+      assertThat(mutable.schemaOfAdditionalItems?.const).isEqualTo("additionalItems")
     }
   }
 }

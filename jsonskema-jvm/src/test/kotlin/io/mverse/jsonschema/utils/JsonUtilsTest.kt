@@ -2,6 +2,7 @@ package io.mverse.jsonschema.utils
 
 import assertk.Assert
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.isEqualTo
 import kotlinx.serialization.json.json
 import lang.json.jsrObject
@@ -22,7 +23,7 @@ class JsonUtilsTest {
       }
     }
     val indentedValue = json.toString()
-    assert(indentedValue).isEqualToIgnoringWhitespace("{\n" +
+    assertThat(indentedValue).isEqualToIgnoringWhitespace("{\n" +
         "\t  \"name\":\"Eric\",\n" +
         "\t  \"age\":34,\n" +
         "\t  \"address\":{\n" +
@@ -54,7 +55,7 @@ class JsonUtilsTest {
       }
     }
     val indentedValue = json.toString()
-    assert(indentedValue).isEqualToIgnoringWhitespace("{\n" +
+    assertThat(indentedValue).isEqualToIgnoringWhitespace("{\n" +
         "\t  \"name\":\"Eric\",\n" +
         "\t  \"age\":34,\n" +
         "\t  \"address\":{\n" +

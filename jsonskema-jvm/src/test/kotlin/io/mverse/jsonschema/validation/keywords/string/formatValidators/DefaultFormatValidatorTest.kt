@@ -16,6 +16,7 @@
 package io.mverse.jsonschema.validation.keywords.string.formatValidators
 
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNull
 import io.mverse.jsonschema.validation.FormatValidator
@@ -29,12 +30,12 @@ class DefaultFormatValidatorTest {
   private fun assertFailure(subject: String, format: FormatValidator,
                             expectedFailure: String) {
     val opt = format.validate(subject)
-    assert(opt).isEqualTo(expectedFailure)
+    assertThat(opt).isEqualTo(expectedFailure)
   }
 
   private fun assertSuccess(subject: String, format: FormatValidator) {
     val opt = format.validate(subject)
-    assert(opt).isNull()
+    assertThat(opt).isNull()
   }
 
   @Test

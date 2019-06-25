@@ -16,6 +16,7 @@
 package io.mverse.jsonschema.validation
 
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.isEqualTo
 import io.mverse.jsonschema.assertj.asserts.isEqualIgnoringWhitespace
 import io.mverse.jsonschema.assertj.asserts.isValid
@@ -45,6 +46,6 @@ class NullSchemaTest {
 
   @Test
   fun toStringTest() {
-    assert(mockNullSchema.build().toString()).isEqualIgnoringWhitespace("{\"type\":\"null\"}")
+    assertThat(mockNullSchema.build().toString()).isEqualIgnoringWhitespace("{\"type\":\"null\"}")
   }
 }

@@ -15,7 +15,9 @@
  */
 package io.mverse.jsonschema.validation
 
+import assertk.Assert
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
@@ -68,8 +70,8 @@ object ValidationTestSupport {
                     expectedPointer: String, input: JsrValue) {
 
     val errors = test(failingSchema, expectedPointer, input)
-    assert(errors).isNotNull()
-    assert(errors!!.violatedSchema).isNotNull {
+    assertThat(errors).isNotNull()
+    assertThat(errors!!.violatedSchema).isNotNull { it: Assert<Schema> ->
       it.isInstanceOf(expectedViolatedSchemaClass)
     }
   }
@@ -87,8 +89,8 @@ object ValidationTestSupport {
                     expectedPointer: String?, input: JsrValue) {
 
     val errors = test(failingSchema, expectedPointer, input)
-    assert(errors).isNotNull()
-    assert(errors!!.violatedSchema, "Matching violation schemas")
+    assertThat(errors).isNotNull()
+    assertThat(errors!!.violatedSchema, "Matching violation schemas")
         .isEqualTo(expectedViolatedSchema)
   }
 
@@ -104,11 +106,11 @@ object ValidationTestSupport {
       throw RuntimeException("Invalid test configuration.  Must provide input value")
     }
     val error = validator.validate(failure.input()!!)
-    assert(error, failure.schema().toString() + " did not fail for " + failure.input()).isNotNull()
+    assertThat(error, failure.schema().toString() + " did not fail for " + failure.input()).isNotNull()
 
     error!!
     if (failure.expected() != null) {
-      assert(failure.expected()!!.invoke(error), "Predicate failed validation").isTrue()
+      assertThat(failure.expected()!!.invoke(error), "Predicate failed validation").isTrue()
     }
     failure.expectedConsumer()?.invoke(error)
     assertEquals("Expected violated schema", failure.expectedViolatedSchema(), error.violatedSchema)
@@ -119,7 +121,7 @@ object ValidationTestSupport {
       assertEquals(failure.expectedKeyword(), error.keyword?.key)
     }
     if (failure.expectedMessageFragment() != null) {
-      assert(error.message, "Message fragment matches").contains(failure.expectedMessageFragment()!!)
+      assertThat(error.message, "Message fragment matches").contains(failure.expectedMessageFragment()!!)
     }
 
     return error
@@ -145,9 +147,9 @@ object ValidationTestSupport {
                    input: JsrValue): ValidationError? {
 
     val error = JsonSchemas.getValidator(failingSchema).validate(input)
-    assert(error, failingSchema.toString() + " did not fail for " + input).isNotNull()
+    assertThat(error, failingSchema.toString() + " did not fail for " + input).isNotNull()
     if (expectedPointer != null) {
-      assert(expectedPointer).isEqualTo(error?.pathToViolation)
+      assertThat(expectedPointer).isEqualTo(error?.pathToViolation)
     }
     return error
   }
@@ -289,13 +291,13 @@ object ValidationTestSupport {
 
   fun verifyFailure(validationFn: () -> ValidationError?): ValidationError {
     val error = validationFn()
-    assert(error != null, "Should have failed").isTrue()
+    assertThat(error != null, "Should have failed").isTrue()
     return error ?: throw AssertionError("Failed")
   }
 
   fun expectSuccess(validationFn: () -> ValidationError?) {
     val error = validationFn()
-    assert(error, "Should have succeeded: $error").isNull()
+    assertThat(error, "Should have succeeded: $error").isNull()
   }
 
   fun expectSuccess(schema: Schema, input: Long) {
@@ -316,6 +318,6 @@ object ValidationTestSupport {
 
   fun expectSuccess(schema: Schema, input: JsrValue) {
     val error = JsonSchemas.createValidatorFactory().createValidator(schema).validate(input)
-    assert(error, "Found validation: " + error.toString()).isNull()
+    assertThat(error, "Found validation: " + error.toString()).isNull()
   }
 }

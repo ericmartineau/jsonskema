@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.validation
 
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.isNotNull
 import io.mverse.jsonschema.schema
 import lang.json.JsrNull
@@ -16,6 +17,6 @@ class JsonSchemaValidatorTest {
     }
 
     val results = ValidationMocks.createTestValidator(constSchema).validate(JsrNull)
-    assert(results).isNotNull()
+    assertThat(results).isNotNull()
   }
 }

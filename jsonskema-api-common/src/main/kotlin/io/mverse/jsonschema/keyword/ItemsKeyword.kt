@@ -60,10 +60,10 @@ data class ItemsKeyword(val indexedSchemas: List<Schema> = emptyList(),
     return result.toString()
   }
 
-  override fun merge(merger: SchemaMergeStrategy, path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<List<Schema>>, report: MergeReport): ItemsKeyword  {
+  override fun merge(strategy: SchemaMergeStrategy, path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<List<Schema>>, report: MergeReport): ItemsKeyword  {
     other as ItemsKeyword
-    val allItemSchema = merger.mergeOrNull(path, allItemSchema, other.allItemSchema, report) ?: other.allItemSchema
-    val addtlItemSchema = merger.mergeOrNull(path.sibling(additionItemsKey), additionalItemSchema, other.additionalItemSchema, report)
+    val allItemSchema = strategy.mergeOrNull(path, allItemSchema, other.allItemSchema, report) ?: other.allItemSchema
+    val addtlItemSchema = strategy.mergeOrNull(path.sibling(additionItemsKey), additionalItemSchema, other.additionalItemSchema, report)
     val indexedSchemas = if (other.hasIndexedSchemas) other.indexedSchemas else indexedSchemas
     return ItemsKeyword(indexedSchemas, allItemSchema, addtlItemSchema)
   }

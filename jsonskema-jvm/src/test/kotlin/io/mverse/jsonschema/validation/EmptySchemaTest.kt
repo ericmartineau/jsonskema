@@ -16,6 +16,7 @@
 package io.mverse.jsonschema.validation
 
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.containsAll
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
@@ -37,7 +38,7 @@ class EmptySchemaTest {
   @Test
   fun testAllGenericProps() {
     val actual = roundTripSchema("my title", "my description", "my/id")
-    assert(actual.keys).containsAll("title", "description", "\$id")
+    assertThat(actual.keys).containsAll("title", "description", "\$id")
   }
 
   @Test
@@ -48,27 +49,27 @@ class EmptySchemaTest {
   @Test
   fun testOnlyId() {
     val actual = roundTripSchema(id = "my/id")
-    assert(actual.keys).hasSize(1)
-    assert(actual[Keywords.DOLLAR_ID_KEY]?.unboxAsAny()).isEqualTo("my/id")
+    assertThat(actual.keys).hasSize(1)
+    assertThat(actual[Keywords.DOLLAR_ID_KEY]?.unboxAsAny()).isEqualTo("my/id")
   }
 
   @Test
   fun testOnlySchemaDescription() {
     val actual = roundTripSchema(description = "descr")
-    assert(actual.keys).hasSize(1)
-    assert(actual["description"]?.unboxAsAny()).isEqualTo("descr")
+    assertThat(actual.keys).hasSize(1)
+    assertThat(actual["description"]?.unboxAsAny()).isEqualTo("descr")
   }
 
   @Test
   fun testOnlyTitle() {
     val actual = roundTripSchema("my title", null, null)
-    assert(actual.keys).containsAll("title")
-    assert(actual["title"]?.unboxAsAny()).isEqualTo("my title")
+    assertThat(actual.keys).containsAll("title")
+    assertThat(actual["title"]?.unboxAsAny()).isEqualTo("my title")
   }
 
   @Test
   fun testToString() {
-    assert(schemaBuilder{}.build().toString()).isEqualIgnoringWhitespace("{}")
+    assertThat(schemaBuilder{}.build().toString()).isEqualIgnoringWhitespace("{}")
   }
 
   @Test

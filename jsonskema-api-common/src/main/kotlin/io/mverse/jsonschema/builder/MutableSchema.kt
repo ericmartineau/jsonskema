@@ -26,6 +26,8 @@ interface MutableSchema : MutableKeywordContainer {
   // ########           COUPLE OF GETTERS                ##############
   // ##################################################################
 
+  var baseSchema: Schema?
+
   @Name("id")
   val id: URI?
 

@@ -1,5 +1,6 @@
 package io.mverse.jsonschema
 
+import assertk.assertThat
 import assertk.assertions.containsAll
 import lang.net.URI
 import org.junit.Test
@@ -27,7 +28,7 @@ class SchemaExtensionsTest {
       }
     }
     val allSchemaProps = schema.draft7().allProperties
-    assertk.assert(allSchemaProps.keys).containsAll("/EMAILS", "/NUMBER", "/OBJECT/NAME", "/OBJECT/PHONE",
+    assertThat(allSchemaProps.keys).containsAll("/EMAILS", "/NUMBER", "/OBJECT/NAME", "/OBJECT/PHONE",
         "/OBJECT/ADDRESS/STREET1", "/OBJECT/ADDRESS/STREET2")
   }
 }

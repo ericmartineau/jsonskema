@@ -22,7 +22,7 @@ open class SchemaListKeyword(final override val value: List<Schema> = listOf())
     return SchemaListKeyword(value + schema)
   }
 
-  override fun merge(merger: SchemaMergeStrategy, path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<List<Schema>>, report: MergeReport): Keyword<List<Schema>> {
+  override fun merge(strategy: SchemaMergeStrategy, path: JsonPath, keyword: KeywordInfo<*>, other: Keyword<List<Schema>>, report: MergeReport): Keyword<List<Schema>> {
     report += mergeCombine(path, keyword, this.value, other.value)
     return SchemaListKeyword(this.value + other.value)
   }

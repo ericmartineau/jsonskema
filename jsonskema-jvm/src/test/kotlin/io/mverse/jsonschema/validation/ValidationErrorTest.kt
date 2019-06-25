@@ -17,6 +17,7 @@ package io.mverse.jsonschema.validation
 
 import assertk.assert
 import assertk.assertAll
+import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.fail
@@ -75,7 +76,7 @@ class ValidationErrorTest {
 
     val expected = loader.readJsonObject("exception-to-json-with-schema-location.json")
     val actual = subject.toJson()
-    assert(actual).isEqualTo(expected)
+    assertThat(actual).isEqualTo(expected)
   }
 
   @Test
@@ -96,7 +97,7 @@ class ValidationErrorTest {
         pointerToViolation = "#".toJsonPointer())
 
     val e = ValidationError.collectErrors(rootSchema, JsonPath.rootPath, Arrays.asList(input1, input2))
-    assert(e).isNotNull()
+    assertThat(e).isNotNull()
 
     Assert.assertSame(rootSchema, e!!.violatedSchema)
     Assert.assertEquals("#: 2 schema violations found", e.message)

@@ -16,6 +16,7 @@
 package io.mverse.jsonschema.integration
 
 import assertk.assert
+import assertk.assertThat
 import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.assertj.asserts.isValid
 import io.mverse.jsonschema.assertj.asserts.validating
@@ -29,7 +30,7 @@ class MetaSchemaTest {
   fun validateMetaSchema() {
     val jsonSchema = JsonSchemas.resourceLoader().readJsonObject("json-schema-draft-06.json")
     val schema = JsonSchemas.createSchemaReader().readSchema(jsonSchema)
-    assert(schema)
+    assertThat(schema)
         .validating(jsonSchema)
         .isValid()
   }

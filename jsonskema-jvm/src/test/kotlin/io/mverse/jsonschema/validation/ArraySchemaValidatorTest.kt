@@ -15,7 +15,9 @@
  */
 package io.mverse.jsonschema.validation
 
+import assertk.Assert
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.containsExactly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
@@ -100,7 +102,7 @@ class ArraySchemaValidatorTest {
   @Test
   fun booleanItems() {
     val subject = JsonSchemas.schema { allItemSchema = mockBooleanSchema }
-    assert(subject)
+    assertThat(subject)
         .validating(arrayTestCases["boolArrFailure"])
         .isNotValid()
         .hasViolationAt("#/2")
@@ -111,7 +113,7 @@ class ArraySchemaValidatorTest {
     val arraySchema = JsonSchemas.schema {
       needsUniqueItems = true
     }
-    assert(arraySchema)
+    assertThat(arraySchema)
         .validating(arrayTestCases["doesNotRequireExplicitArray"])
         .isValid()
   }
@@ -268,9 +270,9 @@ class ArraySchemaValidatorTest {
     val arrayValues = jsrArrayOf(24.3)
     val error = ValidationMocks.createTestValidator(arraySchema).validate(arrayValues)
 
-    assert(error).isNotNull()
-    assert(error!!.keyword).isEqualTo(TYPE)
-    assert(error.arguments).isNotNull {
+    assertThat(error).isNotNull()
+    assertThat(error!!.keyword).isEqualTo(TYPE)
+    assertThat(error.arguments).isNotNull { it: Assert<List<Any>> ->
       it.containsExactly(JsonSchemaType.INTEGER, JsonSchemaType.NUMBER)
     }
   }

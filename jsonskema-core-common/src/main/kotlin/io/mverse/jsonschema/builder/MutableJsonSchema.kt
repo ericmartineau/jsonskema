@@ -1,5 +1,6 @@
 package io.mverse.jsonschema.builder
 
+import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.MergeException
 import io.mverse.jsonschema.MergeReport
 import io.mverse.jsonschema.RefSchema
@@ -119,7 +120,8 @@ data class MutableJsonSchema(
     override var extraProperties: MutableMap<String, JsrValue> = mutableMapOf(),
     override val location: SchemaLocation = SchemaPaths.fromNonSchemaSource(randomUUID()),
     override var currentDocument: JsrObject? = null,
-    override var loadingReport: LoadingReport = LoadingReport()) : MutableSchema {
+    override var loadingReport: LoadingReport = LoadingReport(),
+    override var baseSchema: Schema? = null) : MutableSchema {
 
   constructor(schemaLoader: SchemaLoader, fromSchema: Schema, id: URI)
       : this(schemaLoader = schemaLoader, fromSchema = fromSchema, location = SchemaLocation.builderFromId(id).build()) {
@@ -236,7 +238,7 @@ data class MutableJsonSchema(
     }
 
   override var regex: Regex?
-    get() = this.values[Keywords.PATTERN]?.let { Regex(it) }
+    get() = this.values[PATTERN]?.let { Regex(it) }
     set(value) = set(PATTERN, value?.let { StringKeyword(value.pattern) })
 
   override var minLength: Int? by int(MIN_LENGTH)
@@ -497,7 +499,10 @@ data class MutableJsonSchema(
     if (loadingReport.hasErrors()) {
       throw SchemaLoadingException(location.jsonPointerFragment, loadingReport)
     }
-    return built
+    return when(val baseSchema = baseSchema) {
+      null-> built
+      else->JsonSchemas.schemaMerger.merge(JsonPath.rootPath, baseSchema, built, MergeReport(), mergedId = built.id)
+    }
   }
 
   override fun merge(path: JsonPath, other: Schema, report: MergeReport) {

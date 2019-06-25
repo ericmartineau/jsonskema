@@ -2,6 +2,7 @@ package io.mverse.jsonschema.impl
 
 import assertk.assert
 import assertk.assertAll
+import assertk.assertThat
 import assertk.assertions.isNotNull
 import io.mverse.jsonschema.Draft3Schema
 import io.mverse.jsonschema.Draft4Schema
@@ -34,30 +35,30 @@ class DraftSchemaTest {
   fun <D : AllKeywords> testCommonKeywords(param: TestParam<AllKeywords>) {
     val schema = param.get()
     assertAll {
-      assert(schema.types).isNotNull()
-      assert(schema.enumValues).isNotNull()
-      assert(schema.defaultValue).isNotNull()
-      assert(schema.format).isNotNull()
-      assert(schema.minLength).isNotNull()
-      assert(schema.maxLength).isNotNull()
-      assert(schema.pattern).isNotNull()
-      assert(schema.maximum).isNotNull()
-      assert(schema.minimum).isNotNull()
-      assert(schema.minItems).isNotNull()
-      assert(schema.maxItems).isNotNull()
-      assert(schema.allItemSchema).isNotNull()
-      assert(schema.itemSchemas).isNotNull()
-      assert(schema.additionalItemsSchema).isNotNull()
-      assert(schema.properties).isNotNull()
-      assert(schema.patternProperties).isNotNull()
-      assert(schema.additionalPropertiesSchema).isNotNull()
-      assert(schema.propertyDependencies).isNotNull()
-      assert(schema.propertySchemaDependencies).isNotNull()
-      assert(schema.requiresUniqueItems).isNotNull()
-      assert(schema.properties["selfRef"]).isNotNull()
-      assert(schema.properties.getValue("selfRef")).isNotNull()
-      assert(schema.patternProperties["^abc.*$"]).isNotNull()
-      assert(schema.patternProperties.getValue("^abc.*$")).isNotNull()
+      assertThat(schema.types).isNotNull()
+      assertThat(schema.enumValues).isNotNull()
+      assertThat(schema.defaultValue).isNotNull()
+      assertThat(schema.format).isNotNull()
+      assertThat(schema.minLength).isNotNull()
+      assertThat(schema.maxLength).isNotNull()
+      assertThat(schema.pattern).isNotNull()
+      assertThat(schema.maximum).isNotNull()
+      assertThat(schema.minimum).isNotNull()
+      assertThat(schema.minItems).isNotNull()
+      assertThat(schema.maxItems).isNotNull()
+      assertThat(schema.allItemSchema).isNotNull()
+      assertThat(schema.itemSchemas).isNotNull()
+      assertThat(schema.additionalItemsSchema).isNotNull()
+      assertThat(schema.properties).isNotNull()
+      assertThat(schema.patternProperties).isNotNull()
+      assertThat(schema.additionalPropertiesSchema).isNotNull()
+      assertThat(schema.propertyDependencies).isNotNull()
+      assertThat(schema.propertySchemaDependencies).isNotNull()
+      assertThat(schema.requiresUniqueItems).isNotNull()
+      assertThat(schema.properties["selfRef"]).isNotNull()
+      assertThat(schema.properties.getValue("selfRef")).isNotNull()
+      assertThat(schema.patternProperties["^abc.*$"]).isNotNull()
+      assertThat(schema.patternProperties.getValue("^abc.*$")).isNotNull()
     }
   }
 
@@ -71,65 +72,65 @@ class DraftSchemaTest {
       // #### Meta KEYWORDS ##############
       // ###################################
 
-      assert(schema.location).isNotNull()
-      assert(schema.metaSchemaURI).isNotNull()
-      assert(schema.id).isNotNull()
-      assert(schema.title).isNotNull()
-      assert(schema.description).isNotNull()
+      assertThat(schema.location).isNotNull()
+      assertThat(schema.metaSchemaURI).isNotNull()
+      assertThat(schema.id).isNotNull()
+      assertThat(schema.title).isNotNull()
+      assertThat(schema.description).isNotNull()
 
       // ###################################
       // #### Shared KEYWORDS ##############
       // ###################################
 
-      assert(schema.types).isNotNull()
-      assert(schema.enumValues).isNotNull()
-      assert(schema.defaultValue).isNotNull()
-      assert(schema.notSchema).isNotNull()
-      assert(schema.allOfSchemas).isNotNull()
-      assert(schema.anyOfSchemas).isNotNull()
-      assert(schema.oneOfSchemas).isNotNull()
+      assertThat(schema.types).isNotNull()
+      assertThat(schema.enumValues).isNotNull()
+      assertThat(schema.defaultValue).isNotNull()
+      assertThat(schema.notSchema).isNotNull()
+      assertThat(schema.allOfSchemas).isNotNull()
+      assertThat(schema.anyOfSchemas).isNotNull()
+      assertThat(schema.oneOfSchemas).isNotNull()
 
       // ###################################
       // #### String KEYWORDS ##############
       // ###################################
 
-      assert(schema.format).isNotNull()
-      assert(schema.minLength).isNotNull()
-      assert(schema.maxLength).isNotNull()
-      assert(schema.pattern).isNotNull()
+      assertThat(schema.format).isNotNull()
+      assertThat(schema.minLength).isNotNull()
+      assertThat(schema.maxLength).isNotNull()
+      assertThat(schema.pattern).isNotNull()
 
       // ###################################
       // #### NUMBER KEYWORDS ##############
       // ###################################
-      assert(schema.multipleOf).isNotNull()
-      assert(schema.maximum).isNotNull()
-      assert(schema.minimum).isNotNull()
-      assert(schema.isExclusiveMinimum).isNotNull()
-      assert(schema.isExclusiveMaximum).isNotNull()
+      assertThat(schema.multipleOf).isNotNull()
+      assertThat(schema.maximum).isNotNull()
+      assertThat(schema.minimum).isNotNull()
+      assertThat(schema.isExclusiveMinimum).isNotNull()
+      assertThat(schema.isExclusiveMaximum).isNotNull()
 
       // ###################################
       // #### ARRAY KEYWORDS  ##############
       // ###################################
 
-      assert(schema.minItems).isNotNull()
-      assert(schema.maxItems).isNotNull()
-      assert(schema.allItemSchema).isNotNull()
-      assert(schema.itemSchemas).isNotNull()
-      assert(schema.isAllowAdditionalItems).isNotNull()
-      assert(schema.additionalItemsSchema).isNotNull()
-      assert(schema.requiresUniqueItems).isNotNull()
+      assertThat(schema.minItems).isNotNull()
+      assertThat(schema.maxItems).isNotNull()
+      assertThat(schema.allItemSchema).isNotNull()
+      assertThat(schema.itemSchemas).isNotNull()
+      assertThat(schema.isAllowAdditionalItems).isNotNull()
+      assertThat(schema.additionalItemsSchema).isNotNull()
+      assertThat(schema.requiresUniqueItems).isNotNull()
 
       // ###################################
       // #### OBJECT KEYWORDS  ##############
       // ###################################
 
-      assert(schema.isAllowAdditionalProperties).isNotNull()
-      assert(schema.additionalPropertiesSchema).isNotNull()
-      assert(schema.propertyDependencies).isNotNull()
-      assert(schema.propertySchemaDependencies).isNotNull()
-      assert(schema.maxProperties).isNotNull()
-      assert(schema.minProperties).isNotNull()
-      assert(schema.requiredProperties).isNotNull()
+      assertThat(schema.isAllowAdditionalProperties).isNotNull()
+      assertThat(schema.additionalPropertiesSchema).isNotNull()
+      assertThat(schema.propertyDependencies).isNotNull()
+      assertThat(schema.propertySchemaDependencies).isNotNull()
+      assertThat(schema.maxProperties).isNotNull()
+      assertThat(schema.minProperties).isNotNull()
+      assertThat(schema.requiredProperties).isNotNull()
     }
   }
 
@@ -143,57 +144,57 @@ class DraftSchemaTest {
       // #### Meta KEYWORDS ##############
       // ###################################
 
-      assert(schema.location).isNotNull()
-      assert(schema.metaSchemaURI).isNotNull()
-      assert(schema.id).isNotNull()
-      assert(schema.title).isNotNull()
-      assert(schema.description).isNotNull()
+      assertThat(schema.location).isNotNull()
+      assertThat(schema.metaSchemaURI).isNotNull()
+      assertThat(schema.id).isNotNull()
+      assertThat(schema.title).isNotNull()
+      assertThat(schema.description).isNotNull()
 
       // ###################################
       // #### Shared KEYWORDS ##############
       // ###################################
 
-      assert(schema.types).isNotNull()
-      assert(schema.enumValues).isNotNull()
-      assert(schema.defaultValue).isNotNull()
+      assertThat(schema.types).isNotNull()
+      assertThat(schema.enumValues).isNotNull()
+      assertThat(schema.defaultValue).isNotNull()
 
       // ###################################
       // #### String KEYWORDS ##############
       // ###################################
 
-      assert(schema.format).isNotNull()
-      assert(schema.minLength).isNotNull()
-      assert(schema.maxLength).isNotNull()
-      assert(schema.pattern).isNotNull()
+      assertThat(schema.format).isNotNull()
+      assertThat(schema.minLength).isNotNull()
+      assertThat(schema.maxLength).isNotNull()
+      assertThat(schema.pattern).isNotNull()
 
       // ###################################
       // #### NUMBER KEYWORDS ##############
       // ###################################
-      assert(schema.divisibleBy).isNotNull()
-      assert(schema.maximum).isNotNull()
-      assert(schema.minimum).isNotNull()
-      assert(schema.isExclusiveMinimum).isNotNull()
-      assert(schema.isExclusiveMaximum).isNotNull()
+      assertThat(schema.divisibleBy).isNotNull()
+      assertThat(schema.maximum).isNotNull()
+      assertThat(schema.minimum).isNotNull()
+      assertThat(schema.isExclusiveMinimum).isNotNull()
+      assertThat(schema.isExclusiveMaximum).isNotNull()
 
       // ###################################
       // #### ARRAY KEYWORDS  ##############
       // ###################################
-      assert(schema.minItems).isNotNull()
-      assert(schema.maxItems).isNotNull()
-      assert(schema.allItemSchema).isNotNull()
-      assert(schema.itemSchemas).isNotNull()
-      assert(schema.isAllowAdditionalItems).isNotNull()
-      assert(schema.additionalItemsSchema).isNotNull()
-      assert(schema.requiresUniqueItems).isNotNull()
+      assertThat(schema.minItems).isNotNull()
+      assertThat(schema.maxItems).isNotNull()
+      assertThat(schema.allItemSchema).isNotNull()
+      assertThat(schema.itemSchemas).isNotNull()
+      assertThat(schema.isAllowAdditionalItems).isNotNull()
+      assertThat(schema.additionalItemsSchema).isNotNull()
+      assertThat(schema.requiresUniqueItems).isNotNull()
 
       // ###################################
       // #### OBJECT KEYWORDS  ##############
       // ###################################
 
-      assert(schema.isAllowAdditionalProperties).isNotNull()
-      assert(schema.additionalPropertiesSchema).isNotNull()
-      assert(schema.propertyDependencies).isNotNull()
-      assert(schema.propertySchemaDependencies).isNotNull()
+      assertThat(schema.isAllowAdditionalProperties).isNotNull()
+      assertThat(schema.additionalPropertiesSchema).isNotNull()
+      assertThat(schema.propertyDependencies).isNotNull()
+      assertThat(schema.propertySchemaDependencies).isNotNull()
     }
   }
 
@@ -202,74 +203,74 @@ class DraftSchemaTest {
   fun testDraft6Keywords(param: TestParam<Draft6Schema>) {
     val schema = param.get()
     assertAll {
-      assert(schema.location).isNotNull()
+      assertThat(schema.location).isNotNull()
       // ###################################
       // #### Meta KEYWORDS ##############
       // ###################################
 
-      assert(schema.metaSchemaURI).isNotNull()
-      assert(schema.id).isNotNull()
-      assert(schema.title).isNotNull()
-      assert(schema.description).isNotNull()
-      assert(schema.examples).isNotNull()
-      assert(schema.definitions).isNotNull()
+      assertThat(schema.metaSchemaURI).isNotNull()
+      assertThat(schema.id).isNotNull()
+      assertThat(schema.title).isNotNull()
+      assertThat(schema.description).isNotNull()
+      assertThat(schema.examples).isNotNull()
+      assertThat(schema.definitions).isNotNull()
 
       // ###################################
       // #### Shared KEYWORDS ##############
       // ###################################
-      assert(schema.types).isNotNull()
-      assert(schema.enumValues).isNotNull()
-      assert(schema.defaultValue).isNotNull()
-      assert(schema.notSchema).isNotNull()
-      assert(schema.constValue).isNotNull()
-      assert(schema.allOfSchemas).isNotNull()
-      assert(schema.anyOfSchemas).isNotNull()
-      assert(schema.oneOfSchemas).isNotNull()
+      assertThat(schema.types).isNotNull()
+      assertThat(schema.enumValues).isNotNull()
+      assertThat(schema.defaultValue).isNotNull()
+      assertThat(schema.notSchema).isNotNull()
+      assertThat(schema.constValue).isNotNull()
+      assertThat(schema.allOfSchemas).isNotNull()
+      assertThat(schema.anyOfSchemas).isNotNull()
+      assertThat(schema.oneOfSchemas).isNotNull()
 
       // ###################################
       // #### String KEYWORDS ##############
       // ###################################
 
-      assert(schema.format).isNotNull()
-      assert(schema.minLength).isNotNull()
-      assert(schema.maxLength).isNotNull()
-      assert(schema.pattern).isNotNull()
+      assertThat(schema.format).isNotNull()
+      assertThat(schema.minLength).isNotNull()
+      assertThat(schema.maxLength).isNotNull()
+      assertThat(schema.pattern).isNotNull()
 
       // ###################################
       // #### NUMBER KEYWORDS ##############
       // ###################################
 
-      assert(schema.multipleOf).isNotNull()
-      assert(schema.maximum).isNotNull()
-      assert(schema.minimum).isNotNull()
-      assert(schema.exclusiveMinimum).isNotNull()
-      assert(schema.exclusiveMaximum).isNotNull()
+      assertThat(schema.multipleOf).isNotNull()
+      assertThat(schema.maximum).isNotNull()
+      assertThat(schema.minimum).isNotNull()
+      assertThat(schema.exclusiveMinimum).isNotNull()
+      assertThat(schema.exclusiveMaximum).isNotNull()
 
       // ###################################
       // #### ARRAY KEYWORDS  ##############
       // ###################################
 
-      assert(schema.minItems).isNotNull()
-      assert(schema.maxItems).isNotNull()
-      assert(schema.allItemSchema).isNotNull()
-      assert(schema.itemSchemas).isNotNull()
-      assert(schema.additionalItemsSchema).isNotNull()
-      assert(schema.containsSchema).isNotNull()
-      assert(schema.requiresUniqueItems).isNotNull()
+      assertThat(schema.minItems).isNotNull()
+      assertThat(schema.maxItems).isNotNull()
+      assertThat(schema.allItemSchema).isNotNull()
+      assertThat(schema.itemSchemas).isNotNull()
+      assertThat(schema.additionalItemsSchema).isNotNull()
+      assertThat(schema.containsSchema).isNotNull()
+      assertThat(schema.requiresUniqueItems).isNotNull()
 
       // ###################################
       // #### OBJECT KEYWORDS  ##############
       // ###################################
 
-      assert(schema.properties).isNotNull()
-      assert(schema.patternProperties).isNotNull()
-      assert(schema.additionalPropertiesSchema).isNotNull()
-      assert(schema.propertyNameSchema).isNotNull()
-      assert(schema.propertyDependencies).isNotNull()
-      assert(schema.propertySchemaDependencies).isNotNull()
-      assert(schema.maxProperties).isNotNull()
-      assert(schema.minProperties).isNotNull()
-      assert(schema.requiredProperties).isNotNull()
+      assertThat(schema.properties).isNotNull()
+      assertThat(schema.patternProperties).isNotNull()
+      assertThat(schema.additionalPropertiesSchema).isNotNull()
+      assertThat(schema.propertyNameSchema).isNotNull()
+      assertThat(schema.propertyDependencies).isNotNull()
+      assertThat(schema.propertySchemaDependencies).isNotNull()
+      assertThat(schema.maxProperties).isNotNull()
+      assertThat(schema.minProperties).isNotNull()
+      assertThat(schema.requiredProperties).isNotNull()
     }
   }
 
@@ -278,88 +279,88 @@ class DraftSchemaTest {
   fun testDraft7Keywords(param: TestParam<Draft7Schema>) {
     val schema = param.get()
     assertAll {
-      assert(schema.location).isNotNull()
+      assertThat(schema.location).isNotNull()
 
       // ###################################
       // #### Meta KEYWORDS ##############
       // ###################################
 
-      assert(schema.metaSchemaURI).isNotNull()
-      assert(schema.id).isNotNull()
-      assert(schema.title).isNotNull()
-      assert(schema.description).isNotNull()
-      assert(schema.examples).isNotNull()
-      assert(schema.definitions).isNotNull()
+      assertThat(schema.metaSchemaURI).isNotNull()
+      assertThat(schema.id).isNotNull()
+      assertThat(schema.title).isNotNull()
+      assertThat(schema.description).isNotNull()
+      assertThat(schema.examples).isNotNull()
+      assertThat(schema.definitions).isNotNull()
 
       // ###################################
       // #### Draft 7 KEYWORDS #############
       // ###################################
 
-      assert(schema.ifSchema).isNotNull()
-      assert(schema.elseSchema).isNotNull()
-      assert(schema.thenSchema).isNotNull()
+      assertThat(schema.ifSchema).isNotNull()
+      assertThat(schema.elseSchema).isNotNull()
+      assertThat(schema.thenSchema).isNotNull()
 
-      assert(schema.comment).isNotNull()
-      assert(schema.isReadOnly).isNotNull()
-      assert(schema.isWriteOnly).isNotNull()
+      assertThat(schema.comment).isNotNull()
+      assertThat(schema.isReadOnly).isNotNull()
+      assertThat(schema.isWriteOnly).isNotNull()
 
       // ###################################
       // #### Shared KEYWORDS ##############
       // ###################################
 
-      assert(schema.types).isNotNull()
-      assert(schema.enumValues).isNotNull()
-      assert(schema.defaultValue).isNotNull()
-      assert(schema.notSchema).isNotNull()
-      assert(schema.constValue).isNotNull()
-      assert(schema.allOfSchemas).isNotNull()
-      assert(schema.anyOfSchemas).isNotNull()
-      assert(schema.oneOfSchemas).isNotNull()
+      assertThat(schema.types).isNotNull()
+      assertThat(schema.enumValues).isNotNull()
+      assertThat(schema.defaultValue).isNotNull()
+      assertThat(schema.notSchema).isNotNull()
+      assertThat(schema.constValue).isNotNull()
+      assertThat(schema.allOfSchemas).isNotNull()
+      assertThat(schema.anyOfSchemas).isNotNull()
+      assertThat(schema.oneOfSchemas).isNotNull()
 
       // ###################################
       // #### String KEYWORDS ##############
       // ###################################
 
-      assert(schema.format).isNotNull()
-      assert(schema.minLength).isNotNull()
-      assert(schema.maxLength).isNotNull()
-      assert(schema.pattern).isNotNull()
+      assertThat(schema.format).isNotNull()
+      assertThat(schema.minLength).isNotNull()
+      assertThat(schema.maxLength).isNotNull()
+      assertThat(schema.pattern).isNotNull()
 
       // ###################################
       // #### NUMBER KEYWORDS ##############
       // ###################################
 
-      assert(schema.multipleOf).isNotNull()
-      assert(schema.maximum).isNotNull()
-      assert(schema.minimum).isNotNull()
-      assert(schema.exclusiveMinimum).isNotNull()
-      assert(schema.exclusiveMaximum).isNotNull()
+      assertThat(schema.multipleOf).isNotNull()
+      assertThat(schema.maximum).isNotNull()
+      assertThat(schema.minimum).isNotNull()
+      assertThat(schema.exclusiveMinimum).isNotNull()
+      assertThat(schema.exclusiveMaximum).isNotNull()
 
       // ###################################
       // #### ARRAY KEYWORDS  ##############
       // ###################################
 
-      assert(schema.minItems).isNotNull()
-      assert(schema.maxItems).isNotNull()
-      assert(schema.allItemSchema).isNotNull()
-      assert(schema.itemSchemas).isNotNull()
-      assert(schema.additionalItemsSchema).isNotNull()
-      assert(schema.containsSchema).isNotNull()
-      assert(schema.requiresUniqueItems).isNotNull()
+      assertThat(schema.minItems).isNotNull()
+      assertThat(schema.maxItems).isNotNull()
+      assertThat(schema.allItemSchema).isNotNull()
+      assertThat(schema.itemSchemas).isNotNull()
+      assertThat(schema.additionalItemsSchema).isNotNull()
+      assertThat(schema.containsSchema).isNotNull()
+      assertThat(schema.requiresUniqueItems).isNotNull()
 
       // ###################################
       // #### OBJECT KEYWORDS  ##############
       // ###################################
 
-      assert(schema.properties).isNotNull()
-      assert(schema.patternProperties).isNotNull()
-      assert(schema.additionalPropertiesSchema).isNotNull()
-      assert(schema.propertyNameSchema).isNotNull()
-      assert(schema.propertyDependencies).isNotNull()
-      assert(schema.propertySchemaDependencies).isNotNull()
-      assert(schema.maxProperties).isNotNull()
-      assert(schema.minProperties).isNotNull()
-      assert(schema.requiredProperties).isNotNull()
+      assertThat(schema.properties).isNotNull()
+      assertThat(schema.patternProperties).isNotNull()
+      assertThat(schema.additionalPropertiesSchema).isNotNull()
+      assertThat(schema.propertyNameSchema).isNotNull()
+      assertThat(schema.propertyDependencies).isNotNull()
+      assertThat(schema.propertySchemaDependencies).isNotNull()
+      assertThat(schema.maxProperties).isNotNull()
+      assertThat(schema.minProperties).isNotNull()
+      assertThat(schema.requiredProperties).isNotNull()
     }
   }
 

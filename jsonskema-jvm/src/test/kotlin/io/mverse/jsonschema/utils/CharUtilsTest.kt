@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.utils
 
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.isEqualTo
 import lang.time.Stopwatch
 import lang.time.currentTime
@@ -13,37 +14,37 @@ class CharUtilsTest {
   @Test
   fun testtryParsePositiveInt_HappyPath() {
     val i = CharUtils.tryParsePositiveInt("331")
-    assert(i).isEqualTo(331)
+    assertThat(i).isEqualTo(331)
   }
 
   @Test
   fun testtryParsePositiveInt_HappyPath_Decimal() {
     val i = CharUtils.tryParsePositiveInt("1.1")
-    assert(i).isEqualTo(-1)
+    assertThat(i).isEqualTo(-1)
   }
 
   @Test
   fun testtryParsePositiveInt_HappyPath_Large() {
     val i = CharUtils.tryParsePositiveInt("12354312")
-    assert(i).isEqualTo(12354312)
+    assertThat(i).isEqualTo(12354312)
   }
 
   @Test
   fun testtryParsePositiveInt_HappyPath_Negative() {
     val i = CharUtils.tryParsePositiveInt("-5")
-    assert(i).isEqualTo(-1)
+    assertThat(i).isEqualTo(-1)
   }
 
   @Test
   fun testtryParsePositiveInt_HappyPath_Zero() {
     val i = CharUtils.tryParsePositiveInt("0")
-    assert(i).isEqualTo(0)
+    assertThat(i).isEqualTo(0)
   }
 
   @Test
   fun testtryParsePositiveInt_NonHappyPath() {
     val i = CharUtils.tryParsePositiveInt("33d1")
-    assert(i).isEqualTo(-1)
+    assertThat(i).isEqualTo(-1)
   }
 
   @Test

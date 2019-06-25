@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.validation.keywords.array
 
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import io.mverse.jsonschema.JsonSchemas
@@ -32,9 +33,9 @@ class ArrayContainsValidatorTest {
     val invalidArray = jsrArrayOf(24, "Bob", 5)
 
     val validate = testValidator.validate(invalidArray)
-    assert(validate).isNotNull()
+    assertThat(validate).isNotNull()
     val error = validate!!
-    assert(error.keyword).isEqualTo(Keywords.CONTAINS)
+    assertThat(error.keyword).isEqualTo(Keywords.CONTAINS)
   }
 
   @Test

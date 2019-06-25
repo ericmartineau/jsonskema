@@ -1,5 +1,4 @@
 plugins {
-  id("kotlinx-serialization")
 }
 
 mverse  {
@@ -17,10 +16,10 @@ mverse  {
     compile(kotlinSerialization())
     compile("kotlinx-io")
     compile("kotlinx-coroutines-io")
+    compile("kotlinx-collections-immutable")
   }
 }
 
 dependencies {
-  compile("io.github.jffiorillo:jvmbuilder-annotations:0.0.4")
-  compile("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.1")
+//  compile("io.github.jffiorillo:jvmbuilder-annotations:0.0.4")
 }

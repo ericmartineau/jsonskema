@@ -2,6 +2,7 @@ package io.mverse.jsonschema.loading
 
 import assertk.assert
 import assertk.assertAll
+import assertk.assertThat
 import assertk.assertions.containsAll
 import assertk.assertions.hasSize
 import assertk.assertions.hasToString
@@ -13,7 +14,9 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import com.google.common.collect.ImmutableSet
+import io.mverse.assertk.assertThrowing
 import io.mverse.jsonschema.AllKeywords
+import io.mverse.jsonschema.Draft6Schema
 import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.SchemaException
 import io.mverse.jsonschema.assertj.asserts.isEqualIgnoringWhitespace
@@ -21,6 +24,7 @@ import io.mverse.jsonschema.assertj.asserts.isSchemaEqual
 import io.mverse.jsonschema.assertj.asserts.validating
 import io.mverse.jsonschema.createSchemaReader
 import io.mverse.jsonschema.enums.JsonSchemaType
+import io.mverse.jsonschema.keyword.JsrIterable
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.keyword.StringKeyword
 import io.mverse.jsonschema.loading.reference.DefaultJsonDocumentClient
@@ -28,6 +32,7 @@ import io.mverse.jsonschema.resolver.FetchedDocument
 import io.mverse.jsonschema.resolver.JsonDocumentFetcher
 import io.mverse.jsonschema.resourceLoader
 import io.mverse.jsonschema.schema
+import io.mverse.jsonschema.validation.ValidationMocks
 import io.mverse.logging.mlogger
 import lang.exception.illegalState
 import lang.json.jsrObject
@@ -47,15 +52,15 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   @Test
   fun emptyPatternProperties() {
     val actual = getSchemaForKey("emptyPatternProperties")
-    assert(actual).isNotNull()
+    assertThat(actual).isNotNull()
   }
 
   @Test
   fun emptySchema() {
     val emptySchema = getSchemaForKey("emptySchema")
 
-    assert(emptySchema).isNotNull {
-      assert(it.actual.toString()).isEqualIgnoringWhitespace("{}")
+    assertThat(emptySchema).isNotNull { it: assertk.Assert<Draft6Schema> ->
+      assertThat(it.actual.toString()).isEqualIgnoringWhitespace("{}")
     }
   }
 
@@ -66,14 +71,14 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
       "default" *= 0
     }
 
-    assert(emptySchema.toString()).isEqualIgnoringWhitespace(actual.toString())
+    assertThat(emptySchema.toString()).isEqualIgnoringWhitespace(actual.toString())
   }
 
   @Test
   fun enumSchema() {
     val actual = getSchemaForKey("enumSchema")
-    assert(actual.enumValues).isNotNull {
-      assert(it.actual.count(), "count").isEqualTo(4)
+    assertThat(actual.enumValues).isNotNull { it: assertk.Assert<JsrIterable> ->
+      assertThat(it.actual.count(), "count").isEqualTo(4)
     }
   }
 
@@ -88,8 +93,8 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   @Test
   fun implicitAnyOfLoadsTypeProps() {
     val schema = getSchemaForKey("multipleTypesWithProps")
-    assert(schema.minLength!!.toDouble()).isEqualTo(3.0)
-    assert(schema.minimum!!.toDouble()).isEqualTo(5.0)
+    assertThat(schema.minLength!!.toDouble()).isEqualTo(3.0)
+    assertThat(schema.minimum!!.toDouble()).isEqualTo(5.0)
   }
 
   @Test(expected = SchemaException::class)
@@ -116,55 +121,55 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   @Test
   fun jsonPointerInArray() {
     val jsonSchema = getSchemaForKey("jsonPointerInArray")
-    assert(jsonSchema.itemSchemas).hasSize(2)
-    assert(jsonSchema.itemSchemas[1])
+    assertThat(jsonSchema.itemSchemas).hasSize(2)
+    assertThat(jsonSchema.itemSchemas[1])
         .isInstanceOf(AllKeywords::class) {
-          assert(it.actual.isRefSchema, "Is ref schema").isTrue()
+          assertThat(it.actual.isRefSchema, "Is ref schema").isTrue()
         }
   }
 
   @Test
   fun multipleTypes() {
     val multipleTypes = getSchemaForKey("multipleTypes")
-    assert(multipleTypes).isNotNull()
-    assert(multipleTypes.types)
+    assertThat(multipleTypes).isNotNull()
+    assertThat(multipleTypes.types)
         .containsAll(JsonSchemaType.STRING, JsonSchemaType.BOOLEAN)
   }
 
   @Test
   fun neverMatchingAnyOf() {
     val anyOfNeverMatches = getSchemaForKey("anyOfNeverMatches")
-    assert(anyOfNeverMatches.types)
+    assertThat(anyOfNeverMatches.types)
         .isEqualTo(ImmutableSet.of(JsonSchemaType.STRING))
   }
 
   @Test
   fun noExplicitObject() {
     val actual = getSchemaForKey("noExplicitObject")
-    assert(actual.types).isEmpty()
+    assertThat(actual.types).isEmpty()
   }
 
   @Test
   fun notSchema() {
     val actual = getSchemaForKey("notSchema")
-    assert(actual.notSchema).isNotNull()
+    assertThat(actual.notSchema).isNotNull()
   }
 
   @Test
   fun nullSchema() {
     val actual = getSchemaForKey("nullSchema")
-    assert(actual).isNotNull()
+    assertThat(actual).isNotNull()
   }
 
   @Test
   fun numberSchema() {
     val schema = getSchemaForKey("numberSchema")
-    assert(schema.types).containsAll(JsonSchemaType.NUMBER)
-    assert(schema.minimum!!.toInt()).isEqualTo(10)
-    assert(schema.maximum!!.toInt()).isEqualTo(20)
-    assert(schema.exclusiveMaximum!!.toInt()).isEqualTo(21)
-    assert(schema.exclusiveMinimum!!.toInt()).isEqualTo(11)
-    assert(schema.multipleOf?.toInt()).isEqualTo(5)
+    assertThat(schema.types).containsAll(JsonSchemaType.NUMBER)
+    assertThat(schema.minimum!!.toInt()).isEqualTo(10)
+    assertThat(schema.maximum!!.toInt()).isEqualTo(20)
+    assertThat(schema.exclusiveMaximum!!.toInt()).isEqualTo(21)
+    assertThat(schema.exclusiveMinimum!!.toInt()).isEqualTo(11)
+    assertThat(schema.multipleOf?.toInt()).isEqualTo(5)
   }
 
   @Test
@@ -172,10 +177,10 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
     val actual = getSchemaForKey("pointerResolution")
 
     val rectangleSchema = actual.properties.get("rectangle")?.draft6()
-    assert(rectangleSchema).isNotNull {
+    assertThat(rectangleSchema).isNotNull().let { it: assertk.Assert<Draft6Schema> ->
       val schemaA = rectangleSchema!!.properties.get("a")?.draft6()
-      assert(schemaA).isNotNull {
-        assert(schemaA!!.minimum!!.toInt()).isEqualTo(0)
+      assertThat(schemaA).isNotNull().let { it: assertk.Assert<Draft6Schema> ->
+        assertThat(schemaA!!.minimum!!.toInt()).isEqualTo(0)
       }
     }
   }
@@ -183,21 +188,19 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   @Test
   fun pointerResolutionFailure() {
     val schema = getSchemaForKey("pointerResolutionFailure")
-    assert {
-      schema.validating(jsrObject {}) // This should trigger failure
-    }.thrownError {
-      isInstanceOf(SchemaException::class)
+    assertThrowing<SchemaException> {
+      val validator = ValidationMocks.createTestValidator(schema)
+      validator.validate(jsrObject{})
     }
   }
 
   @Test
   fun pointerResolutionQueryFailure() {
     val schema = getSchemaForKey("pointerResolutionQueryFailure")
-    assert(schema).isNotNull()
-    assert {
-      schema.validating(jsrObject {}) // This should trigger failure
-    }.thrownError {
-      isInstanceOf(SchemaException::class)
+    assertThat(schema).isNotNull()
+    assertThrowing<SchemaException> {
+      val validator = ValidationMocks.createTestValidator(schema)
+      validator.validate(jsrObject{})
     }
   }
 
@@ -209,10 +212,10 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   @Test
   fun refWithType() {
     val actualRoot = getSchemaForKey("refWithType")
-    assert(actualRoot).isNotNull()
+    assertThat(actualRoot).isNotNull()
     val prop = actualRoot.properties.getValue("prop").draft7()
-    assert(prop).isNotNull()
-    assert(prop.requiredProperties).containsAll("a", "b")
+    assertThat(prop).isNotNull()
+    assertThat(prop.requiredProperties).containsAll("a", "b")
   }
 
   @Test
@@ -265,15 +268,15 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
     val actual = JsonSchemas.createSchemaReader().readSchema(rawSchema).draft6()
 
     assertAll {
-      assert(actual).isNotNull()
+      assertThat(actual).isNotNull()
 
-      assert(actual.propertySchemaDependencies)
+      assertThat(actual.propertySchemaDependencies)
           .isNotEmpty()
       val actualSchemaPointer = actual.propertySchemaDependencies["a"]
           ?.location
           ?.jsonPointerFragment
           .toString()
-      assert(actualSchemaPointer).isEqualTo("#/dependencies/a")
+      assertThat(actualSchemaPointer).isEqualTo("#/dependencies/a")
     }
   }
 
@@ -286,14 +289,14 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
   fun sniffByFormat() {
     val schemaJson = jsrObject { "format" *= "hostname" }
     val actual = JsonSchemas.createSchemaReader().readSchema(schemaJson).draft6()
-    assert(actual.format).isEqualTo("hostname")
+    assertThat(actual.format).isEqualTo("hostname")
   }
 
   @Test
   fun stringSchema() {
     val actual = getSchemaForKey("stringSchema")
-    assert(actual.minLength).isEqualTo(2)
-    assert(actual.maxLength).isEqualTo(3)
+    assertThat(actual.minLength).isEqualTo(2)
+    assertThat(actual.maxLength).isEqualTo(3)
   }
 
   @Test
@@ -311,14 +314,14 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
       "customKeyword" *= "boomIsThePassword"
     }
     val schema = loader.readSchema(inputJson)
-    assert(schema.keywords.get(keyword)).isEqualTo(StringKeyword("boomIsThePassword"))
+    assertThat(schema.keywords.get(keyword)).isEqualTo(StringKeyword("boomIsThePassword"))
   }
 
   @Test
   fun tupleSchema() {
     val actual = getSchemaForKey("tupleSchema")
-    assert(actual.allItemSchema).isNull()
-    assert(actual.itemSchemas).hasSize(2)
+    assertThat(actual.allItemSchema).isNull()
+    assertThat(actual.itemSchemas).hasSize(2)
   }
 
   //todo:ericm Test nulls everywhere
@@ -342,7 +345,7 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
     val jsonB = "{\"\$schema\":\"http://json-schema.org/draft-06/schema#\",\"\$id\":\"https://storage.googleapis.com/mverse-test/mverse/petStore/0.0.1/schema/showDog/jsonschema-draft6.json\",\"properties\":{\"mostRecentShow\":{},\"awards\":{\"type\":\"array\",\"items\":{\"properties\":{\"awardDate\":{\"type\":\"string\",\"format\":\"date-time\"},\"placement\":{\"type\":\"number\",\"minimum\":0},\"awardName\":{\"type\":\"string\"},\"show\":{}}}}}}"
     val schemaA = JsonSchemas.schemaReader.readSchema(jsonA)
     val schemaB = JsonSchemas.schemaReader.readSchema(jsonB)
-    assert(schemaA).isEqualTo(schemaB)
+    assertThat(schemaA).isEqualTo(schemaB)
   }
 
   /**
@@ -362,7 +365,7 @@ class SchemaLoaderImplTest : BaseLoaderTest("testschemas.json") {
     val asString = schemaOne.draft7().toString(includeExtraProperties = true)
 
     val deserialized = JsonSchemas.createSchemaReader().readSchema(asString)
-    assert(schemaOne).isSchemaEqual(deserialized)
+    assertThat(schemaOne).isSchemaEqual(deserialized)
   }
 
   companion object {

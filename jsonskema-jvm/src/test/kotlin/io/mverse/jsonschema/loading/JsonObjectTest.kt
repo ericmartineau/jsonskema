@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.loading
 
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.hasToString
 import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.JsonValueWithPath
@@ -40,7 +41,7 @@ class JsonObjectTest : BaseLoaderTest("objecttestcases.json") {
     val schemaJson = JsonValueWithPath.fromJsonValue(schema)
 
     val (_, _, location) = schemaJson.path(Keywords.PROPERTIES).path("prop")
-    assert(location.canonicalURI).hasToString("http://x.y/z#zzz")
+    assertThat(location.canonicalURI).hasToString("http://x.y/z#zzz")
   }
 
   @Test

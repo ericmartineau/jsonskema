@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.utils
 
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.hasToString
 import lang.net.toURI
 import org.junit.Test
@@ -10,7 +11,7 @@ class JsonSchemaInspectionsKtTest {
     val uri = "https://someschemas.com/mverse-test/mverse/booyards/0.1.2/schema/wardgets.json".toURI()
     val merge = "https://someschemas.com/mverse-test/mverse/booyards/0.1.2/schema/goobers.json"
         .toURI()
-    assert(uri.calculateMergeURI(merge))
+    assertThat(uri.calculateMergeURI(merge))
         .hasToString("https://someschemas.com/mverse-test/mverse/booyards/0.1.2/schema/wardgets-goobers.json")
   }
 

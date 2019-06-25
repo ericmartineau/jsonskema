@@ -2,6 +2,7 @@ package io.mverse.jsonschema
 
 import assertk.Assert
 import assertk.assert
+import assertk.assertThat
 import io.mverse.jsonschema.builder.MutableSchema
 import io.mverse.jsonschema.utils.SchemaPaths
 import kotlinx.serialization.json.JsonNull
@@ -86,6 +87,6 @@ object TestUtils {
   }
 }
 
-inline fun <reified T : Any?> T.assertThat(message: String? = null): Assert<T> = assert(this, message)
-inline fun <reified T, reified V> T?.assertThat(block: T.() -> V): Assert<V> = assert(this?.block()
+inline fun <reified T : Any?> T.assertThat(message: String? = null): Assert<T> = assertThat(this, message)
+inline fun <reified T, reified V> T?.assertThat(block: T.() -> V): Assert<V> = assertThat<V>(this?.block()
     ?: illegalState("Accessor method returned null"))

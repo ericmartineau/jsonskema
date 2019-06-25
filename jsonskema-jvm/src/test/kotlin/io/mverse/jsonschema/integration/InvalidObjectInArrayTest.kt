@@ -16,6 +16,7 @@
 package io.mverse.jsonschema.integration
 
 import assertk.assert
+import assertk.assertThat
 import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.assertj.asserts.hasErrorCode
 import io.mverse.jsonschema.assertj.asserts.hasViolationAt
@@ -33,7 +34,7 @@ class InvalidObjectInArrayTest {
     val valueJson = JsonSchemas.resourceLoader().readJsonObject("/io/mverse/jsonschema/invalidobjectinarray/subject.json")
     val schema = JsonSchemas.createSchemaReader().readSchema(schemaJson)
 
-    assert(schema)
+    assertThat(schema)
         .validating(valueJson)
         .hasViolationAt("#/notification/target/apps/0")
         .hasErrorCode("validation.keyword.required")

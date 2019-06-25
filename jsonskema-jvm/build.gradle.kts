@@ -7,13 +7,12 @@ mverse  {
   dependencies {
     compile("kotlin-reflect")
     compile(kotlinIO())
-    compile("kotlinx-serialization-runtime")
     compile("mverse-json")
     compile("mverse-lang-jvm")
     compile("mverse-log-jvm")
     compile("mverse-coroutines-jvm")
-
-    compile("kotlinx-io-jvm")
+    testCompile("kotlin-test")
+//    compile("kotlinx-io-jvm")
     compile("kotlinx-coroutines-io-jvm")
 
     testCompile("mverse-test-jvm")
@@ -21,13 +20,14 @@ mverse  {
     testCompile("org.glassfish:javax.json:1.1.4")
     testCompile("logback-classic")
     testCompile("logback-core")
+    compile("io.mverse:hashkode")
   }
 }
 
 dependencies {
   // Default provider for JSR 353:Java API for Processing JSON
 //  compile("org.glassfish:javax.json:1.1.2")
-  compile("io.mverse:hashkode:1.0.1")
+//  compile("io.mverse:hashkode:1.0.1")
 
   // Guava is a suite of core and expanded libraries that include
   //utility classes, google's collections, io classes, and much
@@ -40,7 +40,6 @@ dependencies {
   compile("com.googlecode.libphonenumber:libphonenumber:8.9.0")
   compile("com.damnhandy:handy-uri-templates:2.1.6")
 
-  compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
   expectedBy(project(":jsonskema-api-common"))
   expectedBy(project(":jsonskema-core-common"))
@@ -58,9 +57,7 @@ dependencies {
   compile("org.eclipse.jetty:jetty-servlet:9.4.12.RC1")
 
   testCompile("nl.jqno.equalsverifier:equalsverifier:2.5.1")
-  testCompile("org.jetbrains.kotlin:kotlin-test")
-  testCompile("org.jetbrains.kotlin:kotlin-test-junit")
-  testCompile ("com.willowtreeapps.assertk:assertk-jvm:0.11")
+  testCompile ("com.willowtreeapps.assertk:assertk-jvm:0.14")
 
   testCompile("pl.pragmatists:JUnitParams:1.1.1")
 

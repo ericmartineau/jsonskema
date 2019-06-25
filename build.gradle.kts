@@ -6,20 +6,15 @@ plugins {
   id("io.mverse.project")
   id("io.mverse.multi-platform")
   id("kotlinx-serialization")
+  id("java")
 }
 
 allprojects {
-  plugins.apply("kotlinx-serialization")
-  plugins.apply("java")
   mverse {
     isDefaultDependencies = false
     coverageRequirement = 0.75
     bom = "io.mverse:mverse-bom:0.5.13"
-    dependencies {
-      compile(kotlinSerialization())
-    }
   }
-
   tasks.withType<KotlinCompile> {
     kotlinOptions {
       jvmTarget = "1.8"
@@ -36,15 +31,30 @@ allprojects {
     kotlinx()
   }
 
+  
   dependencyManagement {
     dependencies {
 
       installKotlinDeps()
       installMverseShared()
 
-      val ktor: String by project
-      dependency("io.ktor:ktor-client-core:$ktor")
-      dependency("io.ktor:ktor-client-cio:$ktor")
+      dependency("io.mverse:hashkode:1.0.1")
+
+      val ktor:String by rootProject
+      dependencySet("io.ktor:$ktor") {
+        entry("ktor-server-servlet")
+        entry("ktor-utils")
+        entry("ktor-utils-jvm")
+        entry("ktor-server-netty")
+        entry("ktor-html-builder")
+        entry("ktor-client-cio")
+        entry("ktor-jackson")
+        entry("ktor-server-core")
+        entry("ktor-locations")
+        entry("ktor-auth")
+        entry("ktor-auth-jwt")
+        entry("ktor-client-core")
+      }
 
       dependency("io.github.microutils:kotlin-logging:1.6.22")
 
@@ -63,15 +73,15 @@ allprojects {
       }
     }
   }
+
+
 }
 
-
-
 fun DependenciesHandler.installKotlinDeps() {
-  val kotlinCoroutines: String by project
-  val kotlin: String by project
-  val kotlinSerialization: String by project
-  val kotlinIO: String by project
+  val kotlinCoroutines: String by rootProject
+  val kotlin: String by rootProject
+  val kotlinSerialization: String by rootProject
+  val kotlinIO: String by rootProject
 
   // None
   dependencySet("org.jetbrains.kotlin:$kotlin") {
@@ -107,7 +117,7 @@ fun DependenciesHandler.installKotlinDeps() {
 }
 
 fun DependenciesHandler.installMverseShared() {
-  val mverseShared: String by project
+  val mverseShared: String by rootProject
 
   dependencySet("io.mverse:$mverseShared") {
     entry("mverse-json")

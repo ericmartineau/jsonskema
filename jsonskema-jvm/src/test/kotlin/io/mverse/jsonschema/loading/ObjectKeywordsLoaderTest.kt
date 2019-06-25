@@ -1,9 +1,5 @@
 package io.mverse.jsonschema.loading
 
-import assertk.assert
-import assertk.assertions.hasSize
-import assertk.assertions.isEqualTo
-import assertk.assertions.isNotNull
 import io.mverse.jsonschema.SchemaException
 import io.mverse.jsonschema.enums.JsonSchemaType
 import io.mverse.jsonschema.schema
@@ -23,11 +19,11 @@ class ObjectKeywordsLoaderTest : BaseLoaderTest("objecttestschemas.json") {
     assertThat(propertySchemas).isNotNull
     assertThat(propertySchemas).hasSize(2)
     val boolProp = actual.properties["boolProp"]
-    assert(boolProp).isNotNull()
+    assertThat(boolProp).isNotNull
 
-    assertThat<String>(actual.requiredProperties).hasSize(2)
-    assert(actual.minProperties).isEqualTo(2)
-    assert(actual.maxProperties).isEqualTo(3)
+    assertThat(actual.requiredProperties).hasSize(2)
+    assertThat(actual.minProperties).isEqualTo(2)
+    assertThat(actual.maxProperties).isEqualTo(3)
   }
 
   @Test(expected = SchemaException::class)
@@ -39,30 +35,28 @@ class ObjectKeywordsLoaderTest : BaseLoaderTest("objecttestschemas.json") {
   fun objectWithAdditionalPropSchema() {
     val actual = getSchemaForKey("objectWithAdditionalPropSchema")
     val addtlPropSchema = actual.additionalPropertiesSchema
-    assert(addtlPropSchema)
+    assertThat(addtlPropSchema)
         .isEqualTo(BOOLEAN_SCHEMA)
   }
 
   @Test
   fun objectWithPropDep() {
     val actual = getSchemaForKey("objectWithPropDep")
-    assert(actual.propertyDependencies.get("isIndividual"))
-        .isNotNull {
-          it.hasSize(1)
-        }
+    assertThat(actual.propertyDependencies.get("isIndividual"))
+        .isNotNull.hasSize(1)
   }
 
   @Test
   fun objectWithSchemaDep() {
     val actual = getSchemaForKey("objectWithSchemaDep")
-    assert(actual.propertySchemaDependencies).hasSize(1)
+    assertThat(actual.propertySchemaDependencies).hasSize(1)
   }
 
   @Test
   fun patternProperties() {
     val actual = getSchemaForKey("patternProperties")
-    assert(actual).isNotNull()
-    assert(actual.patternProperties).hasSize(2)
+    assertThat(actual).isNotNull
+    assertThat(actual.patternProperties).hasSize(2)
   }
 
   @Test(expected = SchemaException::class)

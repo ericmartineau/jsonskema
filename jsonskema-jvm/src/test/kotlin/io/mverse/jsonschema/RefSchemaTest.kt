@@ -1,6 +1,8 @@
 package io.mverse.jsonschema
 
+import assertk.Assert
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
@@ -41,7 +43,7 @@ class RefSchemaTest {
         location = SchemaLocation.documentRoot("https://nonexistant.com/#/foo"),
         refURI = URI("https://nonexistant.com"))
 
-    assert(withRef.toString(true)).isEqualIgnoringWhitespace("{\"\$ref\": \"https://nonexistant.com\"}")
+    assertThat<String>(withRef.toString(true)).isEqualIgnoringWhitespace("{\"\$ref\": \"https://nonexistant.com\"}")
   }
 
   /**
@@ -61,14 +63,13 @@ class RefSchemaTest {
       }
     }
 
-    assert(JsonSchemas.schemaReader.readSchema(URI("http://schemas/parent"))).isEqualTo(parentSchema)
-    assert(JsonSchemas.schemaReader.readSchema(URI("http://schemas/child"))).isEqualTo(childSchema)
+    assertThat(JsonSchemas.schemaReader.readSchema(URI("http://schemas/parent"))).isEqualTo(parentSchema)
+    assertThat(JsonSchemas.schemaReader.readSchema(URI("http://schemas/child"))).isEqualTo(childSchema)
 
     val childRef = childSchema.draft7().properties["parent"]?.draft7()
-    assert(childRef).isNotNull {
-      assert(it.actual).isInstanceOf(RefSchema::class) {
-        assert(it.actual.refSchema).isEqualTo(parentSchema)
-      }
-    }
+    assertThat(childRef).isNotNull()
+        .isInstanceOf(RefSchema::class)
+        .transform { it.refSchema}
+        .isEqualTo(parentSchema)
   }
 }

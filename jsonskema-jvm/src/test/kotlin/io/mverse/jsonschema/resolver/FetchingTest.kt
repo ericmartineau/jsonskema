@@ -1,5 +1,6 @@
 package io.mverse.jsonschema.resolver
 
+import assertk.assertThat
 import assertk.assertions.isTrue
 import io.mverse.assertk.hasStringValue
 import io.mverse.assertk.hasValueAtPointer
@@ -14,8 +15,8 @@ class FetchingTest {
     val fetched = blocking {
       cp.fetchDocument("http://nba.com/schemas/by/eric/hats.json".toURI())
     }
-    assertk.assert(fetched.isDifferentURI).isTrue()
-    assertk.assert(fetched.jsrObject).hasValueAtPointer("/\$id") {
+    assertThat(fetched.isDifferentURI).isTrue()
+    assertThat(fetched.jsrObject).hasValueAtPointer("/\$id") {
       hasStringValue("http://nba.com/schemas/by/eric/hats.json")
     }
   }

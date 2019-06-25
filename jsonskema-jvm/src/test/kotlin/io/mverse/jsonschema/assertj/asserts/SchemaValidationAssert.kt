@@ -69,7 +69,7 @@ fun SchemaValidationAssert.isNotValid(assertions: SchemaValidationAssert.()->Uni
 //  }
 
 fun SchemaValidationAssert.hasViolationCount(expected: Int): SchemaValidationAssert {
-  assert(this.actual, "violations").isNotNull {
+  assert(this.actual, "violations").isNotNull { it: Assert<ValidationError> ->
     assert(it.actual.allMessages.size, "violation count").isEqualTo(expected)
   }
   return this

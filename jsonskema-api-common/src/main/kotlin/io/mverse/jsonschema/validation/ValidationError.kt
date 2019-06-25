@@ -1,4 +1,4 @@
-@file:ContextualSerialization(URI::class,  OffsetDateTime::class, ZonedDateTime::class, LocalDateTime::class)
+@file:ContextualSerialization(Any::class, URI::class,  OffsetDateTime::class, ZonedDateTime::class, LocalDateTime::class)
 /*
  * Copyright (C) 2017 MVerse (http://mverse.io)
  *

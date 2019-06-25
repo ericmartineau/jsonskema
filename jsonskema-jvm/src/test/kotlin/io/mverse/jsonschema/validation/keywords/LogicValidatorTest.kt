@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.validation.keywords
 
 import assertk.assert
+import assertk.assertThat
 import io.mverse.jsonschema.JsonSchemas
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.assertj.asserts.hasErrorArguments
@@ -22,7 +23,7 @@ class LogicValidatorTest {
     val jsonObject = loader.readJsonObject("/draft7-keywords.json")
     val schema = JsonSchemas.createSchemaReader().readSchema(jsonObject)
 
-    assert(schema)
+    assertThat(schema)
         .validating(jsrObject { "ifTest" *= "quadrilateralus" })
         .isNotValid {
           hasViolationAt("#/ifTest")
@@ -39,7 +40,7 @@ class LogicValidatorTest {
     val schema = loader.readJsonObject("/draft7-keywords.json")
         .toJsonSchema()
 
-    assert(schema)
+    assertThat(schema)
         .validating(jsrObject { "ifTest" *= "quadruple" })
         .isValid()
   }
@@ -48,7 +49,7 @@ class LogicValidatorTest {
   fun testLogic_WhenStartsWithS_ThenMaxLengthIs5_Failure() {
     val schema = loader.readJsonObject("/draft7-keywords.json").toJsonSchema()
 
-    assert(schema)
+    assertThat(schema)
         .validating(jsrObject { "ifTest" *= "smasher" })
         .isNotValid {
           hasViolationAt("#/ifTest")
@@ -61,7 +62,7 @@ class LogicValidatorTest {
   fun testLogic_WhenStartsWithS_ThenMaxLengthIs5_Success() {
     val schema = loader.readJsonObject("/draft7-keywords.json").toJsonSchema()
 
-    assert(schema)
+    assertThat(schema)
         .validating(jsrObject { "ifTest" *= "smash" })
         .isValid()
   }
@@ -70,7 +71,7 @@ class LogicValidatorTest {
   fun testLogic_WhenNotAString_ThenMustBeObject_Failure() {
     val schema = loader.readJsonObject("/draft7-keywords.json").toJsonSchema()
 
-    assert(schema)
+    assertThat(schema)
         .validating(jsrObject { "ifTest" *= 10.0 })
         .isNotValid {
           hasViolationAt("#/ifTest")
@@ -83,7 +84,7 @@ class LogicValidatorTest {
   fun testLogic_WhenNotAString_ThenMustBeObject_Success() {
     val schema = loader.readJsonObject("/draft7-keywords.json").toJsonSchema()
 
-    assert(schema)
+    assertThat(schema)
         .validating(jsrObject { "ifTest" *= jsrObject {} })
         .isValid()
   }

@@ -1,6 +1,7 @@
 package io.mverse.jsonschema.validation.keywords.string.formatValidators
 
 import assertk.assert
+import assertk.assertThat
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import org.junit.Test
@@ -14,8 +15,8 @@ class DateTimeFormatValidatorTest(val message: String, val value: String, val sh
   @Test fun run() {
     val validate = formatter.validate(value)
     when (shouldBeValid) {
-      true -> assert(validate).isNull()
-      false -> assert(validate).isNotNull()
+      true -> assertThat(validate).isNull()
+      false -> assertThat(validate).isNotNull()
     }
   }
 

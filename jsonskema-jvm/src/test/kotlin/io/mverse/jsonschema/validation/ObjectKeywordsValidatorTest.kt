@@ -17,6 +17,7 @@ package io.mverse.jsonschema.validation
 
 import assertk.assert
 import assertk.assertAll
+import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.hasToString
 import assertk.assertions.isEqualTo
@@ -383,7 +384,7 @@ class ObjectKeywordsValidatorTest {
       val testValue = 1.toJsrValue()
       ValidationMocks.createTestValidator(subject).validate(testValue)
     }
-    assert(e.schemaLocation).hasToString("#/dependencies/a")
+    assertThat(e.schemaLocation).hasToString("#/dependencies/a")
   }
 
   @Test
@@ -396,9 +397,9 @@ class ObjectKeywordsValidatorTest {
 
     val schema = builder.build().draft6()
 
-    assert(schema.patternProperties).hasSize(1)
-    assert(schema.propertyDependencies.size()).isEqualTo(1)
-    assert(schema.propertySchemaDependencies).hasSize(1)
+    assertThat(schema.patternProperties).hasSize(1)
+    assertThat(schema.propertyDependencies.size()).isEqualTo(1)
+    assertThat(schema.propertySchemaDependencies).hasSize(1)
 
     builder.apply {
       propertyDependencies += ("c" to "a")
@@ -407,9 +408,9 @@ class ObjectKeywordsValidatorTest {
     }
 
     assertAll {
-      assert(schema.propertyDependencies.size(), "propertyDependencies").isEqualTo(1)
-      assert(schema.propertySchemaDependencies, "propertySchemaDependencies size").hasSize(1)
-      assert(schema.patternProperties.size, "patternProperties").isEqualTo(1)
+      assertThat(schema.propertyDependencies.size(), "propertyDependencies").isEqualTo(1)
+      assertThat(schema.propertySchemaDependencies, "propertySchemaDependencies size").hasSize(1)
+      assertThat(schema.patternProperties.size, "patternProperties").isEqualTo(1)
     }
   }
 

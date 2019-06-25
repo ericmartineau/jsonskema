@@ -14,11 +14,15 @@ import lang.json.JsrNull
 import lang.json.JsrObject
 import lang.json.JsrType
 import lang.json.JsrValue
+import lang.json.contains
 import lang.json.get
+import lang.json.getOrNull
 import lang.json.jkey
 import lang.json.propNames
 import lang.json.propValues
 import lang.json.properties
+import lang.json.toJsonPath
+import lang.json.toPathName
 import lang.json.type
 import lang.json.unboxAsAny
 import lang.json.unboxOrNull
@@ -90,8 +94,11 @@ data class JsonValueWithPath(
   }
 
   override operator fun get(key: String): JsrValue {
-    return if (containsKey(key)) jsonObject!![key.jkey] else JsrNull
+    val path = key.toJsonPath()
+    return get(path)
   }
+
+  operator fun get(key: JsonPath): JsrValue = jsonObject?.getOrNull(key) ?: JsrNull
 
   operator fun get(prop: KeywordInfo<*>): JsrValue {
     return this[prop.key]
@@ -132,7 +139,8 @@ data class JsonValueWithPath(
   }
 
   fun path(childKey: String): JsonValueWithPath {
-    return fromJsonValue(root, this[childKey], location.child(childKey))
+    val path = childKey.toJsonPath()
+    return fromJsonValue(root, this[path], location.child(*path.segments.toTypedArray()))
   }
 
   /**
