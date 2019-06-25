@@ -1,6 +1,5 @@
 package io.mverse.jsonschema.loading.reference
 
-import assertk.assert
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.hasSize
@@ -27,12 +26,12 @@ import lang.net.URI
 import lang.time.currentTime
 import org.junit.Test
 
-val slowpoke = 2000L
-val expectedSlowpoke = 2000L
+const val slowpoke = 2000L
+const val expectedSlowpoke = 2000L
 
 class DefaultJsonDocumentClientTest {
   @Test fun testFetchingNoProvidersFound() {
-    assert {
+    assertThat {
       DefaultJsonDocumentClient(mutableListOf(), schemaCache = JsonSchemaCache())
     }.thrownError { }
   }
@@ -42,7 +41,7 @@ class DefaultJsonDocumentClientTest {
     assertTimed {
       defaultClient.fetchDocument("https://nba.com/no/document/here")
     }
-        .duration { isLessThan(2000) }
+        .duration { isLessThan(2100) }
         .returnedValue { result ->
           result.transform { it.fetchedOrNull }.isNull()
           result.transform { it.failures }.hasSize(2)
@@ -89,9 +88,9 @@ class DefaultJsonDocumentClientTest {
     assertTimed {
       defaultClient.fetchDocument("https://unknown.com/path/is/bogus")
     }
-        .returnedValue {
-          assertThat(it.actual.failures).hasSize(0)
-          assertThat(it.actual.fetchedOrNull).isNull()
+        .returnedValue { results ->
+          results.transform { it.failures }.hasSize(0)
+          results.transform { it.fetchedOrNull }.isNull()
         }
         .duration { isBetween(500, expectedSlowpoke) }
   }
@@ -101,9 +100,9 @@ class DefaultJsonDocumentClientTest {
     assertTimed {
       defaultClient.fetchDocument("https://unknown.com/path/is/bogus")
     }
-        .returnedValue {
-          assertThat(it.actual.failures).hasSize(0)
-          assertThat(it.actual.fetchedOrNull).isNull()
+        .returnedValue { results ->
+          results.transform { it.failures }.hasSize(0)
+          results.transform { it.fetchedOrNull }.isNull()
         }
         .duration { isBetween(500, expectedSlowpoke) }
   }
