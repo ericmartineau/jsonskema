@@ -1,7 +1,6 @@
 package io.mverse.jsonschema.builder
 
 import io.mverse.jsonschema.JsonSchemas
-import io.mverse.jsonschema.MergeException
 import io.mverse.jsonschema.MergeReport
 import io.mverse.jsonschema.RefSchema
 import io.mverse.jsonschema.Schema
@@ -40,7 +39,6 @@ import io.mverse.jsonschema.keyword.Keywords.DOLLAR_ID
 import io.mverse.jsonschema.keyword.Keywords.ELSE
 import io.mverse.jsonschema.keyword.Keywords.ENUM
 import io.mverse.jsonschema.keyword.Keywords.FORMAT
-import io.mverse.jsonschema.keyword.Keywords.ID
 import io.mverse.jsonschema.keyword.Keywords.IF
 import io.mverse.jsonschema.keyword.Keywords.ITEMS
 import io.mverse.jsonschema.keyword.Keywords.MAXIMUM
@@ -80,8 +78,6 @@ import io.mverse.jsonschema.keyword.iterableOf
 import io.mverse.jsonschema.loading.LoadingReport
 import io.mverse.jsonschema.loading.SchemaLoader
 import io.mverse.jsonschema.loading.SchemaLoadingException
-import io.mverse.jsonschema.mergeAdd
-import io.mverse.jsonschema.mergeError
 import io.mverse.jsonschema.utils.SchemaPaths
 import io.mverse.jsonschema.utils.Schemas.nullSchema
 import io.mverse.jsonschema.utils.isGeneratedURI
@@ -96,7 +92,6 @@ import lang.json.JsrValue
 import lang.json.toJsrValue
 import lang.json.unboxAsAny
 import lang.net.URI
-import lang.suppress.Suppressions.UNCHECKED_CAST
 import lang.uuid.randomUUID
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -499,14 +494,13 @@ data class MutableJsonSchema(
     if (loadingReport.hasErrors()) {
       throw SchemaLoadingException(location.jsonPointerFragment, loadingReport)
     }
-    return when(val baseSchema = baseSchema) {
-      null-> built
-      else->JsonSchemas.schemaMerger.merge(JsonPath.rootPath, baseSchema, built, MergeReport(), mergedId = built.id)
+    return when (val baseSchema = baseSchema) {
+      null -> built
+      else -> JsonSchemas.schemaMerger.merge(JsonPath.rootPath, baseSchema, built, MergeReport(), mergedId = built.id)
     }
   }
 
   override fun merge(path: JsonPath, other: Schema, report: MergeReport) {
-
   }
 
   override fun withLocation(location: SchemaLocation): MutableSchema {

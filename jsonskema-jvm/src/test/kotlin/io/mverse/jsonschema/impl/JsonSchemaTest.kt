@@ -384,6 +384,12 @@ class JsonSchemaTest {
 
     val schemaB = JsonSchemas.schema(id = "http://schemas/schemaB") {
       baseSchema = schemaA
+      definitions["copyOfA"] = {
+        baseSchema = schemaA
+        properties {
+          "defined" required boolean
+        }
+      }
       properties {
         "name" optional string {
           minLength = 3
@@ -411,7 +417,6 @@ class JsonSchemaTest {
         }
       }
     }
-
 
     val mergedSchema = schemaB
 
