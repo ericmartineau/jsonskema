@@ -16,6 +16,8 @@ import io.mverse.jsonschema.keyword.Keyword
 import io.mverse.jsonschema.keyword.KeywordInfo
 import io.mverse.jsonschema.keyword.Keywords
 import io.mverse.jsonschema.resourceLoader
+import io.mverse.jsonschema.validation.SchemaValidator
+import io.mverse.jsonschema.validation.SchemaValidatorFactory
 import io.mverse.jsonschema.validation.ValidationMocks
 import lang.json.JsrValue
 
@@ -78,9 +80,9 @@ fun SchemaAssert.hasProperty(property: String): SchemaAssert {
       .isNotNull()
 }
 
-fun SchemaAssert.validating(toValidate: JsrValue?): SchemaValidationAssert {
+fun SchemaAssert.validating(toValidate: JsrValue?, validatorFactory: SchemaValidatorFactory? = null): SchemaValidationAssert {
   return transform { actual ->
-    val validator = ValidationMocks.createTestValidator(actual)
+    val validator = validatorFactory?.createValidator(actual) ?: ValidationMocks.createTestValidator(actual)
     validator.validate(toValidate!!)
   }
 }

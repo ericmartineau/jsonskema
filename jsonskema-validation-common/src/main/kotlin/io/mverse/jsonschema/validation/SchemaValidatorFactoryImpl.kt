@@ -176,6 +176,12 @@ class SchemaValidatorFactoryBuilder {
     return this
   }
 
+  inline fun <reified K : Keyword<*>, reified V : KeywordValidator<K>> replaceValidator(keyword: KeywordInfo<K>, noinline creator: (K, Schema, SchemaValidatorFactory) -> V?): SchemaValidatorFactoryBuilder {
+    factories -= keyword
+    factories.add(keyword, KeywordValidatorCreator(creator))
+    return this
+  }
+
   fun build(): SchemaValidatorFactoryImpl {
     return SchemaValidatorFactoryImpl(customFormatValidators = this.customFormatValidators,
         validators = KeywordValidatorCreators(this.factories))

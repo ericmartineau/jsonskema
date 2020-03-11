@@ -31,4 +31,6 @@ interface SchemaValidator {
     validate(subject, report)
     return report
   }
+
+  companion object
 }
