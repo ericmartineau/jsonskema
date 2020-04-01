@@ -4,19 +4,19 @@ plugins {
 mverse  {
   isDefaultDependencies = false
   dependencies {
-    compile(kotlinStdlib())
-    compile("kotlin-reflect")
-    compile(kotlinTest())
-    compile(kotlinImmutable())
-    compile("mverse-lang-common")
-    compile("kotlin-logging")
-    compile("ktor-client-core")
-    compile("ktor-client-cio")
-    compile("mverse-log-common")
-    compile(kotlinSerialization())
-    compile("kotlinx-io")
-    compile("kotlinx-coroutines-io")
-    compile("kotlinx-collections-immutable")
+    implementation(kotlinStdlib())
+    implementation("kotlin-reflect")
+    implementation(kotlinTest())
+    implementation(kotlinImmutable())
+    implementation("mverse-lang-common")
+    implementation("kotlin-logging")
+    implementation("ktor-client-core")
+    implementation("ktor-client-cio")
+    implementation("mverse-log-common")
+    implementation("kotlinx-io")
+    implementation("kotlinx-coroutines-io")
+    implementation("kotlinx-collections-immutable")
+    implementation("kotlinx-serialization-runtime-common")
   }
 }
 

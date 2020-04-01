@@ -6,7 +6,6 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
-import kotlinx.serialization.internal.SerialClassDescImpl
 
 /**
  * Represents the valid json-schema types.
@@ -23,7 +22,7 @@ enum class JsonSchemaType {
 
   @Serializer(forClass = JsonSchemaType::class)
   companion object : KSerializer<JsonSchemaType> {
-    override val descriptor: SerialDescriptor = SerialClassDescImpl("JsonSchemaType")
+    override val descriptor: SerialDescriptor = SerialDescriptor("JsonSchemaType")
 
     override fun deserialize(decoder: Decoder): JsonSchemaType {
       return JsonSchemaTypes.fromString(decoder.decodeString())

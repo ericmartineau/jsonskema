@@ -10,6 +10,7 @@ import io.mverse.jsonschema.utils.asInput
 import kotlinx.io.InputStream
 import kotlinx.io.core.Input
 import kotlinx.io.core.readText
+import kotlinx.serialization.InternalSerializationApi
 import lang.Name
 import lang.json.JsrObject
 import lang.json.JsrValue
@@ -36,6 +37,7 @@ interface SchemaReader {
 
   operator fun <K : Keyword<*>> plus(pair: Pair<KeywordInfo<K>, KeywordLoader<K>>): SchemaReader
 
+  @OptIn(InternalSerializationApi::class)
   @Name("readSchemaFromStream")
   fun readSchema(inputStream: InputStream): Schema = readSchema(inputStream.asInput())
 
@@ -83,6 +85,6 @@ fun String.parseJsrJson(): JsrValue = parseJsrValue(this)
 fun Input.parseJsrObject(): JsrObject = readText().parseJsrObject()
 fun Input.parseJsrJson(): JsrValue = readText().parseJsrJson()
 
-fun InputStream.parseJsrObject(): JsrObject = asInput().readText().parseJsrObject()
-fun InputStream.parseJsrJson(): JsrValue = asInput().readText().parseJsrJson()
+@OptIn(InternalSerializationApi::class) fun InputStream.parseJsrObject(): JsrObject = asInput().readText().parseJsrObject()
+@OptIn(InternalSerializationApi::class) fun InputStream.parseJsrJson(): JsrValue = asInput().readText().parseJsrJson()
 

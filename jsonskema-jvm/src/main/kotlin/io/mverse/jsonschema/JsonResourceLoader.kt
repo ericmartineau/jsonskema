@@ -3,6 +3,7 @@ package io.mverse.jsonschema
 import io.mverse.jsonschema.loading.parseJsrJson
 import io.mverse.jsonschema.loading.parseJsrObject
 import kotlinx.io.InputStream
+import kotlinx.serialization.InternalSerializationApi
 import lang.json.JsrValue
 import lang.json.JsrObject
 import kotlin.reflect.KClass
@@ -17,6 +18,7 @@ class JsonResourceLoader(private val loadFrom: KClass<*>) {
     val testPackage = loadFrom.java.`package`
     return testPackage.name.replace('.', '/') + "/$rel"
   }
+  @OptIn(InternalSerializationApi::class)
   fun getStream(relPath: String): InputStream {
     return loadFrom.java.getResourceAsStream(relPath)
   }

@@ -3,9 +3,6 @@ package io.mverse.jsonschema.validation
 import io.mverse.jsonschema.JsonValueWithPath
 import io.mverse.jsonschema.Schema
 import io.mverse.jsonschema.validation.ValidationError.Companion.collectErrors
-import kotlinx.io.PrintWriter
-import kotlinx.io.StringWriter
-import kotlinx.io.Writer
 import kotlinx.serialization.Serializable
 import lang.Name
 
@@ -45,13 +42,13 @@ class ValidationReport {
   }
 
   override fun toString(): String {
-    val string = StringWriter()
+    val string = StringBuilder()
     writeTo(string)
     return string.toString()
   }
 
-  fun writeTo(writer: Writer) {
-    val printer = PrintWriter(writer)
+  fun writeTo(printer: StringBuilder) {
+
     if (errors.isNotEmpty()) {
       printer.println("###############################################")
       printer.println("####              ERRORS                   ####")
@@ -60,7 +57,7 @@ class ValidationReport {
     errors.forEach { e -> this.toStringErrors(e, printer) }
   }
 
-  private fun toStringErrors(error: ValidationError, printer: PrintWriter) {
+  private fun toStringErrors(error: ValidationError, printer: StringBuilder) {
     if (error.causes.isNotEmpty()) {
       error.causes.forEach { e -> toStringErrors(e, printer) }
     }
@@ -72,3 +69,5 @@ class ValidationReport {
     printer.println("")
   }
 }
+
+fun StringBuilder.println(any: Any?) = append(any)

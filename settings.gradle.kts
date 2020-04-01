@@ -13,6 +13,7 @@ pluginManagement {
     google()
     maven("https://dl.bintray.com/mverse-io/mverse-public")
     maven("https://kotlin.bintray.com/kotlinx")
+    mavenLocal()
   }
 
   val kotlin:String by settings

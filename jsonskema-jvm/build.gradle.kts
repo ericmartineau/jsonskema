@@ -5,22 +5,24 @@ plugins {
 
 mverse  {
   dependencies {
-    compile("kotlin-reflect")
+    implementation("kotlin-reflect")
     compile(kotlinIO())
-    compile("mverse-json")
-    compile("mverse-lang-jvm")
-    compile("mverse-log-jvm")
-    compile("mverse-coroutines-jvm")
-    testCompile("kotlin-test")
+    implementation("mverse-json")
+    implementation("mverse-lang-jvm")
+    implementation("mverse-log-jvm")
+    testImplementation("mverse-test-jvm")
+    implementation("mverse-coroutines-jvm")
+    testImplementation("kotlin-test")
 //    compile("kotlinx-io-jvm")
-    compile("kotlinx-coroutines-io-jvm")
+    implementation("kotlinx-coroutines-io-jvm")
 
-    testCompile("mverse-test-jvm")
+    testImplementation("mverse-test-jvm")
     // Default provider for JSR 353:Java API for Processing JSON
-    testCompile("org.glassfish:javax.json:1.1.4")
-    testCompile("logback-classic")
-    testCompile("logback-core")
-    compile("io.mverse:hashkode")
+    testImplementation("org.glassfish:javax.json:1.1.4")
+    testImplementation("logback-classic")
+    testImplementation("logback-core")
+    implementation("io.mverse:hashkode")
+    implementation("ktor-client-cio")
   }
 }
 

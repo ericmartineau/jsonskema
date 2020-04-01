@@ -7,10 +7,12 @@ import kotlinx.io.InputStream
 import kotlinx.io.core.Input
 import kotlinx.io.core.IoBuffer
 import kotlinx.io.streams.asInput
+import kotlinx.serialization.InternalSerializationApi
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 
+@OptIn(InternalSerializationApi::class)
 actual fun InputStream.asInput(): Input = this.asInput(IoBuffer.Pool)
 actual fun interrupt() = Thread.currentThread().interrupt()
 

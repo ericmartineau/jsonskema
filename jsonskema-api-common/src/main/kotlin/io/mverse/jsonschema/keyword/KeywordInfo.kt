@@ -282,13 +282,13 @@ class KeywordInfoSerializer() : KSerializer<KeywordInfo<out Keyword<*>>> {
   @Suppress(UNUSED_PARAMETER)
   constructor(ser: KSerializer<Any>) : this()
 
-  override val descriptor: SerialDescriptor = StringDescriptor.withName("KeywordInfo")
+  override val descriptor: SerialDescriptor = SerialDescriptor("KeywordInfo")
 
   override fun deserialize(decoder: Decoder): KeywordInfo<Keyword<*>> {
     illegalState("Unable to deserialize keyword info")
   }
 
-  override fun serialize(encoder: Encoder, obj: KeywordInfo<out Keyword<*>>) {
-    encoder.encodeString(obj.key)
+  override fun serialize(encoder: Encoder, value: KeywordInfo<out Keyword<*>>) {
+    encoder.encodeString(value.key)
   }
 }

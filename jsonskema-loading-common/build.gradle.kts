@@ -2,13 +2,14 @@ mverse  {
   isDefaultDependencies = false
 
   dependencies {
-    compile("kotlin-reflect")
-    compile(kotlinIO())
-    compile(kotlinStdlib())
-    compile("kotlinx-serialization-runtime-common")
-    compile("mverse-lang-common")
-    compile("mverse-coroutines-common")
-    compile("kotlinx-coroutines-core-common")
+    implementation("kotlin-reflect")
+    implementation(kotlinIO())
+    implementation(kotlinStdlib())
+    implementation("kotlinx-serialization-runtime-common")
+    implementation("mverse-lang-common")
+    implementation("mverse-log-common")
+    implementation("mverse-coroutines-common")
+    implementation("kotlinx-coroutines-core-common")
   }
 }
 

@@ -2,9 +2,11 @@ mverse  {
   isDefaultDependencies = false
 
   dependencies {
-    compile("kotlin-reflect")
-    compile(kotlinImmutable())
-    compile("kotlinx-serialization-runtime-common")
+    implementation("kotlin-reflect")
+    implementation(kotlinImmutable())
+    implementation("mverse-lang-common")
+    implementation("mverse-log-common")
+    implementation("kotlinx-serialization-runtime-common")
   }
 }
 
